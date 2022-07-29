@@ -9,7 +9,7 @@
     path: /usr/local/bin/vault
   register: vaultInstalled
 
-- name: Vault setup
+- name: Vault install
   become: true
   when: not vaultInstalled.stat.exists
   block:
@@ -74,6 +74,41 @@
       name: vault
       state: started
       enabled: yes
+
+  tags:
+    - vault
+
+
+# Copy the templates again and restart vault service if config changed
+- name: Vault config
+  become: true
+  block:
+    - name: Copy systemd init file
+      template:
+        force: yes # replace the remote file when contents are different than the source.
+        src: init.service.j2
+        dest: /etc/systemd/system/vault.service
+        owner: root
+        group: root
+      notify: systemd_reload
+      register: service
+
+    - name: config file
+      template:
+        force: yes # replace the remote file when contents are different than the source.
+        src: vault.hcl.j2
+        dest: /etc/vault.hcl
+        owner: "{{ vault_user }}"
+        group: "{{ vault_group }}"
+      notify: systemd_reload
+      register: conf
+
+
+    - name: restart vault service
+      service:
+        name: vault
+        state: restarted
+      when: service.changed or conf.changed
 
   tags:
     - vault
