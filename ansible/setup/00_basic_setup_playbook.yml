@@ -1,23 +1,18 @@
 ---
-# At first generate certificates on localhost
+# At first install additional stuff that needed for localhost
 - hosts: localhost
   name: "Setup local environment"
-  vars_files:
-    - vars/versions.yml
-    - vars/common_vars.yml
-    - vars/vault.yml
   gather_facts: no
   roles:
     - role: localhost
   tags:
     - localhost
 
+# Install tools and update the nodes ( not related to nomad hashi stack )
 - hosts: all, !localhost
   name: "Nodes base installations"
   vars_files:
-    - vars/versions.yml
     - vars/common_vars.yml
-    - vars/vault.yml
   gather_facts: yes
   roles:
     - role: common

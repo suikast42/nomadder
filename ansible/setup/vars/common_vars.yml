@@ -11,3 +11,7 @@ is_local_host: "{{ inventory_hostname in groups['localhost'] }}"
 is_build_host: "{{ inventory_hostname in groups['build'] }}"
 is_master_host: "{{ inventory_hostname in groups['masters'] }}"
 is_worker_host: "{{ inventory_hostname in groups['workers'] }}"
+
+
+vault_group: vault
+vault_user: vault
