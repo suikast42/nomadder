@@ -1,4 +1,16 @@
 ---
+- hosts: localhost
+  name: "Generate certificates for tls"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+  gather_facts: no
+  roles:
+    - role: certificates
+  tags:
+    - cert
+
 # install vault only on first master
 - hosts: masters[0]
   name: "Nodes base installations"

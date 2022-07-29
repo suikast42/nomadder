@@ -1,0 +1,48 @@
+---
+- name: "Create cert local cert dirs"
+  delegate_to: localhost
+  shell: |
+    mkdir -p {{role_path}}/files/certs/ca && \
+    mkdir -p {{role_path}}/files/certs/vault
+
+
+- name: Template ca.json
+  template:
+    force: yes
+    src: ca.j2
+    dest: "{{role_path}}/files/config/ca.json"
+
+- name: Template vault.json
+  template:
+    force: yes
+    src: vault.j2
+    dest: "{{role_path}}/files/config/vault.json"
+
+# in case of multiple CA
+#- name: "Generate K8s CA certificates"
+#  delegate_to: localhost
+#  shell: |
+#    cfssl gencert -initca ../cfssl/k8s-ca.json | cfssljson -bare k8s-ca
+#    cfssl sign -ca ca.pem \
+#      -ca-key ca-key.pem \
+#      -config ../cfssl/config.json \
+#      -profile k8s-ca k8s-ca.csr | cfssljson -bare k8s-ca
+#  args:
+#    chdir: "{{role_path}}/files/certs"
+
+- name: "Generate ca certificates"
+  shell: |
+    cfssl gencert -initca ../../config/ca.json | cfssljson -bare ca
+  args:
+    chdir: "{{role_path}}/files/certs/ca"
+
+- name: "Generate ca certificates"
+  shell: |
+    cfssl gencert \
+      -ca ../ca/ca.pem \
+      -ca-key ../ca/ca-key.pem \
+      -config ../../config/config.json \
+      -profile=client  ../../config/vault.json | cfssljson -bare vault
+
+  args:
+    chdir: "{{role_path}}/files/certs/vault"

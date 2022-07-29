@@ -1,0 +1,19 @@
+---
+
+- name: Certificates
+  block:
+
+  - name : "Check if certificates are generated"
+    stat:
+      path: "{{role_path}}/files/certs/ca/ca.pem"
+    register: caCert
+
+  - debug:
+      msg: "Certificates already generated {{ caCert.stat.exists }}"
+
+  - name: "Generate certificates"
+    import_tasks: certificates.yml
+    when:  not caCert.stat.exists
+
+  tags:
+    - cert
