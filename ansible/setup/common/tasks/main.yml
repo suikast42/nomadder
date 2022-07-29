@@ -1,0 +1,34 @@
+---
+#- name: get service facts
+#  service_facts:
+#- debug:
+#    var: ansible_facts.services['ufw.service']
+
+- name: Nodes setup
+  block:
+
+  - name: "Disable firewalld {{host_name}}"
+    import_tasks: disable_firewall.yml
+  #  when: ansible_facts.services['ufw.service'] is defined and ansible_facts.services['ufw.service']['status'] == 'enabled'
+
+  - name: "Delete users {{host_name}}"
+    import_tasks: delete_users.yml
+
+  - name: "Install base packages {{host_name}}"
+    import_tasks: install_base_packages.yml
+
+
+  - name: "Set Timezone {{host_name}}"
+    import_tasks: set_timezone_utc.yml
+
+  - name : "Check if oh my zsh is installed {{host_name}}"
+    stat:
+      path: "/home/{{ansible_ssh_user}}/.zshrc"
+    register: zshinstalled
+
+  - name: "Install oh my zsh {{host_name}}"
+    import_tasks: install_ohmy_zsh.yml
+    when: not zshinstalled.stat.exists
+
+  tags:
+    - nodes

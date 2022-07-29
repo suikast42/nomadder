@@ -1,0 +1,25 @@
+---
+# At first generate certificates on localhost
+- hosts: localhost
+  name: "Setup local environment"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+  gather_facts: no
+  roles:
+    - role: localhost
+  tags:
+    - localhost
+
+- hosts: all, !localhost
+  name: "Nodes base installations"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+  gather_facts: yes
+  roles:
+    - role: common
+  tags:
+    - nodes

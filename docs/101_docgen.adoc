@@ -1,0 +1,31 @@
+ifndef::imagesdir[]
+:imagesdir: ./images
+endif::imagesdir[]
+
+=== Generate documentation
+The documentation is written in asciidoc and processed by asciidoctor. You have to install asciidoc with the plugins listed below at first. For further readings see <<_900_link_asciidoc>>
+
+.AsciiDoc installations
+. graphviz
+. JRE
+
+.AsciiDoc plugins
+. asciidoctor-diagram
+. asciidoctor-pdf
+. text-hyphen
+
+After these installations are done you can generate documentation with the commands below
+
+.Generate html documentation
+[source,shell]
+----
+asciidoctor   -r asciidoctor-diagram   index.adoc
+----
+
+.Generate pdf documentation
+[source,shell]
+----
+asciidoctor  -b pdf  -r asciidoctor-diagram -r asciidoctor-pdf   index.adoc
+----
+
+* [[_101_link_asciidoc,documentation asciidoc]]https://docs.asciidoctor.org/[Asciidoc]

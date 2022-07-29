@@ -1,0 +1,10 @@
+ifndef::imagesdir[]
+:imagesdir: ./images
+endif::imagesdir[]
+
+== Motivation
+TODO
+
+== Architecture
+
+TODO

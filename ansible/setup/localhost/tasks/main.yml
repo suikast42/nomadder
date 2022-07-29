@@ -1,0 +1,12 @@
+- name: Localhost setup
+  block:
+
+  - name: Install pip modules
+    pip:
+      name:
+        - pexpect
+        - docker
+      extra_args: --user
+
+  tags:
+    - localhost

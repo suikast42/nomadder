@@ -1,0 +1,61 @@
+---
+- name: "Install oh-my-zsh"
+  become: false
+  delay: 0
+  async: 60
+  poll: 1
+  shell: |
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+  args:
+    creates: ~/.oh-my-zsh # oh-my-zs is already installed
+
+- name: "Install oh-my-posh"
+  become: true
+  delay: 0
+  async: 60
+  poll: 1
+  shell: |
+    wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-linux-amd64 -O /usr/local/bin/oh-my-posh
+    chmod +x /usr/local/bin/oh-my-posh
+  args:
+    creates: /usr/local/bin/oh-my-posh # oh-my-posh is already installed
+
+- name: Gem install colorls
+  become: true
+  community.general.gem:
+    name: colorls
+    user_install: false
+    state: present
+
+
+- name: Override zshrc
+  ansible.builtin.copy:
+    src: .zshrc
+    dest: "/home/{{ansible_ssh_user}}/.zshrc"
+    force: yes
+    group: "{{ansible_ssh_user}}"
+    owner: "{{ansible_ssh_user}}"
+    mode: 0644
+
+- name: Override theme
+  ansible.builtin.copy:
+    src: blueishv2.omp.json
+    dest: "/home/{{ansible_ssh_user}}/.oh-my-zsh/custom/themes/blueishv2.omp.json"
+    force: yes
+    group: "{{ansible_ssh_user}}"
+    owner: "{{ansible_ssh_user}}"
+    mode: 0644
+
+- name: "Dos2unix"
+  delay: 0
+  async: 60
+  poll: 1
+  shell: |
+    dos2unix /home/{{ansible_ssh_user}}/.zsh*
+
+- name: "Set login shell of user {{ ansible_ssh_user }} to `zsh` with `usermod`"
+  shell: "usermod --shell $(which zsh) {{ ansible_ssh_user }}"
+  become: true
+  changed_when: false

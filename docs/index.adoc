@@ -1,0 +1,52 @@
+:doctype: book
+:icons: font
+:docname: Nomad cluster setup
+
+ifndef::imagesdir[]
+:imagesdir: ./images
+endif::imagesdir[]
+
+
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+
+:author: Süleyman Vurucu
+:email: <S_Vurucu@hotmail.com>
+:authorinitials: vuru
+:revdate: {project-date}
+:homepage: https://github.com/suikast42/nomadder
+:copyright: 2022 Süleyman Vurucu. All Rights reserved. Version {project-version}
+:toc: left
+:toclevels: 4
+//:toc: preamble
+:toc-title: Table of Contents
+
+
+:experimental:
+
+:version-cloud-platform: 0.0.1.M1
+:folder-basic-setup: <project root>/setup
+:folder-ansible-pofile: <project root>/local
+
+Nomad Cloud Platform V {version-cloud-platform} Documentation
+
+:numbered:
+
+
+<<<
+include::000_introduction.adoc[]
+
+<<<
+include::100_setup.adoc[]
+
+<<<
+include::900_links.adoc[]
+
+<<<
+include::901_cheat_sheets.adoc[]

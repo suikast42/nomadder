@@ -1,0 +1,105 @@
+ifndef::imagesdir[]
+:imagesdir: ./images
+endif::imagesdir[]
+
+=== Vagrant setup
+For local development you have to set up vagrant with vmware tools at first. See <<_900_link_vagrant_vmware>>. +
+
+[NOTE]
+====
+If you want to change the ssh keys you must generate new ssh key before running vagrant up
+
+[source,shell]
+----
+ssh-keygen -t <project_root>/vagrant/ssh/id_rsa
+----
+====
+
+Change in into the directory `<project dir>/vagrant/ubuntu/<version>`
+
+
+[source,shell]
+----
+vagrant up
+----
+
+This will set up two VMS. Both VMs have default 64GB disk space.
+
+* master-01 -> 10.21.21.41
+* agent-01 -> 10.21.21.42
+
+User: cloudmaster
+Password: cloudmaster
+
+Optionally you can use `<project main dir>/vagrant/ssh/id_rsa` to login with ssh key
+
+[source,shell]
+----
+ssh -i <project main dir>/vagrant/ssh/id_rsa cloudmaster@10.21.21.41|42
+----
+
+[NOTE]
+====
+To minimize the attack vector to the VM disable the password ssh authentication in production environment.
+Furthermore, every physical machine or VM should have its' own ssh key in production.
+====
+
+=== Extend disk size
+
+If you want to extend the disk size then power-off the VM at first and expand disk over VMWare and power it on again.
+Login to the vm over ssh.
+
+[source,shell]
+----
+sudo fdisk /dev/sda
+----
+
+Press `d` and  then `3`
+[source,shell]
+----
+Command (m for help): d
+Partition number (1-3, default 3): 3
+
+Partition 3 has been deleted.
+----
+
+Press `n` and  then `3`
+
+[source,shell]
+----
+Partition number (3-128, default 3):3
+----
+
+Press two times kbd:[Enter]. This will allocate all free space to the new partition. +
+
+Choose `N` for the next action
+[source,shell]
+----
+Partition #3 contains a ext4 signature.
+
+Do you want to remove the signature? [Y]es/[N]o: N
+----
+
+
+It remains only to save the partition table:
+
+[source,shell]
+----
+Command (m for help): w
+----
+
+Reboot the VM
+
+[source,shell]
+----
+sudo reboot
+----
+
+Login over ssh again
+
+[source,shell]
+----
+sudo pvresize /dev/sda3
+sudo lvresize -l +100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv
+sudo resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
+----
