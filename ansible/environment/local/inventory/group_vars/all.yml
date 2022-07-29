@@ -1,0 +1,9 @@
+---
+#ansible_ssh_port: 22
+# This fixes the warning Distribution centos  on host  should use /usr/libexec/platform-python, but is using /usr/bin/python
+# But makes the assumption that all hosts have python 3 installed.
+ansible_python_interpreter: /usr/bin/python3
+ansible_ssh_user: cloudmaster
+ansible_ssh_timeout: 360
+# https://mschuette.name/wp/2019/01/ansible-and-vagrant-ssh-keys/
+ansible_ssh_private_key_file: "{{ inventory_dir }}/../../../../vagrant/ssh/id_rsa"

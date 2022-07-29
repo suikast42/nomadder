@@ -1,0 +1,19 @@
+- name: tmux conf file copy
+  ansible.builtin.copy:
+    src: tmux.conf
+    dest: "/home/{{ansible_user}}/.tmux.conf"
+    force: yes
+    group: "{{ansible_user}}"
+    owner: "{{ansible_user}}"
+    mode: 0644
+  tags:
+    - tmux
+
+- name: "tmux conf"
+  become: false
+  shell: |
+    rm -fR ~/.tmux
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+    ~/.tmux/plugins/tpm/bin/install_plugins
+  tags:
+    - tmux

@@ -1,0 +1,22 @@
+- name: Get the PID of running process of vagrant
+  ignore_errors: yes
+  become: true
+  # do not trigger a change
+  changed_when: false
+  shell: "ps -u vagrant | awk '{print $1}'"
+  register: running_processes
+
+- name: Kill running processes  of vagrant
+  ignore_errors: yes
+  become: true
+  shell: "kill {{ item }}"
+  with_items: "{{ running_processes.stdout_lines }}"
+
+- name: Delete vagrant user
+  become: true
+  ansible.builtin.user:
+    name: vagrant
+    group: vagrant
+    state: absent
+    home: /home/vagrant
+    remove: yes

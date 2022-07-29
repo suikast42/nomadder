@@ -1,0 +1,6 @@
+- name: Disable firewall
+  become: true
+  service:
+    name: ufw
+    enabled: false
+    state: stopped

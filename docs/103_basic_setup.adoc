@@ -1,0 +1,70 @@
+ifndef::imagesdir[]
+:imagesdir: ./images
+endif::imagesdir[]
+
+=== Setup
+Change to <project_root>/ansible/setup +
+
+
+[NOTE]
+====
+If you don't have installed either zsh or the zsh direnv pliugin then you must export the environment variables yourself. See
+====
+
+Ansible setup needs some collections on the host machine. This step is only required for the first run
+
+[source,shell]
+----
+ansible-galaxy collection install -r requirements.yml
+----
+
+If it is not already done then create a vault file with the content shown below
+
+[source,shell]
+----
+ansible-vault create vars/vault.yml
+----
+
+[source,yaml]
+----
+dockerhub_user: <1>
+dockerhub_password: <2>
+nexus_username: <3>
+nexus_password: <4>
+----
+
+<1>  username of https://hub.docker.com/[dockerhub] account
+<2>  password of https://hub.docker.com/[dockerhub] account
+<3> Optional nexus username from backup file. Default is admin
+<4> Optional nexus password from backup file. Default is admin
+
+
+.Example vault.yml file
+[source,yaml]
+----
+dockerhub_user: myuser
+dockerhub_password: mypasswd
+nexus_username: admin
+nexus_password: admin
+----
+
+
+==== Basic installation
+Ensure that all configured vms in ansible hosts are up and running.
+
+.Os Basic installations
+[source,shell]
+----
+ansible-playbook 01_basic_setup_playbook.yml --ask-vault-pass
+----
+
+=== Ansible Links
+* https://docs.ansible.com/ansible/2.4/playbooks_vault.html[Ansible Vault]
+* https://docs.ansible.com/ansible-core[Ansible documentation]
+* https://docs.ansible.com/ansible/devel/installation_guide/intro_installation.html#selecting-an-ansible-artifact-and-version-to-install[Installation Guide]
+* https://linuxhint.com/shell-vs-command-modules-ansible[Difference between tasks shell and command]
+* https://www.middlewareinventory.com/blog/ansible-shell-examples/[Shell module]
+* https://docs.ansible.com/ansible/latest/user_guide/playbooks_vars_facts.html[Discovering variables: facts and magic variables]
+* https://github.com/ansible/ansible/tree/devel[GitHub]
+* https://github.com/ansible/ansible/blob/v2.11.6/examples[Examples]
+

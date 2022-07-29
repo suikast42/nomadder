@@ -1,0 +1,94 @@
+required_plugins = %w(vagrant-vmware-desktop vagrant-timezone)
+
+plugins_to_install = required_plugins.select { |plugin| not Vagrant.has_plugin? plugin }
+if not plugins_to_install.empty?
+  puts "Installing plugins: #{plugins_to_install.join(' ')}"
+  if system "vagrant plugin install #{plugins_to_install.join(' ')}"
+    exec "vagrant #{ARGV.join(' ')}"
+  else
+    abort "Installation of one or more plugins has failed. Aborting."
+  end
+end
+
+$vm_base_box="suikast42/ubuntu-22.04_64"
+$vm_base_box_version="1.0.0"
+
+$vm_mem_master_01 = 8096 # 8 GB RAM for docker builds and k3s master
+$vm_cpus_master_01 = 4
+$vm_hostname_master_01 = "master-01"
+$vm_master_01_ip = "10.21.21.41"
+
+
+$vm_mem_worker_01 = 43008  # 42 GB RAM for the workloads
+$vm_cpus_worker_01 = 12
+$vm_hostname_worker_01 = "worker-01"
+$vm_worker_01_ip = "10.21.21.42"
+
+
+
+Vagrant.configure("2") do |config|
+    # common settings for server and agent
+    config.vm.box = $vm_base_box
+    config.vm.synced_folder '.', '/vagrant', disabled: true
+    config.ssh.forward_agent = true
+    config.ssh.insert_key = false
+    vagrant_home_path = ENV["VAGRANT_HOME"] ||= "~/.vagrant.d"
+    config.ssh.private_key_path = ["#{vagrant_home_path}/insecure_private_key", "../../ssh/id_rsa"]
+
+    # create new user, add it to sudoers and allow ssh login over key
+    config.vm.provision :shell, privileged: true do |s|
+      vm_user = "cloudmaster"
+      ssh_pub_key = File.readlines("../../ssh/id_rsa.pub").first.strip
+      s.inline = <<-SHELL
+          rm  /home/$USER/.ssh/authorized_keys
+          useradd -m -s /bin/bash -U #{vm_user} -p #{vm_user}
+          mkdir /home/#{vm_user}/.ssh
+          echo #{ssh_pub_key} >> /home/#{vm_user}/.ssh/authorized_keys
+          chown -R #{vm_user}:#{vm_user} /home/#{vm_user}
+          echo "%#{vm_user} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/#{vm_user}
+      SHELL
+    end
+
+    config.timezone.value = :host
+    #master
+    config.vm.define "master" do |mastercfg|
+      mastercfg.vm.provider :vmware_desktop do |master|
+        mastercfg.vm.hostname = $vm_hostname_master_01
+        mastercfg.vm.network :private_network, ip: $vm_master_01_ip, :netmask => "255.255.0.0"
+        mastercfg.vm.box_version = $vm_base_box_version
+        master.gui=true
+        master.linked_clone = false
+        master.vmx["memsize"] = $vm_mem_master_01
+        master.vmx["numvcpus"] = $vm_cpus_master_01
+        master.vmx['displayname'] =$vm_hostname_master_01
+      end
+    end
+
+    #worker
+    config.vm.define "worker" do |workercfg|
+      workercfg.vm.provider :vmware_desktop do |worker|
+        workercfg.vm.hostname = $vm_hostname_worker_01
+        workercfg.vm.network :private_network, ip: $vm_worker_01_ip, :netmask => "255.255.0.0"
+        workercfg.vm.box_version = $vm_base_box_version
+        worker.gui=true
+        worker.linked_clone = false
+        worker.vmx["memsize"] = $vm_mem_worker_01
+        worker.vmx["numvcpus"] = $vm_cpus_worker_01
+        worker.vmx['displayname'] =$vm_hostname_worker_01
+      end
+    end
+
+  # Somehow this part is not working with bento image provisioning
+  # Let's do it self
+  $disk_resize = <<-SHELL
+        echo "Full disk capacity for /dev/sda3"
+        # Increase the Physical Volume (pv) to max size
+        pvresize /dev/sda3
+        # Expand the Logical Volume (LV) to max size to match
+        lvresize -l +100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv
+        # Expand the filesystem itself
+        resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
+  SHELL
+  config.vm.provision "shell", inline: $disk_resize, privileged: true
+
+end

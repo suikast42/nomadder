@@ -1,0 +1,15 @@
+ifndef::imagesdir[]
+:imagesdir: ./images
+endif::imagesdir[]
+
+== Basic setup
+This section describes the environment setup from scratch.
+
+<<<
+include::101_docgen.adoc[]
+
+<<<
+include::102_vagrant.adoc[]
+
+<<<
+include::103_basic_setup.adoc[]

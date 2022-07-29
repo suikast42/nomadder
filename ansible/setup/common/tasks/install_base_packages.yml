@@ -1,0 +1,98 @@
+---
+- name: "Update installed packages"
+  become: true
+  apt:
+    only_upgrade: true
+    update_cache: true
+    force_apt_get: true
+    state: latest
+  register: update
+
+
+- debug:
+    msg: "{{ update }}"
+
+
+- name: "Install base packages"
+  become: true
+  apt:
+    name:
+      - snapd
+      - thin-provisioning-tools
+      - lvm2
+      - tree
+      - htop
+      - zsh
+      - jq
+      - zip
+      - unzip
+      - tree
+      - dos2unix
+      - ruby-dev
+      - fortune-mod
+      - ctop
+      - python3-pip
+      - fzf
+      - net-tools
+      - ncdu
+      - open-iscsi
+      - nfs-common
+
+    state: present
+  register: install_apt
+
+- debug:
+    msg: "{{ install_apt }}"
+
+
+- name: Install snap packeges
+  become: true
+  community.general.snap:
+    name:
+      - direnv
+    state: present
+  register: install_snap
+
+- debug:
+    msg: "{{ install_snap }}"
+
+- name: Upgrade pip
+  pip:
+    name:
+      - pip
+    extra_args: --user --upgrade
+  register: install_pip1
+
+- debug:
+    msg: "{{ install_pip1 }}"
+
+
+- name: Install pip modules
+  pip:
+    name:
+      - pexpect
+      - kubernetes
+    extra_args: --user
+  register: install_pip2
+
+- debug:
+    msg: "{{ install_pip2 }}"
+
+#- name: "Update pip and install pip modules"
+#  delay: 0
+#  async: 120
+#  poll: 1
+#  shell: |
+#    pip3 install --upgrade pip --user
+#    pip3 install pexpect --user
+#    pip3 install kubernetes --user
+#  register: install
+#
+#- debug:
+#    msg: "{{ install.stdout_lines }}"
+
+- name: "Apt clean"
+  become: true
+  apt:
+    autoclean : true
+    autoremove: true
