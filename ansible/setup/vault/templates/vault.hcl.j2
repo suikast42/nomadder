@@ -7,9 +7,9 @@ storage "file" {
 
 listener "tcp" {
 	address     = "0.0.0.0:8200"
-	tls_cert_file = "/tmp/certs/vault/vault.pem"
-	tls_key_file = "/tmp/certs/vault/vault-key.pem"
-	tls_client_ca_file = "/tmp/certs/ca/ca.pem"
+	tls_cert_file = "{{vault_cert}}"
+	tls_key_file = "{{vault_cert_key}}"
+	tls_client_ca_file = "{{ca_cert}}"
 	tls_disable = 0
 }
 
