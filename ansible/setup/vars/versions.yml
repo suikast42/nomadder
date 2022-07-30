@@ -1,3 +1,4 @@
 vault_version: "1.11.1"
 vault_checksum: "sha256:aa2ed532d9a0ecc8635fed63cb3fb6de472b4c01ca622a9a199cd92a046bc73a"
 update_vault: false
+update_certificates: false

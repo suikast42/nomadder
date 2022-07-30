@@ -1,6 +1,5 @@
 ---
 - name: "Create cert local cert dirs"
-  delegate_to: localhost
   shell: |
     mkdir -p {{role_path}}/files/certs/ca && \
     mkdir -p {{role_path}}/files/certs/vault
