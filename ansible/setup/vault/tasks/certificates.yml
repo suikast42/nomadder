@@ -49,6 +49,7 @@
 
     - name: restart vault service
       ignore_errors: true
+      become: true
       service:
         name: vault
         state: restarted

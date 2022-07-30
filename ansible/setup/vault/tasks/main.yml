@@ -19,7 +19,7 @@
     set_fact:
 
       vault_cert: "{{vault_cert_path}}/vault.pem"
-      vault_cert_key: "{{vault_cert_path}}/vault/vault-key.pem"
+      vault_cert_key: "{{vault_cert_path}}/vault-key.pem"
       ca_cert: "{{ca_cert_path}}/ca/ca.pem"
       cacheable: true
 
