@@ -4,9 +4,8 @@
   delegate_to: localhost
   run_once: true
   block:
-
-
   - name: "Update certificates {{ update_certificates|bool == true }} "
+    when: update_certificates|bool == true
     file:
       state: absent
       path: "{{role_path}}/files/certs"

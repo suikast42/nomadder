@@ -22,7 +22,7 @@
 
 - name : "Check if ca certificate exist on node"
   stat:
-    path: "{{ca_cert_path}}/ca.crt"
+    path: "{{ca_cert_path}}/ca/ca.crt"
   register: ca
 
 
