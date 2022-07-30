@@ -30,5 +30,8 @@
     import_tasks: install_ohmy_zsh.yml
     when: not zshinstalled.stat.exists
 
+  - name: "Config tmux {{host_name}}"
+    import_tasks: config_tmux.yml
+
   tags:
     - nodes

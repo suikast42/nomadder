@@ -42,7 +42,7 @@
       -ca ../ca/ca.pem \
       -ca-key ../ca/ca-key.pem \
       -config ../../config/config.json \
-      -profile=client  ../../config/vault.json | cfssljson -bare vault
+      -profile=peer  ../../config/vault.json | cfssljson -bare vault
     cat  ../ca/ca.pem  vault.pem > vault_bundle.pem
   args:
     chdir: "{{role_path}}/files/certs/vault"

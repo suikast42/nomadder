@@ -1,4 +1,5 @@
 ui = true
+disable_mlock = true
 
 storage "file" {
   path = "/opt/deployments/core/vault/data"
@@ -6,7 +7,10 @@ storage "file" {
 
 listener "tcp" {
 	address     = "0.0.0.0:8200"
-	tls_disable = 1
+	tls_cert_file = "/tmp/certs/vault/vault.pem"
+	tls_key_file = "/tmp/certs/vault/vault-key.pem"
+	tls_client_ca_file = "/tmp/certs/ca/ca.pem"
+	tls_disable = 0
 }
 
 
