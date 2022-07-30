@@ -24,3 +24,10 @@ vault_hosts:
 
 vault_group: vault
 vault_user: vault
+
+# path settings
+
+#cert path on nodes
+ca_cert_path: /usr/local/share/ca-certificates/cloudlocal
+# cert path on local host
+local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"

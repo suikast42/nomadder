@@ -1,10 +1,10 @@
-- name: Set local cert path
-  set_fact:
-    #cert path on nodes
-    ca_cert_path: /usr/local/share/ca-certificates/cloudlocal
-    # cert path on local host
-    local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"
-
+#- name: Set local cert path
+#  set_fact:
+#    #cert path on nodes
+#    ca_cert_path: /usr/local/share/ca-certificates/cloudlocal
+#    # cert path on local host
+#    local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"
+#
 
 - name: "Update certificates {{ update_certificates|bool == true }} "
   become: true
@@ -17,6 +17,7 @@
   file:
     state: directory
     path: "{{ca_cert_path}}"
+
 
 - name : "Check if ca certificate exist on node"
   stat:

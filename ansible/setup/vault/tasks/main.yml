@@ -4,15 +4,6 @@
 #- debug:
 #    var: ansible_facts.services['ufw.service']
 
-- name: "Copy ca certs"
-  ansible.posix.synchronize:
-    src: "{{role_path}}/../certificates/files/certs"
-    dest: "/tmp"
-
-- name: "Generate vault certificates"
-  become: true
-  shell: "chown -R vault:vault /tmp/certs"
-
 - name : Check vault installation present
   stat:
     path: /usr/local/bin/vault
