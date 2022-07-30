@@ -24,6 +24,7 @@
   tags:
     - cert
     - cert_install
+
 # install vault only on first master
 - hosts: masters[0]
   name: "Nodes base installations"

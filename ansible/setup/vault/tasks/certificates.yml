@@ -1,0 +1,36 @@
+- name: Certificates
+  block:
+    - name: "Update certificates {{ update_certificates|bool == true }} "
+      become: true
+      file:
+        state: absent
+        path: "{{vault_cert_path}}"
+      when: update_certificates|bool == true
+
+    - name: "Create certificate folder if needed "
+      become: true
+      file:
+        state: directory
+        path: "{{vault_cert_path}}"
+
+    - name : "Check if vault certificate exist on node"
+      stat:
+        path: "{{vault_cert_path}}/vault.pem"
+      register: cert
+  tags:
+    - cert
+    - cert_install
+
+- name: Install certificates
+  when: not cert.stat.exists
+  block:
+
+    - name: "Copy vaults certs to {{ vault_cert_path }}"
+      become: true
+      ansible.posix.synchronize:
+        src: "{{local_ca_cert_path}}"
+        dest: "{{vault_cert_path}}"
+
+  tags:
+    - cert
+    - cert_install

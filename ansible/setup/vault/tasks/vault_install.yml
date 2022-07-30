@@ -1,0 +1,8 @@
+- name: Vault install
+  block:
+    - name: "Test"
+      shell: echo vault install
+      register: out
+
+    - debug:
+        msg: "{{out}}"

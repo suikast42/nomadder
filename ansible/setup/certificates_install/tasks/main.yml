@@ -11,6 +11,7 @@
   file:
     state: absent
     path: "{{ca_cert_path}}"
+  when: update_certificates|bool == true
 
 - name: "Create certificate folder if needed "
   become: true
