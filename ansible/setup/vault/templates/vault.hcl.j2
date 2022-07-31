@@ -2,7 +2,7 @@ ui = true
 disable_mlock = true
 
 storage "file" {
-  path = "/opt/deployments/core/vault/data"
+  path = "{{vault_data_dir}}"
 }
 
 listener "tcp" {

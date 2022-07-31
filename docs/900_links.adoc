@@ -11,4 +11,6 @@ endif::imagesdir[]
 * [[_900_link_ubuntu_cert,documentation vagrant]]https://ubuntu.com/server/docs/security-trust-store[Ubuntu install certificates]
 * [[_900_link_ansible_collection_docker,Ansible Collection Docker]]https://docs.ansible.com/ansible/latest/collections/community/docker/index.html[Ansible Collection Docker]
 * [[_900_link_ssh_keygen,Ansible ssh keygen]]https://linuxhint.com/control-systemd-ansible[Ansible ssh keygen]
+* [[_900_link_ansible_magic_vars,Ansible Magic variables]]https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html[Ansible Magic variables]
+
 

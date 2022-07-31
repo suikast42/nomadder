@@ -1,0 +1,48 @@
+- name: Set init vars
+  set_fact:
+    unseal_keys_dir_output: "{{vault_data_dir}}/unsealKey"
+    root_token_dir_output: "{{vault_data_dir}}/rootKey"
+    cacheable: true
+
+- name: Vault init
+  block:
+    - name: Create unseal directories
+      become: true
+      file:
+        path: "{{ unseal_keys_dir_output }}"
+        owner: vault
+        group: vault
+        state: directory
+        mode: '0755'
+
+    - name: Create root key directories
+      become: true
+      file:
+        path: "{{ root_token_dir_output }}"
+        owner: vault
+        group: vault
+        state: directory
+        mode: '0755'
+
+    - name: Initialise Vault operator
+      shell: vault operator init -key-shares=5 -key-threshold=3 -format json
+      environment:
+        VAULT_ADDR: "https://127.0.0.1:8200"
+      register: vault_init_results
+
+    - name: Parse output of vault init
+      set_fact:
+        vault_init_parsed: "{{ vault_init_results.stdout | from_json }}"
+
+    - name: Write unseal keys to files
+      become: true
+      copy:
+        dest: "{{ unseal_keys_dir_output }}/unseal_key_{{ item.0 }}"
+        content: "{{ item.1 }}"
+      with_indexed_items: "{{ vault_init_parsed.unseal_keys_hex }}"
+
+    - name: Write root token to file
+      become: true
+      copy:
+        content: "{{ vault_init_parsed.root_token }}"
+        dest: "{{root_token_dir_output}}/rootkey"

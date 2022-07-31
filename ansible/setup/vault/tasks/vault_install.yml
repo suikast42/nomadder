@@ -1,3 +1,27 @@
+- name: Vault uninstall
+  become: true
+  when: uninstall_vault|bool == true
+  block:
+    - name: stop vault service
+      service:
+        name: vault
+        state: stopped
+        enabled: false
+
+    - name: "Delete Vault dir if needed"
+      ansible.builtin.file:
+        path: "{{vault_data_dir}}"
+        owner: vault
+        state: absent
+        mode: '0755'
+
+    - name: "Delete Vault installation"
+      ansible.builtin.file:
+        path: /usr/local/bin/vault
+        owner: vault
+        state: absent
+        mode: '0755'
+
 - name : Check vault installation present
   stat:
     path: /usr/local/bin/vault
@@ -7,6 +31,15 @@
   become: true
   when: not vaultInstalled.stat.exists
   block:
+
+  - name: "Create Vault dir if needed"
+    become: true
+    ansible.builtin.file:
+      path: "{{vault_data_dir}}"
+      owner: vault
+      group: vault
+      state: directory
+      mode: '0755'
 
   - name: Download vault binary
     get_url:

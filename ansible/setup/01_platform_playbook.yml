@@ -36,3 +36,16 @@
     - role: vault
   tags:
     - vault
+
+#- hosts: all
+#  name: "Facts"
+#  vars_files:
+#    - vars/versions.yml
+#    - vars/common_vars.yml
+#    - vars/vault.yml
+#  gather_facts: yes
+#  tasks:
+#    - debug:
+#        var: ansible_facts
+#  tags:
+#    facts
