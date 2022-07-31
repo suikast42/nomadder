@@ -1,8 +1,4 @@
-- name: Set init vars
-  set_fact:
-    unseal_keys_dir_output: "{{vault_data_dir}}/unsealKey"
-    root_token_dir_output: "{{vault_data_dir}}/rootKey"
-    cacheable: true
+
 
 - name: Check vault status
   block:
