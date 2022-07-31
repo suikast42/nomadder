@@ -1,0 +1,17 @@
+.Vault cheatsheet
+|===
+|Description |Command
+
+|Vault Cli secure login
+a|[source,shell]
+----
+vault login \
+    -method=cert \
+    -ca-cert=/usr/local/share/ca-certificates/cloudlocal/ca/ca.pem \
+    -client-cert=/etc/opt/certs/vault/vault.pem \
+    -client-key=/etc/opt/certs/vault/vault-key.pem \
+    name=web
+----
+
+
+|===
