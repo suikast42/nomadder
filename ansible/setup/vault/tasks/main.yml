@@ -1,4 +1,7 @@
 ---
+# This setup is inspired by  https://github.com/suikast42/AnsibleVaultRole forked from  https://github.com/MiteshSharma/AnsibleVaultRole
+# The original setup copies the vault keys to the local machine. This changed setup leave the keys in master[0]
+
 #- name: get service facts
 #  service_facts:
 #- debug:

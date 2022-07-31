@@ -4,7 +4,13 @@
     root_token_dir_output: "{{vault_data_dir}}/rootKey"
     cacheable: true
 
+- name : Check vault initialized
+  stat:
+    path: "{{unseal_keys_dir_output}}"
+  register: vaultInitialized
+
 - name: Vault init
+  when: not vaultInitialized.stat.exists
   block:
     - name: Create unseal directories
       become: true
@@ -46,3 +52,24 @@
       copy:
         content: "{{ vault_init_parsed.root_token }}"
         dest: "{{root_token_dir_output}}/rootkey"
+
+- name: Vault Unseal
+  block:
+    - name: Reading unseal key contents
+      register: unseal_files
+      find:
+        paths: "{{unseal_keys_dir_output}}"
+
+    - name: Reading unseal key contents
+      changed_when: false
+      shell: "cat {{item.path}}"
+      register: unseal_keys
+      with_items: "{{ unseal_files.files }}"
+
+    - name: Unseal vault with unseal keys
+      changed_when: false
+      shell: |
+        vault operator unseal {{ item.stdout }}
+      environment:
+        VAULT_ADDR: "https://127.0.0.1:8200"
+      with_items: "{{unseal_keys.results}}"
