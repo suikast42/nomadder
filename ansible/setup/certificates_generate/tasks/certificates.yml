@@ -48,8 +48,8 @@
       cfssl sign \
         -ca ../ca/ca.pem \
         -ca-key ../ca/ca-key.pem \
-        -config ../../config/config.json \
-        -profile ca  ../ca/ca.csr | cfssljson -bare cluster-ca
+        -config ../../cfssl/config.json \
+        -profile ca  ../cluster-ca/cluster-ca.csr | cfssljson -bare cluster-ca
   args:
     chdir: "{{role_path}}/files/certs/cluster-ca"
 
@@ -59,8 +59,8 @@
     cfssl gencert \
       -ca ../cluster-ca/cluster-ca.pem \
       -ca-key ../cluster-ca/cluster-ca-key.pem \
-      -config ../../config/config.json \
-      -profile=peer  ../../config/vault.json | cfssljson -bare vault
+      -config ../../cfssl/config.json \
+      -profile=vault_cli  ../../config/vault.json | cfssljson -bare vault
     cat  ../ca/ca.pem ../cluster-ca/cluster-ca.pem   vault.pem > vault_bundle.pem
   args:
     chdir: "{{role_path}}/files/certs/vault"

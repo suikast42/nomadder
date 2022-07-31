@@ -1,4 +1,2 @@
 certs
-# exlude all in config but leave config.json in git
 config
-!config/config.json

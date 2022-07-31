@@ -22,17 +22,7 @@
           "max_path_len_zero": true
         }
       },
-      "daemon": {
-        "expiry": "367920h",
-        "usages": [
-          "non repudiation",
-          "digital signature",
-          "key encipherment",
-          "server auth",
-          "client auth"
-        ]
-      },
-      "peer": {
+      "vault_cli": {
         "usages": [
           "signing",
           "digital signature",
@@ -40,25 +30,7 @@
           "client auth",
           "server auth"
         ],
-        "expiry": "367920h"
-      },
-      "server": {
-        "usages": [
-          "signing",
-          "digital signing",
-          "key encipherment",
-          "server auth"
-        ],
-        "expiry": "367920h"
-      },
-      "client": {
-        "usages": [
-          "signing",
-          "digital signature",
-          "key encipherment",
-          "client auth"
-        ],
-        "expiry": "367920h"
+        "expiry": "350400h"
       }
     }
   }
