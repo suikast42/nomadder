@@ -4,13 +4,22 @@
     root_token_dir_output: "{{vault_data_dir}}/rootKey"
     cacheable: true
 
-- name : Check vault initialized
-  stat:
-    path: "{{unseal_keys_dir_output}}"
-  register: vaultInitialized
+- name: Check vault status
+  block:
+    - name: Vault query
+      changed_when: false
+      shell: vault status -format json
+      register: vault_status
+      failed_when: vault_status.rc > 2
+
+    - name: Set vault status facts
+      set_fact:
+        is_vault_initialized: "{{ vault_status.stdout | from_json | json_query('initialized')}}"
+        is_vault_sealed: "{{ vault_status.stdout | from_json | json_query('sealed')}}"
+        cacheable: true
 
 - name: Vault init
-  when: not vaultInitialized.stat.exists
+  when: is_vault_initialized |bool == false
   block:
     - name: Create unseal directories
       become: true
@@ -54,6 +63,7 @@
         dest: "{{root_token_dir_output}}/rootkey"
 
 - name: Vault Unseal
+  when: is_vault_sealed |bool == true
   block:
     - name: Reading unseal key contents
       register: unseal_files
