@@ -13,5 +13,13 @@ vault login \
     name=web
 ----
 
+|Vault CURL
+a|[source,shell]
+----
+curl \
+--header "X-Vault-Token: hvs.sQzN7sLfkSzWjsulbKUt4Drg" \
+--request GET \
+https://127.0.0.1:8200/v1/pki/crl
+----
 
 |===

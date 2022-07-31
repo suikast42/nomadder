@@ -36,16 +36,22 @@
         src: "{{local_ca_cert_path}}"
         dest: "{{ ca_cert_path }}"
 
+    - name: "Copy cluster-ca certs to {{ ca_cert_path }}"
+      become: true
+      ansible.posix.synchronize:
+        src: "{{local_cluster_ca_cert_path}}"
+        dest: "{{ ca_cert_path }}"
+
     - name: "Set permissions on {{ca_cert_path}}"
       become: true
       shell: |
         cp {{ca_cert_path}}/ca/ca.pem {{ca_cert_path}}/ca/ca.crt
-
+        cp {{ca_cert_path}}/cluster-ca/cluster-ca.pem {{ca_cert_path}}/cluster-ca/cluster-ca.crt
+        
         find  {{ca_cert_path}} -type d -exec chmod 755 {} +
         find {{ca_cert_path}} -type d -exec chown root:root {} +
         find {{ca_cert_path}} -type f -exec chmod 644 {} +
         find  {{ca_cert_path}} -type f -exec chown root:root {} +
-
       register: caimports
 
     - name: "Import PKI "

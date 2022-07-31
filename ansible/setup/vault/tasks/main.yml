@@ -24,7 +24,7 @@
       vault_data_dir: "/opt/deployments/core/vault/data"
       vault_cert: "{{vault_cert_path}}/vault.pem"
       vault_cert_key: "{{vault_cert_path}}/vault-key.pem"
-      ca_cert: "{{ca_cert_path}}/ca/ca.pem"
+      ca_cert: "{{ca_cert_path}}/cluster-ca/cluster-ca.pem"
       cacheable: true
 
   - name: "Create vault user"

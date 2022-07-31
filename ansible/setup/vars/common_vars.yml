@@ -31,3 +31,4 @@ vault_user: vault
 ca_cert_path: /usr/local/share/ca-certificates/cloudlocal
 # cert path on local host
 local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"
+local_cluster_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/cluster-ca"
