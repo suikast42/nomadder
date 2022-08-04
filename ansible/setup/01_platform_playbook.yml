@@ -35,6 +35,8 @@
   roles:
     - role: vault
   tags:
+    - cert
+    - cert_install
     - vault
 
 #- hosts: all
