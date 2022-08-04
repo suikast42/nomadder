@@ -31,7 +31,6 @@
   become: true
   when: not vaultInstalled.stat.exists
   block:
-
   - name: "Create Vault dir if needed"
     become: true
     ansible.builtin.file:
@@ -40,6 +39,16 @@
       group: vault
       state: directory
       mode: '0755'
+
+  - name: "Create Vault cbin dir if needed"
+    become: true
+    ansible.builtin.file:
+      path: "{{vault_unseal_bin_dir}}"
+      owner: vault
+      group: vault
+      state: directory
+      mode: '0755'
+
 
   - name: Download vault binary
     get_url:
@@ -66,6 +75,22 @@
       capability: cap_ipc_lock+ep
       state: present
 
+  - name: Install vault autocomplete for root
+    shell: vault -autocomplete-install
+    register: install
+    changed_when: false
+    # a reinstall triggers an error. Ignore this
+    failed_when: install.rc > 2
+
+  - name: Install vault autocomplete for user
+    become: false
+    shell: vault -autocomplete-install
+    changed_when: false
+    register: install
+    # a reinstall triggers an error. Ignore this
+    failed_when: install.rc > 2
+
+
   - name: Copy systemd init file
     template:
       src: init.service.j2
@@ -78,6 +103,14 @@
     template:
       src: vault.hcl.j2
       dest: /etc/vault.hcl
+      owner: "{{ vault_user }}"
+      group: "{{ vault_group }}"
+
+  - name: unseal file
+    template:
+      src: unseal.j2
+      dest: "{{vault_unseal_bin_dir}}/unseal.sh"
+      mode: '0755'
       owner: "{{ vault_user }}"
       group: "{{ vault_group }}"
 

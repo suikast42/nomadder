@@ -1,5 +1,3 @@
-
-
 - name: Check vault status
   block:
     - name: Vault query

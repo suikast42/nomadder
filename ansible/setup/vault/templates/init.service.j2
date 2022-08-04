@@ -9,6 +9,7 @@ User=vault
 Group=vault
 ExecStart=/usr/local/bin/vault server -config=/etc/vault.hcl
 ExecReload=/usr/local/bin/kill --signal HUP $MAINPID
+ExecStartPost=+{{vault_unseal_bin_dir}}/unseal.sh
 CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
 Capabilities=CAP_IPC_LOCK+ep
 SecureBits=keep-caps

@@ -1,0 +1,38 @@
+- name: Reading root key
+  changed_when: false
+  shell: "cat  {{root_token_dir_output}}/rootkey"
+  register: rootkey
+
+- name: Set fact vault key
+  set_fact:
+    #cert path on nodes
+    root_key:  "{{rootkey.stdout}}"
+    vault_address:  "https://127.0.0.1:8200"
+
+
+- name: Query Vault secrets
+#  shell: vault secrets list -format json
+  shell: | 
+    vault secrets enable pki
+    vault secrets tune -max-lease-ttl=87600h pki
+    
+    vault write -field=certificate pki/root/generate/internal \
+         common_name="{{tls_san}}" \
+         issuer_name="ca_issuer" \
+         ttl=87600h > ca_issuer.crt 
+    
+    vault write pki/roles/ca_issuer allow_any_name=true
+    
+    vault write pki/config/urls \
+         issuing_certificates="$VAULT_ADDR/v1/pki/ca" \
+         crl_distribution_points="$VAULT_ADDR/v1/pki/crl"
+
+  register: secrets
+  environment:
+    - VAULT_ADDR: "{{vault_address}}"
+    - VAULT_TOKEN: "{{root_key}}"
+
+- debug:
+    msg: "{{secrets}}"
+
+
