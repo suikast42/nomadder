@@ -46,6 +46,9 @@ include::000_introduction.adoc[]
 include::100_setup.adoc[]
 
 <<<
+include::200_stack_core.adoc[]
+
+<<<
 include::900_links.adoc[]
 
 <<<

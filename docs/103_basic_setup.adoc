@@ -31,6 +31,12 @@ dockerhub_user: <1>
 dockerhub_password: <2>
 nexus_username: <3>
 nexus_password: <4>
+ca_cert_k8s_cn: <5>
+ca_cert_name_c: <6>
+ca_cert_name_l: <7>
+ca_cert_name_o: <8>
+ca_cert_name_ou: <9>
+ca_cert_name_st: <10>
 ----
 
 <1>  username of https://hub.docker.com/[dockerhub] account
@@ -46,6 +52,12 @@ dockerhub_user: myuser
 dockerhub_password: mypasswd
 nexus_username: admin
 nexus_password: admin
+ca_cert_k8s_cn: Nomad the hard way intermediate CA
+ca_cert_name_c: DE
+ca_cert_name_l: Fizz
+ca_cert_name_o: Buzz
+ca_cert_name_ou: Foo
+ca_cert_name_st: Bar
 ----
 
 

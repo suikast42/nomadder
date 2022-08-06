@@ -1,0 +1,19 @@
+{
+  "CN": "{{tls_san}}",
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "ca": {
+      "expiry": "350400h"
+  },
+  "names": [
+    {
+      "C": "{{ca_cert_name_c}}",
+      "L": "{{ca_cert_name_l}}",
+      "O": "{{ca_cert_name_o}}",
+      "OU": "{{ca_cert_name_ou}}",
+      "ST": "{{ca_cert_name_st}}"
+    }
+  ]
+}

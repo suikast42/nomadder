@@ -1,0 +1,55 @@
+.Ansible cheatsheet
+|===
+|Description |Command
+
+| Installed plugins
+a|[source,shell]
+----
+ansible-doc -l -t lookup
+----
+
+| Run playbook for specific tag(s)
+a|[source,shell]
+----
+ansible-playbook <playbook>.yml --tag <tagname>
+----
+
+|  Run playbook for specific host(s)
+a|[source,shell]
+----
+ansible-playbook <playbook>.yml --limit=server
+----
+
+|  List facts in playbook
+a|[source,yaml]
+----
+# Add this in your playbook or role
+- debug:
+    var: ansible_facts
+----
+
+|  List facts from node(s)
+a|[source,shell]
+----
+ansible all -m ansible.builtin.setup
+----
+
+|  Ping all hosts
+a|[source,shell]
+----
+ansible all -m ping
+----
+
+| List inventory hosts
+a|[source,shell]
+----
+ansible all --list-hosts
+----
+
+| Run playbook with vaulted var and tags and vars
+a|[source,shell]
+----
+ansible-playbook playbbok.yml  --ask-vault-pass --extra-vars "key1=value1,key2,value2" --tags="tag1,tag2"
+----
+|===
+

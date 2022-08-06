@@ -1,0 +1,2 @@
+<<<
+include::201_stack_core_vault.adoc[]

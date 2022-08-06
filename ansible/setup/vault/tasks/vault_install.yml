@@ -1,0 +1,154 @@
+- name: Vault uninstall
+  become: true
+  when: uninstall_vault|bool == true
+  block:
+    - name: stop vault service
+      service:
+        name: vault
+        state: stopped
+        enabled: false
+
+    - name: "Delete Vault dir if needed"
+      ansible.builtin.file:
+        path: "{{vault_data_dir}}"
+        owner: vault
+        state: absent
+        mode: '0755'
+
+    - name: "Delete Vault installation"
+      ansible.builtin.file:
+        path: /usr/local/bin/vault
+        owner: vault
+        state: absent
+        mode: '0755'
+
+- name : Check vault installation present
+  stat:
+    path: /usr/local/bin/vault
+  register: vaultInstalled
+
+- name: Vault install
+  become: true
+  when: not vaultInstalled.stat.exists
+  block:
+  - name: "Create Vault dir if needed"
+    become: true
+    ansible.builtin.file:
+      path: "{{vault_data_dir}}"
+      owner: vault
+      group: vault
+      state: directory
+      mode: '0755'
+
+  - name: "Create Vault cbin dir if needed"
+    become: true
+    ansible.builtin.file:
+      path: "{{vault_unseal_bin_dir}}"
+      owner: vault
+      group: vault
+      state: directory
+      mode: '0755'
+
+
+  - name: Download vault binary
+    get_url:
+      url: https://releases.hashicorp.com/vault/{{vault_version}}/vault_{{vault_version}}_linux_amd64.zip
+      dest: /tmp/vault_{{vault_version}}_linux_amd64.zip
+      owner: "{{ vault_user }}"
+      group: "{{ vault_group }}"
+      mode: 0755
+      checksum: "{{vault_checksum}}"
+    register: vault_download
+
+  - name: "Unzip vault archive"
+    unarchive:
+      src: "{{ vault_download.dest }}"
+      dest: /usr/local/bin
+      copy: no
+      owner: "{{ vault_user }}"
+      group: "{{ vault_group }}"
+      mode: 0755
+
+  - name: "Set vault binary capabilities"
+    capabilities:
+      path: /usr/local/bin/vault
+      capability: cap_ipc_lock+ep
+      state: present
+
+  - name: Install vault autocomplete for root
+    shell: vault -autocomplete-install
+    register: install
+    changed_when: false
+    # a reinstall triggers an error. Ignore this
+    failed_when: install.rc > 2
+
+  - name: Install vault autocomplete for user
+    become: false
+    shell: vault -autocomplete-install
+    changed_when: false
+    register: install
+    # a reinstall triggers an error. Ignore this
+    failed_when: install.rc > 2
+
+
+  - name: Copy systemd init file
+    template:
+      src: init.service.j2
+      dest: /etc/systemd/system/vault.service
+      owner: root
+      group: root
+    notify: systemd_reload
+
+  - name: config file
+    template:
+      src: vault.hcl.j2
+      dest: /etc/vault.hcl
+      owner: "{{ vault_user }}"
+      group: "{{ vault_group }}"
+
+  - name: unseal file
+    template:
+      src: unseal.j2
+      dest: "{{vault_unseal_bin_dir}}/unseal.sh"
+      mode: '0755'
+      owner: "{{ vault_user }}"
+      group: "{{ vault_group }}"
+
+  - name: vault service
+    service:
+      name: vault
+      state: started
+      enabled: yes
+
+
+
+# Copy the templates again and restart vault service if config changed
+- name: Vault config
+  become: true
+  block:
+    - name: Copy systemd init file
+      template:
+        force: yes # replace the remote file when contents are different than the source.
+        src: init.service.j2
+        dest: /etc/systemd/system/vault.service
+        owner: root
+        group: root
+      notify: systemd_reload
+      register: service
+
+    - name: config file
+      template:
+        force: yes # replace the remote file when contents are different than the source.
+        src: vault.hcl.j2
+        dest: /etc/vault.hcl
+        owner: "{{ vault_user }}"
+        group: "{{ vault_group }}"
+      notify: systemd_reload
+      register: conf
+
+
+    - name: restart vault service
+      service:
+        name: vault
+        state: restarted
+      when: service.changed or conf.changed

@@ -1,0 +1,11 @@
+#!/bin/sh
+if [ -f "{{unseal_keys_dir_output}}/unseal_key_0" ]; then
+    until $(wget --no-check-certificate https://127.0.0.1:8200  ); do
+      printf 'Waiting for vault'
+      sleep 1
+    done
+
+   vault operator unseal $(cat cat {{unseal_keys_dir_output}}/unseal_key_0)
+   vault operator unseal $(cat cat {{unseal_keys_dir_output}}/unseal_key_1)
+   vault operator unseal $(cat cat {{unseal_keys_dir_output}}/unseal_key_2)
+fi

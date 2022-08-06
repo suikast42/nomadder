@@ -1,0 +1,54 @@
+---
+- hosts: localhost
+  name: "Generate certificates for tls"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+  gather_facts: no
+  roles:
+    - role: certificates_generate
+  tags:
+    - cert
+    - cert_gen
+
+- hosts: all,!localhost
+  name: "Install certificates"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+  gather_facts: no
+  roles:
+    - role: certificates_install
+  tags:
+    - cert
+    - cert_install
+
+# install vault only on first master
+- hosts: masters[0]
+  name: "Master [0] base installations"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+  gather_facts: yes
+  roles:
+    - role: vault
+  tags:
+    - cert
+    - cert_install
+    - vault
+
+#- hosts: all
+#  name: "Facts"
+#  vars_files:
+#    - vars/versions.yml
+#    - vars/common_vars.yml
+#    - vars/vault.yml
+#  gather_facts: yes
+#  tasks:
+#    - debug:
+#        var: ansible_facts
+#  tags:
+#    facts

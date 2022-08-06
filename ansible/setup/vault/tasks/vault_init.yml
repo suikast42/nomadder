@@ -1,0 +1,79 @@
+- name: Check vault status
+  block:
+    - name: Vault query
+      changed_when: false
+      shell: vault status -format json
+      register: vault_status
+      failed_when: vault_status.rc > 2
+
+    - name: Set vault status facts
+      set_fact:
+        is_vault_initialized: "{{ vault_status.stdout | from_json | json_query('initialized')}}"
+        is_vault_sealed: "{{ vault_status.stdout | from_json | json_query('sealed')}}"
+        cacheable: true
+
+- name: Vault init
+  when: is_vault_initialized |bool == false
+  block:
+    - name: Create unseal directories
+      become: true
+      file:
+        path: "{{ unseal_keys_dir_output }}"
+        owner: vault
+        group: vault
+        state: directory
+        mode: '0755'
+
+    - name: Create root key directories
+      become: true
+      file:
+        path: "{{ root_token_dir_output }}"
+        owner: vault
+        group: vault
+        state: directory
+        mode: '0755'
+
+    - name: Initialise Vault operator
+      shell: vault operator init -key-shares=5 -key-threshold=3 -format json
+      environment:
+        VAULT_ADDR: "https://127.0.0.1:8200"
+      register: vault_init_results
+
+    - name: Parse output of vault init
+      set_fact:
+        vault_init_parsed: "{{ vault_init_results.stdout | from_json }}"
+
+    - name: Write unseal keys to files
+      become: true
+      copy:
+        dest: "{{ unseal_keys_dir_output }}/unseal_key_{{ item.0 }}"
+        content: "{{ item.1 }}"
+      with_indexed_items: "{{ vault_init_parsed.unseal_keys_hex }}"
+
+    - name: Write root token to file
+      become: true
+      copy:
+        content: "{{ vault_init_parsed.root_token }}"
+        dest: "{{root_token_dir_output}}/rootkey"
+
+- name: Vault Unseal
+  when: is_vault_sealed |bool == true
+  block:
+    - name: Reading unseal key contents
+      register: unseal_files
+      find:
+        paths: "{{unseal_keys_dir_output}}"
+
+    - name: Reading unseal key contents
+      changed_when: false
+      shell: "cat {{item.path}}"
+      register: unseal_keys
+      with_items: "{{ unseal_files.files }}"
+
+    - name: Unseal vault with unseal keys
+      changed_when: false
+      shell: |
+        vault operator unseal {{ item.stdout }}
+      environment:
+        VAULT_ADDR: "https://127.0.0.1:8200"
+      with_items: "{{unseal_keys.results}}"

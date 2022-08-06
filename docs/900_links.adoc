@@ -10,4 +10,10 @@ endif::imagesdir[]
 * [[_900_link_vagrant_vmware,documentation vagrant]]https://www.vagrantup.com/docs/providers/vmware/installation[Vagrant]
 * [[_900_link_ubuntu_cert,documentation vagrant]]https://ubuntu.com/server/docs/security-trust-store[Ubuntu install certificates]
 * [[_900_link_ansible_collection_docker,Ansible Collection Docker]]https://docs.ansible.com/ansible/latest/collections/community/docker/index.html[Ansible Collection Docker]
-* [[_900_link_ansible_collection_kubernetes,Ansible Collection Kubernetes]]https://galaxy.ansible.com/kubernetes/core[Ansible Collection Kubernetes]
+* [[_900_link_ssh_keygen,Ansible ssh keygen]]https://linuxhint.com/control-systemd-ansible[Ansible ssh keygen]
+* [[_900_link_ansible_magic_vars,Ansible Magic variables]]https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html[Ansible Magic variables]
+* [[_900_link_ansible_json_output,How to parse json output]]https://devops4solutions.com/how-to-parse-json-output-in-ansible-and-use-set_fact-for-variable-creation/[How to parse json output]
+* [[_900_link_cfssl,Cfssl]]https://rob-blackbourn.medium.com/how-to-use-cfssl-to-create-self-signed-certificates-d55f76ba5781[Cfssl]
+
+
+

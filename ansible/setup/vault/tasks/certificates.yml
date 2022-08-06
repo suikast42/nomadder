@@ -1,0 +1,66 @@
+- name: Certificates
+  block:
+    - name: "Update certificates {{ update_certificates|bool == true }} "
+      become: true
+      file:
+        state: absent
+        path: "{{vault_cert_path}}"
+      when: update_certificates|bool == true
+
+    - name : "Check if vault certificate exist on node -> {{vault_cert_path}}/vault.pem"
+      stat:
+        path: "{{vault_cert_path}}/vault.pem"
+      register: cert
+
+- name: Install certificates
+  when: not cert.stat.exists
+  block:
+
+    - name: "Create certificate folder if needed "
+      become: true
+      file:
+        state: directory
+        path: "{{vault_cert_path}}"
+
+    - name: "Copy vaults certs to {{ vault_cert_path }}"
+      become: true
+      ansible.posix.synchronize:
+        src: "{{local_ca_cert_path}}"
+        dest: "{{vault_cert_copy_path}}"
+      register: certs
+
+    - name: "Change file ownership, group and permissions for content of {{vault_cert_path}}"
+      become: true
+      ansible.builtin.file:
+        path: "{{vault_cert_path}}"
+        owner: vault
+        group: vault
+        recurse: yes
+        mode: '0644'
+
+    - name: "Change file ownership, group and permissions for {{vault_cert_path}}"
+      become: true
+      ansible.builtin.file:
+        path: "{{vault_cert_path}}"
+        owner: vault
+        group: vault
+        state: directory
+        mode: '0755'
+
+    - name: restart vault service
+      ignore_errors: true
+      become: true
+      service:
+        name: vault
+        state: restarted
+      when: certs.changed
+
+#    - name: "Set permissions on {{vault_cert_path}}"
+#      become: true
+#      shell: |
+#        find  {{vault_cert_path}} -type d -exec chown vault:vault {}
+#        find  {{vault_cert_path}} -type d -exec chmod 755 {} +
+#        find {{vault_cert_path}} -type d -exec chown root:root {} +
+#        find {{vault_cert_path}} -type f -exec chown vault:vault {}
+#        find {{vault_cert_path}} -type f -exec chmod 644 {} +
+#        find  {{vault_cert_path}} -type f -exec chown root:root {} +
