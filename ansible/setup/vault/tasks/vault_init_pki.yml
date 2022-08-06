@@ -1,38 +1,106 @@
-- name: Reading root key
-  changed_when: false
-  shell: "cat  {{root_token_dir_output}}/rootkey"
-  register: rootkey
+# https://learn.hashicorp.com/tutorials/vault/pki-engine#step-5-revoke-certificates
+- name: Check vault status
+  block:
+    - name: Reading root key
+      changed_when: false
+      shell: "cat  {{root_token_dir_output}}/rootkey"
+      register: rootkey
 
-- name: Set fact vault key
-  set_fact:
-    #cert path on nodes
-    root_key:  "{{rootkey.stdout}}"
-    vault_address:  "https://127.0.0.1:8200"
+    - name: Set fact vault key
+      set_fact:
+        #cert path on nodes
+        root_key: "{{rootkey.stdout}}"
+        vault_address: "https://127.0.0.1:8200"
+
+    - name: Read existing secrets
+      changed_when: false
+      shell: vault secrets list
+      register: vault_secrets
+      failed_when: vault_secrets.rc > 2
+      environment:
+        - VAULT_ADDR: "{{vault_address}}"
+        - VAULT_TOKEN: "{{root_key}}"
+        - VAULT_FORMAT: "json"
 
 
-- name: Query Vault secrets
-#  shell: vault secrets list -format json
-  shell: | 
-    vault secrets enable pki
-    vault secrets tune -max-lease-ttl=87600h pki
-    
-    vault write -field=certificate pki/root/generate/internal \
-         common_name="{{tls_san}}" \
-         issuer_name="ca_issuer" \
-         ttl=87600h > ca_issuer.crt 
-    
-    vault write pki/roles/ca_issuer allow_any_name=true
-    
-    vault write pki/config/urls \
-         issuing_certificates="$VAULT_ADDR/v1/pki/ca" \
-         crl_distribution_points="$VAULT_ADDR/v1/pki/crl"
 
-  register: secrets
-  environment:
-    - VAULT_ADDR: "{{vault_address}}"
-    - VAULT_TOKEN: "{{root_key}}"
+    - name: Set vault status facts
+      set_fact:
+        ca_crt_ttl : "87600h"
+        ca_int_crt_ttl : "43800h"
+        ca_int_crt_max_ttl : "720h"
+        is_pki_enabled: "{{ vault_secrets.stdout | from_json | json_query(pkipath) | default('nil',true) | string() != 'nil' }}"
+        is_pki_int_enabled: "{{ vault_secrets.stdout | from_json | json_query(pkiintpath) | default('nil',true) | string() != 'nil' }}"
+        cacheable: true
+      vars:
+        pkipath: '"pki/"'
+        pkiintpath: '"pki_int/"'
 
-- debug:
-    msg: "{{secrets}}"
+    - name: is_pki_enabled
+      debug:
+        msg: "PKI enabled: {{is_pki_enabled}} PKI_INT enabled: {{is_pki_int_enabled}} "
+
+- name: Generate CA crt
+  when: is_pki_enabled | bool == false
+  block:
+
+    - name: Generate CA crt
+      shell: |
+        vault secrets enable pki
+        vault secrets tune -max-lease-ttl={{ca_crt_ttl}} pki
+        vault write pki/config/urls \
+             issuing_certificates="$VAULT_ADDR/v1/pki/ca" \
+             crl_distribution_points="$VAULT_ADDR/v1/pki/crl"		
+        
+        vault write -field=certificate pki/root/generate/internal \
+                 common_name="{{ca_cert_cn}}" \
+                 issuer_name="ca_issuer" \
+        		 ou="{{ca_cert_name_ou}}" \
+        		 country="{{ca_cert_name_c}}" \
+        		 locality="{{ca_cert_name_l}}" \
+        		 province="{{ca_cert_name_st}}" \
+                 ttl={{ca_crt_ttl}} > /tmp/ca_issuer.crt 
+        
+        vault write pki/roles/ca_issuer allow_any_name=true
+      environment:
+      - VAULT_ADDR: "{{vault_address}}"
+      - VAULT_TOKEN: "{{root_key}}"
+      - VAULT_FORMAT: "json"
+
+- name: Generate Intermedia CA
+  when: is_pki_int_enabled | bool == false
+  block:
+
+    - name: Generate Intermediate crt
+      shell: |
+        vault secrets enable -path=pki_int pki
+        vault secrets tune -max-lease-ttl={{ca_int_crt_ttl}} pki_int
+        
+        vault write -format=json pki_int/intermediate/generate/internal \
+                 common_name="{{tls_san}} {{ca_cert_cn}}" \
+                 issuer_name="{{tls_san}}" \
+        		 ou="{{ca_cert_name_ou}}" \
+        		 country="{{ca_cert_name_c}}" \
+        		 locality="{{ca_cert_name_l}}" \
+        		 province="{{ca_cert_name_st}}" \
+                 | jq -r '.data.csr' > /tmp/pki_intermediate.csr
+        
+        vault write -format=json pki/root/sign-intermediate \
+             issuer_ref="ca_issuer" \
+             csr=@/tmp/pki_intermediate.csr \
+             format=pem_bundle ttl="{{ca_int_crt_ttl}}" \
+             | jq -r '.data.certificate' > /tmp/intermediate.cert.pem
+        
+        vault write pki_int/intermediate/set-signed certificate=@/tmp/intermediate.cert.pem
+        
+        vault write pki_int/roles/{{tls_san}} \
+             issuer_ref="$(vault read -field=default pki_int/config/issuers)" \
+             allowed_domains="{{tls_san}}" \
+             allow_subdomains=true \
+             max_ttl="{{ca_int_crt_max_ttl}}"
+      environment:
+        - VAULT_ADDR: "{{vault_address}}"
+        - VAULT_TOKEN: "{{root_key}}"
+        - VAULT_FORMAT: "json"
 
 

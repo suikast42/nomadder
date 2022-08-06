@@ -53,6 +53,6 @@
 
     - name: "Vault initialization"
       import_tasks: vault_init.yml
-#
-#    - name: "Vault init pki"
-#      import_tasks: vault_init_pki.yml
+
+    - name: "Vault init pki"
+      import_tasks: vault_init_pki.yml

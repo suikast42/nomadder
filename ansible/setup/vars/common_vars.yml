@@ -1,5 +1,5 @@
 ---
-tls_san: cloud.local
+tls_san: cloud.private
 host_name: "{{ ansible_hostname  }}"
 master_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
 registry_ip: "{{ hostvars[groups['build'][0]]['ansible_host'] | default(groups['build'][0]) }}"
