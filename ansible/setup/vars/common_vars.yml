@@ -1,13 +1,16 @@
 ---
 tls_san: cloud.private
 host_name: "{{ ansible_hostname  }}"
+host_ip: "{{ ansible_eth1.ipv4.address }}"
 master_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
 registry_ip: "{{ hostvars[groups['build'][0]]['ansible_host'] | default(groups['build'][0]) }}"
 docker_ip: "{{ registry_ip }}"
-host_ip: "{{ ansible_eth1.ipv4.address }}"
 registry_port: "5000"
 registry_port_push: "5001"
 registry_dns: "registry.{{tls_san}}"
+masters: "{{ groups['masters'] }}"
+workers: "{{ groups['workers']] }}"
+
 
 is_local_host: "{{ inventory_hostname in groups['localhost'] }}"
 is_build_host: "{{ inventory_hostname in groups['build'] }}"
