@@ -1,0 +1,15 @@
+- name: Dns Config
+  become: true
+  block:
+    - name: Template resolv.conf
+      template:
+        force: yes
+        src: resolv.j2
+        dest: "/etc/resolv.conf"
+
+
+    - name: Template NetworkManager.conf
+      template:
+        force: yes
+        src: NetworkManager.j2
+        dest: "/etc/NetworkManager/NetworkManager.conf"
