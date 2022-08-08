@@ -1,3 +1,4 @@
+# See https://learn.hashicorp.com/tutorials/consul/dns-forwarding?in=consul/networking#dnsmasq-setup
 - name: DnsMasq
   become: true
   block:
@@ -7,11 +8,6 @@
       state: stopped
       enabled: false
 
-  - name: "Install base  dnsmasq"
-    apt:
-      name:
-        - dnsmasq
-      state: present
 
   - name: Template resolv.conf
     template:
@@ -19,11 +15,25 @@
       src: resolv.j2
       dest: "/etc/resolv.conf"
 
+  - name: "Install dnsmasq"
+    apt:
+      name:
+        - dnsmasq
+      state: present
+
+  - name: Start dnsmasq service
+    changed_when: false
+    service:
+      name: dnsmasq
+      state: started
+
+
+
   - name: Template dnsmasq.conf
     template:
       force: yes
       src: dnsmasq.j2
-      dest: "/etc/dnsmasq.conf"
+      dest: "/etc/dnsmasq.d/10-consul"
 
   - name: Template NetworkManager.conf
     template:
