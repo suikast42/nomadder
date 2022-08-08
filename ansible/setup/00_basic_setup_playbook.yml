@@ -4,9 +4,7 @@
   name: "Setup local environment"
   gather_facts: no
   roles:
-    - role: localhost
-  tags:
-    - localhost
+    - {role: localhost, tags: ['localhost']}
 
 # Install tools and update the nodes ( not related to nomad hashi stack )
 - hosts: all, !localhost
@@ -15,6 +13,4 @@
     - vars/common_vars.yml
   gather_facts: yes
   roles:
-    - role: common
-  tags:
-    - nodes
+    - {role: common, tags: ['nodes']}

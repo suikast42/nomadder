@@ -7,10 +7,7 @@
     - vars/vault.yml
   gather_facts: no
   roles:
-    - role: certificates_generate
-  tags:
-    - cert
-    - cert_gen
+    - {role: certificates_generate, tags: ['cert','cert_gen']}
 
 - hosts: all,!localhost
   name: "Install certificates"
@@ -20,10 +17,7 @@
     - vars/vault.yml
   gather_facts: no
   roles:
-    - role: certificates_install
-  tags:
-    - cert
-    - cert_install
+    - {role: certificates_install, tags: ['cert','cert_install']}
 
 # Single master setup
 # HA Setup is planed in second release
@@ -35,13 +29,8 @@
     - vars/vault.yml
   gather_facts: yes
   roles:
-    - role: master_dnsmasq
-    - role: master_vault
-  tags:
-    - dns
-    - cert
-    - cert_install
-    - vault
+    - {role: master_dnsmasq, tags: ['dns']}
+    - {role: master_vault, tags: ['cert','cert_install','vault']}
 
 - hosts: workers
   name: "Worker installations"
@@ -51,9 +40,7 @@
     - vars/vault.yml
   gather_facts: yes
   roles:
-    - role: worker_dnsmasq
-  tags:
-    - dns
+    - {role: worker_dnsmasq, tags: ['dns']}
 #- hosts: all
 #  name: "Facts"
 #  vars_files:
