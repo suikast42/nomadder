@@ -30,7 +30,7 @@
           "client auth",
           "server auth"
         ],
-        "expiry": "350400h"
+        "expiry": "36288h"
       }
     }
   }
