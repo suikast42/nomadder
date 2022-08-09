@@ -10,3 +10,4 @@
 
   vars:
     consul_data_dir: "/opt/deployments/core/consul/data"
+    consul_home_dir: "/etc/consul.d"

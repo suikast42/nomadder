@@ -15,5 +15,5 @@
         shell: "/sbin/false"
         comment: "{{ consul_user }} nologin User"
         createhome: yes
-        home: /etc/consul.d
+        home: "{{consul_home_dir}}"
         state: present

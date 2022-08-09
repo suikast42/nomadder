@@ -76,3 +76,26 @@
       register: install
       # a reinstall triggers an error. Ignore this
       failed_when: install.rc > 2
+
+- name: Consul config files
+  become: true
+  block:
+    - name: config file server
+      when: is_master_host
+      template:
+        force: yes # replace the remote file when contents are different than the source.
+        src: consul_master.j2
+        dest: "{{consul_home_dir}}/consul.hcl"
+        owner: "{{ consul_user }}"
+        group: "{{ consul_group }}"
+
+    - name: config file worker
+      when: is_worker_host
+      template:
+        force: yes # replace the remote file when contents are different than the source.
+        src: consul_worker.j2
+        dest: "{{consul_home_dir}}/consul.hcl"
+        owner: "{{ consul_user }}"
+        group: "{{ consul_group }}"
+  vars:
+    consul_encrypt_key: "G1CHAD7wwu0tU28BlKkirSahTJ/Tqpo9ClOAycQAUwE="
