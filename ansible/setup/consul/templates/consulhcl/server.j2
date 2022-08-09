@@ -7,6 +7,7 @@ encrypt = "{{consul_encrypt_key}}"
 bind_addr= "0.0.0.0"
 advertise_addr= "{{host_ip}}"
 client_addr = "0.0.0.0"
+verify_incoming_rpc = true
 tls{
   defaults{
     ca_file= "{{ca_cert_path}}/cluster-ca/cluster-ca.pem"
@@ -36,6 +37,8 @@ addresses {
 }
 
 ports {
+#  http = 8500
+#  https= 8501
   grpc  = 8502
 }
 ui_config {
