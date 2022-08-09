@@ -2,6 +2,7 @@ data_dir = "{{consul_data_dir}}"
 datacenter= "{{consul_data_center}}"
 log_level = "INFO"
 node_name = "{{host_name}}"
+server = true
 encrypt = "{{consul_encrypt_key}}"
 bind_addr= "0.0.0.0"
 advertise_addr= "{{host_ip}}"
@@ -9,6 +10,8 @@ client_addr = "0.0.0.0"
 tls{
   defaults{
     ca_file= "{{ca_cert_path}}/cluster-ca/cluster-ca.pem"
+    cert_file = "{{consul_server_certificate_dir}}/consul-agent.pem"
+    key_file = "{{consul_server_certificate_dir}}/consul-agent-key.pem"
     verify_outgoing = true
     verify_incoming = true
 }
@@ -20,5 +23,31 @@ tls{
 auto_encrypt {
   allow_tls = true
 }
+bootstrap_expect = {{masters|length}}
 
 retry_join = {{masters | to_json }}
+
+connect {
+  enabled = true
+}
+
+addresses {
+  grpc = "127.0.0.1"
+}
+
+ports {
+  grpc  = 8502
+}
+ui_config {
+  enabled = true
+}
+
+acl {
+  enabled = true
+  default_policy = "allow"
+  enable_token_persistence = true
+}
+
+performance {
+  raft_multiplier = 1
+}
