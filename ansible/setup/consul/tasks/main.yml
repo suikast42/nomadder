@@ -8,6 +8,9 @@
   - name: "Install consul"
     import_tasks: consul_install.yml
 
+  - name: "Install consul-template"
+    import_tasks: consul_template_install.yml
+
   vars:
     consul_data_dir: "/opt/deployments/core/consul/data"
     consul_home_dir: "/etc/consul.d"

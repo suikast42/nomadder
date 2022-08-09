@@ -16,7 +16,7 @@
         state: absent
         mode: '0755'
 
-    - name: "Delete Vault installation"
+    - name: "Delete Consul installation"
       ansible.builtin.file:
         path: /usr/local/bin/consul
         owner: vault
