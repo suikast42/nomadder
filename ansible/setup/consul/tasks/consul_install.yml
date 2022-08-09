@@ -93,7 +93,7 @@
       when: is_master_host
       template:
         force: yes # replace the remote file when contents are different than the source.
-        src: consul_master.j2
+        src: consulhcl/consul_master.j2
         dest: "{{consul_home_dir}}/consul.hcl"
         owner: "{{ consul_user }}"
         group: "{{ consul_group }}"
@@ -102,7 +102,7 @@
       when: is_worker_host
       template:
         force: yes # replace the remote file when contents are different than the source.
-        src: consul_worker.j2
+        src: consulhcl/consul_worker.j2
         dest: "{{consul_home_dir}}/consul.hcl"
         owner: "{{ consul_user }}"
         group: "{{ consul_group }}"

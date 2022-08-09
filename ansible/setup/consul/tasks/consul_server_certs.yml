@@ -1,0 +1,94 @@
+- name: Set local cert path
+  set_fact:
+    #cert path on nodes
+    local_cert_path: "{{role_path}}/files/certs/{{host_name}}"
+
+- name: "Update certificates {{ update_certificates|bool == true }}"
+  when: update_certificates|bool == true
+  block:
+  - name: "Delete certificates on localhost"
+    file:
+      state: absent
+      path: "{{local_cert_path}}"
+
+  - name: "Delete certificate directory on host"
+    become: true
+    file:
+      state: absent
+      path: "{{consul_server_certificate_dir}}"
+
+
+
+- name : Check consul certifcate installed
+  stat:
+    path: "{{consul_server_certificate_dir}}/consul-agent.pem"
+  register: consulCertInstalled
+
+- name: "Create certificate directory on host {{consul_server_certificate_dir}}"
+  become: true
+  file:
+    owner: "{{consul_user}}"
+    group: "{{consul_group}}"
+    state: directory
+    mode: '0755'
+    path: "{{consul_server_certificate_dir}}"
+
+
+- name: Generate consul server certifacte
+  when: not consulCertInstalled.stat.exists
+  block:
+    - name: Copy cluster ca from remote
+      run_once: true # All masters must have the same cluster ca. Thus is enough to copy this one time
+      ansible.posix.synchronize:
+        mode: pull
+        src: "{{ca_cert_path}}/cluster-ca"
+        dest: "{{local_cert_path}}/.."
+
+    - name: Create local certificate dir
+      delegate_to: localhost
+      file:
+        state: directory
+        path: "{{local_cert_path}}"
+
+    - name: Templating certificate
+      delegate_to: localhost
+      template:
+        force: yes # replace the remote file when contents are different than the source.
+        src: cert/consul.j2
+        dest: "{{local_cert_path}}/consul.json"
+
+    - name: Templating certificate
+      delegate_to: localhost
+      template:
+        force: yes # replace the remote file when contents are different than the source.
+        src: cert/config.json
+        dest: "{{local_cert_path}}/config.json"
+
+    - name: "Generate consul certificates"
+      delegate_to: localhost
+      shell: |
+        cfssl gencert \
+          -ca {{local_cert_path}}/../cluster-ca/cluster-ca.pem \
+          -ca-key {{local_cert_path}}/../cluster-ca/cluster-ca-key.pem \
+          -config config.json \
+          -profile=consul  consul.json | cfssljson -bare consul-agent
+      args:
+        chdir: "{{local_cert_path}}"
+
+    - name: Copy consul cert to host
+      become: true
+      ansible.builtin.copy:
+        src: "{{local_cert_path}}/consul-agent.pem"
+        dest: "{{consul_server_certificate_dir}}/consul-agent.pem"
+        owner: "{{consul_user}}"
+        group: "{{consul_group}}"
+        mode: '0644'
+
+    - name: Copy consul cert key to host
+      become: true
+      ansible.builtin.copy:
+        src: "{{local_cert_path}}/consul-agent-key.pem"
+        dest: "{{consul_server_certificate_dir}}/consul-agent-key.pem"
+        owner: "{{consul_user}}"
+        group: "{{consul_group}}"
+        mode: '0644'

@@ -7,7 +7,7 @@
     - vars/vault.yml
   gather_facts: no
   roles:
-    - {role: certificates_generate, tags: ['cert','cert_gen']}
+    - {role: certificates_generate, tags: ['cert']}
 
 - hosts: all,!localhost
   name: "Master and worker base installations"
@@ -17,7 +17,7 @@
     - vars/vault.yml
   gather_facts: yes
   roles:
-    - {role: certificates_install, tags: ['cert','cert_install']}
+    - {role: certificates_install, tags: ['cert']}
     - {role: dnsmasq, tags: ['dnsmasq']}
 
 # Single master setup
@@ -30,7 +30,7 @@
     - vars/vault.yml
   gather_facts: yes
   roles:
-    - {role: master_vault, tags: ['cert','cert_install','vault']}
+    - {role: master_vault, tags: ['cert','vault']}
 
 - hosts: all,!localhost
   name: "Master and worker platform installations"
@@ -40,7 +40,7 @@
     - vars/vault.yml
   gather_facts: yes
   roles:
-    - {role: consul, tags: ['consul']}
+    - {role: consul, tags: ['cert','consul']}
 #- hosts: all
 #  name: "Facts"
 #  vars_files:

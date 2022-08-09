@@ -21,7 +21,3 @@
   - name: "Generate certificates"
     import_tasks: certificates.yml
     when:  not caCert.stat.exists
-
-  tags:
-    - cert
-    - cert_gen

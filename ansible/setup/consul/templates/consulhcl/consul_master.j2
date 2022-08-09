@@ -1,4 +1,5 @@
 data_dir = "{{consul_data_dir}}"
+datacenter= "{{consul_data_center}}"
 log_level = "INFO"
 node_name = "{{host_name}}"
 server = true
@@ -8,9 +9,9 @@ advertise_addr= "{{host_ip}}"
 client_addr = "0.0.0.0"
 tls{
   defaults{
-    ca_file= "/usr/local/share/ca-certificates/cloudlocal/ca/ca.pem"
-    cert_file = "/usr/local/share/ca-certificates/cloudlocal/cluster-ca/cluster-ca.pem"
-    key_file = "/usr/local/share/ca-certificates/cloudlocal/cluster-ca/cluster-ca-key.pem"
+    ca_file= "{{ca_cert_path}}/cluster-ca/cluster-ca.pem"
+    cert_file = "{{consul_server_certificate_dir}}/consul-agent.pem"
+    key_file = "{{consul_server_certificate_dir}}/consul-agent-key.pem"
     verify_outgoing = true
     verify_incoming = true
 }

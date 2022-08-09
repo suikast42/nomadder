@@ -11,6 +11,19 @@
   - name: "Install consul-template"
     import_tasks: consul_template_install.yml
 
+  - name: "Install consul certificates"
+    import_tasks: consul_server_certs.yml
+    when: is_master_host
+
   vars:
     consul_data_dir: "/opt/deployments/core/consul/data"
     consul_home_dir: "/etc/consul.d"
+    consul_data_center: "nomadder_1"
+    consul_server_certificate_dir: "{{consul_data_dir}}/cert"
+    consul_dns: "consul.{{tls_san}}"
+    consul_servers:
+      - "127.0.0.1"
+      - "localhost"
+      - "{{consul_dns}}"
+      - "server.{{consul_data_center}}.consul"
+      - "server.{{host_name}}.{{consul_data_center}}.consul"
