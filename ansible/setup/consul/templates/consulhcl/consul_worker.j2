@@ -2,5 +2,23 @@ data_dir = "{{consul_data_dir}}"
 datacenter= "{{consul_data_center}}"
 log_level = "INFO"
 node_name = "{{host_name}}"
-server = false
 encrypt = "{{consul_encrypt_key}}"
+bind_addr= "0.0.0.0"
+advertise_addr= "{{host_ip}}"
+client_addr = "0.0.0.0"
+tls{
+  defaults{
+    ca_file= "{{ca_cert_path}}/cluster-ca/cluster-ca.pem"
+    verify_outgoing = true
+    verify_incoming = true
+}
+  internal_rpc{
+     verify_server_hostname = true
+  }
+}
+
+auto_encrypt {
+  allow_tls = true
+}
+
+retry_join = {{masters | to_json }}

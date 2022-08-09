@@ -16,6 +16,13 @@
         state: absent
         mode: '0755'
 
+    - name: "Delete consul home dir if needed"
+      ansible.builtin.file:
+        path: "{{consul_home_dir}}"
+        owner: vault
+        state: absent
+        mode: '0755'
+
     - name: "Delete Consul installation"
       ansible.builtin.file:
         path: /usr/local/bin/consul
@@ -23,10 +30,21 @@
         state: absent
         mode: '0755'
 
+
 - name : Check consul installation present
   stat:
     path: /usr/local/bin/consul
   register: consulInstalled
+
+
+- name: Create consul home dir
+  become: true
+  file:
+    path: "{{consul_home_dir }}"
+    owner: "{{consul_user}}"
+    group: "{{consul_group}}"
+    state: directory
+    mode: '0755'
 
 - name: Create consul data dir
   become: true
