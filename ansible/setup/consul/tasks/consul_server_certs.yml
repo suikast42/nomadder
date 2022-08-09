@@ -1,3 +1,7 @@
+# The consul installation guide uses the consul built in tool for generating certificates
+# but this have limitations for setting certificate fields like CN O etc.
+# Furthermore, on this way we use for all purposes the same CA chain
+
 - name: Set local cert path
   set_fact:
     #cert path on nodes
