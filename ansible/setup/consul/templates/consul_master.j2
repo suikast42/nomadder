@@ -3,3 +3,40 @@ log_level = "INFO"
 node_name = "{{host_name}}"
 server = true
 encrypt = "{{consul_encrypt_key}}"
+bind_addr= "0.0.0.0"
+advertise_addr= "{{host_ip}}"
+client_addr = "0.0.0.0"
+tls{
+  defaults{
+    ca_file= "/usr/local/share/ca-certificates/cloudlocal/ca/ca.pem"
+    cert_file = "/usr/local/share/ca-certificates/cloudlocal/cluster-ca/cluster-ca.pem"
+    key_file = "/usr/local/share/ca-certificates/cloudlocal/cluster-ca/cluster-ca-key.pem"
+    verify_outgoing = true
+    verify_incoming = true
+}
+  internal_rpc{
+     verify_server_hostname = true
+  }
+}
+
+auto_encrypt {
+  allow_tls = true
+}
+bootstrap_expect = {{masters|length}}
+
+retry_join = {{masters | to_json }}
+
+connect {
+  enabled = true
+}
+
+addresses {
+  grpc = "127.0.0.1"
+}
+
+ports {
+  grpc  = 8502
+}
+ui_config {
+  enabled = true
+}

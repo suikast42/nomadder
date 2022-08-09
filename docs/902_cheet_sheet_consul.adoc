@@ -9,10 +9,10 @@ a|[source,shell]
 consul validate /etc/consul.d/
 ----
 
-|Start consul server
+|Start consul server as user consul
 a|[source,shell]
 ----
-consul agent -config-dir=/etc/consul.d/
+sudo -H -u consul bash -c 'consul agent -config-dir=/etc/consul.d'
 ----
 
 

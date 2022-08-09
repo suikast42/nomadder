@@ -28,6 +28,15 @@
     path: /usr/local/bin/consul
   register: consulInstalled
 
+- name: Create consul data dir
+  become: true
+  file:
+    path: "{{ consul_data_dir }}"
+    owner: "{{consul_user}}"
+    group: "{{consul_group}}"
+    state: directory
+    mode: '0755'
+
 - name: Consul install
   become: true
   when: not consulInstalled.stat.exists
