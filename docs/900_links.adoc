@@ -15,7 +15,12 @@ endif::imagesdir[]
 * [[_900_link_ansible_json_output,How to parse json output]]https://devops4solutions.com/how-to-parse-json-output-in-ansible-and-use-set_fact-for-variable-creation/[How to parse json output]
 * [[_900_link_cfssl,Cfssl]]https://rob-blackbourn.medium.com/how-to-use-cfssl-to-create-self-signed-certificates-d55f76ba5781[Cfssl]
 * [[_900_link_vault_integrations,Vault Integrations]]https://learn.hashicorp.com/tutorials/consul/vault-consul-secrets?in=vault/cross-products[Vault Integrations]
+* [[_900_link_consul_deployment_guide,Consul Deployment Guide]]https://learn.hashicorp.com/tutorials/consul/deployment-guide[Consul Deployment Guide]
 * [[_900_link_consul_template,Consul Template]]https://learn.hashicorp.com/tutorials/consul/consul-template[Consul Template]
+* [[_900_link_hasicrop_forum,HashiCrop discuss forum]]https://discuss.hashicorp.com[HashiCrop discuss forum]
+
+
+
 
 
 

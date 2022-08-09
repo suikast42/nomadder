@@ -61,6 +61,5 @@
       -ca-key ../cluster-ca/cluster-ca-key.pem \
       -config ../../cfssl/config.json \
       -profile=vault_cli  ../../config/vault.json | cfssljson -bare vault
-    cat  ../ca/ca.pem ../cluster-ca/cluster-ca.pem   vault.pem > vault_bundle.pem
   args:
     chdir: "{{role_path}}/files/certs/vault"
