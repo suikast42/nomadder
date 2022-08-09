@@ -1,0 +1,78 @@
+- name: Consul uninstall
+  become: true
+  when: uninstall_consul|bool == true
+  block:
+    - name: stop consul service
+      failed_when: false
+      service:
+        name: consul
+        state: stopped
+        enabled: false
+
+    - name: "Delete consul dir if needed"
+      ansible.builtin.file:
+        path: "{{consul_data_dir}}"
+        owner: vault
+        state: absent
+        mode: '0755'
+
+    - name: "Delete Vault installation"
+      ansible.builtin.file:
+        path: /usr/local/bin/consul
+        owner: vault
+        state: absent
+        mode: '0755'
+
+- name : Check consul installation present
+  stat:
+    path: /usr/local/bin/consul
+  register: consulInstalled
+
+- name: Consul install
+  become: true
+  when: not consulInstalled.stat.exists
+  block:
+    - name: "Create consul dir if needed"
+      become: true
+      ansible.builtin.file:
+        path: "{{consul_data_dir}}"
+        owner: consul
+        group: consul
+        state: directory
+        mode: '0755'
+
+    - name: Download consul binary
+      get_url:
+        url: https://releases.hashicorp.com/consul/{{consul_version}}/consul_{{consul_version}}_linux_amd64.zip
+        dest: /tmp/consul{{consul_version}}_linux_amd64.zip
+        owner: "{{ consul_user }}"
+        group: "{{ consul_group }}"
+        mode: 0755
+        checksum: "{{consul_checksum}}"
+      register: consul_download
+
+    - name: "Unzip consul archive"
+      unarchive:
+        src: "{{ consul_download.dest }}"
+        dest: /usr/local/bin
+        copy: no
+        owner: "{{ consul_user }}"
+        group: "{{ consul_group }}"
+        mode: 0755
+
+    - name: Install consul autocomplete for root
+      shell: |
+        consul -autocomplete-install
+      register: install
+      changed_when: false
+      # a reinstall triggers an error. Ignore this
+      failed_when: install.rc > 2
+
+    - name: Install consul autocomplete for user
+      become: false
+      shell: |
+        consul -autocomplete-install
+      changed_when: false
+      register: install
+      # a reinstall triggers an error. Ignore this
+      failed_when: install.rc > 2

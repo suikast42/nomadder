@@ -25,8 +25,7 @@ vault_hosts:
   - "{{vault_dns}}"
   - "{{vault_ip}}"
 
-vault_group: vault
-vault_user: vault
+
 
 # path settings
 
