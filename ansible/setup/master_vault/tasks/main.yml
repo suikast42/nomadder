@@ -35,7 +35,7 @@
 - name: Vault installation
   block:
 
-  - name: "Copy certificates from master 0"
+  - name: Copy certificates from master 0
     import_tasks: copy_certs_from_master_0.yml
 
   - name: "Vault certificates"

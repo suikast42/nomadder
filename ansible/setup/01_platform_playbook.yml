@@ -48,8 +48,6 @@
     - vars/common_vars.yml
     - vars/vault.yml
   gather_facts: yes
-  tasks:
-    - debug:
-        var: ansible_facts
+
   tags:
     facts

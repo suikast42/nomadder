@@ -5,7 +5,7 @@ listen-address={{host_ip}}
 server=/consul/127.0.0.1#8600
 
 # Resolve *.private domain with the given IP
-address=vault.{{tls_san}}/{{master_ip}}
+address=/vault.{{tls_san}}/{{master_ip}}
 #address=registry.{{tls_san}}/{{master_ip}}
 #address=/private/{{host_ip}}
 

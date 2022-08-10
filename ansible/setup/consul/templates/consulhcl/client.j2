@@ -8,7 +8,7 @@ advertise_addr= "{{host_ip}}"
 verify_incoming_rpc = true
 tls{
   defaults{
-    ca_file= "{{ca_cert_path}}/cluster-ca/cluster-ca.pem"
+    ca_file= "{{cluster_intermediate_ca_bundle}}"
     verify_outgoing = true
     verify_incoming = true
 }

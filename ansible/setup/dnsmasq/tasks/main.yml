@@ -8,18 +8,32 @@
       state: stopped
       enabled: false
 
+  - name: "Apt Install dnsmasq"
+    apt:
+      name:
+        - dnsmasq
+      state: present
 
   - name: Template resolv.conf
     template:
       force: yes
       src: resolv.j2
       dest: "/etc/resolv.conf"
+    register: resolve_conf
 
-  - name: "Install dnsmasq"
-    apt:
-      name:
-        - dnsmasq
-      state: present
+  - name: Template dnsmasq.conf
+    template:
+      force: yes
+      src: dnsmasq.j2
+      dest: "/etc/dnsmasq.d/10-consul"
+    register: dnsmasq_conf
+
+  - name: Template NetworkManager.conf
+    template:
+      force: yes
+      src: NetworkManager.j2
+      dest: "/etc/NetworkManager/NetworkManager.conf"
+    register: nwk_conf
 
   - name: Start dnsmasq service
     changed_when: false
@@ -27,22 +41,8 @@
       name: dnsmasq
       state: started
 
-
-
-  - name: Template dnsmasq.conf
-    template:
-      force: yes
-      src: dnsmasq.j2
-      dest: "/etc/dnsmasq.d/10-consul"
-
-  - name: Template NetworkManager.conf
-    template:
-      force: yes
-      src: NetworkManager.j2
-      dest: "/etc/NetworkManager/NetworkManager.conf"
-
-
   - name: restart dnsmasq service
+    when: dnsmasq_conf.changed or nwk_conf.changed or dnsmasq_conf.changed
     changed_when: false
     service:
       name: dnsmasq

@@ -1,0 +1,80 @@
+# The certificates are installed only on servers
+# auto_encrypt setting ensures that the client certificate generations is automated by consul
+- name: Certificates
+  block:
+    - name: "Update certificates {{ update_certificates|bool == true }} "
+      become: true
+      file:
+        state: absent
+        path: "{{consul_cert_path}}"
+      when: update_certificates|bool == true
+
+    - name : "Check if consul certificate exist on node -> {{consul_cert_path}}/consul-server.pem"
+      stat:
+        path: "{{consul_cert_path}}/consul-server.pem"
+      register: cert
+
+- name: Install certificates
+  when: not cert.stat.exists
+  block:
+
+    - name: "Change file ownership, group and permissions for {{consul_cert_path}}"
+      become: true
+      ansible.builtin.file:
+        path: "{{consul_cert_path}}"
+        owner: "{{consul_user}}"
+        group: "{{consul_group}}"
+        state: directory
+        mode: '0755'
+
+    - name: "Create consul certificate work dir if needed"
+      delegate_to: localhost
+      ansible.builtin.file:
+        path: "{{local_cert_gen_path}}"
+        state: directory
+
+    - name: Template consul.json
+      delegate_to: localhost
+      template:
+        force: yes
+        src: cert/consul.j2
+        dest: "{{local_cert_gen_path}}/consul.json"
+
+
+    - name: "Generate consul certificates in {{local_cert_gen_path}}"
+      delegate_to: localhost
+      shell: |
+        cfssl gencert \
+          -ca ../cloudlocal/cluster-ca/cluster-ca.pem \
+          -ca-key ../cloudlocal/cluster-ca/cluster-ca-key.pem \
+          -config {{local_ca_cert_conf}} \
+          -profile peer consul.json | cfssljson -bare consul-server
+      args:
+        chdir: "{{local_cert_gen_path}}"
+
+    - name: "Copy certificate to {{consul_sever_cert}}"
+      become: true
+      ansible.builtin.copy:
+        src: "{{local_cert_gen_path}}/consul-server.pem"
+        dest: "{{consul_sever_cert}}"
+        owner: "{{consul_user}}"
+        group: "{{consul_group}}"
+        mode: '0644'
+
+    - name: "Copy certificate key to {{consul_sever_cert_key}}"
+      become: true
+      ansible.builtin.copy:
+        src: "{{local_cert_gen_path}}/consul-server-key.pem"
+        dest: "{{consul_sever_cert_key}}"
+        owner: "{{consul_user}}"
+        group: "{{consul_group}}"
+        mode: '0644'
+
+    - name: restart consul service
+      ignore_errors: true
+      become: true
+      service:
+        name: consul
+        state: restarted
+
+
