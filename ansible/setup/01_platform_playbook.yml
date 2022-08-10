@@ -32,24 +32,24 @@
   roles:
     - {role: master_vault, tags: ['cert','vault']}
 
-#- hosts: all,!localhost
-#  name: "Master and worker platform installations"
-#  vars_files:
-#    - vars/versions.yml
-#    - vars/common_vars.yml
-#    - vars/vault.yml
-#  gather_facts: yes
-#  roles:
-#    - {role: consul, tags: ['cert','consul']}
-#- hosts: all
-#  name: "Facts"
-#  vars_files:
-#    - vars/versions.yml
-#    - vars/common_vars.yml
-#    - vars/vault.yml
-#  gather_facts: yes
-#  tasks:
-#    - debug:
-#        var: ansible_facts
-#  tags:
-#    facts
+- hosts: all,!localhost
+  name: "Master and worker platform installations"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+  gather_facts: yes
+  roles:
+    - {role: consul, tags: ['cert','consul']}
+- hosts: all
+  name: "Facts"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+  gather_facts: yes
+  tasks:
+    - debug:
+        var: ansible_facts
+  tags:
+    facts

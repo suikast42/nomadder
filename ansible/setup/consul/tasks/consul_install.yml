@@ -18,8 +18,7 @@
 
     - name: "Delete consul home dir if needed"
       ansible.builtin.file:
-        path: "{{consul_home_dir}}"
-        owner: vault
+        path: "{{consul_conf_dir}}"
         state: absent
         mode: '0755'
 
@@ -40,7 +39,7 @@
 - name: Create consul home dir
   become: true
   file:
-    path: "{{consul_home_dir }}"
+    path: "{{consul_conf_dir }}"
     owner: "{{consul_user}}"
     group: "{{consul_group}}"
     state: directory
@@ -113,7 +112,7 @@
       template:
         force: yes # replace the remote file when contents are different than the source.
         src: consulhcl/server.j2
-        dest: "{{consul_home_dir}}/consul.hcl"
+        dest: "{{consul_conf_dir}}/consul.hcl"
         owner: "{{ consul_user }}"
         group: "{{ consul_group }}"
 
@@ -122,7 +121,7 @@
       template:
         force: yes # replace the remote file when contents are different than the source.
         src: consulhcl/client.j2
-        dest: "{{consul_home_dir}}/consul.hcl"
+        dest: "{{consul_conf_dir}}/consul.hcl"
         owner: "{{ consul_user }}"
         group: "{{ consul_group }}"
   vars:

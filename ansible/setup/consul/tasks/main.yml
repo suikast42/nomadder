@@ -17,7 +17,7 @@
 
   vars:
     consul_data_dir: "/opt/deployments/core/consul/data"
-    consul_home_dir: "/etc/consul.d"
+    consul_conf_dir: "/etc/consul.d"
     consul_data_center: "nomadder_1"
     consul_server_certificate_dir: "{{consul_data_dir}}/cert"
     consul_dns: "consul.{{tls_san}}"
