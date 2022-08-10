@@ -33,6 +33,9 @@ vault_hosts:
 #cert path on nodes
 cert_path_master_0: /etc/ssl/private/cloudlocal
 ca_cert_path: /usr/local/share/ca-certificates/cloudlocal
+cluster_intermediate_ca_bundle: "{{ca_cert_path}}/cluster-ca/cluster-ca-bundle.pem"
 # cert path on local host
+local_ca_copy_path: "{{role_path}}/tmp/{{host_name}}/certs"
+local_ca_cert_conf: "{{role_path}}/../certificates_generate/files/cfssl/config.json"
 local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"
 local_cluster_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/cluster-ca"

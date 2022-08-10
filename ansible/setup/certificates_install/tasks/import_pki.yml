@@ -14,21 +14,21 @@
       mode: '0755'
       path: "{{ca_cert_path}}"
 
-  - name: "Copy ca to {{ca_cert_path}}"
+  - name: "Copy ca from {{local_ca_cert_path}} to {{ca_cert_path}}"
     become: true
     ansible.builtin.copy:
       src: "{{local_ca_cert_path}}/ca.pem"
       dest: "{{ca_cert_path}}/ca.crt"
       mode: '0644'
 
-  - name: "Copy cluster intermediate ca to {{ca_cert_path}}"
+  - name: "Copy cluster intermediate ca from {{local_cluster_ca_cert_path}} to {{ca_cert_path}}"
     become: true
     ansible.builtin.copy:
       src: "{{local_cluster_ca_cert_path}}/cluster-ca.pem"
       dest: "{{ca_cert_path}}/cluster-ca.crt"
       mode: '0644'
 
-  - name: "Copy cluster ca bundle to {{ca_cert_path}}"
+  - name: "Copy cluster ca bundle from {{local_cluster_ca_cert_path}} to {{ca_cert_path}}"
     become: true
     ansible.builtin.copy:
       src: "{{local_cluster_ca_cert_path}}/cluster-ca-bundle.pem"

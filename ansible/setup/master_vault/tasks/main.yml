@@ -15,8 +15,6 @@
       #cert path on nodes
       vault_cert_copy_path: /etc/opt/certs
       vault_cert_path: /etc/opt/certs/vault
-      # cert path on local host
-      local_ca_cert_path: "{{role_path}}/tmp/certs"
       cacheable: true
 
   - name: Set local cert files
@@ -25,7 +23,6 @@
       vault_data_dir: "/opt/deployments/core/vault/data"
       vault_cert: "{{vault_cert_path}}/vault.pem"
       vault_cert_key: "{{vault_cert_path}}/vault-key.pem"
-      ca_cert: "{{ca_cert_path}}/cluster-ca/cluster-ca.pem"
       cacheable: true
 
   - name: Set init vars
@@ -38,11 +35,16 @@
 - name: Vault installation
   block:
 
+  - name: "Copy certificates from master 0"
+    import_tasks: copy_certs_from_master_0.yml
+
+  - name: "Vault certificates"
+    import_tasks: install_certificates.yml
+
   - name: "Create vault user"
     import_tasks: user.yml
 
-  - name: "Vault certificates"
-    import_tasks: certificates.yml
+
 
   - name: "Vault installation"
     import_tasks: vault_install.yml

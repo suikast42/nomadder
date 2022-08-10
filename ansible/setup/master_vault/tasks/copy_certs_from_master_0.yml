@@ -1,0 +1,25 @@
+- name : Copy certs from master_0
+  run_once: true
+  block:
+
+  - name: "Delete certtificates from master on localhost {{update_certificates|bool == true}}"
+    when: update_certificates|bool == true
+    delegate_to: localhost
+    ansible.builtin.file:
+      path: "{{local_ca_copy_path}}"
+      state: absent
+
+  - name: "Create Vault certificate copy dir if needed"
+    delegate_to: localhost
+    ansible.builtin.file:
+      path: "{{local_ca_copy_path}}"
+      state: directory
+
+  - name: "Copy certs from master 0"
+    when: is_master_0
+    become: true
+    ansible.posix.synchronize:
+     mode: pull
+     src: "{{cert_path_master_0}}"
+     dest: "{{local_ca_copy_path}}"
+

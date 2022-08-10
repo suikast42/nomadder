@@ -17,7 +17,7 @@
     - vars/vault.yml
   gather_facts: yes
   roles:
-    - {role: certificates_install, tags: ['cert']}
+    - {role: certificates_install, tags: ['cert','cert_install']}
     - {role: dnsmasq, tags: ['dnsmasq']}
 
 # Single master setup
