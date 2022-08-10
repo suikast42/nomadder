@@ -13,7 +13,6 @@
   - name: Set local cert path
     set_fact:
       #cert path on nodes
-      vault_cert_copy_path: /etc/opt/certs
       vault_cert_path: /etc/opt/certs/vault
       cacheable: true
 
