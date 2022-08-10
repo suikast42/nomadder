@@ -16,7 +16,7 @@
       vault_cert_copy_path: /etc/opt/certs
       vault_cert_path: /etc/opt/certs/vault
       # cert path on local host
-      local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/vault"
+      local_ca_cert_path: "{{role_path}}/tmp/certs"
       cacheable: true
 
   - name: Set local cert files

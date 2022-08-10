@@ -16,6 +16,7 @@ is_local_host: "{{ inventory_hostname in groups['localhost'] }}"
 is_build_host: "{{ inventory_hostname in groups['build'] }}"
 is_master_host: "{{ inventory_hostname in groups['masters'] }}"
 is_worker_host: "{{ inventory_hostname in groups['workers'] }}"
+is_master_0: "{{hostvars[groups['masters'][0]]['ansible_hostname'] == host_name}}"
 
 vault_dns: "vault.{{tls_san}}"
 vault_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
@@ -30,6 +31,7 @@ vault_hosts:
 # path settings
 
 #cert path on nodes
+cert_path_master_0: /etc/ssl/private/cloudlocal
 ca_cert_path: /usr/local/share/ca-certificates/cloudlocal
 # cert path on local host
 local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"

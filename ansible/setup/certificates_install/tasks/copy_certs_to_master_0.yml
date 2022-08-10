@@ -1,0 +1,32 @@
+- name: Copy certificates to mater 0
+  become: true
+  run_once: true
+  when: is_master_0
+  block:
+    - name: "Delete ol certificates on master 0 {{update_certificates|bool == true}}"
+      when: update_certificates|bool == true
+      file:
+        state: absent
+        path: "{{cert_path_master_0}}"
+
+    - name: "Check if certificates exists on master 0"
+      stat:
+        path: "{{cert_path_master_0}}/ca/ca.pem"
+      register: caCert
+
+    - name: "Copy ca certs to {{ cert_path_master_0 }}"
+      when: not caCert.stat.exists
+      ansible.posix.synchronize:
+        src: "{{local_ca_cert_path}}"
+        dest: "{{ cert_path_master_0 }}"
+
+    - name: "Check if intermediate certificates exists on master 0"
+      stat:
+        path: "{{cert_path_master_0}}/cluster-ca/cluster-ca.pem"
+      register: caIntCert
+
+    - name: "Copy intermediate ca certs to {{ cert_path_master_0 }}"
+      when: not caIntCert.stat.exists
+      ansible.posix.synchronize:
+        src: "{{local_cluster_ca_cert_path}}"
+        dest: "{{ cert_path_master_0 }}"

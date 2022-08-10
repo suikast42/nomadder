@@ -18,23 +18,13 @@
     src: cluster-ca.j2
     dest: "{{role_path}}/files/config/cluster-ca.json"
 
-- name: Template vault.json
-  template:
-    force: yes
-    src: vault.j2
-    dest: "{{role_path}}/files/config/vault.json"
+#- name: Template vault.json
+#  template:
+#    force: yes
+#    src: vault.j2
+#    dest: "{{role_path}}/files/config/vault.json"
 
-# in case of multiple CA
-#- name: "Generate K8s CA certificates"
-#  delegate_to: localhost
-#  shell: |
-#    cfssl gencert -initca ../cfssl/k8s-ca.json | cfssljson -bare k8s-ca
-#    cfssl sign -ca ca.pem \
-#      -ca-key ca-key.pem \
-#      -config ../cfssl/config.json \
-#      -profile k8s-ca k8s-ca.csr | cfssljson -bare k8s-ca
-#  args:
-#    chdir: "{{role_path}}/files/certs"
+
 
 - name: "Generate ca certificates"
   shell: |
@@ -49,17 +39,20 @@
         -ca ../ca/ca.pem \
         -ca-key ../ca/ca-key.pem \
         -config ../../cfssl/config.json \
-        -profile ca  ../cluster-ca/cluster-ca.csr | cfssljson -bare cluster-ca
+        -profile intermediate_ca  ../cluster-ca/cluster-ca.csr | cfssljson -bare cluster-ca
+      cp ../ca/ca.pem ca.pem
+      mkbundle -f cluster-ca-bundle.pem ../cluster-ca
+      rm ca.pem
   args:
     chdir: "{{role_path}}/files/certs/cluster-ca"
 
 
-- name: "Generate vault certificates"
-  shell: |
-    cfssl gencert \
-      -ca ../cluster-ca/cluster-ca.pem \
-      -ca-key ../cluster-ca/cluster-ca-key.pem \
-      -config ../../cfssl/config.json \
-      -profile=vault_cli  ../../config/vault.json | cfssljson -bare vault
-  args:
-    chdir: "{{role_path}}/files/certs/vault"
+#- name: "Generate vault certificates"
+#  shell: |
+#    cfssl gencert \
+#      -ca ../cluster-ca/cluster-ca.pem \
+#      -ca-key ../cluster-ca/cluster-ca-key.pem \
+#      -config ../../cfssl/config.json \
+#      -profile=vault_cli  ../../config/vault.json | cfssljson -bare vault
+#  args:
+#    chdir: "{{role_path}}/files/certs/vault"
