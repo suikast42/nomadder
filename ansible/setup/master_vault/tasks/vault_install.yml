@@ -102,7 +102,7 @@
   - name: "Create Vault conf dir if needed"
     become: true
     ansible.builtin.file:
-      path: /etc/vault.d
+      path: "{{vault_conf_dir}}"
       owner: "{{vault_user}}"
       group: "{{vault_group}}"
       state: directory
@@ -112,7 +112,7 @@
   - name: config file
     template:
       src: vault.hcl.j2
-      dest: /etc/vault.d/vault.hcl
+      dest: "{{vault_conf_dir}}/vault.hcl"
       owner: "{{ vault_user }}"
       group: "{{ vault_group }}"
 
