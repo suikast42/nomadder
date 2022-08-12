@@ -1,0 +1,23 @@
+{
+    "node_name": "{{host_name}}",
+    "datacenter": "{{consul_data_center}}",
+    "data_dir": "{{consul_data_dir}}",
+	"ports": {"https":8501},
+	"bind_addr": "0.0.0.0",
+    "advertise_addr": "{{host_ip}}",
+    "auto_config":{
+        "enabled": true,
+        "intro_token_file": "{{consul_client_jwt_file}}",
+        "server_addresses":{{masters | to_json }}
+    },
+    "tls":{
+      "defaults":{
+          "ca_file": "{{cluster_intermediate_ca_bundle}}",
+           "verify_incoming": false,
+           "verify_outgoing": true
+      },
+      "internal_rpc":{
+         "verify_server_hostname": true
+      }
+    }
+}

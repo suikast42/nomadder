@@ -1,0 +1,27 @@
+# Read the content of jwt file from master  and
+# write it as file afer on remote host
+- name: "Slurp jwt token from {{masters[0]}}"
+  become: true
+  delegate_to: "{{masters[0]}}"
+  ansible.builtin.slurp:
+    src: "{{secint_build_dir}}/{{host_name}}.jwt"
+  register: jwt
+
+- name: "Create {{consul_client_jwt_dir}} if needed"
+  become: true
+  ansible.builtin.file:
+    path: "{{consul_client_jwt_dir}}"
+    owner: "{{consul_user}}"
+    group: "{{consul_group}}"
+    state: directory
+    mode: '0755'
+
+- name: "Copy"
+  become: true
+  copy:
+    force: true
+    owner: "{{consul_user}}"
+    group: "{{consul_group}}"
+    content: "{{ jwt.content | b64decode }}"
+    mode: '0755'
+    dest: "{{consul_client_jwt_file}}"

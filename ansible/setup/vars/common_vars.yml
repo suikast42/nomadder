@@ -9,8 +9,8 @@ registry_port: "5000"
 registry_port_push: "5001"
 registry_dns: "registry.{{tls_san}}"
 masters: "{{ groups['masters'] }}"
-workers: "{{ groups['workers']] }}"
-
+workers: "{{ groups['workers'] }}"
+worker_names: "{{groups['workers']|map('extract', hostvars, ['ansible_hostname']) |list}}"
 
 is_local_host: "{{ inventory_hostname in groups['localhost'] }}"
 is_build_host: "{{ inventory_hostname in groups['build'] }}"

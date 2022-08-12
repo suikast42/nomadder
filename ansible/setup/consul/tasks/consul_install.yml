@@ -9,23 +9,19 @@
         state: stopped
         enabled: false
 
-    - name: "Delete consul dir if needed"
+    - name: "Delete consul dir  {{consul_data_dir}} if present"
       ansible.builtin.file:
         path: "{{consul_data_dir}}"
-        owner: vault
         state: absent
-        mode: '0755'
 
-    - name: "Delete consul home dir if needed"
+    - name: "Delete consul conf dir  {{consul_conf_dir}} if present"
       ansible.builtin.file:
         path: "{{consul_conf_dir}}"
         state: absent
-        mode: '0755'
 
     - name: "Delete Consul installation"
       ansible.builtin.file:
         path: /usr/local/bin/consul
-        owner: vault
         state: absent
         mode: '0755'
 
@@ -39,7 +35,7 @@
 - name: Create consul home dir
   become: true
   file:
-    path: "{{consul_conf_dir }}"
+    path: "{{consul_conf_dir}}"
     owner: "{{consul_user}}"
     group: "{{consul_group}}"
     state: directory
@@ -62,8 +58,8 @@
       become: true
       ansible.builtin.file:
         path: "{{consul_data_dir}}"
-        owner: consul
-        group: consul
+        owner: "{{ consul_user }}"
+        group: "{{ consul_group }}"
         state: directory
         mode: '0755'
 
@@ -103,26 +99,3 @@
       # a reinstall triggers an error. Ignore this
       failed_when: install.rc > 2
 
-- name: Consul config files
-  become: true
-  block:
-
-    - name: config file server
-      when: is_master_host
-      template:
-        force: yes # replace the remote file when contents are different than the source.
-        src: consulhcl/server.j2
-        dest: "{{consul_conf_dir}}/consul.hcl"
-        owner: "{{ consul_user }}"
-        group: "{{ consul_group }}"
-
-    - name: config file client
-      when: is_worker_host
-      template:
-        force: yes # replace the remote file when contents are different than the source.
-        src: consulhcl/client.j2
-        dest: "{{consul_conf_dir}}/consul.hcl"
-        owner: "{{ consul_user }}"
-        group: "{{ consul_group }}"
-  vars:
-    consul_encrypt_key: "G1CHAD7wwu0tU28BlKkirSahTJ/Tqpo9ClOAycQAUwE="

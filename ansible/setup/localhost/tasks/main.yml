@@ -8,5 +8,24 @@
         - docker
       extra_args: --user
 
+  # Install secint on localhost
+  # Need for autoconfigure consul
+  # See https://github.com/hashicorp/learn-consul-docker/tree/main/datacenter-deploy-auto-config/secint
+  - name: Install secint
+    shell: |
+      git clone https://github.com/banks/secint
+      cd secint
+      go build 
+      sudo mv secint /usr/local/bin
+      cd ..
+      rm -R secint
+    args:
+      creates: /usr/local/bin/secint # oh-my-posh is already installed
+#    register: build
+#
+#  - name: "Debug install secint"
+#    debug:
+#      msg: "{{build}}"
+
   tags:
     - localhost
