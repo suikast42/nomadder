@@ -9,7 +9,7 @@ listener "tcp" {
 	address     = "0.0.0.0:8200"
 	tls_cert_file = "{{vault_cert}}"
 	tls_key_file = "{{vault_cert_key}}"
-	tls_client_ca_file = "{{ca_cert}}"
+	tls_client_ca_file = "{{cluster_intermediate_ca_bundle}}"
 	tls_disable = 0
 }
 

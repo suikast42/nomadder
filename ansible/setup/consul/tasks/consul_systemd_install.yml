@@ -1,0 +1,40 @@
+- name: Install consul systemd service
+  become: true
+  block:
+    - name: Template consul.service.server
+      when: is_master_host
+      template:
+        force: yes
+        src: service/consul.service.server.j2
+        dest: /etc/systemd/system/consul.service
+      register: serviceconfig
+
+    - name: Template consul.service.server
+      when: is_worker_host
+      template:
+        force: yes
+        src: service/consul.service.client.j2
+        dest: /etc/systemd/system/consul.service
+      register: serviceconfig
+
+    - name: stop consul service
+      failed_when: false
+      service:
+        name: consul
+        state: stopped
+
+    - name: Reload systemd
+      when: serviceconfig.changed
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: start consul service
+      service:
+        name: consul
+        state: started
+        enabled: yes
+      register: consulservice
+      until: consulservice.status.ActiveState == "active"
+      retries: 10
+      delay: 5
+

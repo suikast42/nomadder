@@ -1,13 +1,12 @@
 {
   "signing": {
     "default": {
-      "expiry": "367920h"
+      "expiry": "8760h"
     },
     "profiles": {
-      "ca": {
+      "intermediate_ca": {
         "usages": [
           "signing",
-          "non repudiation",
           "digital signature",
           "key encipherment",
           "cert sign",
@@ -15,14 +14,14 @@
           "server auth",
           "client auth"
         ],
-        "expiry": "367920h",
+        "expiry": "8760h",
         "ca_constraint": {
           "is_ca": true,
           "max_path_len": 0,
           "max_path_len_zero": true
         }
       },
-      "vault_cli": {
+      "peer": {
         "usages": [
           "signing",
           "digital signature",
@@ -30,7 +29,25 @@
           "client auth",
           "server auth"
         ],
-        "expiry": "350400h"
+        "expiry": "8760h"
+      },
+      "server": {
+        "usages": [
+          "signing",
+          "digital signing",
+          "key encipherment",
+          "server auth"
+        ],
+        "expiry": "8760h"
+      },
+      "client": {
+        "usages": [
+          "signing",
+          "digital signature",
+          "key encipherment",
+          "client auth"
+        ],
+        "expiry": "8760h"
       }
     }
   }

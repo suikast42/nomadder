@@ -2,4 +2,20 @@ vault_version: "1.11.1"
 vault_checksum: "sha256:aa2ed532d9a0ecc8635fed63cb3fb6de472b4c01ca622a9a199cd92a046bc73a"
 update_vault: false
 uninstall_vault: false
+vault_group: vault
+vault_user: vault
+
+consul_version: "1.12.3"
+consul_checksum: "sha256:620a47cfba34bdf918b4c3238d22f6318b29403888cfd927c6006a4ac1b1c9f6"
+update_consul: false
+uninstall_consul: false
+
+consul_template_version: "0.29.1"
+consul_template_checksum: "sha256:bd051cba75fc86bb1e27a741c69e3f39ea877e15f04e220f8e7e4f2f83127bc3"
+update_consul_template: false
+uninstall_consul_template: false
+
+consul_group: consul
+consul_user: consul
+
 update_certificates: false

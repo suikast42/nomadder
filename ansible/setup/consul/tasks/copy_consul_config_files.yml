@@ -1,0 +1,21 @@
+- name: Consul config files
+  become: true
+  block:
+
+    - name: config file server
+      when: is_master_host
+      template:
+        force: yes # replace the remote file when contents are different than the source.
+        src: consulhcl/server_json.j2
+        dest: "{{consul_conf_dir}}/server.json"
+        owner: "{{ consul_user }}"
+        group: "{{ consul_group }}"
+
+    - name: config file client
+      when: is_worker_host
+      template:
+        force: yes # replace the remote file when contents are different than the source.
+        src: consulhcl/client_json.j2
+        dest: "{{consul_conf_dir}}/client.json"
+        owner: "{{ consul_user }}"
+        group: "{{ consul_group }}"

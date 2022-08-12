@@ -1,11 +1,8 @@
 {
-  "CN": "{{ca_cert_cn}}",
+  "CN": "server.{{host_name}}.{{consul_data_center}}.consul",
   "key": {
     "algo": "rsa",
     "size": 4096
-  },
-  "ca": {
-    "expiry": "36288h"
   },
   "names": [
     {
@@ -15,5 +12,6 @@
       "OU": "{{ca_cert_name_ou}}",
       "ST": "{{ca_cert_name_st}}"
     }
-  ]
+  ],
+  "hosts": {{(consul_servers + masters) | to_json }}
 }

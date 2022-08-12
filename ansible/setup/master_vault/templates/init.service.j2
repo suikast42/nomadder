@@ -2,7 +2,7 @@
 Description=a tool for managing secrets
 Documentation=https://vaultproject.io/docs/
 After=network.target
-ConditionFileNotEmpty=/etc/vault.hcl
+ConditionFileNotEmpty={{vault_conf_dir}}/vault.hcl
 
 [Service]
 User=vault

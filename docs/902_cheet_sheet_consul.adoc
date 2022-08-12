@@ -1,0 +1,20 @@
+.Consul CLI cheatsheet
+|===
+|Description |Command
+
+
+|Validate config
+a|[source,shell]
+----
+consul validate /etc/consul.d/
+----
+
+|Start consul server as user consul
+a|[source,shell]
+----
+sudo -H -u consul bash -c 'consul agent -config-dir=/etc/consul.d'
+----
+
+
+|===
+

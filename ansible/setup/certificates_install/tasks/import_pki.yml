@@ -1,0 +1,46 @@
+- name : "Check if certificates exists on host"
+  stat:
+    path: "{{ca_cert_path}}/ca.crt"
+  register: caCert
+
+- name: "Import PKI {{ not caCert.stat.exists }}"
+  when: not caCert.stat.exists
+  block:
+
+  - name: "Create certificate folder {{ca_cert_path}} if needed "
+    become: true
+    file:
+      state: directory
+      mode: '0755'
+      path: "{{ca_cert_path}}"
+
+  - name: "Copy ca from {{local_ca_cert_path}} to {{ca_cert_path}}"
+    become: true
+    ansible.builtin.copy:
+      src: "{{local_ca_cert_path}}/ca.pem"
+      dest: "{{ca_cert_path}}/ca.crt"
+      mode: '0644'
+
+  - name: "Copy cluster intermediate ca from {{local_cluster_ca_cert_path}} to {{ca_cert_path}}"
+    become: true
+    ansible.builtin.copy:
+      src: "{{local_cluster_ca_cert_path}}/cluster-ca.pem"
+      dest: "{{ca_cert_path}}/cluster-ca.crt"
+      mode: '0644'
+
+  - name: "Copy cluster ca bundle from {{local_cluster_ca_cert_path}} to {{ca_cert_path}}"
+    become: true
+    ansible.builtin.copy:
+      src: "{{local_cluster_ca_cert_path}}/cluster-ca-bundle.pem"
+      dest: "{{ca_cert_path}}/cluster-ca-bundle.pem"
+      mode: '0644'
+
+
+  - name: "Refresh trust store "
+    become: true
+    shell: update-ca-certificates
+    register: caimport
+
+  - name: "Deleted certs"
+    debug:
+      msg: "{{ caimport }}"

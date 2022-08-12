@@ -1,0 +1,41 @@
+- name: Consul template uninstall
+  become: true
+  when: uninstall_consul_template|bool == true
+  block:
+
+    - name: "Delete consul-template installation"
+      ansible.builtin.file:
+        path: /usr/local/bin/consul-template
+        owner: vault
+        state: absent
+        mode: '0755'
+
+
+- name : Check consul installation present
+  stat:
+    path: /usr/local/bin/consul-template
+  register: consulTemplateInstalled
+
+- name: Consul Template
+  when: not consulTemplateInstalled.stat.exists
+  become: true
+  block:
+    - name: Download Consul Template
+      get_url:
+        url:  https://releases.hashicorp.com/consul-template/{{consul_template_version}}/consul-template_{{consul_template_version}}_linux_amd64.zip
+        dest: /consul-template{{consul_template_version}}.tgz
+        owner: "{{ consul_user }}"
+        group: "{{ consul_group }}"
+        mode: 0755
+        checksum: "{{consul_template_checksum}}"
+      register: consul_template_download
+
+    - name: "Unzip consul template archive"
+      unarchive:
+        src: "{{ consul_template_download.dest }}"
+        dest: /usr/local/bin
+        copy: no
+        owner: "{{ consul_user }}"
+        group: "{{ consul_group }}"
+        mode: 0755
+

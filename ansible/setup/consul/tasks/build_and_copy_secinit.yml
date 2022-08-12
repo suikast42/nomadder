@@ -1,0 +1,44 @@
+# see https://github.com/hashicorp/learn-consul-docker/tree/main/datacenter-deploy-auto-config/secint
+- name: "Copy secint to master 0"
+  become: true
+  ansible.builtin.copy:
+    src: /usr/local/bin/secint
+    dest: /usr/local/bin/secint
+    mode: '0755'
+
+- name: "Build secint jwts"
+  become: true
+  block:
+
+    - name: "Create secint build dir if needed"
+      become: true
+      ansible.builtin.file:
+        path: "{{secint_build_dir}}"
+        state: directory
+        mode: '0755'
+
+    - name: "Secint init"
+      shell: secint init
+      args:
+        creates: "{{secint_build_dir}}/secint-priv-key.pem"
+        chdir: "{{secint_build_dir}}"
+
+    - name: "Secint create jwt"
+      shell: "secint mint -node {{item}} -issuer secint -audience consul-cluster-{{consul_data_center}} -ttl 1h > {{item}}.jwt"
+      with_items: "{{worker_names}}"
+      args:
+        creates: "{{item}}.jwt"
+        chdir: "{{secint_build_dir}}"
+
+    - name: "Grep pub key secint"
+      changed_when: false
+      shell: "cat secint-pub-key.pem |  jq -sR"
+      register: pubkey
+      args:
+        chdir: "{{secint_build_dir}}"
+
+    - name: Save pubkey in fact
+      set_fact:
+        secint_pubkey: "{{pubkey.stdout | regex_replace('\"', '')}}"
+        cacheable: true
+

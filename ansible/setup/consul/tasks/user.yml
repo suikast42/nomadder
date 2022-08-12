@@ -1,0 +1,19 @@
+- name: Consul user
+  become: true
+  block:
+
+    - name: "Creating group {{ consul_group }}"
+      group:
+        name: "{{ consul_group }}"
+        state: present
+
+    - name: "Creating user {{ consul_user }}"
+      user:
+        name: "{{ consul_user }}"
+        group: "{{ consul_group }}"
+        system: yes
+        shell: "/sbin/false"
+        comment: "{{ consul_user }} nologin User"
+        createhome: no
+        home: "{{consul_conf_dir}}"
+        state: present

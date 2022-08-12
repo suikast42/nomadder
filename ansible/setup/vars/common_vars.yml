@@ -9,13 +9,14 @@ registry_port: "5000"
 registry_port_push: "5001"
 registry_dns: "registry.{{tls_san}}"
 masters: "{{ groups['masters'] }}"
-workers: "{{ groups['workers']] }}"
-
+workers: "{{ groups['workers'] }}"
+worker_names: "{{groups['workers']|map('extract', hostvars, ['ansible_hostname']) |list}}"
 
 is_local_host: "{{ inventory_hostname in groups['localhost'] }}"
 is_build_host: "{{ inventory_hostname in groups['build'] }}"
 is_master_host: "{{ inventory_hostname in groups['masters'] }}"
 is_worker_host: "{{ inventory_hostname in groups['workers'] }}"
+is_master_0: "{{hostvars[groups['masters'][0]]['ansible_hostname'] == host_name}}"
 
 vault_dns: "vault.{{tls_san}}"
 vault_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
@@ -25,13 +26,17 @@ vault_hosts:
   - "{{vault_dns}}"
   - "{{vault_ip}}"
 
-vault_group: vault
-vault_user: vault
+
 
 # path settings
 
 #cert path on nodes
+cert_path_master_0: /etc/ssl/private/cloudlocal
 ca_cert_path: /usr/local/share/ca-certificates/cloudlocal
+cluster_intermediate_ca_bundle: "{{ca_cert_path}}/cluster-ca-bundle.pem"
 # cert path on local host
+local_ca_copy_path: "{{role_path}}/tmp/certs"
+local_cert_gen_path: "{{local_ca_copy_path}}/{{host_name}}"
+local_ca_cert_conf: "{{role_path}}/../certificates_generate/files/cfssl/config.json"
 local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"
 local_cluster_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/cluster-ca"
