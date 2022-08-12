@@ -10,6 +10,9 @@
         "intro_token_file": "{{consul_client_jwt_file}}",
         "server_addresses":{{masters | to_json }}
     },
+    "node_meta": {
+        "node_type": "worker"
+    },
     "tls":{
       "defaults":{
           "ca_file": "{{cluster_intermediate_ca_bundle}}",
