@@ -9,6 +9,12 @@
         state: stopped
         enabled: false
 
+
+    - name: "Delete secint dir {{secint_build_dir}} if present"
+      ansible.builtin.file:
+        path: "{{ secint_build_dir}}"
+        state: absent
+
     - name: "Delete consul dir  {{consul_data_dir}} if present"
       ansible.builtin.file:
         path: "{{consul_data_dir}}"

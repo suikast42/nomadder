@@ -35,7 +35,8 @@
   - name: "Install consul-template"
     import_tasks: consul_template_install.yml
 
-
+  - name: "Systemd service"
+    import_tasks: consul_systemd_install.yml
 
   vars:
     consul_initial_management_token: "e95b599e-166e-7d80-08ad-aee76e7ddf19"
