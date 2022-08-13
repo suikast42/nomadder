@@ -49,7 +49,7 @@
     consul_conf_dir: "/etc/consul.d"
     consul_cert_path: "/etc/opt/certs/consul"
     consul_sever_cert: "{{consul_cert_path}}/consul-server.pem"
-    consul_sever_cert_key: "{{consul_cert_path}}consul-server-key.pem"
+    consul_sever_cert_key: "{{consul_cert_path}}/consul-server-key.pem"
     consul_dns: "consul.{{tls_san}}"
     consul_servers:
       - "127.0.0.1"

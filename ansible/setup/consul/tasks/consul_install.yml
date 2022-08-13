@@ -25,6 +25,11 @@
         path: "{{consul_conf_dir}}"
         state: absent
 
+    - name: "Delete consul cert dir  {{consul_cert_path}} if present"
+      ansible.builtin.file:
+        path: "{{  consul_cert_path}}"
+        state: absent
+
     - name: "Delete Consul installation"
       ansible.builtin.file:
         path: /usr/local/bin/consul

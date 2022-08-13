@@ -1,0 +1,20 @@
+log_level = "DEBUG"
+datacenter = "{{data_center}}"
+data_dir =  "{{nomad_data_dir}}"
+
+server {
+  enabled = true
+  bootstrap_expect =  {{masters|length}}
+}
+
+tls {
+  http = true
+  rpc  = true
+
+  ca_file   = "{{cluster_intermediate_ca_bundle}}"
+  cert_file = "{{nomad_cert}}"
+  key_file  = "{{nomad_cert_key}}"
+
+  verify_server_hostname = true
+  verify_https_client    = true
+}

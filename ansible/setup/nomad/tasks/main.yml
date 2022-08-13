@@ -16,16 +16,26 @@
     - name: Install certificates
       include_tasks: install_certificates.yml
 
+    - name: Install nomad
+      include_tasks: nomad_install.yml
+
+    - name: Nomad config
+      include_tasks: copy_copy_config_files.yml
+
+    - name: Nomad service
+      include_tasks: nomad_systemd_install.yml
+
   vars:
-    nomad_user: "nomad"
-    nomad_group: "nomad"
     nomad_conf_dir: "/etc/nomad.d"
     nomad_cert_path: /etc/opt/certs/nomad
     nomad_cert: "{{nomad_cert_path}}/nomad.pem"
-    consul_dns: "nomad.{{tls_san}}"
-    consul_servers:
+    nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"
+    nomad_cli_cert: "{{nomad_cert_path}}/nomad-cli.pem"
+    nomad_data_dir: "/opt/deployments/core/nomad/data"
+    nomad_dns: "nomad.{{tls_san}}"
+    nomad_servers:
       - "127.0.0.1"
       - "localhost"
-      - "{{consul_dns}}"
+      - "{{nomad_dns}}"
       - "server.{{data_center}}.nomad"
       - "server.{{host_name}}.{{data_center}}.nomad"
