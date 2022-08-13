@@ -2,6 +2,7 @@
 # auto_encrypt setting ensures that the client certificate generations is automated by consul
 - name: Certificates
   block:
+
     - name: "Update certificates {{ update_certificates|bool == true }} "
       become: true
       file:
@@ -9,7 +10,7 @@
         path: "{{nomad_cert_path}}"
       when: update_certificates|bool == true
 
-    - name : "Check if consul certificate exist on node -> {{    nomad_cert}}"
+    - name : "Check if consul certificate exist on node -> {{nomad_cert}}"
       stat:
         path: "{{nomad_cert}}"
       register: cert

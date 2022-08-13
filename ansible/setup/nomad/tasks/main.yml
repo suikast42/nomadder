@@ -13,11 +13,11 @@
         create_group: "{{nomad_group}}"
         create_usr_conf_dir: "{{nomad_conf_dir}}"
 
-    - name: Install certificates
-      include_tasks: install_certificates.yml
-
     - name: Install nomad
       include_tasks: nomad_install.yml
+
+    - name: Install certificates
+      include_tasks: install_certificates.yml
 
     - name: Nomad config
       include_tasks: copy_copy_config_files.yml
@@ -35,6 +35,7 @@
     nomad_dns: "nomad.{{tls_san}}"
     nomad_servers:
       - "127.0.0.1"
+      - "server.global.nomad"
       - "localhost"
       - "{{nomad_dns}}"
       - "server.{{data_center}}.nomad"

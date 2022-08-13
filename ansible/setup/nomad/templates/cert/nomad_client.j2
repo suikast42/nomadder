@@ -13,5 +13,5 @@
       "ST": "{{ca_cert_name_st}}"
     }
   ],
-  "hosts": {{(consul_servers + masters) | to_json }}
+  "hosts": {{(nomad_servers + masters) | to_json }}
 }
