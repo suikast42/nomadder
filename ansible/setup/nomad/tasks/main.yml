@@ -26,6 +26,8 @@
       include_tasks: nomad_systemd_install.yml
 
   vars:
+    # todo define this in common
+    nomad_consul_initial_agent_token: "e95b599e-166e-7d80-08ad-aee76e7ddf19"
     nomad_conf_dir: "/etc/nomad.d"
     nomad_cert_path: /etc/opt/certs/nomad
     nomad_cert: "{{nomad_cert_path}}/nomad.pem"
@@ -33,6 +35,7 @@
     nomad_cli_cert: "{{nomad_cert_path}}/nomad-cli.pem"
     nomad_data_dir: "/opt/deployments/core/nomad/data"
     nomad_dns: "nomad.{{tls_san}}"
+    nomad_encrypt_key: "4PRfoE6Mj9dHTLpnzmYD1+THdlyAo2Ji4U6ewMumpAw="
     nomad_servers:
       - "127.0.0.1"
       - "server.global.nomad"

@@ -2,9 +2,11 @@ log_level = "DEBUG"
 datacenter = "{{data_center}}"
 data_dir =  "{{nomad_data_dir}}"
 
+
 server {
   enabled = true
   bootstrap_expect =  {{masters|length}}
+  encrypt = "{{nomad_encrypt_key}}"
 }
 
 tls {
@@ -16,5 +18,9 @@ tls {
   key_file  = "{{nomad_cert_key}}"
 
   verify_server_hostname = true
-  verify_https_client    = true
+  verify_https_client    = false
+}
+
+consul{
+    token = "{{nomad_consul_initial_agent_token}}"
 }

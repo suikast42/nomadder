@@ -17,3 +17,7 @@ tls {
   verify_server_hostname = true
   verify_https_client    = true
 }
+
+consul{
+    token = "{{nomad_consul_initial_agent_token}}"
+}
