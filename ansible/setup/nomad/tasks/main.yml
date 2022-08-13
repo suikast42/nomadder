@@ -1,0 +1,31 @@
+# see https://learn.hashicorp.com/tutorials/nomad/production-deployment-guide-vm-with-consul
+- name: nomad installation
+  block:
+    - name: copy certificate from master[0]
+      include_tasks: common/tasks/copy_certs_from_master_0.yml
+      vars:
+        for_service: nomad
+
+    - name: "Create user {{nomad_user}}"
+      include_tasks: common/tasks/user.yml
+      vars:
+        create_user: "{{nomad_user}}"
+        create_group: "{{nomad_group}}"
+        create_usr_conf_dir: "{{nomad_conf_dir}}"
+
+    - name: Install certificates
+      include_tasks: install_certificates.yml
+
+  vars:
+    nomad_user: "nomad"
+    nomad_group: "nomad"
+    nomad_conf_dir: "/etc/nomad.d"
+    nomad_cert_path: /etc/opt/certs/nomad
+    nomad_cert: "{{nomad_cert_path}}/nomad.pem"
+    consul_dns: "nomad.{{tls_san}}"
+    consul_servers:
+      - "127.0.0.1"
+      - "localhost"
+      - "{{consul_dns}}"
+      - "server.{{data_center}}.nomad"
+      - "server.{{host_name}}.{{data_center}}.nomad"

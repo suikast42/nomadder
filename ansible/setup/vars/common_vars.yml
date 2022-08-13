@@ -28,8 +28,8 @@ vault_hosts:
 
 
 
-# path settings
-
+# consul and nomad datacenter name
+data_center: "nomadder_1"
 #cert path on nodes
 cert_path_master_0: /etc/ssl/private/cloudlocal
 ca_cert_path: /usr/local/share/ca-certificates/cloudlocal
