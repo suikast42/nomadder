@@ -16,6 +16,9 @@
     - name: Install nomad
       include_tasks: nomad_install.yml
 
+    - name: Install nomad plugin cni
+      include_tasks: nomad_plugin_cni_install.yml
+
     - name: Install certificates
       include_tasks: install_certificates.yml
 
