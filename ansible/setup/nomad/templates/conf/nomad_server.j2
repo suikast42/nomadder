@@ -24,3 +24,15 @@ tls {
 consul{
     token = "{{nomad_consul_initial_agent_token}}"
 }
+
+ui {
+  enabled =  true
+
+  consul {
+    ui_url = "http://{{master_ip}}:8500/ui"
+  }
+
+  vault {
+    ui_url = "https://{{master_ip}}:8200/ui"
+  }
+}

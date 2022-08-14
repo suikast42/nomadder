@@ -1,5 +1,0 @@
-
-
-[[_200_link_vault_ca_delete,vault_delete_ca]]https://discuss.hashicorp.com/t/pki-tidy-didnt-remove-revoked-certificates/38449/8[Understanding why can't why vault can't delete long living certificates]
-
-
