@@ -1,0 +1,21 @@
+- name: nomad config files
+  become: true
+  block:
+
+    - name: config file server
+      when: is_master_host
+      template:
+        force: yes # replace the remote file when contents are different than the source.
+        src: conf/nomad_server.j2
+        dest: "{{nomad_conf_dir}}/server.hcl"
+        owner: "{{ nomad_user }}"
+        group: "{{ nomad_group }}"
+
+    - name: config file client
+      when: is_worker_host
+      template:
+        force: yes # replace the remote file when contents are different than the source.
+        src: conf/nomad_client.j2
+        dest: "{{nomad_conf_dir}}/client.hcl"
+        owner: "{{ nomad_user }}"
+        group: "{{ nomad_group }}"

@@ -1,0 +1,101 @@
+- name: nomad uninstall
+  become: true
+  when: uninstall_nomad|bool == true
+  block:
+    - name: stop nomad service
+      failed_when: false
+      service:
+        name: nomad
+        state: stopped
+        enabled: false
+
+
+    - name: "Delete nomad dir  {{nomad_data_dir}} if present"
+      ansible.builtin.file:
+        path: "{{nomad_data_dir}}"
+        state: absent
+
+    - name: "Delete nomad conf dir  {{nomad_conf_dir}} if present"
+      ansible.builtin.file:
+        path: "{{nomad_conf_dir}}"
+        state: absent
+
+    - name: "Delete nomad cert dir  {{nomad_cert_path}} if present"
+      ansible.builtin.file:
+        path: "{{nomad_cert_path}}"
+        state: absent
+
+
+    - name: "Delete nomad installation"
+      ansible.builtin.file:
+        path: /usr/local/bin/nomad
+        state: absent
+        mode: '0755'
+
+
+- name : Check nomad installation present
+  stat:
+    path: /usr/local/bin/nomad
+  register: nomadInstalled
+
+
+- name: Create nomad home dir
+  become: true
+  file:
+    path: "{{nomad_conf_dir}}"
+    owner: "{{nomad_user}}"
+    group: "{{nomad_group}}"
+    state: directory
+    mode: '0755'
+
+
+- name: nomad install
+  become: true
+  when: not nomadInstalled.stat.exists
+  block:
+    - name: "Create nomad data dir if needed"
+      become: true
+      file:
+        path: "{{nomad_data_dir}}"
+        owner: "{{nomad_user}}"
+        group: "{{nomad_group}}"
+        state: directory
+        mode: '0755'
+
+
+    - name: Download nomad binary
+      get_url:
+        url: https://releases.hashicorp.com/nomad/{{nomad_version}}/nomad_{{nomad_version}}_linux_amd64.zip
+        dest: /tmp/consul{{nomad_version}}_linux_amd64.zip
+        owner: "{{ nomad_user }}"
+        group: "{{ nomad_group }}"
+        mode: 0755
+        checksum: "{{nomad_checksum}}"
+      register: nomad_download
+
+    - name: "Unzip nomad archive"
+      unarchive:
+        src: "{{ nomad_download.dest }}"
+        dest: /usr/local/bin
+        copy: no
+        owner: "{{ nomad_user }}"
+        group: "{{ nomad_group }}"
+        mode: 0755
+
+    - name: Install nomad autocomplete for root
+      shell: |
+        nomad -autocomplete-install
+      register: install
+      changed_when: false
+      # a reinstall triggers an error. Ignore this
+      failed_when: install.rc > 2
+
+    - name: Install nomad autocomplete for user
+      become: false
+      shell: |
+        nomad -autocomplete-install
+      changed_when: false
+      register: install
+      # a reinstall triggers an error. Ignore this
+      failed_when: install.rc > 2
+

@@ -1,5 +1,5 @@
 {
-  "CN": "server.{{host_name}}.{{data_center}}.consul",
+  "CN": "cli.{{host_name}}.{{data_center}}.nomad",
   "key": {
     "algo": "rsa",
     "size": 4096
@@ -12,6 +12,5 @@
       "OU": "{{ca_cert_name_ou}}",
       "ST": "{{ca_cert_name_st}}"
     }
-  ],
-  "hosts": {{(consul_servers + masters) | to_json }}
+  ]
 }

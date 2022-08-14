@@ -3,7 +3,7 @@
   run_once: true
   when: is_master_0
   block:
-    - name: "Delete ol certificates on master 0 {{update_certificates|bool == true}}"
+    - name: "Delete old certificates on master 0 {{update_certificates|bool == true}}"
       when: update_certificates|bool == true
       file:
         state: absent

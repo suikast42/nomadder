@@ -24,7 +24,7 @@
         chdir: "{{secint_build_dir}}"
 
     - name: "Secint create jwt"
-      shell: "secint mint -node {{item}} -issuer secint -audience consul-cluster-{{consul_data_center}} -ttl 1h > {{item}}.jwt"
+      shell: "secint mint -node {{item}} -issuer secint -audience consul-cluster-{{data_center}} -ttl 1h > {{item}}.jwt"
       with_items: "{{worker_names}}"
       args:
         creates: "{{item}}.jwt"

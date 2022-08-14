@@ -41,3 +41,4 @@
   gather_facts: yes
   roles:
     - {role: consul, tags: ['cert','consul']}
+    - {role: nomad, tags: ['cert','nomad']}
