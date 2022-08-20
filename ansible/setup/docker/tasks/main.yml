@@ -1,0 +1,6 @@
+- name: Docker installation
+  block:
+    - name: "Install docker"
+      include_tasks: install_docker.yml
+  vars:
+    docker_download_dir: "/tmp/docker"

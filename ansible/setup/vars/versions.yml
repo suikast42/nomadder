@@ -24,4 +24,8 @@ uninstall_nomad_plugin_cni: false
 nomad_group: nomad
 nomad_user: nomad
 
+
+docker_version: "20.10.17"
+uninstall_docker: false
+
 update_certificates: false

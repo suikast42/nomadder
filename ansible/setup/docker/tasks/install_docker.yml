@@ -1,0 +1,94 @@
+- name: Uninstall docker
+  become: true
+  when: uninstall_docker|bool == true
+  block:
+
+    - name: Stop docker socket
+      failed_when: false
+      service:
+        name: docker.socket
+        state: stopped
+        enabled: false
+
+    - name: Stop docker damon
+      failed_when: false
+      service:
+        name: docker
+        state: stopped
+        enabled: false
+
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: "Uninstall docker packages"
+      become: true
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+          - docker-scan-plugin
+
+        state: absent
+
+    - name: "Delete docker files"
+      file:
+        state: absent
+        path: "{{item}}"
+      with_items:
+        - "{{docker_download_dir}}"
+        - "/var/lib/docker"
+        - "/etc/apparmor.d/docker"
+        - "/var/run/docker.sock"
+        - "/var/lib/containerd"
+        - "/usr/bin/docker"
+        - "/usr/bin/dockerd"
+
+- name: "Install docker"
+  become: true
+  block:
+    - name: Docker group add if not present
+      become: true
+      group:
+        name: docker
+        state: present
+
+    - name: "{{ ansible_ssh_user }} userGrp conf"
+      become: true
+      ansible.builtin.user:
+        name: "{{ ansible_ssh_user }}"
+        groups: root, docker
+        state: present
+
+    - name: "Create docker download dir if needed"
+      file:
+        state: directory
+        path: "{{docker_download_dir}}"
+
+    - name: "Install docker V {{ docker_version }}"
+      delay: 0
+      async: 300
+      poll: 1
+      shell: |
+        export VERSION={{docker_version}}
+        curl -fsSL https://get.docker.com -o install-docker.sh
+        chmod +x install-docker.sh
+        ./install-docker.sh
+        grep -qF '{{ ansible_ssh_user }} - nofile 65536' /etc/security/limits.conf || echo '{{ ansible_ssh_user }} - nofile 65536' >> /etc/security/limits.conf
+        systemctl enable docker
+      args:
+        creates: /usr/bin/docker # docker is already installed
+        chdir: /tmp/docker
+      register: dockerInstall
+
+    - name: Start docker damon
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+#    - name: Debug docker install
+#      debug:
+#        msg: "{{dockerInstall}}"

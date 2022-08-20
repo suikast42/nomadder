@@ -42,3 +42,4 @@
   roles:
     - {role: consul, tags: ['cert','consul']}
     - {role: nomad, tags: ['cert','nomad']}
+    - {role: docker, tags: ['cert','docker']}
