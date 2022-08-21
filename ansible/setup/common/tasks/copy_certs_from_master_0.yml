@@ -19,6 +19,7 @@
 
   - name: "Copy certs from master 0 to {{local_ca_copy_path}}"
     when: is_master_0
+    run_once: true
     become: true
     ansible.posix.synchronize:
      mode: pull

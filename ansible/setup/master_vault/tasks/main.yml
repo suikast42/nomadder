@@ -39,7 +39,11 @@
     import_tasks: user.yml
 
   - name: Copy certificates from master 0
-    import_tasks: copy_certs_from_master_0.yml
+    when: is_buildnode_host
+    include_tasks: common/tasks/copy_certs_from_master_0.yml
+    vars:
+      for_service: vault
+
 
   - name: "Vault certificates"
     import_tasks: install_certificates.yml

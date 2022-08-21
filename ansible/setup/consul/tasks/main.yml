@@ -21,9 +21,12 @@
   - name: Consul config files
     import_tasks: copy_consul_config_files.yml
 
-
   - name: Copy certificates from master 0
-    import_tasks: copy_certs_from_master_0.yml
+    when: is_buildnode_host
+    include_tasks: common/tasks/copy_certs_from_master_0.yml
+    vars:
+      for_service: consul
+
 
   # Consul agents have only the cluster ca bundle in the ubuntu trust store
   # The TLS certificates are handles over autoconfiguration
