@@ -1,0 +1,153 @@
+# The certificates are installed only on servers
+# auto_encrypt setting ensures that the client certificate generations is automated by consul
+- name: Set local cert path
+  set_fact:
+    local_cert_path_client: "{{ lookup('env','DOCKER_CERT_PATH') }}"
+    docker_server_cert: "{{docker_cert_path}}/docker-server.pem"
+    docker_server_cert_key: "{{docker_cert_path}}/docker-server-key.pem"
+
+- name: Certificates
+  block:
+    - name: "Update certificates {{ update_certificates|bool == true }} "
+      become: true
+      file:
+        state: absent
+        path: "{{docker_cert_path}}"
+      when: update_certificates|bool == true
+
+    - name: "Update certificates {{ update_certificates|bool == true }} "
+      become: true
+      delegate_to: localhost
+      run_once: true
+      file:
+        state: absent
+        path: "{{local_cert_path_client}}"
+      when: update_certificates|bool == true
+
+    - name : "Check if docker certificate exist on node -> {{docker_cert_path}}/docker-server.pem"
+      stat:
+        path: "{{docker_cert_path}}/docker-server.pem"
+      register: cert
+
+- name: Install certificates
+  when: not cert.stat.exists
+  block:
+
+    - name: "Change file ownership, group and permissions for {{docker_cert_path}}"
+      become: true
+      ansible.builtin.file:
+        path: "{{docker_cert_path}}"
+        owner: "{{ansible_ssh_user}}"
+        group: docker
+        state: directory
+        mode: '0755'
+
+    - name: "Change file ownership, group and permissions for {{docker_cert_path}}/client_cert"
+      become: true
+      ansible.builtin.file:
+        path: "{{docker_cert_path}}/client_cert"
+        owner: "{{ansible_ssh_user}}"
+        group: docker
+        state: directory
+        mode: '0755'
+
+    - name: "Create docker certificate work dir if needed {{local_cert_gen_path}}"
+      delegate_to: localhost
+      ansible.builtin.file:
+        path: "{{local_cert_gen_path}}"
+        state: directory
+
+    - name: "Create docker client cert dir if needed {{local_cert_path_client}}"
+      delegate_to: localhost
+      ansible.builtin.file:
+        path: "{{local_cert_path_client}}"
+        state: directory
+
+    - name: Template docker-server.json
+      delegate_to: localhost
+      template:
+        force: yes
+        src: cert/docker-server.j2
+        dest: "{{local_cert_gen_path}}/docker-server.json"
+
+    # One client certificate for local host access
+    - name: Template docker-client.json
+      run_once: true
+      delegate_to: localhost
+      template:
+        force: yes
+        src: cert/docker-client.j2
+        dest: "{{local_cert_gen_path}}/docker-client.json"
+
+    - name: "Generate docker server certificate(s) in {{local_cert_gen_path}}"
+      delegate_to: localhost
+      shell: |
+        cfssl gencert \
+          -ca ../cloudlocal/cluster-ca/cluster-ca.pem \
+          -ca-key ../cloudlocal/cluster-ca/cluster-ca-key.pem \
+          -config {{local_ca_cert_conf}} \
+          -profile server docker-server.json | cfssljson -bare docker-server
+      args:
+        chdir: "{{local_cert_gen_path}}"
+
+    - name: "Generate docker client certificate in {{local_cert_gen_path}}"
+      run_once: true
+      delegate_to: localhost
+      shell: |
+        cfssl gencert \
+          -ca ../cloudlocal/cluster-ca/cluster-ca.pem \
+          -ca-key ../cloudlocal/cluster-ca/cluster-ca-key.pem \
+          -config {{local_ca_cert_conf}} \
+          -profile client docker-client.json | cfssljson -bare docker-client
+        mv docker-client.pem {{local_cert_path_client}}/cert.pem
+        mv docker-client-key.pem {{local_cert_path_client}}/key.pem
+        cp ../cloudlocal/cluster-ca/cluster-ca-bundle.pem {{local_cert_path_client}}/ca.pem
+      args:
+        chdir: "{{local_cert_gen_path}}"
+
+    - name: "Copy client certificate to {{docker_cert_path}}/client_cert"
+      become: true
+      ansible.builtin.copy:
+        src: "{{local_cert_path_client}}/"
+        dest: "{{docker_cert_path}}/client_cert"
+        owner: "{{ansible_ssh_user}}"
+        group: docker
+        mode: '0644'
+
+    - name: "Copy docker server certificate to {{docker_cert_path}}"
+      become: true
+      ansible.builtin.copy:
+        src: "{{item}}"
+        dest: "{{docker_cert_path}}"
+        owner: "{{ansible_ssh_user}}"
+        group: docker
+        mode: '0644'
+      with_items:
+        - "{{local_cert_gen_path}}/docker-server.pem"
+        - "{{local_cert_gen_path}}/docker-server-key.pem"
+
+    - name: Copy Docker daemon template
+      become: true
+      template:
+        force: yes
+        src: docker/daemon.json
+        dest: /etc/docker
+        owner: "{{ansible_ssh_user}}"
+        group: docker
+        mode: '0644'
+
+    - name: "Docker Hosts Workaround"
+      become: true
+      delay: 0
+      async: 300
+      poll: 1
+      shell: |
+        cp /lib/systemd/system/docker.service /etc/systemd/system/
+        sed -i 's# -H\ fd:\/\/# #g' /etc/systemd/system/docker.service
+        systemctl daemon-reload
+
+    - name: Start docker service
+      become: true
+      service:
+        name: docker
+        state: restarted

@@ -1,6 +1,6 @@
 vault_version: "1.11.1"
 vault_checksum: "sha256:aa2ed532d9a0ecc8635fed63cb3fb6de472b4c01ca622a9a199cd92a046bc73a"
-update_vault: false
+uninstall_vault: false
 vault_group: vault
 vault_user: vault
 
@@ -23,5 +23,9 @@ nomad_plugin_cni_checksum: "sha256:b275772da4026d2161bf8a8b41ed4786754c8a93ebfb6
 uninstall_nomad_plugin_cni: false
 nomad_group: nomad
 nomad_user: nomad
+
+
+docker_version: "20.10.17"
+uninstall_docker: false
 
 update_certificates: false

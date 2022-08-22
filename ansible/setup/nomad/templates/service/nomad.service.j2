@@ -14,8 +14,19 @@ After=consul.service
 
 # Nomad server should be run as the nomad user. Nomad clients
 # should be run as root
+{% if is_master_host  %}
 User={{nomad_user}}
+{% else %}
+User=root
+{% endif %}
+
+{% if is_master_host  %}
 Group={{nomad_group}}
+{% else %}
+Group=root
+{% endif %}
+
+
 
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStart=/usr/local/bin/nomad agent -config {{nomad_conf_dir}}

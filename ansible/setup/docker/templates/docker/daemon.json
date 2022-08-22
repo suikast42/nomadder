@@ -1,0 +1,16 @@
+{
+  "log-opts": {
+    "max-size": "20m",
+    "max-file": "2"
+  },
+  "icc": false,
+  "tls": true,
+  "tlsverify": true,
+  "tlscacert": "{{cluster_intermediate_ca_bundle}}",
+  "tlscert": "{{docker_server_cert}}",
+  "tlskey": "{{docker_server_cert_key}}",
+  "userland-proxy": false,
+  "default-ulimit": "nofile=50:100",
+  "hosts": ["unix:///var/run/docker.sock", "tcp://{{host_ip}}:2375"],
+  "registry-mirrors": ["https://{{registry_dns}}:{{registry_port}}"]
+}

@@ -1,0 +1,17 @@
+- name: Docker installation
+  block:
+    - name: "Install docker"
+      include_tasks: install_docker.yml
+
+    - name: Copy certificates from master 0
+      when: is_buildnode_host
+      include_tasks: common/tasks/copy_certs_from_master_0.yml
+      vars:
+        for_service: docker
+
+    - name: "Docker build node installation"
+      when: is_buildnode_host
+      include_tasks: docker_remote.yml
+  vars:
+    docker_download_dir: "/tmp/docker"
+    docker_cert_path: "/etc/opt/certs/docker"
