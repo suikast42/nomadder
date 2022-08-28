@@ -4,6 +4,14 @@ data_dir =  "{{nomad_data_dir}}"
 
 client {
   enabled = true
+  meta{
+      host.index={{worker_index}}
+  }
+  host_volume "mysql_data" {
+      path      = "/opt/volumes/mysql/data"
+      read_only = false
+  }
+
 }
 
 tls {

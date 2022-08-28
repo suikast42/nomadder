@@ -10,7 +10,7 @@
         state: stopped
         enabled: false
 
-    - name: Stop docker damon
+    - name: Stop docker daemon
       failed_when: false
       service:
         name: docker
@@ -90,7 +90,7 @@
         chdir: /tmp/docker
       register: dockerInstall
 
-    - name: Start docker damon
+    - name: Start docker daemon
       service:
         name: docker
         state: started

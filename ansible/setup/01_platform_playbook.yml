@@ -43,3 +43,13 @@
     - {role: consul, tags: ['cert','consul']}
     - {role: nomad, tags: ['cert','nomad']}
     - {role: docker, tags: ['cert','docker']}
+
+- hosts: all
+  name: "Test"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+  gather_facts: yes
+  roles:
+    - {role: test, tags: ['never','test']}

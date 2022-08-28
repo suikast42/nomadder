@@ -1,0 +1,43 @@
+- name: Test Nomad local volumes
+  when: is_worker_host
+  become: true
+  block:
+  - name: restart nomad service
+    ignore_errors: true
+    service:
+      name: nomad
+      state: stopped
+
+  - name: "(Re)Create the host volumes"
+    delay: 0
+    async: 60
+    poll: 1
+    shell: |
+      rm -R /opt/volumes
+      mkdir -p /opt/volumes/mysql/data
+
+  - name: config file client
+    template:
+      force: yes # replace the remote file when contents are different than the source.
+      src: nomad_client.j2
+      dest: "{{nomad_conf_dir}}/client.hcl"
+      owner: nomad
+      group: nomad
+
+  - name: restart nomad service
+    service:
+      name: nomad
+      state: restarted
+  vars:
+    nomad_consul_initial_agent_token: "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+    cert_path_master_0: /etc/ssl/private/cloudlocal
+    ca_cert_path: /usr/local/share/ca-certificates/cloudlocal
+    cluster_intermediate_ca_bundle: "{{ca_cert_path}}/cluster-ca-bundle.pem"
+    nomad_cert_path: /etc/opt/certs/nomad
+    nomad_cert: "{{nomad_cert_path}}/nomad.pem"
+    nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"
+    nomad_cli_cert: "{{nomad_cert_path}}/nomad-cli.pem"
+    nomad_data_dir: "/opt/deployments/core/nomad/data"
+    nomad_dns: "nomad.{{tls_san}}"
+    nomad_conf_dir: "/etc/nomad.d"
+    data_center: "nomadder_1"

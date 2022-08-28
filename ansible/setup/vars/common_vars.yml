@@ -11,6 +11,7 @@ masters: "{{ groups['masters'] }}"
 workers: "{{ groups['workers'] }}"
 builders: "{{ groups['build'] }}"
 worker_names: "{{groups['workers']|map('extract', hostvars, ['ansible_hostname']) |list}}"
+worker_index: "{{groups['workers'].index(inventory_hostname)}}"
 
 is_local_host: "{{ inventory_hostname in groups['localhost'] }}"
 is_build_host: "{{ inventory_hostname in groups['build'] }}"
