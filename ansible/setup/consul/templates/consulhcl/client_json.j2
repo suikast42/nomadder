@@ -13,6 +13,13 @@
     "node_meta": {
         "node_type": "worker"
     },
+    "ports": {
+        "grpc" : 8502,
+        "https": 8501
+    },
+    "connect": {
+        "enabled": true
+    },
     "tls":{
       "defaults":{
           "ca_file": "{{cluster_intermediate_ca_bundle}}",

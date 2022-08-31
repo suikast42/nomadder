@@ -17,6 +17,9 @@
         "grpc" : 8502,
         "https": 8501
     },
+    "connect": {
+        "enabled": true
+    },
     "retry_join":{{masters | to_json }},
     "bootstrap_expect": {{masters|length}},
 	"acl": {
