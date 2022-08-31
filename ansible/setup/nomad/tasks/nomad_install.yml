@@ -53,7 +53,18 @@
   become: true
   when: not nomadInstalled.stat.exists
   block:
-    - name: "Create nomad data dir if needed"
+#  Permissions
+#  Nomad servers and Nomad clients have different requirements for permissions.
+#  Nomad servers should be run with the lowest possible permissions.
+#  They need access to their own data directory and the ability to bind to their ports.
+#  You should create a nomad user with the minimal set of required privileges.
+#
+#  Nomad clients should be run as root due to the OS isolation mechanisms that require root privileges.
+#  While it is possible to run Nomad as an unprivileged user, careful testing must be done to ensure the task drivers and
+#  features you use function as expected. The Nomad client's
+#  data directory should be owned by root with filesystem permissions set to 0700.
+    - name: "Create nomad data dir for master if needed"
+      when: is_master_host
       become: true
       file:
         path: "{{nomad_data_dir}}"
@@ -61,6 +72,16 @@
         group: "{{nomad_group}}"
         state: directory
         mode: '0755'
+
+    - name: "Create nomad data dir for worker if needed"
+      when: is_worker_host
+      become: true
+      file:
+        path: "{{nomad_data_dir}}"
+        owner: root
+        group: root
+        state: directory
+        mode: '0700'
 
 
     - name: Download nomad binary

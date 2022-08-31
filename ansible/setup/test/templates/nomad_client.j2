@@ -1,10 +1,17 @@
 log_level = "DEBUG"
-name = "{{host_name}}"
 datacenter = "{{data_center}}"
 data_dir =  "{{nomad_data_dir}}"
 
 client {
   enabled = true
+  meta{
+      host.index={{worker_index}}
+  }
+  host_volume "mysql_data" {
+      path      = "/opt/volumes/mysql/data"
+      read_only = false
+  }
+
 }
 
 tls {
@@ -25,6 +32,7 @@ consul{
 
 plugin "docker" {
   config {
+    allow_privileged = true
     volumes {
       enabled      = true
     }

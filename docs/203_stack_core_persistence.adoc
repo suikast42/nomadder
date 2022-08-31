@@ -1,0 +1,64 @@
+=== Persistence with nomad
+
+Nomad handles with two types of persistence.
+
+1. HostPath
+2. Over CSI Driver
+
+==== Hostpath persistence
+This is a simple mapping from static OS directories with nomad. The volumes to map from the host nomad must statically placed in nomad agents client configuration see <<sample_nomad_host_volume_mapping>>.
+
+After refreshing a entry the nomad service must be restarted.
+
+[[sample_nomad_host_volume_mapping,Nomad agent client conf]]
+.Nomad agent client conf
+[source,hcl]
+----
+client {
+   enabled = true
+   meta{
+   host.index=2
+}
+
+# The name mysql_data i sused in job config for referencing this volume
+host_volume "mysql_data" {
+  path      = "/opt/volumes/mysql/data"
+  read_only = false
+}
+
+
+----
+
+Advantages:
+
+* Simple to use ( for small size of cluster )
+* Fast persistence
+
+Disadvantages:
+
+* The operator of the platform must statically maintain the volumes on every host and restart the agents
+* Scaling of stateful workloads is not easy. The operator must define a task per cluster instance see <<_900_link_hasicrop_stack_install_es>>
+
+
+==== CSI persistence
+On the other hand it is possible to handle persistence over a csi driver. Over the CSi dirver the operator can create, snapshot, restore and delete volumes over nomad csi.
+
+Advantages:
+
+* Flexible volume management
+* Automated backups and restore of volumes
+* Scales for stateful workloads
+
+Disadvantages:
+
+* Depends on your CSI drives slower then native host path
+* Needs knowledge of the CSI implementation.
+* If the CSI driver not works then every stateful workload not works in the cluster
+* Consumes additional CPU and RAM resources on the hosts.
+
+There a lot of CSI implementations:
+ * Portworkx: To many important features are enterprise and have to many dependencies to the linux kernel. For example it is not possible to run portworkx on ubuntu 22.04 without downgrading the kernel.
+* Cinder: needs a extra dependency for authentication ( Keystone )
+* hostpath: is not a production ready implementation.
+* kadalu: needs a storage implementation underneath like flusterfs.
+* Ceph: Ceph is a candidate for CSI evaluation. Because it doesn't need an external dependency. Define Ceph with cephfs is enough to run the csi driver.See   https://github.com/suikast42/nomadder/issues/30[issue]

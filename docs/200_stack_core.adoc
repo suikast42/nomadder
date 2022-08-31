@@ -1,2 +1,5 @@
 <<<
 include::202_stack_core_consul.adoc[]
+
+<<<
+include::203_stack_core_persistence.adoc[]
