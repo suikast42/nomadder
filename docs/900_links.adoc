@@ -20,6 +20,7 @@ endif::imagesdir[]
 * [[_900_link_hasicrop_forum,HashiCrop discuss forum]]https://discuss.hashicorp.com[HashiCrop discuss forum]
 * [[_900_link_hasicrop_stack_install,HashiCrop stack install alternatives]]https://discuss.hashicorp.com/t/nomad-cluster-for-smart-home/33833[HashiCrop stack install alternatives]
 
+* [[_900_link_hasicrop_stack_install_es,HashiCrop stack install elasticsearch]]https://itnext.io/elasticsearch-on-nomad-ae685b762779[HashiCrop stack install elasticsearch]
 
 
 

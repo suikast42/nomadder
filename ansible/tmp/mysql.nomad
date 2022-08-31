@@ -11,7 +11,7 @@ job "mysql-server" {
       value     = "true"
     }
     constraint {
-      attribute = "${attr.host.index}"
+      attribute = "${meta.host.index}"
       value     = "${NOMAD_ALLOC_INDEX}"
     }
     volume "mysql" {
