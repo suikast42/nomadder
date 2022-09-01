@@ -6,21 +6,38 @@ job "webserver" {
     count = 3
 
     network {
+      mode = "bridge"
       port "http" {
         to = 80
+      }
+      port "healthcheck" {
+        to = -1
       }
     }
 
     service {
       name = "apache-webserver"
       tags = ["urlprefix-webserver.cloud.private:80","webserver.urlprefix-cloud.private:443"]
-      port = "http"
+      port = "80"
+#      check {
+#        name     = "alive"
+#        type     = "http"
+#        path     = "/"
+#        interval = "10s"
+#        timeout  = "2s"
+#      }
       check {
-        name     = "alive"
+        name     = "apache-webserver-health"
+        port     = "healthcheck"
         type     = "http"
-        path     = "/"
+        protocol = "http"
+        path     = "/health"
         interval = "10s"
-        timeout  = "2s"
+        timeout  = "3s"
+        expose   = true
+      }
+      connect {
+        sidecar_service {}
       }
     }
 
