@@ -9,9 +9,9 @@
         path: "{{consul_cert_path}}"
       when: update_certificates|bool == true
 
-    - name : "Check if consul certificate exist on node -> {{consul_cert_path}}/consul-server.pem"
+    - name : "Check if consul certificate exist on node -> {{consul_cert_path}}/consul.pem"
       stat:
-        path: "{{consul_cert_path}}/consul-server.pem"
+        path: "{{consul_cert_path}}/consul.pem"
       register: cert
 
 - name: Install certificates
@@ -33,39 +33,73 @@
         path: "{{local_cert_gen_path}}"
         state: directory
 
-    - name: Template consul.json
+    - name: Template consul server .json
+      when: is_master_host
       delegate_to: localhost
       template:
         force: yes
-        src: cert/consul.j2
+        src: cert/consul_server.j2
+        dest: "{{local_cert_gen_path}}/consul.json"
+
+    - name: Template consul client .json
+      when: is_worker_host
+      delegate_to: localhost
+      template:
+        force: yes
+        src: cert/consul_client.j2
         dest: "{{local_cert_gen_path}}/consul.json"
 
 
     - name: "Generate consul certificates in {{local_cert_gen_path}}"
+      when: is_master_host
       delegate_to: localhost
       shell: |
         cfssl gencert \
           -ca ../cloudlocal/cluster-ca/cluster-ca.pem \
           -ca-key ../cloudlocal/cluster-ca/cluster-ca-key.pem \
           -config {{local_ca_cert_conf}} \
-          -profile peer consul.json | cfssljson -bare consul-server
+          -profile peer consul.json | cfssljson -bare consul
       args:
         chdir: "{{local_cert_gen_path}}"
 
-    - name: "Copy certificate to {{consul_sever_cert}}"
+    - name: "Generate consul certificates in {{local_cert_gen_path}}"
+      when: is_worker_host
+      delegate_to: localhost
+      shell: |
+        cfssl gencert \
+          -ca ../cloudlocal/cluster-ca/cluster-ca.pem \
+          -ca-key ../cloudlocal/cluster-ca/cluster-ca-key.pem \
+          -config {{local_ca_cert_conf}} \
+          -profile client consul.json | cfssljson -bare consul
+      args:
+        chdir: "{{local_cert_gen_path}}"
+
+    - name: "Generate consul certificates in {{local_cert_gen_path}}"
+      when: is_worker_host
+      delegate_to: localhost
+      shell: |
+        cfssl gencert \
+          -ca ../cloudlocal/cluster-ca/cluster-ca.pem \
+          -ca-key ../cloudlocal/cluster-ca/cluster-ca-key.pem \
+          -config {{local_ca_cert_conf}} \
+          -profile peer consul.json | cfssljson -bare consul
+      args:
+        chdir: "{{local_cert_gen_path}}"
+
+    - name: "Copy certificate to {{consul_cert}}"
       become: true
       ansible.builtin.copy:
-        src: "{{local_cert_gen_path}}/consul-server.pem"
-        dest: "{{consul_sever_cert}}"
+        src: "{{local_cert_gen_path}}/consul.pem"
+        dest: "{{consul_cert}}"
         owner: "{{consul_user}}"
         group: "{{consul_group}}"
         mode: '0644'
 
-    - name: "Copy certificate key to {{consul_sever_cert_key}}"
+    - name: "Copy certificate key to {{consul_cert_key}}"
       become: true
       ansible.builtin.copy:
-        src: "{{local_cert_gen_path}}/consul-server-key.pem"
-        dest: "{{consul_sever_cert_key}}"
+        src: "{{local_cert_gen_path}}/consul-key.pem"
+        dest: "{{consul_cert_key}}"
         owner: "{{consul_user}}"
         group: "{{consul_group}}"
         mode: '0644'

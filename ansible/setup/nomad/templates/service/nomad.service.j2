@@ -11,6 +11,10 @@ Wants=consul.service
 After=consul.service
 
 [Service]
+{% if is_worker_host  %}
+Environment="CONSUL_HTTP_ADDR=127.0.0.1:8501"
+Environment="CONSUL_HTTP_SSL=true"
+{% endif %}
 
 # Nomad server should be run as the nomad user. Nomad clients
 # should be run as root

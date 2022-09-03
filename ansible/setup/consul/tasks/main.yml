@@ -33,7 +33,7 @@
   # see https://github.com/hashicorp/learn-consul-docker/tree/main/datacenter-deploy-auto-config/secint
   - name: "Intsall certificates"
     import_tasks: install_certificates.yml
-    when: is_master_host
+#    when: is_master_host
 
   - name: "Install consul-template"
     import_tasks: consul_template_install.yml
@@ -51,8 +51,8 @@
     consul_client_jwt_file: "{{consul_client_jwt_dir}}/{{host_name}}.jwt"
     consul_conf_dir: "/etc/consul.d"
     consul_cert_path: "/etc/opt/certs/consul"
-    consul_sever_cert: "{{consul_cert_path}}/consul-server.pem"
-    consul_sever_cert_key: "{{consul_cert_path}}/consul-server-key.pem"
+    consul_cert: "{{consul_cert_path}}/consul.pem"
+    consul_cert_key: "{{consul_cert_path}}/consul-key.pem"
     consul_dns: "consul.{{tls_san}}"
     consul_servers:
       - "127.0.0.1"

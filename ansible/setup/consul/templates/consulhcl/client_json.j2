@@ -22,9 +22,11 @@
     },
     "tls":{
       "defaults":{
-          "ca_file": "{{cluster_intermediate_ca_bundle}}",
-           "verify_incoming": false,
-           "verify_outgoing": true
+        "ca_file": "{{cluster_intermediate_ca_bundle}}",
+        "cert_file": "{{consul_cert}}",
+        "key_file": "{{consul_cert_key}}",
+        "verify_incoming": false,
+        "verify_outgoing": true
       },
       "internal_rpc":{
          "verify_server_hostname": true

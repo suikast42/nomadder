@@ -7,6 +7,7 @@
     "bind_addr": "0.0.0.0",
     "advertise_addr": "{{host_ip}}",
     "client_addr": "0.0.0.0",
+    "encrypt": "{{consul_encrypt_key}}",
     "ui_config": {
         "enabled" : true
     },
@@ -53,18 +54,16 @@
     "node_meta": {
         "node_type": "server"
     },
-    "encrypt": "{{consul_encrypt_key}}",
     "tls":{
       "defaults":{
-          "ca_file": "{{cluster_intermediate_ca_bundle}}",
-          "cert_file": "{{consul_sever_cert}}",
-          "key_file": "{{consul_sever_cert_key}}",
-          "verify_incoming": true,
-          "verify_outgoing": true
+        "ca_file": "{{cluster_intermediate_ca_bundle}}",
+        "cert_file": "{{consul_cert}}",
+        "key_file": "{{consul_cert_key}}",
+        "verify_incoming": true,
+        "verify_outgoing": true
       },
-      "internal_rpc":{
+     "internal_rpc":{
          "verify_server_hostname": true
-      }
+     }
     }
-
 }
