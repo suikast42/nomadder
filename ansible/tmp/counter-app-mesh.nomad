@@ -1,4 +1,4 @@
-job "countdash" {
+job "countdash_mesh" {
   datacenters = ["nomadder_1"]
 
   group "api" {

@@ -5,6 +5,23 @@ data_dir =  "{{nomad_data_dir}}"
 
 client {
   enabled = true
+  host_network "private" {
+    interface = "eth0"
+    #cidr = "203.0.113.0/24"
+    #reserved_ports = "22,80"
+  }
+  host_network "default" {
+      interface = "eth1"
+  }
+  host_network "public" {
+    interface = "eth1"
+  }
+  host_network "local" {
+    interface = "lo"
+  }
+  host_network "nomad" {
+    interface = "nomad"
+  }
 }
 
 tls {
