@@ -28,6 +28,7 @@
 		"default_policy": "deny",
 		"enable_token_persistence": true,
 		"tokens": {
+		    "default": "{{consul_initial_management_token}}",
 			"initial_management": "{{consul_initial_management_token}}",
 			"agent": "{{consul_initial_agent_token}}"
 		}

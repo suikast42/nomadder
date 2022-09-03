@@ -5,6 +5,14 @@
 	"ports": {"https":8501},
 	"bind_addr": "0.0.0.0",
     "advertise_addr": "{{host_ip}}",
+    "acl": {
+        "enabled": true,
+        "default_policy": "deny",
+        "enable_token_persistence": true,
+        "tokens": {
+            "default": "{{consul_initial_management_token}}"
+        }
+    },
     "auto_config":{
         "enabled": true,
         "intro_token_file": "{{consul_client_jwt_file}}",

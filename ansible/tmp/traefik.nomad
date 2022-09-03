@@ -1,6 +1,6 @@
 job "ingress" {
   region      = "global"
-  datacenters = ["nomadder_1"]
+  datacenters = ["nomadder1"]
   type        = "system"
 
 

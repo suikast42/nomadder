@@ -1,5 +1,5 @@
 job "traefik" {
-  datacenters = ["nomadder_1"]
+  datacenters = ["nomadder1"]
 
   group "edge" {
     network {

@@ -1,5 +1,5 @@
 job "webserver" {
-  datacenters = ["nomadder_1"]
+  datacenters = ["nomadder1"]
   type = "service"
 
   group "webserver" {
