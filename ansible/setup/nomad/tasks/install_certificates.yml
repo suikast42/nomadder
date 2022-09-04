@@ -119,7 +119,7 @@
             - "{{local_cert_gen_path}}/cert/nomad-key.pem"
 
 
-    - name: restart consul service
+    - name: restart nomad service
       ignore_errors: true
       become: true
       service:
