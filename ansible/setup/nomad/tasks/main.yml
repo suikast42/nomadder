@@ -1,10 +1,6 @@
 # see https://learn.hashicorp.com/tutorials/nomad/production-deployment-guide-vm-with-consul
 - name: nomad installation
   block:
-    - name: copy certificate from master[0]
-      include_tasks: common/tasks/copy_certs_from_master_0.yml
-      vars:
-        for_service: nomad
 
     - name: "Create user {{nomad_user}}"
       include_tasks: common/tasks/user.yml
@@ -19,8 +15,6 @@
     - name: Install nomad plugin cni
       include_tasks: nomad_plugin_cni_install.yml
 
-    - name: Install certificates
-      include_tasks: install_certificates.yml
 
     - name: Nomad config
       include_tasks: copy_copy_config_files.yml

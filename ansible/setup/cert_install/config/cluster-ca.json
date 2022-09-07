@@ -1,0 +1,19 @@
+{
+  "CN": "Amovacloud Nomad the hard way CA Intermedia CA for cloud.private",
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "ca": {
+      "expiry": "36288h"
+  },
+  "names": [
+    {
+      "C": "DE",
+      "L": "Hilchenbach",
+      "O": "TD",
+      "OU": "TDP",
+      "ST": "NRW"
+    }
+  ]
+}

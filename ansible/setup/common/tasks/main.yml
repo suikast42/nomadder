@@ -33,5 +33,9 @@
   - name: "Config tmux {{host_name}}"
     import_tasks: config_tmux.yml
 
+  - name: "Install cfssl tmux {{host_name}}"
+    when: is_master_0
+    run_once: true
+    import_tasks: install_cfssl.yml
   tags:
     - nodes

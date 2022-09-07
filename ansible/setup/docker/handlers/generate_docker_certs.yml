@@ -1,0 +1,138 @@
+# Consul agents have only the cluster ca bundle in the ubuntu trust store
+# The TLS certificates are handles over autoconfiguration
+# see https://github.com/hashicorp/learn-consul-docker/tree/main/datacenter-deploy-auto-config/secint
+- name: "Generate docker certs"
+  become: true
+  block:
+    - name: Stop docker
+      failed_when: false
+      service:
+        name: docker
+        state: stopped
+
+
+    - name: "Delete cfssl_working_dir on master 0"
+      delegate_to: "{{masters[0]}}"
+      file:
+        path: "{{cfssl_working_dir}}"
+        state: absent
+
+
+    - name: "Delete docker certs"
+      file:
+        path: "{{docker_cert_path}}"
+        state: absent
+
+
+    - name: "Delete local client certs"
+      run_once: true
+      delegate_to: localhost
+      file:
+        path: "{{local_cert_path_docker_client}}"
+        state: absent
+
+
+    - name: "Create docker certs dir if needed"
+      file:
+        path: "{{docker_cert_path}}"
+        state: directory
+        mode: '0400'
+        group: docker
+
+
+    - name: "Create cfssl_working_dir on master 0 if needed"
+      delegate_to: "{{masters[0]}}"
+      file:
+        state: directory
+        mode: '0700'
+        path: "{{cfssl_working_dir}}"
+
+    - name: "Create docker client cert dir on localhost if needed"
+      run_once: true
+      delegate_to: localhost
+      file:
+        state: directory
+        path: "{{local_cert_path_docker_client}}"
+
+    - name: Template docker-server.json
+      delegate_to: "{{masters[0]}}"
+      template:
+        force: yes
+        src: ../templates/cert/docker-server.j2
+        dest: "{{cfssl_working_dir}}/docker-server.json"
+
+    - name: Template docker-client.json
+      when: is_build_host
+      delegate_to: "{{masters[0]}}"
+      template:
+        force: yes
+        src: ../templates/cert/docker-client.j2
+        dest: "{{cfssl_working_dir}}/docker-client.json"
+
+    - name: Template docker daemon json
+      when: is_build_host
+      template:
+        force: yes
+        src: ../templates/docker/daemon.json
+        dest: /etc/docker
+        group: docker
+        mode: '0644'
+
+    - name: "Generate docker server certificate(s) in  on master 0"
+      register: cfsslgen
+      failed_when: cfsslgen.rc != 0
+      delegate_to: "{{masters[0]}}"
+      shell: |
+        cfssl gencert \
+          -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
+          -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
+          -config {{cert_path_master_0}}/cfssl/config.json \
+          -profile server docker-server.json | cfssljson -bare docker-server
+      args:
+        chdir: "{{cfssl_working_dir}}"
+
+    - name: "Generate docker client certificate(s) in on master 0"
+      when: is_build_host
+      register: cfsslgen
+      failed_when: cfsslgen.rc != 0
+      delegate_to: "{{masters[0]}}"
+      shell: |
+        cfssl gencert \
+          -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
+          -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
+          -config {{cert_path_master_0}}/cfssl/config.json \
+          -profile client docker-client.json | cfssljson -bare docker-client
+      args:
+        chdir: "{{cfssl_working_dir}}"
+
+    - name: "Copy docker server certs"
+      include_tasks: cert_install/tasks/copy_from_master_0.yml
+      loop:
+        - { src: '{{cfssl_working_dir}}/docker-server.pem', dest: '{{docker_server_cert}}' ,mode: '0400'}
+        - { src: '{{cfssl_working_dir}}/docker-server-key.pem', dest: '{{docker_server_cert_key}}',mode: '0400'}
+
+    - name: "Copy docker client certs"
+      when: is_build_host
+      run_once: true
+      include_tasks: cert_install/tasks/copy_from_master_0.yml
+      loop:
+        - { src: '{{cluster_intermediate_ca_bundle}}', dest: '{{local_cert_path_docker_client}}/ca.pem', host: localhost}
+        - { src: '{{cfssl_working_dir}}/docker-client.pem', dest: '{{ local_cert_path_docker_client}}/cert.pem', host: localhost }
+        - { src: '{{cfssl_working_dir}}/docker-client-key.pem', dest: '{{local_cert_path_docker_client}}/key.pem', host: localhost}
+
+    - name: Start docker
+      ignore_errors: true
+      service:
+        name: docker
+        state: started
+      register: dockerService
+      until: dockerService.status.ActiveState == "active"
+      retries: 10
+      delay: 5
+
+  vars:
+    - local_cert_path_docker_client: "{{ lookup('env','DOCKER_CERT_PATH') }}"
+    - cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/docker"
+    - docker_cert_path: "/etc/opt/certs/docker"
+    - docker_server_cert: "{{docker_cert_path}}/docker-server.pem"
+    - docker_server_cert_key: "{{docker_cert_path}}/docker-server-key.pem"

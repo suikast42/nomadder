@@ -1,0 +1,111 @@
+- name: "Generate consul certs"
+  become: true
+  block:
+    - name: Stop consul
+      failed_when: false
+      service:
+        name: consul
+        state: stopped
+
+
+    - name: "Delete cfssl_working_dir on master 0"
+      delegate_to: "{{masters[0]}}"
+      file:
+        path: "{{cfssl_working_dir}}"
+        state: absent
+
+
+    - name: "Delete consul certs"
+      file:
+        path: "{{consul_cert_path}}"
+        state: absent
+
+
+    - name: "Create consul certs dir if needed"
+      file:
+        path: "{{consul_cert_path}}"
+        state: directory
+        owner: "{{consul_user}}"
+        group: "{{consul_group}}"
+        mode: '0755'
+
+
+    - name: "Create cfssl_working_dir on master 0 if needed"
+      delegate_to: "{{masters[0]}}"
+      file:
+        state: directory
+        mode: '0700'
+        path: "{{cfssl_working_dir}}"
+
+
+    - name: Template consul-server.json
+      delegate_to: "{{masters[0]}}"
+      template:
+        force: yes
+        src: ../templates/cert/consul_server.j2
+        dest: "{{cfssl_working_dir}}/consul_server.json"
+
+    - name: Template consul-client.json
+      delegate_to: "{{masters[0]}}"
+      template:
+        force: yes
+        src: ../templates/cert/consul_client.j2
+        dest: "{{cfssl_working_dir}}/consul_client.json"
+
+    - name: "Generate consul server certificate(s) in  on master 0"
+      register: cfsslgen
+      when: is_master_host
+      failed_when: cfsslgen.rc != 0
+      delegate_to: "{{masters[0]}}"
+      shell: |
+        cfssl gencert \
+          -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
+          -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
+          -config {{cert_path_master_0}}/cfssl/config.json \
+          -profile peer consul_server.json | cfssljson -bare consul
+      args:
+        chdir: "{{cfssl_working_dir}}"
+
+    - name: "Generate consul client certificate(s) in  on master 0"
+      register: cfsslgen
+      when: is_worker_host
+      failed_when: cfsslgen.rc != 0
+      delegate_to: "{{masters[0]}}"
+      shell: |
+        cfssl gencert \
+          -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
+          -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
+          -config {{cert_path_master_0}}/cfssl/config.json \
+          -profile peer consul_client.json | cfssljson -bare consul
+      args:
+        chdir: "{{cfssl_working_dir}}"
+
+    - name: "Copy consul agent certs"
+      include_tasks: cert_install/tasks/copy_from_master_0.yml
+      loop:
+        - { src: '{{cfssl_working_dir}}/consul.pem', dest: '{{consul_cert}}' ,mode: '0644'}
+        - { src: '{{cfssl_working_dir}}/consul-key.pem', dest: '{{consul_cert_key}}',mode: '0644'}
+
+    - name: Start consul
+      failed_when: false
+      service:
+        name: consul
+        state: started
+      register: consulService
+      until: consulService.status.ActiveState == "active"
+      retries: 10
+      delay: 5
+
+
+  vars:
+    - cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/consul"
+    - consul_cert_path: /etc/opt/certs/consul
+    - consul_cert: "{{consul_cert_path}}/consul.pem"
+    - consul_cert_key: "{{consul_cert_path}}/consul-key.pem"
+    - consul_dns: "consul.{{tls_san}}"
+    - consul_servers:
+      - "127.0.0.1"
+      - "localhost"
+      - "{{consul_dns}}"
+      - "server.{{data_center}}.consul"
+      - "server.{{host_name}}.{{data_center}}.consul"

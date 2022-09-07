@@ -21,19 +21,6 @@
   - name: Consul config files
     import_tasks: copy_consul_config_files.yml
 
-  - name: Copy certificates from master 0
-    when: is_buildnode_host
-    include_tasks: common/tasks/copy_certs_from_master_0.yml
-    vars:
-      for_service: consul
-
-
-  # Consul agents have only the cluster ca bundle in the ubuntu trust store
-  # The TLS certificates are handles over autoconfiguration
-  # see https://github.com/hashicorp/learn-consul-docker/tree/main/datacenter-deploy-auto-config/secint
-  - name: "Intsall certificates"
-    import_tasks: install_certificates.yml
-#    when: is_master_host
 
   - name: "Install consul-template"
     import_tasks: consul_template_install.yml
@@ -53,10 +40,3 @@
     consul_cert_path: "/etc/opt/certs/consul"
     consul_cert: "{{consul_cert_path}}/consul.pem"
     consul_cert_key: "{{consul_cert_path}}/consul-key.pem"
-    consul_dns: "consul.{{tls_san}}"
-    consul_servers:
-      - "127.0.0.1"
-      - "localhost"
-      - "{{consul_dns}}"
-      - "server.{{data_center}}.consul"
-      - "server.{{host_name}}.{{data_center}}.consul"

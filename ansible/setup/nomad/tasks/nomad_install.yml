@@ -48,12 +48,20 @@
     state: directory
     mode: '0755'
 
+- name: nomad cert install
+  become: true
+  when: not nomadInstalled.stat.exists or update_certificates|bool == true
+  block:
+    - name: install_cert handler nomad
+      include_tasks: handlers/generate_nomad_certs.yml
+
 
 - name: nomad install
   become: true
   when: not nomadInstalled.stat.exists
   block:
-#  Permissions
+
+    #  Permissions
 #  Nomad servers and Nomad clients have different requirements for permissions.
 #  Nomad servers should be run with the lowest possible permissions.
 #  They need access to their own data directory and the ability to bind to their ports.

@@ -45,9 +45,18 @@
         - "/var/lib/containerd"
         - "/usr/bin/docker"
         - "/usr/bin/dockerd"
+        - "/etc/opt/certs/docker"
 
-- name: "Install docker"
+- name : Check docker installation present
+  stat:
+    path: /usr/bin/docker
+  register: dockerInstalled
+
+
+
+- name: "Install docker pre conditions"
   become: true
+  when: not dockerInstalled.stat.exists
   block:
     - name: Docker group add if not present
       become: true
@@ -74,6 +83,29 @@
         state: directory
         path: "{{docker_download_dir}}"
 
+- name: "Install docker certificates"
+  become: true
+  when: not dockerInstalled.stat.exists or update_certificates|bool == true
+  block:
+    - name: install_cert handler nomad
+      include_tasks: handlers/generate_docker_certs.yml
+
+
+- name: "Install docker"
+  become: true
+  when: not dockerInstalled.stat.exists
+  block:
+    - name: "Docker Hosts Workaround"
+      when: is_build_host
+      become: true
+      delay: 0
+      async: 300
+      poll: 1
+      shell: |
+        cp /lib/systemd/system/docker.service /etc/systemd/system/
+        sed -i 's# -H\ fd:\/\/# #g' /etc/systemd/system/docker.service
+        systemctl daemon-reload
+
     - name: "Install docker V {{ docker_version }}"
       delay: 0
       async: 300
@@ -90,11 +122,14 @@
         chdir: /tmp/docker
       register: dockerInstall
 
-    - name: Start docker daemon
+    - name: Start docker
       service:
         name: docker
-        state: started
-        enabled: true
+        state: restarted
+      register: dockerService
+      until: dockerService.status.ActiveState == "active"
+      retries: 10
+      delay: 5
 
 #    - name: Debug docker install
 #      debug:

@@ -1,7 +1,7 @@
 - name: Install nomad systemd service
   become: true
   block:
-    - name: Template consul.service.server
+    - name: Template nomad.service.server
       template:
         force: yes
         src: service/nomad.service.j2
