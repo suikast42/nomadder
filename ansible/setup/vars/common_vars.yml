@@ -1,7 +1,12 @@
 ---
 tls_san: cloud.private
+tls_san_wc:
+  -  "*.{{tls_san}}"
 host_name: "{{ ansible_hostname  }}"
 host_ip: "{{ ansible_eth1.ipv4.address }}"
+host_ips:
+  - "{{ ansible_eth0.ipv4.address }}"
+  - "{{ ansible_eth1.ipv4.address }}"
 master_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
 registry_ip: "{{ hostvars[groups['build'][0]]['ansible_host'] | default(groups['build'][0]) }}"
 registry_port: "5000"

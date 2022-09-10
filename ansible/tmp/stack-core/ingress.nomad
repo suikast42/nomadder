@@ -29,6 +29,11 @@ job "ingress" {
   type        = "service"
 
   group "traefik" {
+    volume "cert" {
+      type      = "host"
+      source    = "cert_ingress"
+      read_only   = true
+    }
 
     network {
       port "http" {
@@ -57,14 +62,28 @@ job "ingress" {
     task "traefik" {
       driver = "docker"
 
+      volume_mount {
+        volume      = "cert"
+        destination = "/etc/opt/certs/ingress"
+      }
+
       config {
         image        = var.image
         network_mode = "host"
         volumes = [
           "local/traefik.toml:/etc/traefik/traefik.toml",
+          "local/certconfig.toml:/etc/traefik/certconfig.toml"
         ]
       }
+      template {
+        data = <<EOF
 
+    [[tls.certificates]]
+      certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
+      keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+        EOF
+        destination = "local/certconfig.toml"
+      }
       template {
         data = <<EOF
 [entryPoints]
@@ -86,6 +105,10 @@ job "ingress" {
 [api]
     dashboard = true
     insecure  = true
+
+[providers]
+  [providers.file]
+    filename = "/etc/traefik/certconfig.toml"
 
 # Enable Consul Catalog configuration backend.
 [providers.consulCatalog]
