@@ -77,7 +77,11 @@ job "ingress" {
       }
       template {
         data = <<EOF
-
+[tls.stores]
+  [tls.stores.default]
+    [tls.stores.default.defaultCertificate]
+      certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
+      keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
     [[tls.certificates]]
       certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
       keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
@@ -121,6 +125,9 @@ job "ingress" {
       address = "127.0.0.1:8500"
       scheme  = "http"
 #      token = "ee443d4a-d143-b46e-998e-535fca00fb00"
+[log]
+  level = "INFO"
+
 EOF
 
         destination = "local/traefik.toml"
