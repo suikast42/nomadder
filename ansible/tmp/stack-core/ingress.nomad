@@ -116,7 +116,6 @@ job "ingress" {
       certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
       keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
 
-
         EOF
         destination = "local/certconfig.toml"
       }
@@ -155,10 +154,15 @@ job "ingress" {
     connectByDefault = false
 
   [providers.consulCatalog.endpoint]
-      address = "127.0.0.1:8500"
-      scheme  = "http"
+      address = "127.0.0.1:8501"
+      scheme  = "https"
       token = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
 
+
+[providers.consulCatalog.endpoint.tls]
+  ca = "/etc/opt/certs/ca/cluster-ca.crt"
+  cert = "/etc/opt/certs/ingress/nomad-ingress.pem"
+  key = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
 
 
 [log]

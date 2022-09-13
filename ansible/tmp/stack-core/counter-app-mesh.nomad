@@ -4,22 +4,23 @@ job "countdash_app_mesh" {
   group "api" {
     network {
       mode = "bridge"
+
     }
 
     service {
       name = "count-api"
       port = "9001"
-
       connect {
         sidecar_service {}
       }
     }
 
-    task "web" {
+    task "count-api" {
       driver = "docker"
 
       config {
         image = "hashicorpnomad/counter-api:v3"
+        ports = ["http"]
       }
 
       resources {
@@ -34,7 +35,7 @@ job "countdash_app_mesh" {
       mode = "bridge"
 
       port "http" {
-#        static= 9002
+        #        static= 9002
         to = 9002
       }
     }
@@ -42,20 +43,21 @@ job "countdash_app_mesh" {
     service {
       name = "count-dashboard"
       port = "http"
-
-      tags = [
-        "traefik.enable=true",
-        "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.count-dashboard.tls=true",
-#        "traefik.http.routers.count-dashboard.tls.options=mtls",
-        "traefik.http.routers.count-dashboard.entrypoints=https",
-        "traefik.http.services.count-dashboard.loadbalancer.server.scheme=https",
-        "traefik.http.routers.count-dashboard.rule=Host(`count.cloud.private`)",
-#        "traefik.http.routers.count-dashboard.tls.domains[0].main=cloud.private",
-#        "traefik.http.routers.count-dashboard.tls.domains[0].sans=count.cloud.private"
-      ]
+            tags = [
+              "traefik.enable=true",
+              "traefik.consulcatalog.connect=true",
+              "traefik.http.routers.count-dashboard.tls=true",
+      #        "traefik.http.routers.count-dashboard.tls.options=mtls",
+#              "traefik.http.routers.count-dashboard.entrypoints=https",
+#              "traefik.http.services.count-dashboard.loadbalancer.server.scheme=https",
+              "traefik.http.routers.count-dashboard.rule=Host(`count.cloud.private`)",
+#              "traefik.http.routers.count-dashboard.tls.domains[0].main=cloud.private",
+#              "traefik.http.routers.count-dashboard.tls.domains[0].sans=count.cloud.private"
+            ]
 
       connect {
+
+
         sidecar_service {
           proxy {
             upstreams {
@@ -72,7 +74,7 @@ job "countdash_app_mesh" {
 
       env {
         CONSUL_TLS_SERVER_NAME = "localhost"
-        COUNTING_SERVICE_URL = "http://${NOMAD_UPSTREAM_ADDR_count_api}"
+        COUNTING_SERVICE_URL   = "http://${NOMAD_UPSTREAM_ADDR_count_api}"
       }
 
       config {
