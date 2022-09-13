@@ -123,7 +123,7 @@
         -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
         -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
         -config {{cert_path_master_0}}/cfssl/config.json \
-        -profile server nomad_ingress.json | cfssljson -bare nomad_ingress
+        -profile peer nomad_ingress.json | cfssljson -bare nomad_ingress
       args:
         chdir: "{{cfssl_working_dir}}"
 
@@ -159,13 +159,13 @@
   vars:
     - cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/nomad"
     - nomad_cert_path: /etc/opt/certs/nomad
-    - nomad_cert_ingress_path: /etc/opt/certs/ingress
     - nomad_cert: "{{nomad_cert_path}}/nomad.pem"
     - nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"
-    - nomad_cert_ingress: "{{nomad_cert_ingress_path}}/nomad-ingress.pem"
-    - nomad_cert_ingress_key: "{{nomad_cert_ingress_path}}/nomad-ingress-key.pem"#
     - nomad_cert_cli: "{{nomad_cert_path}}/nomad-cli.pem"
     - nomad_cert_cli_key: "{{nomad_cert_path}}/nomad-cli-key.pem"
+    - nomad_cert_ingress_path: /etc/opt/certs/ingress
+    - nomad_cert_ingress_key: "{{nomad_cert_ingress_path}}/nomad-ingress-key.pem"#
+    - nomad_cert_ingress: "{{nomad_cert_ingress_path}}/nomad-ingress.pem"
     - nomad_dns: "nomad.{{tls_san}}"
     - data_center: "nomadder1"
     - nomad_servers:

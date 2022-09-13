@@ -6,7 +6,6 @@ job "countdash_app" {
     network {
       mode = "host"
       port "http" {
-        static = 9001
         to = 9001
       }
     }
@@ -69,4 +68,5 @@ job "countdash_app" {
       }
     }
   }
+
 }

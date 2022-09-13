@@ -5,10 +5,15 @@ data_dir =  "{{nomad_data_dir}}"
 
 client {
   enabled = true
+  host_volume "ca_cert" {
+    path      = "/usr/local/share/ca-certificates/cloudlocal"
+    read_only = true
+  }
   host_volume "cert_ingress" {
     path      = "/etc/opt/certs/ingress"
     read_only = true
   }
+
   host_network "private" {
     interface = "eth0"
     #cidr = "203.0.113.0/24"

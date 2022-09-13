@@ -29,9 +29,14 @@ job "ingress" {
   type        = "service"
 
   group "traefik" {
-    volume "cert" {
+    volume "cert_ingress" {
       type      = "host"
       source    = "cert_ingress"
+      read_only   = true
+    }
+    volume "ca_cert" {
+      type      = "host"
+      source    = "ca_cert"
       read_only   = true
     }
 
@@ -47,24 +52,40 @@ job "ingress" {
       }
     }
 
-    service {
-      name = "traefik"
-
-      check {
-        name     = "alive"
-        type     = "tcp"
-        port     = "http"
-        interval = "10s"
-        timeout  = "2s"
-      }
-    }
 
     task "traefik" {
       driver = "docker"
+      service {
+        name = "traefik"
+        tags = [
+          "traefik.enable=true",
+          "traefik.http.routers.traefik.rule=Host(`cloud.private`) && (PathPrefix(`/ingress`) || PathPrefix(`/api`))",
 
+          #### set traefik dashboard
+          "traefik.http.routers.traefik.service=api@internal",
+
+          #### set middlewares: stripprefix for dashboard
+          "traefik.http.routers.traefik.middlewares=traefik-strip",
+          "traefik.http.middlewares.traefik-strip.stripprefix.prefixes=/ingress",
+
+          #### set TLS
+          "traefik.http.routers.traefik.tls=true"
+        ]
+        check {
+          name     = "alive"
+          type     = "tcp"
+          port     = "http"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
       volume_mount {
-        volume      = "cert"
+        volume      = "cert_ingress"
         destination = "/etc/opt/certs/ingress"
+      }
+      volume_mount {
+        volume      = "ca_cert"
+        destination = "/etc/opt/certs/ca"
       }
 
       config {
@@ -77,14 +98,34 @@ job "ingress" {
       }
       template {
         data = <<EOF
+[tls.options]
+  [tls.options.default]
+    [tls.options.default.clientAuth]
+      caFiles = ["/etc/opt/certs/ca/ca.crt","/etc/opt/certs/ca/cluster-ca.crt"]
+      clientAuthType = "NoClientCert"
+#      clientAuthType = "RequireAndVerifyClientCert"
+   #   clientAuthType = "RequireAnyClientCert"
+
 [tls.stores]
   [tls.stores.default]
     [tls.stores.default.defaultCertificate]
       certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
       keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
-    [[tls.certificates]]
-      certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
-      keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+
+[http.serversTransports.mytransport]
+  serverName = "myhost"
+
+[providers.consulCatalog.endpoint.tls]
+#      insecureSkipVerify = true
+      ca= "/etc/opt/certs/ca/cluster-ca-bundle.pem"
+      cert  = "/etc/opt/certs/ingress/nomad-ingress.pem"
+      key = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+
+#
+#[entryPoints.https.tls.certificates]
+#    certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
+#    keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+
         EOF
         destination = "local/certconfig.toml"
       }
@@ -99,6 +140,7 @@ job "ingress" {
         scheme = "https"
     [entryPoints.https]
     address = ":443"
+
     [entryPoints.traefik]
     address = ":8081"
 # TCP / UDP over one port
@@ -109,7 +151,7 @@ job "ingress" {
 [api]
     dashboard = true
     insecure  = true
-
+    debug = false
 [providers]
   [providers.file]
     filename = "/etc/traefik/certconfig.toml"
@@ -124,9 +166,11 @@ job "ingress" {
   [providers.consulCatalog.endpoint]
       address = "127.0.0.1:8500"
       scheme  = "http"
-#      token = "ee443d4a-d143-b46e-998e-535fca00fb00"
+      token = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+
+
 [log]
-  level = "INFO"
+  level = "DEBUG"
 
 EOF
 
