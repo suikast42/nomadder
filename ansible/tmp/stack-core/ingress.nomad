@@ -98,6 +98,10 @@ job "ingress" {
       }
       template {
         data = <<EOF
+[serversTransport]
+  insecureSkipVerify = false
+  rootCAs = ["/etc/opt/certs/ca/ca.crt","/etc/opt/certs/ca/cluster-ca.crt"]
+
 [tls.options]
   [tls.options.default]
     [tls.options.default.clientAuth]
@@ -112,19 +116,6 @@ job "ingress" {
       certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
       keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
 
-[http.serversTransports.mytransport]
-  serverName = "myhost"
-
-[providers.consulCatalog.endpoint.tls]
-#      insecureSkipVerify = true
-      ca= "/etc/opt/certs/ca/cluster-ca-bundle.pem"
-      cert  = "/etc/opt/certs/ingress/nomad-ingress.pem"
-      key = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
-
-#
-#[entryPoints.https.tls.certificates]
-#    certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
-#    keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
 
         EOF
         destination = "local/certconfig.toml"
@@ -167,6 +158,7 @@ job "ingress" {
       address = "127.0.0.1:8500"
       scheme  = "http"
       token = "e95b599e-166e-7d80-08ad-aee76e7ddf19"
+
 
 
 [log]

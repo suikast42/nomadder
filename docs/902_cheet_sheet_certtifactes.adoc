@@ -1,4 +1,4 @@
-.Vault REST-API cheatsheet
+.Openssl cheat sheet
 |===
 |Description |Command
 
@@ -7,6 +7,12 @@
 a|[source,shell]
 ----
 openssl x509 -text -noout -in <path>/my.crt
+----
+
+|Test connection with certificate:
+a|[source,shell]
+----
+echo quit | openssl s_client -connect localhost:8501
 ----
 
 |===
