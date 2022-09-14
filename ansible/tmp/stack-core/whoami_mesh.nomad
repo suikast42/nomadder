@@ -2,26 +2,27 @@ job "whoami" {
   datacenters = ["nomadder1"]
 
   group "whoami" {
-    count = 1
+    count = 2
 
     network {
       mode = "bridge"
-      port "web" {
-      }
+
+      port "web" {}
     }
 
     service {
       name = "whoami"
       port = "web"
+
       connect {
-        sidecar_service {
-        }
+        sidecar_service {}
       }
 
       tags = [
         "traefik.enable=true",
-#        "traefik.consulcatalog.connect=true",
-        "traefik.http.routers.count-dashboard.rule=Host(`whoami.cloud.private`)",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.whoami.tls=true",
+        "traefik.http.routers.whoami.rule=Host(`whoami.cloud.private`)",
       ]
 
       check {
