@@ -23,15 +23,35 @@
     },
     "retry_join":{{masters | to_json }},
     "bootstrap_expect": {{masters|length}},
-
-    "auto_encrypt": {
-        "allow_tls": true
-    },
-
+	"acl": {
+		"enabled": true,
+		"default_policy": "deny",
+		"enable_token_persistence": true,
+		"tokens": {
+		    "default": "{{consul_initial_management_token}}",
+			"initial_management": "{{consul_initial_management_token}}",
+			"agent": "{{consul_initial_agent_token}}"
+		}
+	},
 	"performance" :{
 	   "raft_multiplier" : 1
 	},
-
+	"auto_config": {
+		"authorization": {
+			"enabled": true,
+			"static": {
+				"jwt_validation_pub_keys": ["{{secint_pubkey}}"],
+				"bound_issuer": "secint",
+				"bound_audiences": ["consul-cluster-{{data_center}}"],
+				"claim_mappings": {
+					"sub": "node_name"
+				},
+				"claim_assertions": [
+					"value.node_name == \"${node}\""
+				]
+			}
+		}
+	},
     "node_meta": {
         "node_type": "server"
     },

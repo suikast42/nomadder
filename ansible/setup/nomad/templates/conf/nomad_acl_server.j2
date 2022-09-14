@@ -22,7 +22,10 @@ tls {
   verify_https_client    = false
 }
 
-
+consul{
+    token = "{{nomad_consul_initial_agent_token}}"
+    allow_unauthenticated = false
+}
 
 ui {
   enabled =  true

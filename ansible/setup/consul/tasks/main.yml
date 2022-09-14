@@ -7,16 +7,16 @@
   - name: "Install consul"
     import_tasks: consul_install.yml
 
-  - name: "Build and copy secint"
-    import_tasks: build_and_copy_secinit.yml
-    run_once: true
-    when: is_master_host
+#  - name: "Build and copy secint"
+#    import_tasks: build_and_copy_secinit.yml
+#    run_once: true
+#    when: is_master_host
 
   # The jwt tokens are generated on the master
   # This task copies the jwt tokens from master to the consul client hosts
-  - name: "Copy jwt tokens"
-    import_tasks: copy_jwt.yml
-    when: is_worker_host
+#  - name: "Copy secint jwt tokens"
+#    import_tasks: copy_jwt.yml
+#    when: is_worker_host
 
   - name: Consul config files
     import_tasks: copy_consul_config_files.yml
