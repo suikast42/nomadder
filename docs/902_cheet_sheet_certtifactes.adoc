@@ -9,6 +9,13 @@ a|[source,shell]
 openssl x509 -text -noout -in <path>/my.crt
 ----
 
+|show the certificate content:
+a|[source,shell]
+----
+openssl x509 -in / <path>/my.crt -noout -text
+----
+
+
 |Test connection with certificate:
 a|[source,shell]
 ----
