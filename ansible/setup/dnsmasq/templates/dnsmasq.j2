@@ -11,7 +11,7 @@ address=/{{tls_san}}/{{host_ip}}
 {% else %}
 #address=registry.{{tls_san}}/{{master_ip}}
 #address=/private/{{host_ip}}
-
+{% endif %}
 # Uncomment and modify as appropriate to enable reverse DNS lookups for
 # common netblocks found in RFC 1918, 5735, and 6598:
 #rev-server=0.0.0.0/8,127.0.0.1#8600

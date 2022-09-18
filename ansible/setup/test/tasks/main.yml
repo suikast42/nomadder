@@ -37,7 +37,7 @@
     nomad_cert: "{{nomad_cert_path}}/nomad.pem"
     nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"
     nomad_cli_cert: "{{nomad_cert_path}}/nomad-cli.pem"
-    nomad_data_dir: "/opt/deployments/core/nomad/data"
+    nomad_data_dir: "{{systemd_install_dir}}/nomad/data"
     nomad_dns: "nomad.{{tls_san}}"
     nomad_conf_dir: "/etc/nomad.d"
     data_center: "nomadder1"
