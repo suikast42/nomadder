@@ -1,0 +1,217 @@
+#region var definitions
+variable "datacenter" {
+  type = string
+  description = "Deploy to this datacenter"
+  default = "{{data_center}}"
+}
+
+variable "ingress_http" {
+  type = number
+  description = "Ingress http port"
+  default = 80
+}
+
+variable "ingress_https" {
+  type = number
+  description = "Ingress https port"
+  default = 443
+}
+
+variable "image" {
+  type = string
+  description = "Default image"
+  default = "traefik:v{{version_traefik}}"
+}
+# endregion
+
+job "ingress" {
+  datacenters = [var.datacenter]
+  type        = "service"
+
+  group "traefik" {
+    volume "cert_ingress" {
+      type      = "host"
+      source    = "cert_ingress"
+      read_only   = true
+    }
+    volume "ca_cert" {
+      type      = "host"
+      source    = "ca_cert"
+      read_only   = true
+    }
+
+    network {
+      port "http" {
+        static = var.ingress_http
+      }
+      port "https" {
+        static = var.ingress_https
+      }
+      port "ui" {
+        static = 8081
+      }
+    }
+
+
+    task "traefik" {
+      driver = "docker"
+      service {
+        name = "traefik"
+        tags = [
+          "traefik.enable=true",
+          "traefik.http.routers.traefik.rule=Host(`{{tls_san}}`) && (PathPrefix(`/ingress`) || PathPrefix(`/api`))",
+
+          #### set traefik dashboard
+          "traefik.http.routers.traefik.service=api@internal",
+
+          #### set middlewares: stripprefix for dashboard
+          "traefik.http.routers.traefik.middlewares=traefik-strip",
+          "traefik.http.middlewares.traefik-strip.stripprefix.prefixes=/ingress",
+
+          #### set TLS
+          "traefik.http.routers.traefik.tls=true"
+        ]
+        check {
+          name     = "alive"
+          type     = "tcp"
+          port     = "http"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+      volume_mount {
+        volume      = "cert_ingress"
+        destination = "/etc/opt/certs/ingress"
+      }
+      volume_mount {
+        volume      = "ca_cert"
+        destination = "/etc/opt/certs/ca"
+      }
+
+      config {
+        image        = var.image
+        network_mode = "host"
+        volumes = [
+          "local/traefik.toml:/etc/traefik/traefik.toml",
+          "local/certconfig.toml:/etc/traefik/certconfig.toml"
+        ]
+      }
+            template {
+              data = <<EOF
+[http.serversTransports]
+[http.serversTransports.default]
+  insecureSkipVerify = false
+  rootCAs = ["/etc/opt/certs/ca/ca.crt","/etc/opt/certs/ca/cluster-ca.crt"]
+      [[http.serversTransports.default.certificates]]
+      certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
+      keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+
+[tls.stores]
+  [tls.stores.default]
+    [tls.stores.default.defaultCertificate]
+      certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
+      keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+
+[[tls.certificates]]
+  certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
+  keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+  stores = ["default"]
+
+
+# Route to nomad ui
+[http.services]
+  [http.services.nomad.loadBalancer]
+    serversTransport = "default"
+    [[http.services.nomad.loadBalancer.servers]]
+      url = "https://10.21.21.41:4646"
+
+  [http.services.consul.loadBalancer]
+   serversTransport = "default"
+    [[http.services.consul.loadBalancer.servers]]
+      url = "https://10.21.21.41:8501"
+
+[http.routers]
+  [http.routers.consul]
+     entryPoints = ["https"]
+     rule = "Host(`consul.{{tls_san}}`) "
+     service = "consul"
+       # will terminate the TLS request
+ #     [http.routers.consul.tls]
+      [[http.routers.consul.tls.domains]]
+ #       main = "{{tls_san}}"
+        sans = ["consul.{{tls_san}}"]
+
+  [http.routers.nomad]
+    entryPoints = ["https"]
+    rule = "Host(`nomad.{{tls_san}}`) "
+    service = "nomad"
+    [[http.routers.nomad.tls.domains]]
+      #main = "{{tls_san}}"
+      sans = ["nomad.{{tls_san}}"]
+
+              EOF
+              destination = "local/certconfig.toml"
+            }
+      template {
+        data = <<EOF
+[entryPoints]
+    [entryPoints.http]
+    address = ":80"
+    [entryPoints.http.http.redirections]
+      [entryPoints.http.http.redirections.entryPoint]
+        to = "https"
+        scheme = "https"
+    [entryPoints.https]
+    address = ":443"
+
+    [entryPoints.traefik]
+    address = ":8081"
+# TCP / UDP over one port
+#  [entryPoints.tcpep]
+#    address = ":3179"
+#  [entryPoints.udpep]
+#    address = ":3179/udp"
+[api]
+    dashboard = true
+    insecure  = true
+    debug = false
+[providers]
+  [providers.file]
+    filename = "/etc/traefik/certconfig.toml"
+     debugLogGeneratedTemplate = true
+     watch = true
+
+# Enable Consul Catalog configuration backend.
+[providers.consulCatalog]
+    prefix           = "traefik"
+    exposedByDefault = false
+    connectAware = true
+    connectByDefault = false
+    watch = true
+
+  [providers.consulCatalog.endpoint]
+      address = "127.0.0.1:8501"
+      scheme  = "https"
+
+
+[providers.consulCatalog.endpoint.tls]
+  ca = "/etc/opt/certs/ca/cluster-ca.crt"
+  cert = "/etc/opt/certs/ingress/nomad-ingress.pem"
+  key = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+
+[log]
+  level = "DEBUG"
+#  format = "json"
+
+EOF
+
+        destination = "local/traefik.toml"
+      }
+
+      resources {
+        cpu    = 100
+        memory = 128
+      }
+    }
+  }
+}

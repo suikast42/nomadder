@@ -45,3 +45,12 @@ tls {
   verify_https_client    = true
 }
 
+consul{
+  ssl= true
+  address = "127.0.0.1:8501"
+  # this works only with ACL enabled
+  allow_unauthenticated= true
+  ca_file   = "{{cluster_intermediate_ca_bundle}}"
+  cert_file = "{{nomad_cert}}"
+  key_file  = "{{nomad_cert_key}}"
+}

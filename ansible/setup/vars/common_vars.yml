@@ -50,4 +50,5 @@ local_ca_cert_conf: "{{role_path}}/../certificates_generate/files/cfssl/config.j
 local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"
 local_cluster_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/cluster-ca"
 systemd_install_dir:  /opt/services/core
+master_0_job_dir:  /opt/deployments
 notify_cert_change: false

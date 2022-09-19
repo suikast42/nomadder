@@ -19,7 +19,7 @@ tls {
   key_file  = "{{nomad_cert_key}}"
 
   verify_server_hostname = true
-  verify_https_client    = false
+  verify_https_client    = true
 }
 
 
@@ -34,4 +34,14 @@ ui {
   vault {
     ui_url = "https://{{master_ip}}:8200/ui"
   }
+}
+
+consul{
+ ssl= true
+ address = "127.0.0.1:8501"
+ # this works only with ACL enabled
+ allow_unauthenticated= true
+ ca_file   = "{{cluster_intermediate_ca_bundle}}"
+ cert_file = "{{nomad_cert}}"
+ key_file  = "{{nomad_cert_key}}"
 }
