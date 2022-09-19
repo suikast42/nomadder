@@ -1,0 +1,48 @@
+- name: "Create {{core_deployment_dir}} if needed"
+  become: true
+  file:
+    state: directory
+    mode: '0755'
+    path: "{{core_deployment_dir}}"
+
+- name: Template ingress.json
+  delegate_to: localhost
+  template:
+    force: yes
+    src: ingress.j2
+    dest: "{{role_path}}/files/ingress.nomad"
+
+- name: "Copy ingress.nomad"
+  become: true
+  copy:
+    force: true
+    src: ingress.nomad
+    dest: "{{core_deployment_dir}}/ingress.nomad"
+    mode: '0755'
+
+#
+#    - name: "Slurp {{core_deployment_dir}}/ingress.nomad from master_0"
+#      ansible.builtin.slurp:
+#        src: "{{core_deployment_dir}}/ingress.nomad"
+#      register: job
+
+- name: Create job
+  community.general.nomad_job:
+    # host: "{{masters[0]}}"
+    client_cert: "{{nomad_cli_cert}}"
+    client_key: "{{nomad_cli_cert_key}}"
+    host: localhost
+    state: present
+    force_start: true
+    #        content: "{{ job.content | b64decode }}"
+    content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/ingress.nomad') }}"
+    timeout: 120
+
+#    - name: Force job to start
+#      community.general.nomad_job:
+##        host: "{{masters[0]}}"
+#        host: localhost
+#        state: present
+#        name: ingress
+#        timeout: 120
+#        force_start: true
