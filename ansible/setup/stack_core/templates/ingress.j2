@@ -59,14 +59,15 @@ job "ingress" {
         name = "traefik"
         tags = [
           "traefik.enable=true",
-          "traefik.http.routers.traefik.rule=Host(`{{tls_san}}`) && (PathPrefix(`/ingress`) || PathPrefix(`/api`))",
+       #   "traefik.http.routers.traefik.rule=Host(`{{tls_san}}`) && (PathPrefix(`/ingress`) || PathPrefix(`/api`))",
+          "traefik.http.routers.traefik.rule=Host(`ingress.{{tls_san}}`)",
 
           #### set traefik dashboard
           "traefik.http.routers.traefik.service=api@internal",
 
           #### set middlewares: stripprefix for dashboard
-          "traefik.http.routers.traefik.middlewares=traefik-strip",
-          "traefik.http.middlewares.traefik-strip.stripprefix.prefixes=/ingress",
+    #      "traefik.http.routers.traefik.middlewares=traefik-strip",
+    #      "traefik.http.middlewares.traefik-strip.stripprefix.prefixes=/ingress",
 
           #### set TLS
           "traefik.http.routers.traefik.tls=true"
