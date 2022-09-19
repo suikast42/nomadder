@@ -2,17 +2,17 @@
 |===
 |Description |Command
 
-|List all installed certificates
-a|[source,shell]
-----
-awk -v cmd='openssl x509 -noout -subject' '
-/BEGIN/{close(cmd)};{print | cmd}' < /etc/ssl/certs/ca-certificates.crt
-----
-
 |List all installed certificates with ui
 a|[source,shell]
 ----
 sudo dpkg-reconfigure ca-certificates
+----
+
+|List all installed certificates
+a|[source,shell]
+----
+awk -v cmd='openssl x509 -noout -subject' '
+/BEGIN/{close(cmd)};{print \| cmd}' < /etc/ssl/certs/ca-certificates.crt
 ----
 
 |===

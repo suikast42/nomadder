@@ -5,6 +5,32 @@ data_dir =  "{{nomad_data_dir}}"
 
 client {
   enabled = true
+  host_volume "ca_cert" {
+    path      = "/usr/local/share/ca-certificates/cloudlocal"
+    read_only = true
+  }
+  host_volume "cert_ingress" {
+    path      = "/etc/opt/certs/ingress"
+    read_only = true
+  }
+
+  host_network "private" {
+    interface = "eth0"
+    #cidr = "203.0.113.0/24"
+    #reserved_ports = "22,80"
+  }
+  host_network "default" {
+      interface = "eth1"
+  }
+  host_network "public" {
+    interface = "eth1"
+  }
+  host_network "local" {
+    interface = "lo"
+  }
+  host_network "nomad" {
+    interface = "nomad"
+  }
 }
 
 tls {
@@ -20,13 +46,11 @@ tls {
 }
 
 consul{
-    token = "{{nomad_consul_initial_agent_token}}"
-}
-
-plugin "docker" {
-  config {
-    volumes {
-      enabled      = true
-    }
-  }
+  ssl= true
+  address = "127.0.0.1:8501"
+  # this works only with ACL enabled
+  allow_unauthenticated= true
+  ca_file   = "{{cluster_intermediate_ca_bundle}}"
+  cert_file = "{{nomad_cert}}"
+  key_file  = "{{nomad_cert_key}}"
 }

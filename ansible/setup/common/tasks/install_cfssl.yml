@@ -1,0 +1,29 @@
+- name: Cfssl
+  become: true
+  block:
+    - name: "Delete cfssl on master 0 {{update_cfssl}}"
+      when: update_cfssl |bool == true
+      file:
+        state: absent
+        path: "/usr/bin/cfssl"
+
+    - name: "Install cfssl V {{ version_cfssl }} on master 0 "
+      delay: 0
+      async: 300
+      poll: 1
+      shell: |
+        wget -O cfssl  https://github.com/cloudflare/cfssl/releases/download/v{{version_cfssl}}/cfssl_{{version_cfssl}}_linux_amd64
+        wget -O cfssljson https://github.com/cloudflare/cfssl/releases/download/v{{version_cfssl}}/cfssljson_{{version_cfssl}}_linux_amd64
+        wget -O mkbundle https://github.com/cloudflare/cfssl/releases/download/v{{version_cfssl}}/mkbundle_{{version_cfssl}}_linux_amd64
+        chmod +x cfssl
+        chmod +x cfssljson
+        chmod +x mkbundle
+        mv cfssl  /usr/bin
+        mv cfssljson /usr/bin
+        mv mkbundle /usr/bin
+      args:
+        chdir: "/tmp"
+        creates: /usr/bin/cfssl # cfssl is already installed
+
+  tags:
+    - cfssl

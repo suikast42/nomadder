@@ -10,6 +10,7 @@
 - hosts: all, !localhost
   name: "Nodes base installations"
   vars_files:
+    - vars/versions.yml
     - vars/common_vars.yml
   gather_facts: yes
   roles:

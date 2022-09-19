@@ -1,0 +1,86 @@
+- name: "Generate vault certs"
+  become: true
+  # installed only on
+  when: is_master_0
+  block:
+    - name: Stop vault
+      failed_when: false
+      service:
+        name: vault
+        state: stopped
+
+
+    - name: "Delete cfssl_working_dir on master 0"
+      delegate_to: "{{masters[0]}}"
+      file:
+        path: "{{cfssl_working_dir}}"
+        state: absent
+
+
+    - name: "Delete vault certs"
+      file:
+        path: "{{ vault_cert_path}}"
+        state: absent
+
+
+    - name: "Create vault certs dir if needed"
+      file:
+        path: "{{vault_cert_path}}"
+        state: directory
+        owner: "{{vault_user}}"
+        group: "{{vault_group}}"
+        mode: '0755'
+
+
+    - name: "Create cfssl_working_dir on master 0 if needed"
+      delegate_to: "{{masters[0]}}"
+      file:
+        state: directory
+        mode: '0700'
+        path: "{{cfssl_working_dir}}"
+
+
+    - name: Template vault_cert.json
+      delegate_to: "{{masters[0]}}"
+      template:
+        force: yes
+        src: ../templates/vault_cert.j2
+        dest: "{{cfssl_working_dir}}/vault-server.json"
+
+
+    - name: "Generate vault server certificate(s) in  on master 0"
+      register: cfsslgen
+      failed_when: cfsslgen.rc != 0
+      delegate_to: "{{masters[0]}}"
+      shell: |
+        cfssl gencert \
+          -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
+          -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
+          -config {{cert_path_master_0}}/cfssl/config.json \
+          -profile server vault-server.json | cfssljson -bare vault
+      args:
+        chdir: "{{cfssl_working_dir}}"
+
+
+    - name: "Copy vault server certs"
+      include_tasks: cert_install/tasks/copy_from_master_0.yml
+      loop:
+        - { src: '{{cfssl_working_dir}}/vault.pem', dest: '{{vault_cert}}' ,mode: '0755', user: '{{vault_user}}', group: '{{vault_group}}'}
+        - { src: '{{cfssl_working_dir}}/vault-key.pem', dest: '{{vault_cert_key}}',mode: '0755', user: '{{vault_user}}' , group: '{{vault_group}}'}
+
+
+    - name: Start vault
+      ignore_errors: true
+      service:
+        name: vault
+        state: started
+      register: vaultService
+      until: vaultService.status.ActiveState == "active"
+      retries: 10
+      delay: 5
+
+  vars:
+    - cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/vault_master"
+    - vault_cert_path: /etc/opt/certs/vault
+    - vault_cert: "{{vault_cert_path}}/vault.pem"
+    - vault_cert_key: "{{vault_cert_path}}/vault-key.pem"

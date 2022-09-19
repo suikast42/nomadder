@@ -1,7 +1,12 @@
 ---
 tls_san: cloud.private
+tls_san_wc:
+  -  "*.{{tls_san}}"
 host_name: "{{ ansible_hostname  }}"
 host_ip: "{{ ansible_eth1.ipv4.address }}"
+host_ips:
+  - "{{ ansible_eth0.ipv4.address }}"
+  - "{{ ansible_eth1.ipv4.address }}"
 master_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
 registry_ip: "{{ hostvars[groups['build'][0]]['ansible_host'] | default(groups['build'][0]) }}"
 registry_port: "5000"
@@ -31,14 +36,19 @@ vault_hosts:
 
 
 # consul and nomad datacenter name
-data_center: "nomadder_1"
+data_center: "nomadder1"
 #cert path on nodes
 cert_path_master_0: /etc/ssl/private/cloudlocal
+#TODO rename to ca_os_trust_store
 ca_cert_path: /usr/local/share/ca-certificates/cloudlocal
 cluster_intermediate_ca_bundle: "{{ca_cert_path}}/cluster-ca-bundle.pem"
 # cert path on local host
+#TODO this should not be necessary anymore
 local_ca_copy_path: "{{role_path}}/tmp/certs"
 local_cert_gen_path: "{{local_ca_copy_path}}/{{host_name}}"
 local_ca_cert_conf: "{{role_path}}/../certificates_generate/files/cfssl/config.json"
 local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"
 local_cluster_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/cluster-ca"
+systemd_install_dir:  /opt/services/core
+master_0_job_dir:  /opt/deployments
+notify_cert_change: false

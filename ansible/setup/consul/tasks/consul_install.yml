@@ -61,10 +61,20 @@
     state: directory
     mode: '0755'
 
+
+- name: Consul install certs
+  become: true
+  when: not consulInstalled.stat.exists  or update_certificates|bool == true
+  block:
+    - name: install_cert handler consul
+      include_tasks: handlers/generate_consul_certs.yml
+
 - name: Consul install
   become: true
   when: not consulInstalled.stat.exists
   block:
+
+
     - name: "Create consul dir if needed"
       become: true
       ansible.builtin.file:

@@ -1,0 +1,177 @@
+- name: "Generate nomad certs"
+  become: true
+  block:
+    - name: Stop nomad
+      failed_when: false
+      service:
+        name: nomad
+        state: stopped
+
+
+    - name: "Delete cfssl_working_dir on master 0"
+      delegate_to: "{{masters[0]}}"
+      file:
+        path: "{{cfssl_working_dir}}"
+        state: absent
+
+
+    - name: "Delete nomad certs"
+      file:
+        path: "{{nomad_cert_path}}"
+        state: absent
+
+    - name: "Delete nomad ingress certs"
+      file:
+        path: "{{nomad_cert_ingress_path}}"
+        state: absent
+
+    - name: "Create nomad certs dir if needed"
+      file:
+        path: "{{nomad_cert_path}}"
+        state: directory
+        owner: "{{nomad_user}}"
+        group: "{{nomad_group}}"
+        mode: '0755'
+
+    - name: "Create nomad ingress certs dir if needed"
+      file:
+        path: "{{nomad_cert_ingress_path}}"
+        state: directory
+        owner: "{{nomad_user}}"
+        group: "{{nomad_group}}"
+        mode: '0755'
+
+    - name: "Create cfssl_working_dir on master 0 if needed"
+      delegate_to: "{{masters[0]}}"
+      file:
+        state: directory
+        mode: '0700'
+        path: "{{cfssl_working_dir}}"
+
+
+    - name: Template nomad_server.json
+      delegate_to: "{{masters[0]}}"
+      template:
+        force: yes
+        src: ../templates/cert/nomad_server.j2
+        dest: "{{cfssl_working_dir}}/nomad_server.json"
+
+    - name: Template nomad_cli.json
+      delegate_to: "{{masters[0]}}"
+      template:
+        force: yes
+        src: ../templates/cert/nomad_cli.j2
+        dest: "{{cfssl_working_dir}}/nomad_cli.json"
+
+    - name: Template nomad_client.json
+      delegate_to: "{{masters[0]}}"
+      template:
+        force: yes
+        src: ../templates/cert/nomad_client.j2
+        dest: "{{cfssl_working_dir}}/nomad_client.json"
+
+    - name: Template nomad_ingress.j2
+      delegate_to: "{{masters[0]}}"
+      template:
+        force: yes
+        src: ../templates/cert/nomad_ingress.j2
+        dest: "{{cfssl_working_dir}}/nomad_ingress.json"
+
+    - name: "Generate nomad server certificate(s) in  on master 0"
+      register: cfsslgen
+      when: is_master_host
+      failed_when: cfsslgen.rc != 0
+      delegate_to: "{{masters[0]}}"
+      shell: |
+        cfssl gencert \
+          -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
+          -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
+          -config {{cert_path_master_0}}/cfssl/config.json \
+          -profile peer nomad_server.json | cfssljson -bare nomad
+
+        cfssl gencert \
+          -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
+          -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
+          -config {{cert_path_master_0}}/cfssl/config.json \
+          -profile client nomad_cli.json | cfssljson -bare nomad-cli
+
+      args:
+        chdir: "{{cfssl_working_dir}}"
+
+    - name: "Generate nomad client certificate(s) in  on master 0"
+      register: cfsslgen
+      when: is_worker_host
+      failed_when: cfsslgen.rc != 0
+      delegate_to: "{{masters[0]}}"
+      shell: |
+        cfssl gencert \
+          -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
+          -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
+          -config {{cert_path_master_0}}/cfssl/config.json \
+          -profile peer nomad_client.json | cfssljson -bare nomad
+
+      args:
+        chdir: "{{cfssl_working_dir}}"
+
+    - name: "Generate nomad ingress certificate(s) in  on master 0"
+      register: cfsslgen
+      when: is_worker_host
+      failed_when: cfsslgen.rc != 0
+      delegate_to: "{{masters[0]}}"
+      shell: |
+        cfssl gencert \
+        -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
+        -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
+        -config {{cert_path_master_0}}/cfssl/config.json \
+        -profile peer nomad_ingress.json | cfssljson -bare nomad_ingress
+      args:
+        chdir: "{{cfssl_working_dir}}"
+
+    - name: "Copy nomad agent certs"
+      when: is_master_host
+      include_tasks: cert_install/tasks/copy_from_master_0.yml
+      loop:
+        - { src: '{{cfssl_working_dir}}/nomad.pem', dest: '{{nomad_cert}}' ,mode: '0644'}
+        - { src: '{{cfssl_working_dir}}/nomad-key.pem', dest: '{{nomad_cert_key}}',mode: '0644'}
+        - { src: '{{cfssl_working_dir}}/nomad-cli.pem', dest: '{{nomad_cert_cli}}' ,mode: '0644'}
+        - { src: '{{cfssl_working_dir}}/nomad-cli-key.pem', dest: '{{nomad_cert_cli_key}}',mode: '0644'}
+
+    - name: "Copy nomad agent certs"
+      when: is_worker_host
+      include_tasks: cert_install/tasks/copy_from_master_0.yml
+      loop:
+        - { src: '{{cfssl_working_dir}}/nomad.pem', dest: '{{nomad_cert}}' ,mode: '0644' }
+        - { src: '{{cfssl_working_dir}}/nomad-key.pem', dest: '{{nomad_cert_key}}',mode: '0644' }
+        - { src: '{{cfssl_working_dir}}/nomad_ingress.pem', dest: '{{nomad_cert_ingress}}' ,mode: '0644' }
+        - { src: '{{cfssl_working_dir}}/nomad_ingress-key.pem', dest: '{{nomad_cert_ingress_key}}',mode: '0644' }
+
+    - name: Start nomad
+      failed_when: false
+      service:
+        name: nomad
+        state: started
+      register: nomadService
+      until: nomadService.status.ActiveState == "active"
+      retries: 10
+      delay: 5
+
+
+  vars:
+    - cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/nomad"
+    - nomad_cert_path: /etc/opt/certs/nomad
+    - nomad_cert: "{{nomad_cert_path}}/nomad.pem"
+    - nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"
+    - nomad_cert_cli: "{{nomad_cert_path}}/nomad-cli.pem"
+    - nomad_cert_cli_key: "{{nomad_cert_path}}/nomad-cli-key.pem"
+    - nomad_cert_ingress_path: /etc/opt/certs/ingress
+    - nomad_cert_ingress_key: "{{nomad_cert_ingress_path}}/nomad-ingress-key.pem"#
+    - nomad_cert_ingress: "{{nomad_cert_ingress_path}}/nomad-ingress.pem"
+    - nomad_dns: "nomad.{{tls_san}}"
+    - data_center: "nomadder1"
+    - nomad_servers:
+      - "127.0.0.1"
+      - "server.global.nomad"
+      - "localhost"
+      - "{{nomad_dns}}"
+      - "server.{{data_center}}.nomad"
+      - "server.{{host_name}}.{{data_center}}.nomad"

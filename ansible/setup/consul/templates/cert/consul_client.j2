@@ -1,0 +1,22 @@
+{
+  "CN": "client.{{host_name}}.{{data_center}}.consul",
+  "key": {
+    "algo": "rsa",
+    "size": 4096
+  },
+  "names": [
+    {
+      "C": "{{ca_cert_name_c}}",
+      "L": "{{ca_cert_name_l}}",
+      "O": "{{ca_cert_name_o}}",
+      "OU": "{{ca_cert_name_ou}}",
+      "ST": "{{ca_cert_name_st}}"
+    }
+  ],
+    "hosts": [
+        "127.0.0.1",
+        "localhost",
+        "{{host_ip}}",
+        "client.{{host_name}}.{{data_center}}.consul"
+    ]
+}

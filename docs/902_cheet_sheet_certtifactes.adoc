@@ -1,4 +1,4 @@
-.Vault REST-API cheatsheet
+.Openssl cheat sheet
 |===
 |Description |Command
 
@@ -7,6 +7,33 @@
 a|[source,shell]
 ----
 openssl x509 -text -noout -in <path>/my.crt
+----
+
+|show the certificate content:
+a|[source,shell]
+----
+openssl x509 -in / <path>/my.crt -noout -text
+----
+
+
+|extract cert from json
+a|[source,shell]
+----
+cat auto-config.json \| jq '.CARoots.Roots[0].RootCert' \| tr -d '\\n'
+----
+
+|verify certificate
+a|[source,shell]
+----
+openssl verify -CAfile /usr/local/share/ca-certificates/cloudlocal/ca.crt /usr/local/share/ca-certificates/cloudlocal/cluster-ca.crt /etc/opt/certs/consul/consul.pem
+----
+
+
+
+|Test connection with certificate:
+a|[source,shell]
+----
+echo quit \| openssl s_client -connect localhost:8501
 ----
 
 |===

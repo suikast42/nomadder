@@ -5,19 +5,29 @@
 	"ports": {"https":8501},
 	"bind_addr": "0.0.0.0",
     "advertise_addr": "{{host_ip}}",
-    "auto_config":{
-        "enabled": true,
-        "intro_token_file": "{{consul_client_jwt_file}}",
-        "server_addresses":{{masters | to_json }}
+    "auto_encrypt": {
+        "tls": true
     },
+    "retry_join":{{masters | to_json }},
+    "encrypt": "{{consul_encrypt_key}}",
     "node_meta": {
         "node_type": "worker"
     },
+    "ports": {
+        "http": -1,
+        "grpc" : 8502,
+        "https": 8501
+    },
+    "connect": {
+        "enabled": true
+    },
     "tls":{
       "defaults":{
-          "ca_file": "{{cluster_intermediate_ca_bundle}}",
-           "verify_incoming": false,
-           "verify_outgoing": true
+        "ca_file": "{{cluster_intermediate_ca_bundle}}",
+        "cert_file": "{{consul_cert}}",
+        "key_file": "{{consul_cert_key}}",
+        "verify_incoming": false,
+        "verify_outgoing": true
       },
       "internal_rpc":{
          "verify_server_hostname": true

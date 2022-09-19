@@ -11,45 +11,57 @@
     - name: "Delete Vault dir if needed"
       ansible.builtin.file:
         path: "{{vault_data_dir}}"
-        owner: vault
         state: absent
-        mode: '0755'
 
     - name: "Delete Vault installation"
       ansible.builtin.file:
         path: /usr/local/bin/vault
-        owner: vault
         state: absent
-        mode: '0755'
+
+    - name: "Delete Vault certificates"
+      ansible.builtin.file:
+        path: "{{vault_cert_path}}"
+        state: absent
 
 - name : Check vault installation present
   stat:
     path: /usr/local/bin/vault
   register: vaultInstalled
 
+- name: Vault pre tasks
+  become: true
+  when: not vaultInstalled.stat.exists
+  block:
+    - name: "Create Vault dir if needed"
+      become: true
+      ansible.builtin.file:
+        path: "{{vault_data_dir}}"
+        owner: vault
+        group: vault
+        state: directory
+        mode: '0755'
+
+    - name: "Create Vault cbin dir if needed"
+      become: true
+      ansible.builtin.file:
+        path: "{{vault_unseal_bin_dir}}"
+        owner: vault
+        group: vault
+        state: directory
+        mode: '0755'
+
+- name: Vault cert install
+  become: true
+  when: not vaultInstalled.stat.exists  or update_certificates|bool == true
+  block:
+
+    - name: install_cert handler vault_master
+      include_tasks: handlers/generate_vault_certs.yml
+
 - name: Vault install
   become: true
   when: not vaultInstalled.stat.exists
   block:
-  - name: "Create Vault dir if needed"
-    become: true
-    ansible.builtin.file:
-      path: "{{vault_data_dir}}"
-      owner: vault
-      group: vault
-      state: directory
-      mode: '0755'
-
-  - name: "Create Vault cbin dir if needed"
-    become: true
-    ansible.builtin.file:
-      path: "{{vault_unseal_bin_dir}}"
-      owner: vault
-      group: vault
-      state: directory
-      mode: '0755'
-
-
   - name: Download vault binary
     get_url:
       url: https://releases.hashicorp.com/vault/{{vault_version}}/vault_{{vault_version}}_linux_amd64.zip
@@ -150,7 +162,7 @@
       template:
         force: yes # replace the remote file when contents are different than the source.
         src: vault.hcl.j2
-        dest: /etc/vault.hcl
+        dest: /etc/vault.d/vault.hcl
         owner: "{{ vault_user }}"
         group: "{{ vault_group }}"
       notify: systemd_reload

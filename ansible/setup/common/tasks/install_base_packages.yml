@@ -72,6 +72,7 @@
     name:
       - pexpect
       - kubernetes
+      - python-nomad
     extra_args: --user
   register: install_pip2
 

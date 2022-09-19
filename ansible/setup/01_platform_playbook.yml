@@ -1,14 +1,4 @@
 ---
-- hosts: localhost
-  name: "Generate certificates for tls"
-  vars_files:
-    - vars/versions.yml
-    - vars/common_vars.yml
-    - vars/vault.yml
-  gather_facts: no
-  roles:
-    - {role: certificates_generate, tags: ['cert','cert_gen']}
-
 - hosts: all,!localhost
   name: "Master and worker base installations"
   vars_files:
@@ -16,9 +6,16 @@
     - vars/common_vars.yml
     - vars/vault.yml
   gather_facts: yes
+  # include the handlers for ca changed
+  handlers:
+    - import_tasks: docker/handlers/main.yml
+    - import_tasks: master_vault/handlers/main.yml
+    - import_tasks: consul/handlers/main.yml
+    - import_tasks: nomad/handlers/main.yml
   roles:
-    - {role: certificates_install, tags: ['cert','cert_install']}
     - {role: dnsmasq, tags: ['dnsmasq']}
+    - {role: cert_install, tags: ['cert']}
+
 
 # Single master setup
 # HA Setup is planed in second release
@@ -30,7 +27,7 @@
     - vars/vault.yml
   gather_facts: yes
   roles:
-    - {role: master_vault, tags: ['cert','vault']}
+    - {role: master_vault, tags: ['vault']}
 
 - hosts: all,!localhost
   name: "Master and worker platform installations"
@@ -40,9 +37,9 @@
     - vars/vault.yml
   gather_facts: yes
   roles:
-    - {role: consul, tags: ['cert','consul']}
-    - {role: nomad, tags: ['cert','nomad']}
-    - {role: docker, tags: ['cert','docker']}
+    - {role: docker, tags: ['docker']}
+    - {role: consul, tags: ['consul']}
+    - {role: nomad, tags: ['nomad']}
 
 - hosts: all
   name: "Test"

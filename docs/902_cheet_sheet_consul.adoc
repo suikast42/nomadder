@@ -14,7 +14,11 @@ a|[source,shell]
 ----
 sudo -H -u consul bash -c 'consul agent -config-dir=/etc/consul.d'
 ----
-
+|Test consul DNS
+a|[source,shell]
+----
+dig @127.0.0.1 -p 8600 consul.service.consul SRV
+----
 
 |===
 

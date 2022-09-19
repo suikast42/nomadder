@@ -1,0 +1,190 @@
+- name: Certgen
+  block:
+  - name: "Delete cluster ca crt {{update_certificates|bool == true}}"
+    become: true
+    when: update_certificates|bool == true
+    block:
+      - name: "Delete ca crt path {{ca_cert_path}} if present"
+        file:
+          path: "{{ ca_cert_path }}"
+          state: absent
+
+      - name: "Delete generated app crts on master_0"
+        when: is_master_0
+        run_once: true
+        file:
+          path: "{{ cert_path_master_0 }}"
+          state: absent
+
+      - name: "Refresh trust store "
+        shell: update-ca-certificates
+        register: caimport
+
+      - name: "Delete certs from PKI"
+        debug:
+          msg: "{{ caimport }}"
+
+  - name: "Create common folders if needed"
+    become: true
+    block:
+      - name: "Create certificate folder {{ca_cert_path}} if needed"
+        file:
+          state: directory
+          path: "{{ca_cert_path}}"
+          mode: '0755'
+
+
+  - name : "Check if certificates exists on master_0"
+    stat:
+      path: "{{ca_cert_path}}/ca.crt"
+    register: caCert
+##########################################################
+##### This block is only running on master 0 and in ######
+##### run once mode.                                ######
+##########################################################
+  - name: "Generate ca certificate and import PKI on master 0"
+    become: true
+    run_once: true
+    when: not caCert.stat.exists and is_master_0
+    block:
+      - name: "Create cfssl working dir on master_0 {{cfssl_working_dir}} if needed "
+        become: true
+        # Don't trigger changes it is only a tmp folder
+        changed_when: false
+        file:
+          state: directory
+          mode: '0700'
+          path: "{{cfssl_working_dir}}"
+
+      - name: "Create app certificate folder on master_0 {{cert_path_master_0}}/ca if needed "
+        become: true
+        file:
+          state: directory
+          mode: '0700'
+          path: "{{cert_path_master_0}}/ca"
+
+      - name: "Create app certificate folder on master_0 {{cert_path_master_0}}/cluster-ca if needed "
+        become: true
+        file:
+          state: directory
+          mode: '0700'
+          path: "{{cert_path_master_0}}/cluster-ca"
+
+      - name: "Create app certificate folder on master_0 {{cert_path_master_0}}/cfssl if needed "
+        become: true
+        file:
+          state: directory
+          mode: '0700'
+          path: "{{cert_path_master_0}}/cfssl"
+
+      - name: "Create cfssl  {{cert_path_master_0}} if needed"
+        become: true
+        file:
+          state: directory
+          mode: '0700'
+          path: "{{cert_path_master_0}}"
+
+      - name: Template ca.json
+        template:
+          force: yes
+          src: ca.j2
+          dest: "{{cfssl_working_dir}}/ca.json"
+
+      - name: Template cluster-ca.json
+        template:
+          force: yes
+          src: cluster-ca.j2
+          dest: "{{cfssl_working_dir}}/cluster-ca.json"
+
+      - name: Template config.json
+        template:
+          force: yes
+          src: config.json
+          dest: "{{cfssl_working_dir}}/config.json"
+      - name: "Generate ca certificates in {{cfssl_working_dir}}"
+        shell: |
+          cfssl gencert -initca ca.json | cfssljson -bare ca
+        args:
+          chdir: "{{cfssl_working_dir}}"
+
+      - name: "Generate cluster-ca certificates in {{cfssl_working_dir}}"
+        any_errors_fatal: true
+        register: cfsslgen
+        # ignore_errors: true
+        failed_when: cfsslgen.rc != 0
+        shell: |
+          cfssl gencert -initca cluster-ca.json | cfssljson -bare cluster-ca 
+          cfssl sign \
+            -ca ca.pem \
+            -ca-key ca-key.pem \
+            -config config.json \
+            -profile intermediate_ca  cluster-ca.csr | cfssljson -bare cluster-ca
+          mkbundle -f cluster-ca-bundle.pem ca.pem cluster-ca.pem 
+          cp config.json {{cert_path_master_0}}/cfssl/
+          cp ca.csr {{cert_path_master_0}}/ca/
+          cp ca.pem {{cert_path_master_0}}/ca/
+          cp ca-key.pem {{cert_path_master_0}}/ca/
+          cp cluster-ca.csr {{cert_path_master_0}}/cluster-ca/
+          cp cluster-ca.pem {{cert_path_master_0}}/cluster-ca/
+          cp cluster-ca-key.pem {{cert_path_master_0}}/cluster-ca/
+        args:
+          chdir: "{{cfssl_working_dir}}"
+
+      - name: "Copy certs"
+        include_tasks: copy_from_master_0.yml
+        loop:
+          - { src: '{{cfssl_working_dir}}/ca.pem', dest: '{{ca_cert_path}}/ca.crt' }
+          - { src: '{{cfssl_working_dir}}/cluster-ca.pem', dest: '{{ca_cert_path}}/cluster-ca.crt' }
+          - { src: '{{cfssl_working_dir}}/cluster-ca-bundle.pem', dest: '{{cluster_intermediate_ca_bundle}}' }
+
+      - name: "Refresh trust store import PKI on master 0 "
+        shell: update-ca-certificates
+        register: caimport
+
+      - name: "Import PKI on master 0"
+        debug:
+          msg: "{{ caimport }}"
+
+  - name: "Import PKI from master_0 to host"
+    become: true
+    # master 0 has already  imported PKI
+    when: not caCert.stat.exists and not is_master_0
+    block:
+      - name: "Copy certs"
+        include_tasks: copy_from_master_0.yml
+        # Distrubute the certs from master_0s' trust store
+        loop:
+          - { src: '{{ca_cert_path}}/ca.crt', dest: '{{ca_cert_path}}/ca.crt' }
+          - { src: '{{ca_cert_path}}/cluster-ca.crt', dest: '{{ca_cert_path}}/cluster-ca.crt' }
+          - { src: '{{ca_cert_path}}/cluster-ca-bundle.pem', dest: '{{cluster_intermediate_ca_bundle}}' }
+
+      - name: "Refresh trust store import PKI "
+        shell: update-ca-certificates
+        register: caimport
+
+      - name: "Import PKI"
+        debug:
+          msg: "{{ caimport }}"
+
+  - name: "Notify handlers ca_changed"
+    become: true
+    when: not caCert.stat.exists or notify_cert_change|bool == true
+    block:
+      - name: Notify Ca changed
+        # dummy command for satisfy  the ansible notify logic
+        shell: hostname -s
+        notify: ca_changed
+
+  always:
+    - name : Finally
+      become: true
+      when: is_master_0
+      run_once: true
+      block:
+      - name: "Delete {{cfssl_working_dir}} on master_0"
+        file:
+          path: "{{ cfssl_working_dir }}"
+          state: absent
+  vars:
+    cfssl_working_dir: "/tmp/certificates"
+

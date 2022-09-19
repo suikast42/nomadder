@@ -7,6 +7,7 @@
     "bind_addr": "0.0.0.0",
     "advertise_addr": "{{host_ip}}",
     "client_addr": "0.0.0.0",
+    "encrypt": "{{consul_encrypt_key}}",
     "ui_config": {
         "enabled" : true
     },
@@ -14,55 +15,37 @@
         "grpc" : "127.0.0.1"
     },
     "ports": {
+        "http": -1,
         "grpc" : 8502,
         "https": 8501
     },
+    "connect": {
+        "enabled": true
+    },
     "retry_join":{{masters | to_json }},
     "bootstrap_expect": {{masters|length}},
-	"acl": {
-		"enabled": true,
-		"default_policy": "deny",
-		"enable_token_persistence": true,
-		"tokens": {
-			"initial_management": "{{consul_initial_management_token}}",
-			"agent": "{{consul_initial_agent_token}}"
-		}
-	},
+
+    "auto_encrypt": {
+        "allow_tls": true
+    },
+
 	"performance" :{
 	   "raft_multiplier" : 1
 	},
-	"connect": { "enabled": true },
-	"auto_config": {
-		"authorization": {
-			"enabled": true,
-			"static": {
-				"jwt_validation_pub_keys": ["{{secint_pubkey}}"],
-				"bound_issuer": "secint",
-				"bound_audiences": ["consul-cluster-{{data_center}}"],
-				"claim_mappings": {
-					"sub": "node_name"
-				},
-				"claim_assertions": [
-					"value.node_name == \"${node}\""
-				]
-			}
-		}
-	},
+
     "node_meta": {
         "node_type": "server"
     },
-    "encrypt": "{{consul_encrypt_key}}",
     "tls":{
       "defaults":{
-          "ca_file": "{{cluster_intermediate_ca_bundle}}",
-          "cert_file": "{{consul_sever_cert}}",
-          "key_file": "{{consul_sever_cert_key}}",
-          "verify_incoming": true,
-          "verify_outgoing": true
+        "ca_file": "{{cluster_intermediate_ca_bundle}}",
+        "cert_file": "{{consul_cert}}",
+        "key_file": "{{consul_cert_key}}",
+        "verify_incoming": true,
+        "verify_outgoing": true
       },
-      "internal_rpc":{
+     "internal_rpc":{
          "verify_server_hostname": true
-      }
+     }
     }
-
 }

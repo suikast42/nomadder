@@ -1,10 +1,6 @@
 # see https://learn.hashicorp.com/tutorials/nomad/production-deployment-guide-vm-with-consul
 - name: nomad installation
   block:
-    - name: copy certificate from master[0]
-      include_tasks: common/tasks/copy_certs_from_master_0.yml
-      vars:
-        for_service: nomad
 
     - name: "Create user {{nomad_user}}"
       include_tasks: common/tasks/user.yml
@@ -19,8 +15,6 @@
     - name: Install nomad plugin cni
       include_tasks: nomad_plugin_cni_install.yml
 
-    - name: Install certificates
-      include_tasks: install_certificates.yml
 
     - name: Nomad config
       include_tasks: copy_copy_config_files.yml
@@ -29,6 +23,9 @@
       include_tasks: nomad_systemd_install.yml
 
   vars:
+    consul_cert_path: "/etc/opt/certs/consul"
+    consul_cert: "{{consul_cert_path}}/consul.pem"
+    consul_cert_key: "{{consul_cert_path}}/consul-key.pem"
     # todo define this in common
     nomad_consul_initial_agent_token: "e95b599e-166e-7d80-08ad-aee76e7ddf19"
     nomad_conf_dir: "/etc/nomad.d"
@@ -36,7 +33,7 @@
     nomad_cert: "{{nomad_cert_path}}/nomad.pem"
     nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"
     nomad_cli_cert: "{{nomad_cert_path}}/nomad-cli.pem"
-    nomad_data_dir: "/opt/deployments/core/nomad/data"
+    nomad_data_dir: "{{systemd_install_dir}}/nomad/data"
     nomad_dns: "nomad.{{tls_san}}"
     nomad_encrypt_key: "4PRfoE6Mj9dHTLpnzmYD1+THdlyAo2Ji4U6ewMumpAw="
     nomad_servers:

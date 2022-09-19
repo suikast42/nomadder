@@ -1,0 +1,19 @@
+# Copies
+- name: "Slurp item.src from master_0"
+  become: true
+  delegate_to: "{{masters[0]}}"
+  ansible.builtin.slurp:
+    src: "{{item.src}}"
+  register: src
+
+- name: "Copy"
+  become: true
+  delegate_to: "{{ item.host | default( host_ip) }}"
+  copy:
+    force: true
+    content: "{{ src.content | b64decode }}"
+    mode: "{{item.mode | default('0755')}}"
+    owner: "{{item.user | default('root')}}"
+    group: "{{item.group | default('root')}}"
+    dest: "{{item.dest}}"
+

@@ -2,3 +2,7 @@
   become: true
   command: systemctl daemon-reload
   listen: systemd_reload
+
+- name: ca_changed handler vault_master
+  include_tasks: generate_vault_certs.yml
+  listen: ca_changed
