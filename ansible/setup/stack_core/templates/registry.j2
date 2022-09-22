@@ -1,0 +1,113 @@
+job "registry" {
+  datacenters = ["{{data_center}}"]
+  type        = "service"
+
+  group "nexus" {
+    count = 1
+    restart {
+      attempts = 3
+      delay    = "10s"
+      interval = "1m"
+      mode     = "fail"
+    }
+    network {
+      mode = "bridge"
+      port "ui" { to = 8081 }
+      # Set by poststart service
+      port "pull" { to = 5000 }
+      # Set by poststart service
+      port "push" { to = 5001 }
+    }
+    service {
+      name = "nexus-ui"
+      port = "ui"
+      tags = [
+        # Nexus UI
+        "traefik.enable=true",
+        "traefik.http.routers.nexus-ui.rule=Host(`nexus.{{tls_san}}`)",
+        "traefik.http.routers.nexus-ui.tls=true",
+      ]
+      check {
+        name     = "health"
+        type     = "http"
+        port     = "ui"
+        path     = "service/rest/v1/status"
+        interval = "10s"
+        timeout  = "2s"
+        check_restart {
+          limit           = 5
+          grace           = "60s"
+          ignore_warnings = false
+        }
+      }
+    }
+    service {
+      name = "nexus-pull"
+      port = "pull"
+      tags = [
+        # Nexus pull
+        "traefik.enable=true",
+        "traefik.http.routers.nexus-pull.tls=true",
+        "traefik.http.routers.nexus-pull.rule=Host(`registry.{{tls_san}}`) && Method(`GET`,`HEAD`)"
+      ]
+      check {
+        name     = "alive"
+        type     = "tcp"
+        port     = "pull"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+    service {
+      name = "nexus-push"
+      port = "push"
+      tags = [
+        # Nexus pull
+        "traefik.enable=true",
+        "traefik.http.routers.nexus-push.tls=true",
+        "traefik.http.routers.nexus-push.rule=Host(`registry.{{tls_san}}`) && Method(`POST`,`PUT`,`DELETE`,`PATCH`)"
+      ]
+      check {
+        name     = "alive"
+        type     = "tcp"
+        port     = "push"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+    task "nexus" {
+
+      driver = "docker"
+      env {
+        #leave the default password as admin 123
+        NEXUS_SECURITY_RANDOMPASSWORD = false
+      }
+      config {
+        image = "sonatype/nexus3:{{version_nexus}}"
+        ports = ["ui", "pull", "push"]
+      }
+
+      resources {
+        cpu    = 100
+        memory = 4096
+      }
+    }
+    task "nexus-initzlr" {
+      driver = "docker"
+
+      config {
+        image = "suikast42/nexus-initlzr:1.0.0.Alpha4"
+      }
+
+      resources {
+        cpu    = 200
+        memory = 128
+      }
+
+      lifecycle {
+        hook    = "poststart"
+        sidecar = false
+      }
+    }
+  }
+}
