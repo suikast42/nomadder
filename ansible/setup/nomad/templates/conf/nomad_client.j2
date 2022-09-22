@@ -5,6 +5,9 @@ data_dir =  "{{nomad_data_dir}}"
 
 client {
   enabled = true
+  meta {
+    node_type= "worker"
+  }
   host_volume "ca_cert" {
     path      = "/usr/local/share/ca-certificates/cloudlocal"
     read_only = true

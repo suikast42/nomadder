@@ -1,7 +1,6 @@
 # see https://learn.hashicorp.com/tutorials/nomad/production-deployment-guide-vm-with-consul
 - name: nomad installation
   block:
-
     - name: "Create user {{nomad_user}}"
       include_tasks: common/tasks/user.yml
       vars:
@@ -9,12 +8,17 @@
         create_group: "{{nomad_group}}"
         create_usr_conf_dir: "{{nomad_conf_dir}}"
 
+    - name: Create nomad volumes
+      when: is_worker_host
+      include_tasks: nomad_volumes.yml
+      loop:
+        - { name: 'nexus_workdir' , path: '/opt/deployments/core/nexus/workdir'}
+
     - name: Install nomad
       include_tasks: nomad_install.yml
 
     - name: Install nomad plugin cni
       include_tasks: nomad_plugin_cni_install.yml
-
 
     - name: Nomad config
       include_tasks: copy_copy_config_files.yml

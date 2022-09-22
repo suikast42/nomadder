@@ -28,11 +28,11 @@ ui {
   enabled =  true
 
   consul {
-    ui_url = "http://{{master_ip}}:8500/ui"
+    ui_url = "https://consul.{{tls_san}}"
   }
 
   vault {
-    ui_url = "https://{{master_ip}}:8200/ui"
+    ui_url = "https://vault.{{tls_san}}"
   }
 }
 

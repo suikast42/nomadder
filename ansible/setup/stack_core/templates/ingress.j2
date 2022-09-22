@@ -26,7 +26,7 @@ variable "image" {
 
 job "ingress" {
   datacenters = [var.datacenter]
-  type        = "service"
+  type        = "system"
 
   group "traefik" {
     volume "cert_ingress" {
@@ -124,12 +124,17 @@ job "ingress" {
   [http.services.nomad.loadBalancer]
     serversTransport = "default"
     [[http.services.nomad.loadBalancer.servers]]
-      url = "https://10.21.21.41:4646"
+      url = "https://{{master_ip}}:4646"
 
   [http.services.consul.loadBalancer]
    serversTransport = "default"
     [[http.services.consul.loadBalancer.servers]]
-      url = "https://10.21.21.41:8501"
+      url = "https://{{master_ip}}:8501"
+
+  [http.services.vault.loadBalancer]
+   serversTransport = "default"
+    [[http.services.vault.loadBalancer.servers]]
+      url = "https://{{master_ip}}:8200"
 
 [http.routers]
   [http.routers.consul]
@@ -149,6 +154,13 @@ job "ingress" {
     [[http.routers.nomad.tls.domains]]
       #main = "{{tls_san}}"
       sans = ["nomad.{{tls_san}}"]
+
+  [http.routers.vault]
+    entryPoints = ["https"]
+    rule = "Host(`vault.{{tls_san}}`) "
+    service = "vault"
+    [[http.routers.vault.tls.domains]]
+      sans = ["vault.{{tls_san}}"]
 
               EOF
               destination = "local/certconfig.toml"
