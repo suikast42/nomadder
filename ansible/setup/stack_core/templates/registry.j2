@@ -3,6 +3,15 @@ job "registry" {
   type        = "service"
 
   group "nexus" {
+  constraint {
+    attribute = "${attr.unique.hostname}"
+    value     = "worker-01"
+  }
+  volume "nexus_workdir" {
+    type      = "host"
+    source    = "nexus_workdir"
+    read_only   = false
+  }
     count = 1
     restart {
       attempts = 3
@@ -82,6 +91,10 @@ job "registry" {
         #leave the default password as admin 123
         NEXUS_SECURITY_RANDOMPASSWORD = false
       }
+     volume_mount {
+        volume      = "nexus_workdir"
+        destination = "/opt/sonatype/sonatype-work"
+     }
       config {
         image = "sonatype/nexus3:{{version_nexus}}"
         ports = ["ui", "pull", "push"]
@@ -96,7 +109,7 @@ job "registry" {
       driver = "docker"
 
       config {
-        image = "suikast42/nexus-initlzr:1.0.0.Alpha4"
+        image = "suikast42/nexus-initlzr:{{version_nexus_initlzr}}"
       }
 
       resources {
