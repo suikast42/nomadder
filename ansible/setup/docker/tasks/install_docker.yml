@@ -66,6 +66,19 @@
         name: docker
         state: present
 
+    - name: Docker group add if not present
+      become: true
+      group:
+        name: docker
+        state: present
+
+    - name: "{{ ansible_ssh_user }} userGrp conf"
+      become: true
+      ansible.builtin.user:
+        name: "{{ ansible_ssh_user }}"
+        groups: root, docker
+        state: present
+
     - name: "{{ ansible_ssh_user }} userGrp conf"
       become: true
       ansible.builtin.user:

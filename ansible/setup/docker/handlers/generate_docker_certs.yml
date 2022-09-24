@@ -21,12 +21,6 @@
         name: docker
         state: present
 
-    - name: "{{ ansible_ssh_user }} userGrp conf"
-      become: true
-      ansible.builtin.user:
-        name: "{{ ansible_ssh_user }}"
-        groups: root, docker
-        state: present
 
     - name: "Delete cfssl_working_dir on master 0"
       delegate_to: "{{masters[0]}}"
