@@ -1,0 +1,51 @@
+version: '2.4'
+
+services:
+
+  nexus-initlzr:
+    image: suikast42/nexus-initlzr:{{version_nexus_initlzr}}
+    environment:
+    # Let the default admin password as admin123
+      NEXUS_ADDRESS: {{host_ip}}
+      NEXUS_PORT: 5002
+      NEXUS_SCHEME: "http"
+    depends_on:
+      nexus:
+        condition: service_started
+
+  nexus:
+    image: sonatype/nexus3:{{version_nexus}}
+    container_name: nexus
+    hostname: nexus
+    mem_limit: 2048M
+    restart: always
+    environment:
+      # Let the default admin password as admin123
+      NEXUS_SECURITY_RANDOMPASSWORD : false
+    logging:
+      options:
+        max-size: '100m'
+        max-file: '1'
+    ports:
+      - '5000:5000'
+      - '5001:5001'
+      - '5002:8081'
+
+    healthcheck:
+      test: ["CMD", "curl","-fk","http://localhost:5002"]
+      start_period: 20s
+      interval: 10s
+      timeout: 5s
+
+    volumes:
+      - nexus_data:/nexus-data
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+
+volumes:
+  nexus_data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '{{nexus_workdir}}'

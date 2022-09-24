@@ -70,7 +70,6 @@
         dest: "{{cfssl_working_dir}}/docker-client.json"
 
     - name: Template docker daemon json
-      when: is_build_host
       template:
         force: yes
         src: ../templates/docker/daemon.json

@@ -1,0 +1,7 @@
+- name: Log into dockerhub
+  changed_when: false
+  community.docker.docker_login:
+    # do not trigger a change
+    username: "{{dockerhub_user}}"
+    password: "{{dockerhub_password}}"
+    reauthorize: yes

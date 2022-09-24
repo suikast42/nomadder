@@ -1,0 +1,89 @@
+- name: Build nexus
+  become: true
+  block:
+    - name: "Create image backup dir {{image_backup_dir}} if needed "
+      file:
+        state: directory
+        mode: "0755"
+        path: "{{image_backup_dir}}"
+
+    - name: "Create nexus volumes {{nexus_workdir}} if needed"
+      file:
+        state: directory
+        mode: "0755"
+        path: "{{nexus_workdir}}"
+
+    - name: "Create nexus compose dir {{nexus_compose_dir}} if needed"
+      file:
+        state: directory
+        mode: "0755"
+        path: "{{nexus_compose_dir}}"
+
+    - name: "Pull nexus v {{version_nexus}} from dockerhub"
+      community.docker.docker_image:
+        name: "sonatype/nexus3:{{version_nexus}}"
+        source: pull
+        archive_path: "{{ image_backup_dir }}/nexus.tar"
+        state: present
+
+    - name: "Pull nexus initlzr v {{version_nexus_initlzr}} from dockerhub"
+      community.docker.docker_image:
+        name: "suikast42/nexus-initlzr:{{version_nexus_initlzr}}"
+        source: pull
+        archive_path: "{{ image_backup_dir }}/nexus-initlzr.tar"
+        state: present
+
+    - name: Template docker_load_images.sh
+      template:
+        force: yes
+        src: templates/docker_load_images.sh
+        dest: "{{image_backup_dir}}/docker_load_images.sh"
+
+    - name: Change permission on docker_load_images.sh
+      file:
+        path: "{{image_backup_dir}}/docker_load_images.sh"
+        state: file
+        mode: 0755
+
+    - name: Template docker-compose.yml
+      template:
+        force: yes
+        src: templates/docker-compose.yml
+        dest: "{{nexus_compose_dir}}/docker-compose.yml"
+
+    - name: Template startCompose.sh
+      template:
+        force: yes
+        src: templates/startCompose.sh
+        dest: "{{nexus_compose_dir}}/startCompose.sh"
+
+    - name: Template stopCompose.sh
+      template:
+        force: yes
+        src: templates/stopCompose.sh
+        dest: "{{nexus_compose_dir}}/stopCompose.sh"
+
+    - name: Change permission on startCompose.sh
+      file:
+        path: "{{nexus_compose_dir}}/startCompose.sh"
+        state: file
+        mode: 0755
+
+    - name: Change permission on stopCompose.sh
+      file:
+        path: "{{nexus_compose_dir}}/stopCompose.sh"
+        state: file
+        mode: 0755
+
+    - name: "Start nexus"
+      shell: "{{nexus_compose_dir}}/startCompose.sh"
+
+    - name: Wait for port 5002 to become open on the host
+      wait_for:
+        port: 5002
+        delay: 20
+
+  vars:
+    nexus_workdir: /opt/deployments/core/nexus/workdir
+    nexus_compose_dir: /usr/local/etc/deployments/core
+    image_backup_dir: /opt/deployments/imagebackups

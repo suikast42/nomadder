@@ -12,14 +12,10 @@
     - name: "Deploy traefik v {{version_traefik}}"
       import_tasks: deploy_ingress.yml
 
-    - name: "Deploy nexus v {{      version_nexus}}"
-      import_tasks: deploy_nexus.yml
 
   vars:
     - nomad_cli_cert: /etc/opt/certs/nomad/nomad-cli.pem
     - nomad_cli_cert_key: /etc/opt/certs/nomad/nomad-cli-key.pem
     - version_traefik: "2.8.4"
-    - version_nexus: "3.41.1"
-    - version_nexus_initlzr: "1.0.0.Alpha4"
     - core_deployment_dir: "{{master_0_job_dir}}/core"
 

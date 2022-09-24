@@ -20,7 +20,7 @@ variable "ingress_https" {
 variable "image" {
   type = string
   description = "Default image"
-  default = "traefik:v{{version_traefik}}"
+  default = "{{registry_ip}}:{{registry_port}}/traefik:v{{version_traefik}}"
 }
 # endregion
 
@@ -119,24 +119,45 @@ job "ingress" {
   stores = ["default"]
 
 
-# Route to nomad ui
+
 [http.services]
+# Service to nomad
   [http.services.nomad.loadBalancer]
     serversTransport = "default"
     [[http.services.nomad.loadBalancer.servers]]
       url = "https://{{master_ip}}:4646"
-
+# Service to consul
   [http.services.consul.loadBalancer]
    serversTransport = "default"
     [[http.services.consul.loadBalancer.servers]]
       url = "https://{{master_ip}}:8501"
 
+# Service to vault
   [http.services.vault.loadBalancer]
    serversTransport = "default"
     [[http.services.vault.loadBalancer.servers]]
       url = "https://{{master_ip}}:8200"
 
+# Service to nexus ui
+  [http.services.nexus-ui.loadBalancer]
+   serversTransport = "default"
+    [[http.services.nexus-ui.loadBalancer.servers]]
+      url = "http://{{master_ip}}:5002"
+
+# Service to nexus push
+  [http.services.nexus-push.loadBalancer]
+   serversTransport = "default"
+    [[http.services.nexus-push.loadBalancer.servers]]
+      url = "http://{{master_ip}}:5001"
+
+ # Service to nexus pull
+   [http.services.nexus-pull.loadBalancer]
+    serversTransport = "default"
+     [[http.services.nexus-pull.loadBalancer.servers]]
+       url = "http://{{master_ip}}:5000"
+
 [http.routers]
+# Route to consul ui
   [http.routers.consul]
      entryPoints = ["https"]
      rule = "Host(`consul.{{tls_san}}`) "
@@ -147,6 +168,7 @@ job "ingress" {
  #       main = "{{tls_san}}"
         sans = ["consul.{{tls_san}}"]
 
+# Route to nomad ui
   [http.routers.nomad]
     entryPoints = ["https"]
     rule = "Host(`nomad.{{tls_san}}`) "
@@ -155,12 +177,37 @@ job "ingress" {
       #main = "{{tls_san}}"
       sans = ["nomad.{{tls_san}}"]
 
+# Route to vault ui
   [http.routers.vault]
     entryPoints = ["https"]
     rule = "Host(`vault.{{tls_san}}`) "
     service = "vault"
     [[http.routers.vault.tls.domains]]
       sans = ["vault.{{tls_san}}"]
+
+# Route to nexus ui
+  [http.routers.nexus-ui]
+    entryPoints = ["https"]
+    rule = "Host(`nexus.{{tls_san}}`) "
+    service = "nexus-ui"
+    [[http.routers.nexus-ui.tls.domains]]
+      sans = ["nexus.{{tls_san}}"]
+
+# Route to nexus pull
+  [http.routers.nexus-pull]
+    entryPoints = ["https"]
+    rule = "Host(`registry.{{tls_san}}`)  && Method(`GET`,`HEAD`)"
+    service = "nexus-pull"
+    [[http.routers.nexus-pull.tls.domains]]
+      sans = ["registry.{{tls_san}}"]
+
+# Route to nexus push
+  [http.routers.nexus-push]
+    entryPoints = ["https"]
+    rule = "Host(`registry.{{tls_san}}`) && Method(`POST`,`PUT`,`DELETE`,`PATCH`)"
+    service = "nexus-push"
+    [[http.routers.nexus-push.tls.domains]]
+      sans = ["registry.{{tls_san}}"]
 
               EOF
               destination = "local/certconfig.toml"

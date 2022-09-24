@@ -1,5 +1,10 @@
+# Sample nexus as service mesh
+# This approach is weak for air gaped approach. If someone delete the nexus image over docker system prune -all
+# Then u need access to dockerhub again.
+# Nexus is hosted on the builder node as a compose deployment and is backed up as a tar file.
+
 job "registry" {
-  datacenters = ["{{data_center}}"]
+  datacenters = ["nomadder1"]
   type        = "service"
 
   group "nexus" {
@@ -38,7 +43,7 @@ job "registry" {
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
         "traefik.http.routers.nexus-ui.tls=true",
-        "traefik.http.routers.nexus-ui.rule=Host(`nexus.{{tls_san}}`)",
+        "traefik.http.routers.nexus-ui.rule=Host(`nexus.cloud.private`)",
       ]
       check {
         name     = "health"
@@ -65,7 +70,7 @@ job "registry" {
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
         "traefik.http.routers.nexus-pull.tls=true",
-        "traefik.http.routers.nexus-pull.rule=Host(`registry.{{tls_san}}`) && Method(`GET`,`HEAD`)"
+        "traefik.http.routers.nexus-pull.rule=Host(`registry.cloud.private`) && Method(`GET`,`HEAD`)"
       ]
   #    check {
   #      name     = "alive"
@@ -87,7 +92,7 @@ job "registry" {
         "traefik.enable=true",
         "traefik.consulcatalog.connect=true",
         "traefik.http.routers.nexus-push.tls=true",
-        "traefik.http.routers.nexus-push.rule=Host(`registry.{{tls_san}}`) && Method(`POST`,`PUT`,`DELETE`,`PATCH`)"
+        "traefik.http.routers.nexus-push.rule=Host(`registry.cloud.private`) && Method(`POST`,`PUT`,`DELETE`,`PATCH`)"
       ]
 
     }
@@ -103,7 +108,7 @@ job "registry" {
         destination = "/opt/sonatype/sonatype-work"
      }
       config {
-        image = "sonatype/nexus3:{{version_nexus}}"
+        image = "sonatype/nexus3:3.41.1"
       #  ports = ["ui", "pull", "push"]
       }
 
@@ -116,7 +121,7 @@ job "registry" {
       driver = "docker"
 
       config {
-        image = "suikast42/nexus-initlzr:{{version_nexus_initlzr}}"
+        image = "suikast42/nexus-initlzr:1.0.0.Alpha4"
       }
 
       resources {

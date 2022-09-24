@@ -37,6 +37,7 @@
       - ncdu
       - open-iscsi
       - nfs-common
+      - python3-docker
 
     state: present
   register: install_apt
