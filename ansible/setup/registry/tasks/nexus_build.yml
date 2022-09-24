@@ -79,6 +79,9 @@
       shell: "{{nexus_compose_dir}}/startCompose.sh"
 
     - name: Wait for port 5002 to become open on the host
+      delay: 0
+      async: 60
+      poll: 1
       wait_for:
         port: 5002
         delay: 20
