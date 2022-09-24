@@ -162,9 +162,9 @@ job "ingress" {
 
 
 #[providers.consulCatalog.endpoint.tls]
-#  ca = "/etc/opt/certs/ca/cluster-ca.crt"
-#  cert = "/etc/opt/certs/ingress/nomad-ingress.pem"
-#  key = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+#  ca = "{{base_cert_dir}}/ca/cluster-ca.crt"
+#  cert = {{base_cert_dir}}/ingress/nomad-ingress.pem"
+#  key = "{{base_cert_dir}}/ingress/nomad-ingress-key.pem"
 
 
 [log]

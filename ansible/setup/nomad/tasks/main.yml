@@ -8,6 +8,12 @@
         create_group: "{{nomad_group}}"
         create_usr_conf_dir: "{{nomad_conf_dir}}"
 
+    - name: "Add nomad to docker"
+      become: true
+      ansible.builtin.user:
+        name: nomad
+        groups: docker
+        state: present
 #    - name: Create nomad volumes
 #      when: is_worker_host
 #      include_tasks: nomad_volumes.yml
@@ -27,13 +33,13 @@
       include_tasks: nomad_systemd_install.yml
 
   vars:
-    consul_cert_path: "/etc/opt/certs/consul"
+    consul_cert_path: "{{base_cert_dir}}/consul"
     consul_cert: "{{consul_cert_path}}/consul.pem"
     consul_cert_key: "{{consul_cert_path}}/consul-key.pem"
     # todo define this in common
     nomad_consul_initial_agent_token: "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-    nomad_conf_dir: "/etc/nomad.d"
-    nomad_cert_path: /etc/opt/certs/nomad
+
+    nomad_cert_path: "{{base_cert_dir}}/nomad"
     nomad_cert: "{{nomad_cert_path}}/nomad.pem"
     nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"
     nomad_cli_cert: "{{nomad_cert_path}}/nomad-cli.pem"

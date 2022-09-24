@@ -49,4 +49,18 @@ local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"
 local_cluster_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/cluster-ca"
 systemd_install_dir:  /opt/services/core
 master_0_job_dir:  /opt/deployments
+base_cert_dir: /etc/opt/certs
 notify_cert_change: false
+
+
+vault_group: vault
+vault_user: vault
+vault_conf_dir: "/etc/vault.d"
+
+consul_group: consul
+consul_user: consul
+consul_conf_dir: "/etc/consul.d"
+
+nomad_group: nomad
+nomad_user: nomad
+nomad_conf_dir: "/etc/nomad.d"

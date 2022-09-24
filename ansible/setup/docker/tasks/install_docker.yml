@@ -45,7 +45,8 @@
         - "/var/lib/containerd"
         - "/usr/bin/docker"
         - "/usr/bin/dockerd"
-        - "/etc/opt/certs/docker"
+        - "{{base_cert_dir}}/docker"
+        - "/etc/docker"
 
 - name : Check docker installation present
   stat:
@@ -58,6 +59,7 @@
   become: true
   when: not dockerInstalled.stat.exists
   block:
+#  Grp add handled in generate_docker_certs.yml
     - name: Docker group add if not present
       become: true
       group:
@@ -71,17 +73,29 @@
         groups: root, docker
         state: present
 
-    - name: "Add nomad to usergroup"
-      become: true
-      ansible.builtin.user:
-        name: nomad
-        groups: docker
-        state: present
-
     - name: "Create docker download dir if needed"
       file:
         state: directory
         path: "{{docker_download_dir}}"
+
+    - name: "Docker conf dir if needed"
+      file:
+        state: directory
+        path: "/etc/docker"
+
+- name: Template docker daemon.json
+  become: true
+  template:
+    force: yes
+    src: templates/docker/daemon.json
+    dest: /etc/docker/daemon.json
+    group: docker
+    mode: '0644'
+  vars:
+    - docker_cert_path: "{{base_cert_dir}}/docker"
+    - docker_server_cert: "{{docker_cert_path}}/docker-server.pem"
+    - docker_server_cert_key: "{{docker_cert_path}}/docker-server-key.pem"
+
 
 - name: "Install docker certificates"
   become: true
@@ -95,17 +109,6 @@
   become: true
   when: not dockerInstalled.stat.exists
   block:
-    - name: "Docker Hosts Workaround"
-      when: is_build_host
-      become: true
-      delay: 0
-      async: 300
-      poll: 1
-      shell: |
-        cp /lib/systemd/system/docker.service /etc/systemd/system/
-        sed -i 's# -H\ fd:\/\/# #g' /etc/systemd/system/docker.service
-        systemctl daemon-reload
-
     - name: "Install docker V {{ docker_version }}"
       delay: 0
       async: 300
@@ -122,6 +125,16 @@
         chdir: /tmp/docker
       register: dockerInstall
 
+    - name: "Docker Hosts Workaround"
+      when: is_build_host
+      become: true
+      delay: 0
+      async: 300
+      poll: 1
+      shell: |
+        cp /lib/systemd/system/docker.service /etc/systemd/system/
+        sed -i 's# -H\ fd:\/\/# #g' /etc/systemd/system/docker.service
+        systemctl daemon-reload
     - name: Start docker
       service:
         name: docker

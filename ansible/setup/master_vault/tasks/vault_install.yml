@@ -36,8 +36,8 @@
       become: true
       ansible.builtin.file:
         path: "{{vault_data_dir}}"
-        owner: vault
-        group: vault
+        owner: "{{vault_user}}"
+        group: "{{vault_group}}"
         state: directory
         mode: '0755'
 
@@ -45,8 +45,8 @@
       become: true
       ansible.builtin.file:
         path: "{{vault_unseal_bin_dir}}"
-        owner: vault
-        group: vault
+        owner: "{{vault_user}}"
+        group: "{{vault_group}}"
         state: directory
         mode: '0755'
 

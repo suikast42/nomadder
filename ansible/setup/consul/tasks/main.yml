@@ -1,8 +1,13 @@
 #https://learn.hashicorp.com/tutorials/consul/deployment-guide
 - name: Consul installation
   block:
-  - name: "Create consul user"
-    import_tasks: user.yml
+  - name: "Create user {consul_user}}"
+    include_tasks: common/tasks/user.yml
+    vars:
+      create_user: "{{consul_user}}"
+      create_group: "{{consul_group}}"
+      create_usr_conf_dir: "{{consul_conf_dir}}"
+
 
   - name: "Install consul"
     import_tasks: consul_install.yml
@@ -36,7 +41,6 @@
     consul_data_dir: "{{systemd_install_dir}}/consul/data"
     consul_client_jwt_dir: "{{consul_data_dir}}/tokens/jwt"
     consul_client_jwt_file: "{{consul_client_jwt_dir}}/{{host_name}}.jwt"
-    consul_conf_dir: "/etc/consul.d"
-    consul_cert_path: "/etc/opt/certs/consul"
+    consul_cert_path: "{{base_cert_dir}}/consul"
     consul_cert: "{{consul_cert_path}}/consul.pem"
     consul_cert_key: "{{consul_cert_path}}/consul-key.pem"

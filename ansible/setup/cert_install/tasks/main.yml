@@ -33,6 +33,11 @@
           path: "{{ca_cert_path}}"
           mode: '0755'
 
+      - name: "Create certificate folder {{base_cert_dir}} if needed"
+        file:
+          state: directory
+          path: "{{base_cert_dir}}"
+          mode: '0755'
 
   - name : "Check if certificates exists on master_0"
     stat:

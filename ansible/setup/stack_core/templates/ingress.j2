@@ -82,11 +82,11 @@ job "ingress" {
       }
       volume_mount {
         volume      = "cert_ingress"
-        destination = "/etc/opt/certs/ingress"
+        destination = "{{base_cert_dir}}/ingress"
       }
       volume_mount {
         volume      = "ca_cert"
-        destination = "/etc/opt/certs/ca"
+        destination = "{{base_cert_dir}}/ca"
       }
 
       config {
@@ -102,20 +102,20 @@ job "ingress" {
 [http.serversTransports]
 [http.serversTransports.default]
   insecureSkipVerify = false
-  rootCAs = ["/etc/opt/certs/ca/ca.crt","/etc/opt/certs/ca/cluster-ca.crt"]
+  rootCAs = ["{{base_cert_dir}}/ca/ca.crt","{{base_cert_dir}}/ca/cluster-ca.crt"]
       [[http.serversTransports.default.certificates]]
-      certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
-      keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+      certFile = "{{base_cert_dir}}/ingress/nomad-ingress.pem"
+      keyFile = "{{base_cert_dir}}/ingress/nomad-ingress-key.pem"
 
 [tls.stores]
   [tls.stores.default]
     [tls.stores.default.defaultCertificate]
-      certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
-      keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+      certFile = "{{base_cert_dir}}/ingress/nomad-ingress.pem"
+      keyFile = "{{base_cert_dir}}/ingress/nomad-ingress-key.pem"
 
 [[tls.certificates]]
-  certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
-  keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+  certFile = "{{base_cert_dir}}/ingress/nomad-ingress.pem"
+  keyFile = "{{base_cert_dir}}/ingress/nomad-ingress-key.pem"
   stores = ["default"]
 
 
@@ -255,9 +255,9 @@ job "ingress" {
 
 
 [providers.consulCatalog.endpoint.tls]
-  ca = "/etc/opt/certs/ca/cluster-ca.crt"
-  cert = "/etc/opt/certs/ingress/nomad-ingress.pem"
-  key = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+  ca = "{{base_cert_dir}}/ca/cluster-ca.crt"
+  cert = "{{base_cert_dir}}/ingress/nomad-ingress.pem"
+  key = "{{base_cert_dir}}/ingress/nomad-ingress-key.pem"
 
 [log]
   level = "DEBUG"

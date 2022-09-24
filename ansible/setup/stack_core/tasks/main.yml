@@ -14,8 +14,8 @@
 
 
   vars:
-    - nomad_cli_cert: /etc/opt/certs/nomad/nomad-cli.pem
-    - nomad_cli_cert_key: /etc/opt/certs/nomad/nomad-cli-key.pem
+    - nomad_cli_cert: "{{base_cert_dir}}/nomad/nomad-cli.pem"
+    - nomad_cli_cert_key: "{{base_cert_dir}}/nomad/nomad-cli-key.pem"
     - version_traefik: "2.8.4"
     - core_deployment_dir: "{{master_0_job_dir}}/core"
 
