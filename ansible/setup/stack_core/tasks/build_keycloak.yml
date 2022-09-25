@@ -1,0 +1,51 @@
+- name: Keycloak docker build
+  run_once: true
+  block:
+
+  - name: "Create docker build dir {{docker_build_dir_keycloak}} if needed"
+    file:
+      path: "{{docker_build_dir_keycloak}}"
+      state: directory
+
+  - name: Template dockerfile keycloak
+    template:
+      force: yes
+      src: DockerfileKeycloak
+      dest: "{{docker_build_dir_keycloak}}/Dockerfile"
+
+  - name: "Login {{registry_dns}}"
+    # do not trigger a change
+    changed_when: false
+    community.docker.docker_login:
+      registry_url: "{{registry_dns}}"
+      username: "admin"
+      password: "cloudmaster"
+      reauthorize: yes
+
+  - name: "Build and push keycloak image v {{version_keycloak_build}}"
+    community.docker.docker_image:
+      build:
+        path: "{{docker_build_dir_keycloak}}"
+      name: "{{registry_dns}}/core/keycloak"
+#      repository: "{{registry_dns}}"
+      tag: "{{version_keycloak}}"
+      push: yes
+      source: build
+
+  always:
+    - name : Finally
+      block:
+        - name: "Delete {{docker_build_dir_keycloak}}"
+          become: true
+          file:
+            path: "{{docker_build_dir_keycloak }}"
+            state: absent
+        - name: "Logout {{registry_dns}}"
+          # do not trigger a change
+          changed_when: false
+          community.docker.docker_login:
+            state: absent
+            registry_url: "{{registry_dns}}"
+
+  vars:
+    - docker_build_dir_keycloak: "{{docker_build_dir}}/keycloak"
