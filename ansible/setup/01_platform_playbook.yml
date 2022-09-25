@@ -9,7 +9,7 @@
   # include the handlers for ca changed
   handlers:
     - import_tasks: docker/handlers/main.yml
-    - import_tasks: master_vault/handlers/main.yml
+#    - import_tasks: master_vault/handlers/main.yml
     - import_tasks: consul/handlers/main.yml
     - import_tasks: nomad/handlers/main.yml
   roles:
@@ -19,15 +19,15 @@
 
 # Single master setup
 # HA Setup is planed in second release
-- hosts: masters[0]
-  name: "Master [0] installations"
-  vars_files:
-    - vars/versions.yml
-    - vars/common_vars.yml
-    - vars/vault.yml
-  gather_facts: yes
-  roles:
-    - {role: master_vault, tags: ['vault']}
+#- hosts: masters[0]
+#  name: "Master [0] installations"
+#  vars_files:
+#    - vars/versions.yml
+#    - vars/common_vars.yml
+#    - vars/vault.yml
+#  gather_facts: yes
+#  roles:
+#    - {role: master_vault, tags: ['vault']}
 
 - hosts: all,!localhost
   name: "Master and worker platform installations"
@@ -40,6 +40,16 @@
     - {role: docker, tags: ['docker']}
     - {role: consul, tags: ['consul']}
     - {role: nomad, tags: ['nomad']}
+
+- hosts: build
+  name: "Build host specific installations"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+  gather_facts: yes
+  roles:
+    - {role: registry, tags: ['registry']}
 
 - hosts: all
   name: "Test"

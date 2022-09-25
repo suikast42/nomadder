@@ -1,12 +1,25 @@
 - name: "Generate nomad certs"
   become: true
   block:
+
+    - name: Check if nomad service exists
+      stat:
+        path: /etc/init.d/nomad.service
+      register: service_status
+
+
     - name: Stop nomad
-      failed_when: false
+      ignore_errors: "{{service_status.stat.exists|bool == false}}"
       service:
         name: nomad
         state: stopped
 
+    - name: "Create user {{nomad_user}}"
+      include_tasks: common/tasks/user.yml
+      vars:
+        create_user: "{{nomad_user}}"
+        create_group: "{{nomad_group}}"
+        create_usr_conf_dir: "{{nomad_conf_dir}}"
 
     - name: "Delete cfssl_working_dir on master 0"
       delegate_to: "{{masters[0]}}"
@@ -146,7 +159,7 @@
         - { src: '{{cfssl_working_dir}}/nomad_ingress-key.pem', dest: '{{nomad_cert_ingress_key}}',mode: '0644' }
 
     - name: Start nomad
-      failed_when: false
+      ignore_errors: "{{service_status.stat.exists|bool == false}}"
       service:
         name: nomad
         state: started
@@ -158,12 +171,12 @@
 
   vars:
     - cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/nomad"
-    - nomad_cert_path: /etc/opt/certs/nomad
+    - nomad_cert_path: "{{ base_cert_dir}}/nomad"
     - nomad_cert: "{{nomad_cert_path}}/nomad.pem"
     - nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"
     - nomad_cert_cli: "{{nomad_cert_path}}/nomad-cli.pem"
     - nomad_cert_cli_key: "{{nomad_cert_path}}/nomad-cli-key.pem"
-    - nomad_cert_ingress_path: /etc/opt/certs/ingress
+    - nomad_cert_ingress_path: "{{base_cert_dir}}/ingress"
     - nomad_cert_ingress_key: "{{nomad_cert_ingress_path}}/nomad-ingress-key.pem"#
     - nomad_cert_ingress: "{{nomad_cert_ingress_path}}/nomad-ingress.pem"
     - nomad_dns: "nomad.{{tls_san}}"

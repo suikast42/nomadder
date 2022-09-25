@@ -33,7 +33,7 @@
     cert_path_master_0: /etc/ssl/private/cloudlocal
     ca_cert_path: /usr/local/share/ca-certificates/cloudlocal
     cluster_intermediate_ca_bundle: "{{ca_cert_path}}/cluster-ca-bundle.pem"
-    nomad_cert_path: /etc/opt/certs/nomad
+    nomad_cert_path: "{{ base_cert_dir }}/nomad"
     nomad_cert: "{{nomad_cert_path}}/nomad.pem"
     nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"
     nomad_cli_cert: "{{nomad_cert_path}}/nomad-cli.pem"

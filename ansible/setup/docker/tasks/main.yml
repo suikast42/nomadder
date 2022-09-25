@@ -5,4 +5,4 @@
 
   vars:
     docker_download_dir: "/tmp/docker"
-    docker_cert_path: "/etc/opt/certs/docker"
+    docker_cert_path: "{{base_cert_dir}}/docker"

@@ -1,14 +1,29 @@
+- name: Check if Service Exists
+  stat: path=/etc/init.d/vault
+  register: service_status
+
 - name: "Generate vault certs"
   become: true
   # installed only on
   when: is_master_0
   block:
+    - name: Check if vault service exists
+      stat:
+        path: /etc/init.d/vault.service
+      register: service_status
+
     - name: Stop vault
-      failed_when: false
+      ignore_errors: "{{service_status.stat.exists|bool == false}}"
       service:
         name: vault
         state: stopped
 
+    - name: "Create user {{vault_user}}"
+      include_tasks: common/tasks/user.yml
+      vars:
+        create_user: "{{vault_user}}"
+        create_group: "{{vault_group}}"
+        create_usr_conf_dir: "{{vault_conf_dir}}"
 
     - name: "Delete cfssl_working_dir on master 0"
       delegate_to: "{{masters[0]}}"
@@ -70,7 +85,7 @@
 
 
     - name: Start vault
-      ignore_errors: true
+      ignore_errors: "{{service_status.stat.exists|bool == false}}"
       service:
         name: vault
         state: started
@@ -81,6 +96,6 @@
 
   vars:
     - cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/vault_master"
-    - vault_cert_path: /etc/opt/certs/vault
+    - vault_cert_path: "{{base_cert_dir}}/vault"
     - vault_cert: "{{vault_cert_path}}/vault.pem"
     - vault_cert_key: "{{vault_cert_path}}/vault-key.pem"

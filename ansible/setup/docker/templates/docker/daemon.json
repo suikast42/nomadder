@@ -11,6 +11,9 @@
   "tlskey": "{{docker_server_cert_key}}",
   "userland-proxy": false,
   "default-ulimit": "nofile=50:100",
+  {% if is_build_host %}
   "hosts": ["unix:///var/run/docker.sock", "tcp://{{host_ip}}:2375"],
-  "registry-mirrors": ["https://{{registry_dns}}:{{registry_port}}"]
+  {% endif %}
+  "registry-mirrors": ["https://{{registry_dns}}"],
+  "insecure-registries" : ["http://{{registry_ip}}:{{registry_port}}"]
 }

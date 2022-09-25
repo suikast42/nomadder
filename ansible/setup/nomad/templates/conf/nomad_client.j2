@@ -13,7 +13,7 @@ client {
     read_only = true
   }
   host_volume "cert_ingress" {
-    path      = "/etc/opt/certs/ingress"
+    path      = "{{base_cert_dir}}/ingress"
     read_only = true
   }
 
@@ -56,4 +56,10 @@ consul{
   ca_file   = "{{cluster_intermediate_ca_bundle}}"
   cert_file = "{{nomad_cert}}"
   key_file  = "{{nomad_cert_key}}"
+}
+
+plugin "docker"{
+config{
+    infra_image = "{{nomad_infra_image}}"
+  }
 }

@@ -1,0 +1,6 @@
+- name: Log out of DockerHub
+  changed_when: false
+  become: true
+  community.docker.docker_login:
+    # do not trigger a change
+    state: absent

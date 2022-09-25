@@ -1,12 +1,23 @@
 - name: "Generate consul certs"
   become: true
   block:
+    - name: Check if nomad service exists
+      stat:
+        path: /etc/init.d/consul.service
+      register: service_status
+
     - name: Stop consul
-      failed_when: false
+      ignore_errors: "{{service_status.stat.exists|bool == false}}"
       service:
         name: consul
         state: stopped
 
+    - name: "Create user {consul_user}}"
+      include_tasks: common/tasks/user.yml
+      vars:
+        create_user: "{{consul_user}}"
+        create_group: "{{consul_group}}"
+        create_usr_conf_dir: "{{consul_conf_dir}}"
 
     - name: "Delete cfssl_working_dir on master 0"
       delegate_to: "{{masters[0]}}"
@@ -87,7 +98,7 @@
         - { src: '{{cfssl_working_dir}}/consul-key.pem', dest: '{{consul_cert_key}}',mode: '0644'}
 
     - name: Start consul
-      failed_when: false
+      ignore_errors: "{{service_status.stat.exists|bool == false}}"
       service:
         name: consul
         state: started
@@ -99,7 +110,7 @@
 
   vars:
     - cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/consul"
-    - consul_cert_path: /etc/opt/certs/consul
+    - consul_cert_path: "{{base_cert_dir}}/consul"
     - consul_cert: "{{consul_cert_path}}/consul.pem"
     - consul_cert_key: "{{consul_cert_path}}/consul-key.pem"
     - consul_dns: "consul.{{tls_san}}"

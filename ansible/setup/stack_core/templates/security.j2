@@ -1,0 +1,62 @@
+job "security" {
+  type = "service"
+  datacenters = ["{{data_center}}"]
+
+  group "keycloak" {
+    count = 1
+    network {
+      mode = "bridge"
+      port "ui" {
+        to = 8080
+      }
+    }
+
+    service {
+      name = "keycloak"
+#      port = "ui"
+      port = "8080"
+      connect {
+        sidecar_service {}
+      }
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.keycloak.tls=true",
+        "traefik.http.routers.keycloak.rule=Host(`{{security_dns}}`)",
+      ]
+
+
+      check {
+        name  = "health"
+        type  = "http"
+        port ="ui"
+        path="/health"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+    task "keycloak" {
+      driver = "docker"
+      env {
+        KEYCLOAK_ADMIN  = "admin"
+        KEYCLOAK_ADMIN_PASSWORD   = "admin"
+        KC_HTTP_ENABLED= "true"
+        KC_HOSTNAME_STRICT_HTTPS="false"
+        KC_HEALTH_ENABLED= "true"
+        KC_HOSTNAME="security.cloud.private"
+        KC_PROXY="edge"
+      }
+      config {
+        image = "{{registry_dns}}/{{stack_name}}/keycloak:{{version_keycloak}}"
+        ports = ["ui"]
+        args = [
+          "start", "--optimized"
+        ]
+      }
+      resources {
+        cpu    = 1000
+        memory = 2048
+      }
+    }
+  }
+}

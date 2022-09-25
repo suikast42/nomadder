@@ -10,8 +10,9 @@ host_ips:
 master_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
 registry_ip: "{{ hostvars[groups['build'][0]]['ansible_host'] | default(groups['build'][0]) }}"
 registry_port: "5000"
-registry_port_push: "5001"
 registry_dns: "registry.{{tls_san}}"
+nexus_dns: "nexus.{{tls_san}}"
+security_dns: "security.{{tls_san}}"
 masters: "{{ groups['masters'] }}"
 workers: "{{ groups['workers'] }}"
 builders: "{{ groups['build'] }}"
@@ -22,7 +23,6 @@ is_local_host: "{{ inventory_hostname in groups['localhost'] }}"
 is_build_host: "{{ inventory_hostname in groups['build'] }}"
 is_master_host: "{{ inventory_hostname in groups['masters'] }}"
 is_worker_host: "{{ inventory_hostname in groups['workers'] }}"
-is_buildnode_host: "{{ inventory_hostname in groups['build'] }}"
 is_master_0: "{{hostvars[groups['masters'][0]]['ansible_hostname'] == host_name}}"
 
 vault_dns: "vault.{{tls_san}}"
@@ -51,4 +51,18 @@ local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"
 local_cluster_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/cluster-ca"
 systemd_install_dir:  /opt/services/core
 master_0_job_dir:  /opt/deployments
+base_cert_dir: /etc/opt/certs
 notify_cert_change: false
+
+
+vault_group: vault
+vault_user: vault
+vault_conf_dir: "/etc/vault.d"
+
+consul_group: consul
+consul_user: consul
+consul_conf_dir: "/etc/consul.d"
+
+nomad_group: nomad
+nomad_user: nomad
+nomad_conf_dir: "/etc/nomad.d"

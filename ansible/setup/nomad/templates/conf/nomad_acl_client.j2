@@ -10,7 +10,7 @@ client {
     read_only = true
   }
   host_volume "cert_ingress" {
-    path      = "/etc/opt/certs/ingress"
+    path      = "{{base_cert_dir}}/ingress"
     read_only = true
   }
 
@@ -48,4 +48,10 @@ tls {
 consul{
     token = "{{nomad_consul_initial_agent_token}}"
     allow_unauthenticated = false
+}
+
+plugin "docker"{
+config{
+    infra_image = "{{nomad_infra_image}}"
+  }
 }

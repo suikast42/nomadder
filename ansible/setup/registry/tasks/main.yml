@@ -1,0 +1,8 @@
+- name: "Docker login"
+  import_tasks: docker-login.yml
+
+- name:  "Nexus build"
+  import_tasks: nexus_build.yml
+
+- name: "Docker logout"
+  import_tasks: docker-logout.yml

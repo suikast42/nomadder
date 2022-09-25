@@ -100,12 +100,12 @@ job "ingress" {
               data = <<EOF
       [serversTransport]
         insecureSkipVerify = false
-        rootCAs = ["/etc/opt/certs/ca/ca.crt","/etc/opt/certs/ca/cluster-ca.crt"]
+        rootCAs = ["{{base_cert_dir}}/ca/ca.crt","{{base_cert_dir}}/ca/cluster-ca.crt"]
 
       [tls.options]
         [tls.options.default]
           [tls.options.default.clientAuth]
-            caFiles = ["/etc/opt/certs/ca/ca.crt","/etc/opt/certs/ca/cluster-ca.crt"]
+            caFiles = ["{{base_cert_dir}}/ca/ca.crt","{{base_cert_dir}}/ca/cluster-ca.crt"]
             clientAuthType = "NoClientCert"
       #      clientAuthType = "RequireAndVerifyClientCert"
          #   clientAuthType = "RequireAnyClientCert"
@@ -113,8 +113,8 @@ job "ingress" {
       [tls.stores]
         [tls.stores.default]
           [tls.stores.default.defaultCertificate]
-            certFile = "/etc/opt/certs/ingress/nomad-ingress.pem"
-            keyFile = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+            certFile = "{{base_cert_dir}}/ingress/nomad-ingress.pem"
+            keyFile = "{{base_cert_dir}}/ingress/nomad-ingress-key.pem"
 
               EOF
               destination = "local/certconfig.toml"
@@ -163,9 +163,9 @@ job "ingress" {
 
 
 [providers.consulCatalog.endpoint.tls]
-  ca = "/etc/opt/certs/ca/cluster-ca.crt"
-  cert = "/etc/opt/certs/ingress/nomad-ingress.pem"
-  key = "/etc/opt/certs/ingress/nomad-ingress-key.pem"
+  ca = "{{base_cert_dir}}/ca/cluster-ca.crt"
+  cert = "{{base_cert_dir}}/ingress/nomad-ingress.pem"
+  key = "{{base_cert_dir}}/ingress/nomad-ingress-key.pem"
 
 [log]
   level = "DEBUG"
