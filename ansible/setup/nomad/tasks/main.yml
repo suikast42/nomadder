@@ -46,6 +46,7 @@
     nomad_data_dir: "{{systemd_install_dir}}/nomad/data"
     nomad_dns: "nomad.{{tls_san}}"
     nomad_encrypt_key: "4PRfoE6Mj9dHTLpnzmYD1+THdlyAo2Ji4U6ewMumpAw="
+    nomad_infra_image: "{{registry_dns}}/google_containers/pause-amd64:3.1"
     nomad_servers:
       - "127.0.0.1"
       - "server.global.nomad"

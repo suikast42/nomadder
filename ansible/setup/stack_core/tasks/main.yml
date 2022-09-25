@@ -15,6 +15,8 @@
     - name: "Deploy traefik v {{version_traefik}}"
       import_tasks: deploy_ingress.yml
 
+    - name: "Deploy keycloak v {{version_keycloak}}"
+      import_tasks: deploy_security.yml
   vars:
     - stack_name: "stack/core"
     - docker_build_dir: "/tmp/dockerbuild"

@@ -1,9 +1,9 @@
 - name: Keycloak docker build
   run_once: true
   block:
-  - name: "Search for {{registry_dns}}/core/keycloak:{{version_keycloak}} in nexus"
+  - name: "Search for {{registry_dns}}/{{stack_name}}/keycloak:{{version_keycloak}} in nexus"
     uri:
-      url: "https://{{nexus_dns}}/service/rest/v1/search?repository=dockerLocal&format=docker&name=core%2Fkeycloak&version{{version_keycloak}}"
+      url: "https://{{nexus_dns}}/service/rest/v1/search?repository=dockerLocal&format=docker&name={{stack_name}}/keycloak&version{{version_keycloak}}"
       method: GET
       #Get json content back
 #      return_content: true
@@ -15,6 +15,10 @@
       status_code:
         - 200
     register: nexus_response
+
+#  - name: "Nexus response"
+#    debug:
+#      msg: "{{ nexus_response }}"
 
   - name: "Set fact image exists on nexus {{ nexus_response.json['items']|length == 1}}"
     set_fact:
@@ -47,7 +51,7 @@
       community.docker.docker_image:
         build:
           path: "{{docker_build_dir_keycloak}}"
-        name: "{{registry_dns}}/core/keycloak"
+        name: "{{registry_dns}}/{{stack_name}}/keycloak"
   #      repository: "{{registry_dns}}"
         tag: "{{version_keycloak}}"
         push: yes

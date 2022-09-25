@@ -49,3 +49,9 @@ consul{
     token = "{{nomad_consul_initial_agent_token}}"
     allow_unauthenticated = false
 }
+
+plugin "docker"{
+config{
+    infra_image = "{{nomad_infra_image}}"
+  }
+}
