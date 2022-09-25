@@ -8,5 +8,5 @@
     - vars/vault.yml
   gather_facts: yes
   roles:
-    - {role: stack_core, tags: ['stack_core','stack_core_build']}
+    - {role: stack_core, tags: ['stack_core','stack_core_build',]}
 

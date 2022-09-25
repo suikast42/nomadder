@@ -1,36 +1,57 @@
 - name: Keycloak docker build
   run_once: true
   block:
+  - name: "Search for {{registry_dns}}/core/keycloak:{{version_keycloak}} in nexus"
+    uri:
+      url: "https://{{nexus_dns}}/service/rest/v1/search?repository=dockerLocal&format=docker&name=core%2Fkeycloak&version{{version_keycloak}}"
+      method: GET
+      #Get json content back
+#      return_content: true
+      headers:
+        Content-Type: application/json
+#      user: "{{nexus_username}}"
+#      password: "{{nexus_password}}"
+#      force_basic_auth: yes
+      status_code:
+        - 200
+    register: nexus_response
 
-  - name: "Create docker build dir {{docker_build_dir_keycloak}} if needed"
-    file:
-      path: "{{docker_build_dir_keycloak}}"
-      state: directory
+  - name: "Set fact image exists on nexus {{ nexus_response.json['items']|length == 1}}"
+    set_fact:
+      image_exists_on_nexus: "{{ nexus_response.json['items']|length == 1}}"
 
-  - name: Template dockerfile keycloak
-    template:
-      force: yes
-      src: DockerfileKeycloak
-      dest: "{{docker_build_dir_keycloak}}/Dockerfile"
-
-  - name: "Login {{registry_dns}}"
-    # do not trigger a change
-    changed_when: false
-    community.docker.docker_login:
-      registry_url: "{{registry_dns}}"
-      username: "admin"
-      password: "cloudmaster"
-      reauthorize: yes
-
-  - name: "Build and push keycloak image v {{version_keycloak_build}}"
-    community.docker.docker_image:
-      build:
+  - name: Image build
+    when: not image_exists_on_nexus
+    block:
+    - name: "Create docker build dir {{docker_build_dir_keycloak}} if needed"
+      file:
         path: "{{docker_build_dir_keycloak}}"
-      name: "{{registry_dns}}/core/keycloak"
-#      repository: "{{registry_dns}}"
-      tag: "{{version_keycloak}}"
-      push: yes
-      source: build
+        state: directory
+
+    - name: Template dockerfile keycloak
+      template:
+        force: yes
+        src: DockerfileKeycloak
+        dest: "{{docker_build_dir_keycloak}}/Dockerfile"
+
+    - name: "Login {{registry_dns}}"
+      # do not trigger a change
+      changed_when: false
+      community.docker.docker_login:
+        registry_url: "{{registry_dns}}"
+        username: "admin"
+        password: "cloudmaster"
+        reauthorize: yes
+
+    - name: "Build and push keycloak image v {{version_keycloak}}"
+      community.docker.docker_image:
+        build:
+          path: "{{docker_build_dir_keycloak}}"
+        name: "{{registry_dns}}/core/keycloak"
+  #      repository: "{{registry_dns}}"
+        tag: "{{version_keycloak}}"
+        push: yes
+        source: build
 
   always:
     - name : Finally

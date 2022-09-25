@@ -4,9 +4,6 @@
   block:
     - name: "Build keycloak v {{version_keycloak}}"
       import_tasks: build_keycloak.yml
-      tags:
-        - stack_core
-        - stack_core_build
 
     - name: "Create {{core_deployment_dir}} if needed"
       become: true
@@ -14,16 +11,9 @@
         state: directory
         mode: '0755'
         path: "{{core_deployment_dir}}"
-      tags:
-        - stack_core
-        - stack_core_deploy
 
     - name: "Deploy traefik v {{version_traefik}}"
       import_tasks: deploy_ingress.yml
-      tags:
-        - stack_core
-        - stack_core_deploy
-
 
   vars:
     - stack_name: "stack/core"
