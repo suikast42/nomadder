@@ -70,7 +70,8 @@ job "ingress" {
     #      "traefik.http.middlewares.traefik-strip.stripprefix.prefixes=/ingress",
 
           #### set TLS
-          "traefik.http.routers.traefik.tls=true"
+          "traefik.http.routers.traefik.tls=true",
+          "traefik.http.routers.traefik.middlewares=traefik-forward-auth"
         ]
         check {
           name     = "alive"
@@ -162,6 +163,7 @@ job "ingress" {
      entryPoints = ["https"]
      rule = "Host(`consul.{{tls_san}}`) "
      service = "consul"
+     middlewares = ["traefik-forward-auth@consulcatalog"]
        # will terminate the TLS request
  #     [http.routers.consul.tls]
       [[http.routers.consul.tls.domains]]
@@ -173,6 +175,7 @@ job "ingress" {
     entryPoints = ["https"]
     rule = "Host(`nomad.{{tls_san}}`) "
     service = "nomad"
+    middlewares = ["traefik-forward-auth@consulcatalog"]
     [[http.routers.nomad.tls.domains]]
       #main = "{{tls_san}}"
       sans = ["nomad.{{tls_san}}"]
@@ -182,6 +185,7 @@ job "ingress" {
     entryPoints = ["https"]
     rule = "Host(`vault.{{tls_san}}`) "
     service = "vault"
+    middlewares = ["traefik-forward-auth@consulcatalog"]
     [[http.routers.vault.tls.domains]]
       sans = ["vault.{{tls_san}}"]
 
