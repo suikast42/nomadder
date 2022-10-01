@@ -48,6 +48,8 @@ job "security" {
         CLIENT_ID     = "ingress"
         CLIENT_SECRET = "{{secret_ingress}}"
         LOG_LEVEL     = "debug"
+        # Lifetime of cookie 60s
+        LIFETIME = "60"
         #        AUTH_HOST     = "http://forwardauth.service.consul:${NOMAD_HOST_PORT_auth}"
 
       }
