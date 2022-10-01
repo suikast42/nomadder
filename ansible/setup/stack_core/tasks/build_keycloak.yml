@@ -1,9 +1,10 @@
 - name: Keycloak docker build
   run_once: true
   block:
-  - name: "Search for {{registry_dns}}/{{stack_name}}/keycloak:{{version_keycloak}} in nexus"
+  - name: "Search for {{registry_dns}}/{{stack_name}}/keycloak:{{version_keycloak_nomadder}} in nexus"
     uri:
-      url: "https://{{nexus_dns}}/service/rest/v1/search?repository=dockerLocal&format=docker&name={{stack_name}}/keycloak&version{{version_keycloak}}"
+    # url :"https://{{nexus_dns}}/service/rest/v1/search?repository=dockerLocal&format=docker&name=stack/core/keycloak&version=19.0.2.0"
+      url: "https://{{nexus_dns}}/service/rest/v1/search?repository=dockerLocal&format=docker&name={{stack_name}}/keycloak&version={{version_keycloak_nomadder}}"
       method: GET
       #Get json content back
 #      return_content: true
@@ -16,9 +17,9 @@
         - 200
     register: nexus_response
 
-#  - name: "Nexus response"
-#    debug:
-#      msg: "{{ nexus_response }}"
+  - name: "Nexus response"
+    debug:
+      msg: "{{nexus_response}}"
 
   - name: "Set fact image exists on nexus {{ nexus_response.json['items']|length == 1}}"
     set_fact:
@@ -38,6 +39,12 @@
         src: DockerfileKeycloak
         dest: "{{docker_build_dir_keycloak}}/Dockerfile"
 
+    - name: Template keycloak nomadder-realm.json
+      template:
+        force: yes
+        src: nomadder-realm.json
+        dest: "{{docker_build_dir_keycloak}}/nomadder-realm.json"
+
     - name: "Login {{registry_dns}}"
       # do not trigger a change
       changed_when: false
@@ -47,13 +54,13 @@
         password: "cloudmaster"
         reauthorize: yes
 
-    - name: "Build and push keycloak image v {{version_keycloak}}"
+    - name: "Build and push keycloak image v {{version_keycloak_nomadder}}"
       community.docker.docker_image:
         build:
           path: "{{docker_build_dir_keycloak}}"
         name: "{{registry_dns}}/{{stack_name}}/keycloak"
   #      repository: "{{registry_dns}}"
-        tag: "{{version_keycloak}}"
+        tag: "{{version_keycloak_nomadder}}"
         push: yes
         source: build
 

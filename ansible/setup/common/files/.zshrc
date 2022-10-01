@@ -1,6 +1,9 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
-
+export NOMAD_ADDR=https://localhost:4646
+export NOMAD_CACERT=/usr/local/share/ca-certificates/cloudlocal/cluster-ca-bundle.pem
+export NOMAD_CLIENT_CERT=/etc/opt/certs/nomad/nomad-cli.pem
+export NOMAD_CLIENT_KEY=/etc/opt/certs/nomad/nomad-cli-key.pem
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 # Set name of the theme to load --- if set to "random", it will
