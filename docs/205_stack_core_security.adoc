@@ -1,0 +1,21 @@
+=== Keycloak
+
+After first install.
+
+. Create realm nomadder
+. Create client scopes groups and opendid with default assign type
+. create client ingres
+* Client authentication on
+* Authorization  on
+* Implicit flow checked
+* Valid redirect URIs *
+* add client scopes groups and opendid
+
+.Create user and set its passowrd
+
+. Export the realm settings
+. If the exported setting contains policies with
+*  "type" : "js",
+*    "type" : "resource",
+Delete it
+. Search for secret ******** and replace it with your secret

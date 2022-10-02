@@ -1,5 +1,15 @@
 ---
 # start the deployment jobs on master_0
+- hosts: all,!localhost
+  name: "Create stack core volumes"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+  gather_facts: yes
+  roles:
+    - {role: stack_core_volumes, tags: ['stack_core','stack_core_volumes']}
+
 - hosts: masters[0]
   name: "Master [0] stack core deployment"
   vars_files:
@@ -8,5 +18,4 @@
     - vars/vault.yml
   gather_facts: yes
   roles:
-    - {role: stack_core, tags: ['stack_core','stack_core_build',]}
-
+    - {role: stack_core, tags: ['stack_core','stack_core_build']}

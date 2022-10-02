@@ -19,6 +19,7 @@ job "whoami" {
 #        "traefik.consulcatalog.connect=true",
         "traefik.http.routers.whoami.rule=Host(`whoami.cloud.private`)",
         "traefik.http.routers.whoami.tls=true",
+        "traefik.http.routers.whoami.middlewares=traefik-forward-auth"
       ]
 
       check {

@@ -2,6 +2,126 @@ job "security" {
   type = "service"
   datacenters = ["{{data_center}}"]
 
+  group "keycloak-db" {
+    volume "security_postgres_volume" {
+      type      = "host"
+      source    = "security_postgres_volume"
+      read_only = false
+    }
+
+    count = 1
+    network {
+      mode = "bridge"
+      port "db" {
+        to = 5432
+      }
+    }
+
+    service {
+      name = "security-postgres"
+      port = "5432"
+      connect {
+        sidecar_service {}
+      }
+    }
+
+    task "security_postgres" {
+      volume_mount {
+        volume      = "security_postgres_volume"
+        destination = "/var/lib/postgresql/data/pgdata"
+      }
+      driver = "docker"
+      env {
+        POSTGRES_USER        = "keycloak"
+        POSTGRES_PASSWORD    = "keycloak"
+        POSTGRES_DB          = "keycloak"
+        PGDATA               = "/var/lib/postgresql/data/pgdata"
+        POSTGRES_INITDB_ARGS = "--encoding=UTF8"
+      }
+      config {
+        image = "registry.cloud.private/postgres:{{version_postgres_keycloak}}"
+        volumes = [
+          "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
+        ]
+        ports = ["db"]
+      }
+      resources {
+        cpu    = 1000
+        memory = 2048
+      }
+      template {
+        data = <<EOF
+           CREATE SCHEMA IF NOT EXISTS keycloak;
+         EOF
+        destination = "local/initddb.sql"
+      }
+    }
+  }
+
+  group "keycloak-ingress" {
+    volume "ca_cert" {
+      type      = "host"
+      source    = "ca_cert"
+      read_only = true
+    }
+    count = 1
+    network {
+      mode = "bridge"
+      port "auth" {
+        to = 4181
+      }
+    }
+    service {
+      name = "forwardauth"
+      port = "auth"
+      tags = [
+        "traefik.enable=true",
+        "traefik.http.routers.forwardauth.entrypoints=https",
+        "traefik.http.routers.forwardauth.rule= Path(`/_oauth`)",
+        "traefik.http.routers.forwardauth.middlewares=traefik-forward-auth",
+        "traefik.http.routers.traefik-forward-auth.tls=true",
+        "traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://forwardauth.service.consul:${NOMAD_HOST_PORT_auth}",
+        "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders= X-Forwarded-User",
+        "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeadersRegex= ^X-",
+        "traefik.http.middlewares.traefik-forward-auth.forwardauth.trustForwardHeader=true",
+        "traefik.http.middlewares.test-auth.forwardauth.tls.insecureSkipVerify=true"
+      ]
+
+
+    }
+    task "forwardauth" {
+      driver = "docker"
+      env {
+        #        https://brianturchyn.net/traefik-forwardauth-support-with-keycloak/
+        #        https://github.com/mesosphere/traefik-forward-auth/issues/36
+        #        INSECURE_COOKIE = "1"
+        ENCRYPTION_KEY = "45659373957778734945638459467936" #32 character encryption key
+        #        SCOPE = "profile email openid" # scope openid is necessary for keycloak...
+        SECRET        = "9e7d7b0776f032e3a1996272c2fe22d2"
+        PROVIDER_URI  = "https://security.{{tls_san}}/realms/nomadder"
+        #        OIDC_ISSUER   = "https://security.{{tls_san}}/realms/nomadder"
+        CLIENT_ID     = "ingress"
+        CLIENT_SECRET = "{{secret_ingress}}"
+        LOG_LEVEL     = "debug"
+        # Lifetime of cookie 60s
+        LIFETIME = "60"
+
+      }
+      volume_mount {
+        volume      = "ca_cert"
+        destination = "/etc/ssl/certs/"
+      }
+      config {
+        image = "{{registry_dns}}/mesosphere/traefik-forward-auth:{{version_mesosphere}}"
+        ports = ["auth"]
+      }
+      resources {
+        cpu    = 500
+        memory = 256
+      }
+    }
+  }
+
   group "keycloak" {
     count = 1
     network {
@@ -16,7 +136,14 @@ job "security" {
 #      port = "ui"
       port = "8080"
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            upstreams {
+              destination_name = "security-postgres"
+              local_bind_port  = 5432
+            }
+          }
+        }
       }
       tags = [
         "traefik.enable=true",
@@ -45,12 +172,19 @@ job "security" {
         KC_HEALTH_ENABLED= "true"
         KC_HOSTNAME="security.cloud.private"
         KC_PROXY="edge"
+        KC_DB                     = "postgres"
+        KC_DB_PASSWORD            = "keycloak"
+        KC_DB_SCHEMA              = "keycloak"
+        KC_DB_USERNAME            = "keycloak"
+        KC_DB_URL_HOST            = "${NOMAD_UPSTREAM_IP_security_postgres}"
+        KC_DB_URL_PORT            = "${NOMAD_UPSTREAM_PORT_security_postgres}"
+        KC_NOMADDER_CLIENT_SECRET = "{{secret_ingress}}"
       }
       config {
-        image = "{{registry_dns}}/{{stack_name}}/keycloak:{{version_keycloak}}"
+        image = "{{registry_dns}}/{{stack_name}}/keycloak:{{version_keycloak_nomadder}}"
         ports = ["ui"]
         args = [
-          "start", "--optimized"
+          "start", "--import-realm" , "--optimized"
         ]
       }
       resources {
