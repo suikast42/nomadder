@@ -13,7 +13,7 @@
   - name: Template nomad volume
     template:
       force: yes # replace the remote file when contents are different than the source.
-      src: conf/nomad_client_volumes.j2
+      src: "{{role_path}}/../nomad/templates/conf/nomad_client_volumes.j2"
       dest: "{{nomad_conf_dir}}/nomad_volume_{{item.name}}.hcl"
       owner: "{{ nomad_user }}"
       group: "{{ nomad_group }}"
