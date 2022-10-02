@@ -431,6 +431,7 @@
     "clientRole": false,
     "containerId": "27205a78-e03d-4064-8ca6-cfe03739897e"
   },
+
   "requiredCredentials": [
     "password"
   ],
@@ -489,6 +490,23 @@
       },
       "notBefore": 0,
       "groups": []
+    },
+    {
+      "id": "9d3bd6d6-2185-4dbc-a39a-d717bbd58eb7",
+      "createdTimestamp": 1664526942368,
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "email" : "admin@{{tls_san}}",
+      "firstName" : "Admin",
+      "lastName" : "Admin",
+      "credentials" : [{
+        "type" : "password",
+        "value" : "admin"
+      }],
+      "requiredActions": ["UPDATE_PROFILE","UPDATE_PASSWORD"],
+      "realmRoles" : ["default-roles-nomadder", "offline_access", "uma_authorization" ],
+      "groups": ["clusteradmin","cloudadmin"]
     }
   ],
   "scopeMappings": [
@@ -701,7 +719,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "{{secret_ingress}}",
+      "secret": "${KC_NOMADDER_CLIENT_SECRET}",
       "redirectUris": [
         "https://ingress.cloud.private/_oauth",
         "https://nomad.cloud.private/_oauth",

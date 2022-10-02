@@ -2,6 +2,62 @@ job "security" {
   type = "service"
   datacenters = ["{{data_center}}"]
 
+  group "keycloak-db" {
+    volume "security_postgres_volume" {
+      type      = "host"
+      source    = "security_postgres_volume"
+      read_only = false
+    }
+
+    count = 1
+    network {
+      mode = "bridge"
+      port "db" {
+        to = 5432
+      }
+    }
+
+    service {
+      name = "security-postgres"
+      port = "5432"
+      connect {
+        sidecar_service {}
+      }
+    }
+
+    task "security_postgres" {
+      volume_mount {
+        volume      = "security_postgres_volume"
+        destination = "/var/lib/postgresql/data/pgdata"
+      }
+      driver = "docker"
+      env {
+        POSTGRES_USER        = "keycloak"
+        POSTGRES_PASSWORD    = "keycloak"
+        POSTGRES_DB          = "keycloak"
+        PGDATA               = "/var/lib/postgresql/data/pgdata"
+        POSTGRES_INITDB_ARGS = "--encoding=UTF8"
+      }
+      config {
+        image = "registry.cloud.private/postgres:{{version_postgres_keycloak}}"
+        volumes = [
+          "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
+        ]
+        ports = ["db"]
+      }
+      resources {
+        cpu    = 1000
+        memory = 2048
+      }
+      template {
+        data = <<EOF
+           CREATE SCHEMA IF NOT EXISTS keycloak;
+         EOF
+        destination = "local/initddb.sql"
+      }
+    }
+  }
+
   group "keycloak-ingress" {
     volume "ca_cert" {
       type      = "host"
@@ -80,7 +136,14 @@ job "security" {
 #      port = "ui"
       port = "8080"
       connect {
-        sidecar_service {}
+        sidecar_service {
+          proxy {
+            upstreams {
+              destination_name = "security-postgres"
+              local_bind_port  = 5432
+            }
+          }
+        }
       }
       tags = [
         "traefik.enable=true",
@@ -109,12 +172,19 @@ job "security" {
         KC_HEALTH_ENABLED= "true"
         KC_HOSTNAME="security.cloud.private"
         KC_PROXY="edge"
+        KC_DB                     = "postgres"
+        KC_DB_PASSWORD            = "keycloak"
+        KC_DB_SCHEMA              = "keycloak"
+        KC_DB_USERNAME            = "keycloak"
+        KC_DB_URL_HOST            = "${NOMAD_UPSTREAM_IP_security_postgres}"
+        KC_DB_URL_PORT            = "${NOMAD_UPSTREAM_PORT_security_postgres}"
+        KC_NOMADDER_CLIENT_SECRET = "{{secret_ingress}}"
       }
       config {
         image = "{{registry_dns}}/{{stack_name}}/keycloak:{{version_keycloak_nomadder}}"
         ports = ["ui"]
         args = [
-          "start", "--optimized"
+          "start", "--import-realm" , "--optimized"
         ]
       }
       resources {

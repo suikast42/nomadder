@@ -9,7 +9,7 @@
   - name: Create stack core postgres volumes
     include_tasks: nomad/tasks/nomad_volumes.yml
     loop:
-      - { name: 'postgres_volume' , path: '{{postgres_volume}}'}
+      - { name: 'security_postgres_volume' , path: '{{postgres_volume}}'}
 
   - name: restart nomad if needed
     become: true
