@@ -1,41 +1,58 @@
-- name: Template security.j2
-  delegate_to: localhost
-  template:
-    force: yes
-    src: security.j2
-    dest: "{{role_path}}/files/security.nomad"
+- name: Deploy security
+  block:
+  - name: Template security.j2
+    delegate_to: localhost
+    template:
+      force: yes
+      src: security.j2
+      dest: "{{role_path}}/files/security.nomad"
 
-- name: "Copy security.nomad"
-  become: true
-  copy:
-    force: true
-    src: security.nomad
-    dest: "{{core_deployment_dir}}/security.nomad"
-    mode: '0755'
+  - name: "Create Variables in nomad"
+    shell: |
+      nomad var put -force {{nomad_security_job_path}} \
+      keycloak_password={{keycloak_passwd}} \
+      keycloak_db_password={{keycloak_db_passwd}} \
+      keycloak_ingress_secret={{keycloak_ingress_secret}}
+    environment:
+      - NOMAD_ADDR: "https://localhost:4646"
+      - NOMAD_CACERT: "{{cluster_intermediate_ca_bundle}}"
+      - NOMAD_CLIENT_CERT: "{{nomad_cli_cert}}"
+      - NOMAD_CLIENT_KEY: "{{nomad_cli_cert_key}}"
 
-#
-#    - name: "Slurp {{core_deployment_dir}}/ingress.nomad from master_0"
-#      ansible.builtin.slurp:
-#        src: "{{core_deployment_dir}}/ingress.nomad"
-#      register: job
 
-- name: Create job
-  community.general.nomad_job:
-    # host: "{{masters[0]}}"
-    client_cert: "{{nomad_cli_cert}}"
-    client_key: "{{nomad_cli_cert_key}}"
-    host: localhost
-    state: present
-    force_start: true
-    #        content: "{{ job.content | b64decode }}"
-    content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/security.nomad') }}"
-    timeout: 120
+  - name: "Copy security.nomad"
+    become: true
+    copy:
+      force: true
+      src: security.nomad
+      dest: "{{core_deployment_dir}}/security.nomad"
+      mode: '0755'
 
-#    - name: Force job to start
-#      community.general.nomad_job:
-##        host: "{{masters[0]}}"
-#        host: localhost
-#        state: present
-#        name: ingress
-#        timeout: 120
-#        force_start: true
+  #
+  #    - name: "Slurp {{core_deployment_dir}}/ingress.nomad from master_0"
+  #      ansible.builtin.slurp:
+  #        src: "{{core_deployment_dir}}/ingress.nomad"
+  #      register: job
+
+  - name: Create job
+    community.general.nomad_job:
+      # host: "{{masters[0]}}"
+      client_cert: "{{nomad_cli_cert}}"
+      client_key: "{{nomad_cli_cert_key}}"
+      host: localhost
+      state: present
+      force_start: true
+      #        content: "{{ job.content | b64decode }}"
+      content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/security.nomad') }}"
+      timeout: 120
+
+  vars:
+    nomad_security_job_path: nomad/jobs/security
+  #    - name: Force job to start
+  #      community.general.nomad_job:
+  ##        host: "{{masters[0]}}"
+  #        host: localhost
+  #        state: present
+  #        name: ingress
+  #        timeout: 120
+  #        force_start: true
