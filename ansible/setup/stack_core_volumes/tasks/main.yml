@@ -1,27 +1,13 @@
 - name: Create postgres volume
   when: host_name == 'worker-01'
   block:
-  - name: Check if postgrest volume exists
-    stat:
-      path: "{{postgres_volume}}"
-    register: postgres_volume_stat
 
   - name: Create stack core postgres volumes
     include_tasks: nomad/tasks/nomad_volumes.yml
     loop:
       - { name: 'security_postgres_volume' , path: '{{postgres_volume}}'}
 
-  - name: restart nomad if needed
-    become: true
-    when: not postgres_volume_stat.stat.exists
-    service:
-      name: nomad
-      state: restarted
-    register: nomadService
-    until: nomadService.status.ActiveState == "active"
-    async: 300
-    retries: 10
-    delay: 5
+
 
   vars:
     postgres_volume: /opt/deployments/core/postgres

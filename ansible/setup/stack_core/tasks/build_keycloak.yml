@@ -1,10 +1,11 @@
 - name: Keycloak docker build
   run_once: true
   block:
-  - name: "Search for {{registry_dns}}/{{stack_name}}/keycloak:{{version_keycloak_nomadder}} in nexus"
+  - name: "Search for {{registry_ip}}/{{stack_name}}/keycloak:{{version_keycloak_nomadder}} in nexus"
     uri:
     # url :"https://{{nexus_dns}}/service/rest/v1/search?repository=dockerLocal&format=docker&name=stack/core/keycloak&version=19.0.2.0"
-      url: "https://{{nexus_dns}}/service/rest/v1/search?repository=dockerLocal&format=docker&name={{stack_name}}/keycloak&version={{version_keycloak_nomadder}}"
+      # In the first installation phase traefik is not available. Thus, we use the ip here.
+      url: "http://{{registry_ip}}:{{registry_port_http}}/service/rest/v1/search?repository=dockerLocal&format=docker&name={{stack_name}}/keycloak&version={{version_keycloak_nomadder}}"
       method: GET
       #Get json content back
 #      return_content: true

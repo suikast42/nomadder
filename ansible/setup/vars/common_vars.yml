@@ -10,6 +10,7 @@ host_ips:
 master_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
 registry_ip: "{{ hostvars[groups['build'][0]]['ansible_host'] | default(groups['build'][0]) }}"
 registry_port: "5000"
+registry_port_http: "5002"
 registry_dns: "registry.{{tls_san}}"
 nexus_dns: "nexus.{{tls_san}}"
 security_dns: "security.{{tls_san}}"

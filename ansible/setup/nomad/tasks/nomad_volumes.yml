@@ -2,6 +2,7 @@
   become: true
   block:
   - name: "Create volumes"
+    register: volume
     become: true
     file:
       state: directory
@@ -11,9 +12,22 @@
       path: "{{item.path}}"
 
   - name: Template nomad volume
+    register: template
     template:
       force: yes # replace the remote file when contents are different than the source.
       src: "{{role_path}}/../nomad/templates/conf/nomad_client_volumes.j2"
       dest: "{{nomad_conf_dir}}/nomad_volume_{{item.name}}.hcl"
       owner: "{{ nomad_user }}"
       group: "{{ nomad_group }}"
+
+  - name: restart nomad if needed
+    become: true
+    when: template.changed or volume.changed
+    service:
+      name: nomad
+      state: restarted
+    register: nomadService
+    until: nomadService.status.ActiveState == "active"
+    async: 300
+    retries: 10
+    delay: 5
