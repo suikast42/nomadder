@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2022-10-31T14:30:31.367Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36" etag="6e7yh530bsoo4Doi5J3L" version="20.5.1" type="github">
+<mxfile host="app.diagrams.net" modified="2022-10-31T14:33:25.112Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36" etag="4I781I_RXy4ELYTZI42E" version="20.5.1" type="github">
   <diagram id="6FrJkTGqepBg1Tuwh8yL" name="Seite-1">
     <mxGraphModel dx="1758" dy="945" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -64,6 +64,9 @@
         <mxCell id="Fz0lCOCFPgg_8n7OzY3J-47" value="Worker Node - 01" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="Fz0lCOCFPgg_8n7OzY3J-45">
           <mxGeometry width="157.14285714285714" height="42.85714285714286" as="geometry" />
         </mxCell>
+        <mxCell id="Fz0lCOCFPgg_8n7OzY3J-60" value="&amp;lt;&amp;lt;systemd&amp;gt;&amp;gt;" style="sketch=0;aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/Docker.svg;labelPosition=center;verticalLabelPosition=top;verticalAlign=bottom;labelBackgroundColor=none;" vertex="1" parent="Fz0lCOCFPgg_8n7OzY3J-45">
+          <mxGeometry x="330" y="350" width="50" height="41" as="geometry" />
+        </mxCell>
         <mxCell id="Fz0lCOCFPgg_8n7OzY3J-48" value="" style="group" vertex="1" connectable="0" parent="1">
           <mxGeometry x="680" y="360" width="400" height="400" as="geometry" />
         </mxCell>
@@ -91,6 +94,9 @@
         <mxCell id="Fz0lCOCFPgg_8n7OzY3J-56" value="Worker Node - 02" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="Fz0lCOCFPgg_8n7OzY3J-54">
           <mxGeometry width="157.14285714285714" height="42.85714285714286" as="geometry" />
         </mxCell>
+        <mxCell id="Fz0lCOCFPgg_8n7OzY3J-61" value="&amp;lt;&amp;lt;systemd&amp;gt;&amp;gt;" style="sketch=0;aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/Docker.svg;labelPosition=center;verticalLabelPosition=top;verticalAlign=bottom;labelBackgroundColor=none;" vertex="1" parent="Fz0lCOCFPgg_8n7OzY3J-54">
+          <mxGeometry x="330" y="350" width="50" height="41" as="geometry" />
+        </mxCell>
         <mxCell id="Fz0lCOCFPgg_8n7OzY3J-57" value="" style="group" vertex="1" connectable="0" parent="1">
           <mxGeometry x="1241" y="800" width="400" height="400" as="geometry" />
         </mxCell>
@@ -99,6 +105,9 @@
         </mxCell>
         <mxCell id="Fz0lCOCFPgg_8n7OzY3J-59" value="Worker Node - K" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="Fz0lCOCFPgg_8n7OzY3J-57">
           <mxGeometry width="157.14285714285714" height="42.85714285714286" as="geometry" />
+        </mxCell>
+        <mxCell id="Fz0lCOCFPgg_8n7OzY3J-62" value="&amp;lt;&amp;lt;systemd&amp;gt;&amp;gt;" style="sketch=0;aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/Docker.svg;labelPosition=center;verticalLabelPosition=top;verticalAlign=bottom;labelBackgroundColor=none;" vertex="1" parent="Fz0lCOCFPgg_8n7OzY3J-57">
+          <mxGeometry x="339" y="350" width="50" height="41" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
