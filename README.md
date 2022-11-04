@@ -24,7 +24,7 @@ Rethinking stuff
 
 Evaluate later 
 
-# Security platform 
+## Security platform 
 Kubermatic
 Aporeto
 Neuvector
@@ -32,9 +32,9 @@ Sysdig
 StackRox
 Cilium
 
-#Monitring
+##Monitring
 	ELK -> HUMIO
-#Messaging	
+##Messaging	
 	KAFKA -> NATS 
 	KAFKA -> FLUVIO
 
