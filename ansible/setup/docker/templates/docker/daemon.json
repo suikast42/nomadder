@@ -15,5 +15,5 @@
   "hosts": ["unix:///var/run/docker.sock", "tcp://{{host_ip}}:2375"],
   {% endif %}
   "registry-mirrors": ["https://{{registry_dns}}"],
-  "insecure-registries" : ["http://{{registry_ip}}:{{registry_port}}"]
+  "insecure-registries" : ["http://{{registry_ip}}:{{registry_port}}","http://{{registry_ip}}:{{registry_port_push}}"]
 }

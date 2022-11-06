@@ -50,7 +50,7 @@
       # do not trigger a change
       changed_when: false
       community.docker.docker_login:
-        registry_url: "{{registry_dns}}"
+        registry_url: "{{push_registry}}"
         username: "admin"
         password: "cloudmaster"
         reauthorize: yes
@@ -59,7 +59,7 @@
       community.docker.docker_image:
         build:
           path: "{{docker_build_dir_keycloak}}"
-        name: "{{registry_dns}}/{{stack_name}}/keycloak"
+        name: "{{push_registry}}/{{stack_name}}/keycloak"
   #      repository: "{{registry_dns}}"
         tag: "{{version_keycloak_nomadder}}"
         push: yes
@@ -82,3 +82,4 @@
 
   vars:
     - docker_build_dir_keycloak: "{{docker_build_dir}}/keycloak"
+    - push_registry : "{{registry_ip}}:{{registry_port_push}}"

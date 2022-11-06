@@ -146,10 +146,10 @@ job "ingress" {
       url = "http://{{master_ip}}:5002"
 
 # Service to nexus push
-  [http.services.nexus-push.loadBalancer]
-   serversTransport = "default"
-    [[http.services.nexus-push.loadBalancer.servers]]
-      url = "http://{{master_ip}}:5001"
+#  [http.services.nexus-push.loadBalancer]
+#   serversTransport = "default"
+#    [[http.services.nexus-push.loadBalancer.servers]]
+#      url = "http://{{master_ip}}:5001"
 
  # Service to nexus pull
    [http.services.nexus-pull.loadBalancer]
@@ -200,18 +200,19 @@ job "ingress" {
 # Route to nexus pull
   [http.routers.nexus-pull]
     entryPoints = ["https"]
-    rule = "Host(`registry.{{tls_san}}`)  && Method(`GET`,`HEAD`)"
+  #  rule = "Host(`registry.{{tls_san}}`)  && Method(`GET`,`HEAD`)"
+    rule = "Host(`registry.{{tls_san}}`)"
     service = "nexus-pull"
     [[http.routers.nexus-pull.tls.domains]]
       sans = ["registry.{{tls_san}}"]
 
 # Route to nexus push
-  [http.routers.nexus-push]
-    entryPoints = ["https"]
-    rule = "Host(`registry.{{tls_san}}`) && Method(`POST`,`PUT`,`DELETE`,`PATCH`)"
-    service = "nexus-push"
-    [[http.routers.nexus-push.tls.domains]]
-      sans = ["registry.{{tls_san}}"]
+#  [http.routers.nexus-push]
+#    entryPoints = ["https"]
+#    rule = "Host(`registry.{{tls_san}}`) && Method(`POST`,`PUT`,`DELETE`,`PATCH`)"
+#    service = "nexus-push"
+#    [[http.routers.nexus-push.tls.domains]]
+#      sans = ["registry.{{tls_san}}"]
 
               EOF
               destination = "local/certconfig.toml"

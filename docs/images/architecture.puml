@@ -1,0 +1,69 @@
+@startuml
+
+skinparam component {
+  backgroundColor<<static lib>> DarkKhaki
+  backgroundColor<<shared lib>> Green
+}
+
+skinparam node {
+  borderColor White
+  backgroundColor Yellow
+  backgroundColor<<Master_node>> Green
+  backgroundColor<<Build_node>> Yellow
+  backgroundColor<<Worker_node>> Aqua
+}
+
+skinparam artifact{
+ backgroundColor<<os_trust_store>> Red
+}
+
+skinparam databaseBackgroundColor Aqua
+
+node master_01 <<Master_node>>{
+    artifact "Cluster Certificate" as CA_Cert_Master_node <<os_trust_store>>
+    component Consul <<systemd>> as consul_Master_node{
+        artifact "Consul cert"  as cert_consul_master_node  <<Server Certificate>>
+    }
+    component Nomad <<systemd>> as nomad_Master_node{
+        artifact "Nomad cert"  as cert_nomad_master_node  <<Server Certificate>>
+    }
+    component DnsMasq <<systemd>> as dnsmasq_master_node
+}
+
+node build_node <<Build_node>>{
+    artifact "Cluster Certificate"  as CA_Cert_Build_node  <<os_trust_store>>
+    component Docker <<systemd>> as docker_Build_node{
+        artifact "Docker cert"  as cert_docker_build_node  <<Server Certificate>>
+      }
+    component Nexus <<docker>> as nexus
+}
+
+node worker_01 <<Worker_node>>{
+    artifact "Cluster Certificate" as CA_Cert_Worker_node  <<os_trust_store>>
+    component Docker <<systemd>> as docker_Worker_node{
+        artifact "Docker cert"  as cert_docker_worker_node  <<Server Certificate>>
+    }
+    component Consul <<systemd>> as consul_Worker_node{
+      artifact "Consul cert"  as cert_consul_worker_node  <<Server Certificate>>
+
+    }
+    component Nomad <<systemd>> as nomad_Worker_node{
+      artifact "Nomad cert"  as cert_nomad_worker_node  <<Server Certificate>>
+    }
+    component DnsMasq <<systemd>> as dnsmasq_worker_node
+}
+
+
+
+dnsmasq_worker_node -u->  consul_Worker_node:"forward dns"
+[dnsmasq_worker_node] -d-> DNS:":53"
+
+dnsmasq_master_node -u->  consul_Master_node:"forward dns"
+[dnsmasq_master_node] -d-> DNS:":53"
+
+[nexus] -d-> NexusPull:":5000"
+[nexus] -d-> NexusPush:":5001"
+[nexus] -d-> NexusUi:":5002"
+
+
+@enduml
