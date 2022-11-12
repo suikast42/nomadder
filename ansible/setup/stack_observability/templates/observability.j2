@@ -37,6 +37,7 @@ job "observability" {
     task "grafana" {
       driver = "docker"
       env {
+        GF_AUTH_OAUTH_AUTO_LOGIN= "true"
         GF_PATHS_CONFIG  = "/etc/grafana/grafana2.ini"
         GF_PATHS_PLUGINS = "/data/grafana/plugins"
         GF_SERVER_DOMAIN = "grafana.{{tls_san}}"
