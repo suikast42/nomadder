@@ -63,3 +63,8 @@ config{
     infra_image = "{{nomad_infra_image}}"
   }
 }
+
+telemetry {
+  publish_allocation_metrics = true
+  publish_node_metrics       = true
+}

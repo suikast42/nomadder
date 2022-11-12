@@ -1,0 +1,56 @@
+job "observability" {
+  type = "service"
+  datacenters = ["{{data_center}}"]
+
+  group "grafana" {
+    count = 1
+    network {
+      mode = "bridge"
+      port "ui" {
+        to = 3000
+      }
+    }
+
+    service {
+          name = "grafana"
+          #      port = "ui"
+          port = "3000"
+          connect {
+            sidecar_service {}
+          }
+        tags = [
+          "traefik.enable=true",
+          "traefik.consulcatalog.connect=true",
+          "traefik.http.routers.grafana.tls=true",
+          "traefik.http.routers.grafana.rule=Host(`grafana.{{tls_san}}`)",
+        ]
+
+        check {
+          name     = "health"
+          type     = "http"
+          port     = "ui"
+          path     = "/health"
+          interval = "10s"
+          timeout  = "2s"
+        }
+    }
+    task "grafana" {
+      driver = "docker"
+      env {
+        GF_PATHS_CONFIG  = "/etc/grafana/grafana2.ini"
+        GF_PATHS_PLUGINS = "/data/grafana/plugins"
+        GF_SERVER_DOMAIN = "grafana.{{tls_san}}"
+        GF_SERVER_ROOT_URL = "https://grafana.{{tls_san}}"
+        GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH = "contains(realm_access.roles[*], 'admin') && 'GrafanaAdmin' || contains(realm_access.roles[*], 'editor') && 'Editor' || 'Viewer'"
+      }
+      config {
+        image = "{{registry_dns}}/{{stack_name}}/grafana:{{version_grafana_nomadder}}"
+        ports = ["ui"]
+      }
+      resources {
+        cpu    = 1000
+        memory = 2048
+      }
+    }
+  }
+}

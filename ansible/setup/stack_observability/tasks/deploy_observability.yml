@@ -1,0 +1,53 @@
+- name: Template observability.j2
+  delegate_to: localhost
+  template:
+    force: yes
+    src: observability.j2
+    dest: "{{role_path}}/files/observability.nomad"
+
+- name: "Copy observability.nomad"
+  become: true
+  copy:
+    force: true
+    src: observability.nomad
+    dest: "{{stack_deployment_dir}}/observability.nomad"
+    mode: '0755'
+
+#
+#    - name: "Slurp {{stack_deployment_dir}}/observability.nomad from master_0"
+#      ansible.builtin.slurp:
+#        src: "{{stack_deployment_dir}}/observability.nomad"
+#      register: job
+
+- name: Create job
+  community.general.nomad_job:
+    # host: "{{masters[0]}}"
+    client_cert: "{{nomad_cli_cert}}"
+    client_key: "{{nomad_cli_cert_key}}"
+    host: localhost
+    state: present
+    force_start: true
+    #        content: "{{ job.content | b64decode }}"
+    content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/observability.nomad') }}"
+    timeout: 120
+
+#- name: " Wait https://ingress.{{tls_san}} is available"
+#  uri:
+#    url: "https://ingress.{{tls_san}}"
+#    return_content: yes
+#    validate_certs: no
+#    status_code:
+#      - 200
+#  until: uri_output.status == 200
+#  retries: 24 # Retries for 24 * 5 seconds = 120 seconds = 2 minutes
+#  delay: 5 # Every 5 seconds
+#  register: uri_output
+
+#    - name: Force job to start
+#      community.general.nomad_job:
+##        host: "{{masters[0]}}"
+#        host: localhost
+#        state: present
+#        name: ingress
+#        timeout: 120
+#        force_start: true

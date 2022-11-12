@@ -45,3 +45,8 @@ consul{
  cert_file = "{{nomad_cert}}"
  key_file  = "{{nomad_cert_key}}"
 }
+
+telemetry {
+  publish_allocation_metrics = true
+  publish_node_metrics       = true
+}

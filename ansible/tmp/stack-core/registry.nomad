@@ -121,7 +121,7 @@ job "registry" {
       driver = "docker"
 
       config {
-        image = "suikast42/nexus-initlzr:1.0.0.Alpha4"
+        image = "suikast42/nexus-initlzr:1.0.0.Alpha9"
       }
 
       resources {

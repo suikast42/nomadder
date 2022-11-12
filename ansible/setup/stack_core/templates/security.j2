@@ -38,7 +38,7 @@ job "security" {
         POSTGRES_INITDB_ARGS = "--encoding=UTF8"
       }
       config {
-        image = "registry.cloud.private/postgres:{{version_postgres_keycloak}}"
+        image = "{{registry_dns}}/postgres:{{version_postgres_keycloak}}"
         volumes = [
           "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
         ]

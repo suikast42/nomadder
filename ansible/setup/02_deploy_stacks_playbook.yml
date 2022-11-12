@@ -20,3 +20,4 @@
   gather_facts: yes
   roles:
     - {role: stack_core, tags: ['stack_core','stack_core_build']}
+    - {role: stack_observability, tags: ['stack_observability','stack_observability_build']}

@@ -1,0 +1,26 @@
+- name: Deploy core stack
+  when: is_master_0
+  run_once: true
+  block:
+    - name: "Build grafana v {{version_grafana}}"
+      import_tasks: build_grafana.yml
+
+    - name: "Create {{stack_deployment_dir}} if needed"
+      become: true
+      file:
+        state: directory
+        mode: '0755'
+        path: "{{stack_deployment_dir}}"
+
+    - name: "Deploy observability stack"
+      import_tasks: deploy_observability.yml
+
+  vars:
+    - stack_name: "stack/observability"
+    - docker_build_dir: "/tmp/dockerbuild"
+    - nomad_cli_cert: "{{base_cert_dir}}/nomad/nomad-cli.pem"
+    - nomad_cli_cert_key: "{{base_cert_dir}}/nomad/nomad-cli-key.pem"
+    - version_grafana: "9.2.3"
+    - version_grafana_nomadder: "{{version_grafana}}.12"
+    - stack_deployment_dir: "{{master_0_job_dir}}/observability"
+

@@ -10,7 +10,8 @@ include::902_cheet_sheet_ubuntu.adoc[]
 include::902_cheet_sheet_ansible.adoc[]
 <<<
 include::902_cheet_sheet_vault.adoc[]
-
+<<<
+include::902_cheet_sheet_keycloak.adoc[]
 
 
 

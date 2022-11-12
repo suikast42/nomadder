@@ -1,11 +1,11 @@
 - name: Keycloak docker build
   run_once: true
   block:
-  - name: "Search for {{registry_ip}}/{{stack_name}}/keycloak:{{version_keycloak_nomadder}} in nexus"
+  - name: "Search for {{registry_ip}}/{{stack_name}}/grafana:{{version_grafana_nomadder}} in nexus"
     uri:
     # url :"https://{{nexus_dns}}/service/rest/v1/search?repository=dockerLocal&format=docker&name=stack/core/keycloak&version=19.0.2.0"
       # In the first installation phase traefik is not available. Thus, we use the ip here.
-      url: "http://{{registry_ip}}:{{registry_port_http}}/service/rest/v1/search?repository=dockerLocal&format=docker&name={{stack_name}}/keycloak&version={{version_keycloak_nomadder}}"
+      url: "http://{{registry_ip}}:{{registry_port_http}}/service/rest/v1/search?repository=dockerLocal&format=docker&name={{stack_name}}/grafana&version={{version_grafana_nomadder}}"
       method: GET
       #Get json content back
 #      return_content: true
@@ -18,7 +18,7 @@
         - 200
     register: nexus_response
 
-  - name: "Nexus response"
+  - name: "Nexus response for grafana v {{version_grafana_nomadder}}"
     debug:
       msg: "{{nexus_response}}"
 
@@ -29,22 +29,29 @@
   - name: Image build
     when: not image_exists_on_nexus
     block:
-    - name: "Create docker build dir {{docker_build_dir_keycloak}} if needed"
+    - name: "Create docker build dir {{docker_build_dir_grafana}} if needed"
       file:
-        path: "{{docker_build_dir_keycloak}}"
+        path: "{{docker_build_dir_grafana}}"
         state: directory
 
-    - name: Template dockerfile keycloak
+    - name: Template dockerfile grafana
       template:
         force: yes
-        src: DockerfileKeycloak
-        dest: "{{docker_build_dir_keycloak}}/Dockerfile"
+        src: grafana/DockerfileGrafana
+        dest: "{{docker_build_dir_grafana}}/Dockerfile"
 
-    - name: Template keycloak nomadder-realm.json
+    - name: Template dockerfile grafana
       template:
         force: yes
-        src: nomadder-realm.json
-        dest: "{{docker_build_dir_keycloak}}/nomadder-realm.json"
+        src: grafana/grafana2.ini
+        dest: "{{docker_build_dir_grafana}}/grafana2.ini"
+
+    - name: Template dockerfile grafana
+      template:
+        force: yes
+        src: grafana/installPlugins.sh
+        dest: "{{docker_build_dir_grafana}}/installPlugins.sh"
+
 
     - name: "Login {{registry_dns}}"
       # do not trigger a change
@@ -55,23 +62,23 @@
         password: "{{registry_password}}"
         reauthorize: yes
 
-    - name: "Build and push keycloak image v {{version_keycloak_nomadder}}"
+    - name: "Build and push grafana image v {{version_grafana_nomadder}}"
       community.docker.docker_image:
         build:
-          path: "{{docker_build_dir_keycloak}}"
-        name: "{{push_registry}}/{{stack_name}}/keycloak"
+          path: "{{docker_build_dir_grafana}}"
+        name: "{{push_registry}}/{{stack_name}}/grafana"
   #      repository: "{{registry_dns}}"
-        tag: "{{version_keycloak_nomadder}}"
+        tag: "{{version_grafana_nomadder}}"
         push: yes
         source: build
 
   always:
     - name : Finally
       block:
-        - name: "Delete {{docker_build_dir_keycloak}}"
+        - name: "Delete {{docker_build_dir_grafana}}"
           become: true
           file:
-            path: "{{docker_build_dir_keycloak }}"
+            path: "{{docker_build_dir_grafana }}"
             state: absent
         - name: "Logout {{registry_dns}}"
           # do not trigger a change
@@ -81,4 +88,4 @@
             registry_url: "{{registry_dns}}"
 
   vars:
-    - docker_build_dir_keycloak: "{{docker_build_dir}}/keycloak"
+    - docker_build_dir_grafana: "{{docker_build_dir}}/grafana"
