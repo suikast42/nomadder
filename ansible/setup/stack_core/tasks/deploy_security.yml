@@ -12,7 +12,8 @@
       nomad var put -force {{nomad_security_job_path}} \
       keycloak_password={{keycloak_passwd}} \
       keycloak_db_password={{keycloak_db_passwd}} \
-      keycloak_ingress_secret={{keycloak_ingress_secret}}
+      keycloak_ingress_secret={{keycloak_ingress_secret}} \
+      keycloak_secret_observability_grafana={{keycloak_secret_observability_grafana}}
     environment:
       - NOMAD_ADDR: "https://localhost:4646"
       - NOMAD_CACERT: "{{cluster_intermediate_ca_bundle}}"

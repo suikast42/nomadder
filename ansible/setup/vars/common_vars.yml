@@ -38,6 +38,7 @@ vault_hosts:
 
 
 
+core_realm: "nomadder"
 # consul and nomad datacenter name
 data_center: "nomadder1"
 #cert path on nodes

@@ -20,7 +20,7 @@
     - docker_build_dir: "/tmp/dockerbuild"
     - nomad_cli_cert: "{{base_cert_dir}}/nomad/nomad-cli.pem"
     - nomad_cli_cert_key: "{{base_cert_dir}}/nomad/nomad-cli-key.pem"
-    - version_grafana: "9.2.3"
-    - version_grafana_nomadder: "{{version_grafana}}.12"
+    - version_grafana: "9.2.4"
+    - version_grafana_nomadder: "{{version_grafana}}.0"
     - stack_deployment_dir: "{{master_0_job_dir}}/observability"
 

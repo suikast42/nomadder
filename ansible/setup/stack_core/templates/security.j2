@@ -215,6 +215,7 @@ job "security" {
       KEYCLOAK_ADMIN_PASSWORD      = {{ '{{' }}.keycloak_password{{ '}}' }}
       KC_DB_PASSWORD               = {{ '{{' }}.keycloak_db_password{{ '}}' }}
       KC_NOMADDER_CLIENT_SECRET    = {{ '{{' }}.keycloak_ingress_secret{{ '}}' }}
+      KC_NOMADDER_CLIENT_SECRET_GRAFANA    = {{ '{{' }}.keycloak_secret_observability_grafana{{ '}}' }}
     {{ '{{' }}- end -{{ '}}' }}
     EOF
          }

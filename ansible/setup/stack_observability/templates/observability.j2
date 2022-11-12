@@ -51,6 +51,16 @@ job "observability" {
         cpu    = 1000
         memory = 2048
       }
+      template {
+         destination = "${NOMAD_SECRETS_DIR}/env.vars"
+         env         = true
+         change_mode = "restart"
+         data        = <<EOF
+          {{ '{{' }}- with nomadVar "{{nomad_observability_job_path}}" -{{ '}}' }}
+            GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET    = {{ '{{' }}.keycloak_secret_observability_grafana{{ '}}' }}
+          {{ '{{' }}- end -{{ '}}' }}
+          EOF
+      }
     }
   }
 }
