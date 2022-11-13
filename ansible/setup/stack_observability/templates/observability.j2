@@ -10,7 +10,6 @@ job "observability" {
         to = 3000
       }
     }
-
     service {
           name = "grafana"
           #      port = "ui"
@@ -59,6 +58,80 @@ job "observability" {
          data        = <<EOF
           {{ '{{' }}- with nomadVar "{{nomad_observability_job_path}}" -{{ '}}' }}
             GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET    = {{ '{{' }}.keycloak_secret_observability_grafana{{ '}}' }}
+          {{ '{{' }}- end -{{ '}}' }}
+          EOF
+      }
+    }
+  }
+  group "minio-1"{
+
+    volume "stack_observability_minio_1_volume" {
+      type      = "host"
+      source    = "stack_observability_minio_1_volume"
+      read_only = false
+    }
+    count = 1
+    network {
+      mode = "bridge"
+      port "api" {
+        to = 9000
+      }
+      port "console" {
+         to = 9001
+      }
+    }
+    service{
+      name ="minio-1"
+      port= "9000"
+      connect{
+        sidecar_service {}
+      }
+      check {
+        name  = "health"
+        type  = "http"
+        port ="api"
+        path="/minio/health/live"
+        interval = "10s"
+        timeout  = "2s"
+      }
+    }
+    service{
+      name ="minio-1-console"
+      port= "9001"
+      connect{
+        sidecar_service {}
+      }
+    }
+    task "minio-1"{
+
+      volume_mount {
+        volume      = "stack_observability_minio_1_volume"
+        destination = "/data"
+      }
+
+      driver = "docker"
+      config {
+        image = "{{registry_dns}}/minio/minio:{{version_minio}}"
+        ports   = ["api", "console"] # Defined above, in `network` stanza
+        command = "server"
+        args    = [
+          "/data/",
+          "--address", ":${NOMAD_PORT_api}",
+          "--console-address", ":${NOMAD_PORT_console}",
+        ]
+      }
+      resources {
+        cpu    = 500
+        memory = 512
+      }
+      template {
+         destination = "${NOMAD_SECRETS_DIR}/env.vars"
+         env         = true
+         change_mode = "restart"
+         data        = <<EOF
+          {{ '{{' }}- with nomadVar "{{nomad_observability_job_path}}" -{{ '}}' }}
+            MINIO_ROOT_USER         = {{ '{{' }}.minio_user{{ '}}' }}
+            MINIO_ROOT_PASSWORD     = {{ '{{' }}.minio_password{{ '}}' }}
           {{ '{{' }}- end -{{ '}}' }}
           EOF
       }

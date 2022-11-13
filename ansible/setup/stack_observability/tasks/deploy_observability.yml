@@ -10,7 +10,9 @@
   - name: "Create Variables in nomad"
     shell: |
       nomad var put -force {{nomad_observability_job_path}} \
-      keycloak_secret_observability_grafana={{keycloak_secret_observability_grafana}}
+      keycloak_secret_observability_grafana={{keycloak_secret_observability_grafana}} \
+      minio_user={{minio_user}} \
+      minio_password={{minio_password}}
     environment:
       - NOMAD_ADDR: "https://localhost:4646"
       - NOMAD_CACERT: "{{cluster_intermediate_ca_bundle}}"

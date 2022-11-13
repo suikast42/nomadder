@@ -1,0 +1,12 @@
+- name: Create postgres volume
+  when: host_name == 'worker-01'
+  block:
+
+  - name: Create stack core postgres volumes
+    include_tasks: nomad/tasks/nomad_volumes.yml
+    loop:
+      - { name: 'stack_observability_minio_1_volume' , path: '{{stack_observability_minio_1_volume}}'}
+
+  vars:
+    stack_observability_minio_1_volume: /opt/deployments/observability/minio-1
+

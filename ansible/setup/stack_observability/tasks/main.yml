@@ -22,5 +22,5 @@
     - nomad_cli_cert_key: "{{base_cert_dir}}/nomad/nomad-cli-key.pem"
     - version_grafana: "9.2.4"
     - version_grafana_nomadder: "{{version_grafana}}.0"
+    - version_minio: "RELEASE.2022-11-11T03-44-20Z.fips"
     - stack_deployment_dir: "{{master_0_job_dir}}/observability"
-

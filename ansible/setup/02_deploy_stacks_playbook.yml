@@ -9,6 +9,7 @@
   gather_facts: yes
   roles:
     - {role: stack_core_volumes, tags: ['stack_core','stack_core_volumes']}
+    - {role: stack_observability_volumes, tags: ['stack_observability','stack_observability_volumes']}
 
 - hosts: masters[0]
   name: "Master [0] stack core deployment"
