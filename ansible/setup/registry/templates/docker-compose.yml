@@ -17,7 +17,7 @@ services:
     image: sonatype/nexus3:{{version_nexus}}
     container_name: nexus
     hostname: nexus
-    mem_limit: 2048M
+    mem_limit: 4096M
     restart: always
     environment:
       # Let the default admin password as admin123
