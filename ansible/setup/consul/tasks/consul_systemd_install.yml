@@ -18,6 +18,7 @@
       register: serviceconfig
 
     - name: stop consul service
+      when: serviceconfig.changed
       failed_when: false
       service:
         name: consul

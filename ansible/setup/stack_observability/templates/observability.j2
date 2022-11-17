@@ -15,8 +15,15 @@ job "observability" {
           #      port = "ui"
           port = "3000"
           connect {
-            sidecar_service {}
+            sidecar_service {
+              proxy {
+                upstreams {
+                  destination_name = "mimir-1"
+                  local_bind_port  = 8000
+                }
+            }
           }
+        }
         tags = [
           "traefik.enable=true",
           "traefik.consulcatalog.connect=true",
@@ -63,77 +70,64 @@ job "observability" {
       }
     }
   }
-  group "minio-1"{
 
-    volume "stack_observability_minio_1_volume" {
-      type      = "host"
-      source    = "stack_observability_minio_1_volume"
-      read_only = false
-    }
-    count = 1
-    network {
-      mode = "bridge"
-      port "api" {
-        to = 9000
+  group "mimir-1"{
+
+      count = 1
+      network {
+        mode = "bridge"
+        port "api" {
+          to = 9009
+        }
       }
-      port "console" {
-         to = 9001
-      }
-    }
+
+
     service{
-      name ="minio-1"
-      port= "9000"
+      name ="mimir-1"
+      port= "9009"
       connect{
         sidecar_service {}
       }
-      check {
-        name  = "health"
-        type  = "http"
-        port ="api"
-        path="/minio/health/live"
-        interval = "10s"
-        timeout  = "2s"
-      }
-    }
-    service{
-      name ="minio-1-console"
-      port= "9001"
-      connect{
-        sidecar_service {}
-      }
-    }
-    task "minio-1"{
-
-      volume_mount {
-        volume      = "stack_observability_minio_1_volume"
-        destination = "/data"
-      }
-
-      driver = "docker"
-      config {
-        image = "{{registry_dns}}/minio/minio:{{version_minio}}"
-        ports   = ["api", "console"] # Defined above, in `network` stanza
-        command = "server"
-        args    = [
-          "/data/",
-          "--address", ":${NOMAD_PORT_api}",
-          "--console-address", ":${NOMAD_PORT_console}",
+      tags = [
+          "traefik.enable=true",
+          "traefik.consulcatalog.connect=true",
+          "traefik.http.routers.mimir.tls=true",
+          "traefik.http.routers.mimir.rule=Host(`mimir.{{tls_san}}`)",
         ]
+          check {
+            name  = "health"
+            type  = "http"
+            port ="api"
+            path="/ready"
+            interval = "10s"
+            timeout  = "2s"
+          }
       }
+      task "mimir-1"{
+         driver = "docker"
+         config {
+         image = "{{registry_dns}}/grafana/mimir:{{version_grafana_mimir}}"
+         ports = ["api"]
+         args = [
+           "-config.file","/config/mimir.yaml"
+         ]
+        volumes = [
+          "local/mimir.yaml:/config/mimir.yaml"
+        ]
+         }
       resources {
-        cpu    = 500
-        memory = 512
+        cpu    = 1000
+        memory = 2048
       }
+     artifact {
+       source      = "https://nexus.{{tls_san}}/repository/raw/config/stack/observability/mimir.yaml"
+       mode= "file"
+       destination = "local/mimir.tpl"
+     }
       template {
-         destination = "${NOMAD_SECRETS_DIR}/env.vars"
-         env         = true
-         change_mode = "restart"
-         data        = <<EOF
-          {{ '{{' }}- with nomadVar "{{nomad_observability_job_path}}" -{{ '}}' }}
-            MINIO_ROOT_USER         = {{ '{{' }}.minio_user{{ '}}' }}
-            MINIO_ROOT_PASSWORD     = {{ '{{' }}.minio_password{{ '}}' }}
-          {{ '{{' }}- end -{{ '}}' }}
-          EOF
+        change_mode   = "restart"
+        source        = "local/mimir.tpl"
+        destination = "local/mimir.yaml"
       }
     }
   }

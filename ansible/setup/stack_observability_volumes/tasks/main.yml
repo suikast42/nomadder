@@ -8,5 +8,5 @@
       - { name: 'stack_observability_minio_1_volume' , path: '{{stack_observability_minio_1_volume}}'}
 
   vars:
-    stack_observability_minio_1_volume: /opt/deployments/observability/minio-1
+    stack_observability_minio_1_volume: "{{nomad_volumes_dir}}/observability/minio-1"
 

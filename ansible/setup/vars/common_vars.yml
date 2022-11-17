@@ -8,6 +8,7 @@ host_ips:
   - "{{ ansible_eth0.ipv4.address }}"
   - "{{ ansible_eth1.ipv4.address }}"
 master_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
+worker_01_ip: "{{ hostvars[groups['workers'][0]]['ansible_host'] | default(groups['workers'][0]) }}"
 registry_ip: "{{ hostvars[groups['build'][0]]['ansible_host'] | default(groups['build'][0]) }}"
 registry_port: "5000"
 registry_port_push: "5001"
@@ -54,7 +55,8 @@ local_ca_cert_conf: "{{role_path}}/../certificates_generate/files/cfssl/config.j
 local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"
 local_cluster_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/cluster-ca"
 systemd_install_dir:  /opt/services/core
-master_0_job_dir:  /opt/deployments
+master_0_job_dir:  /opt/nomadjobs
+nomad_volumes_dir:  /opt/nomadvolumes
 base_cert_dir: /etc/opt/certs
 notify_cert_change: false
 

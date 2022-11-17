@@ -23,4 +23,7 @@
     - version_grafana: "9.2.4"
     - version_grafana_nomadder: "{{version_grafana}}.0"
     - version_minio: "RELEASE.2022-11-11T03-44-20Z.fips"
+    - version_grafana_mimir: "2.4.0"
+    - version_grafana_mimir_nomadder: "{{version_grafana_mimir}}.13"
     - stack_deployment_dir: "{{master_0_job_dir}}/observability"
+    - version_busy_box_init_container: "1.28"

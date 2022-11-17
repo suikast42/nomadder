@@ -7,6 +7,23 @@
       src: observability.j2
       dest: "{{role_path}}/files/observability.nomad"
 
+  - name: Template mimir.yml
+    delegate_to: localhost
+    template:
+      force: yes
+      src: mimir/mimir.yaml
+      dest: "{{role_path}}/files/mimir.yaml"
+
+  - name: Upload mimir.yml to nexus
+    delegate_to: localhost
+    shell:
+      cmd: "curl -k --user '{{registry_user}}:{{registry_password}}' --upload-file {{role_path}}/files/mimir.yaml https://{{nexus_dns}}/repository/raw/config/stack/observability/mimir.yaml"
+    register: result
+
+  - name: "Upload result mimir.yml"
+    debug:
+      msg: "{{ result }}"
+
   - name: "Create Variables in nomad"
     shell: |
       nomad var put -force {{nomad_observability_job_path}} \

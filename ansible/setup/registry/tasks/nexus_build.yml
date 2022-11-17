@@ -87,6 +87,6 @@
         delay: 20
 
   vars:
-    nexus_workdir: /opt/deployments/core/nexus/workdir
-    nexus_compose_dir: /usr/local/etc/deployments/core
-    image_backup_dir: /opt/deployments/imagebackups
+    nexus_workdir: "{{nomad_volumes_dir}}/core/nexus/workdir"
+    nexus_compose_dir: "{{master_0_job_dir}}/core"
+    image_backup_dir: "{{nomad_volumes_dir}}/imagebackups"

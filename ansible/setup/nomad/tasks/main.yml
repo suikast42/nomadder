@@ -14,11 +14,7 @@
         name: nomad
         groups: docker
         state: present
-#    - name: Create nomad volumes
-#      when: is_worker_host
-#      include_tasks: nomad_volumes.yml
-#      loop:
-#        - { name: 'nexus_workdir' , path: '/opt/deployments/core/nexus/workdir'}
+
 
     - name: Install nomad
       include_tasks: nomad_install.yml

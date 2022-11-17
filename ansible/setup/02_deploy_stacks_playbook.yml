@@ -1,4 +1,18 @@
 ---
+#TODO make nameserver entry for all workers
+- hosts: localhost
+  vars_files:
+    - vars/common_vars.yml
+  tasks:
+  - name: Add nameserver to localhost
+    become: true
+    lineinfile:
+      state: present
+      path: /etc/resolv.conf
+      firstmatch: yes
+      insertbefore: "nameserver.*"
+      line: "nameserver {{worker_01_ip}}"
+
 # start the deployment jobs on master_0
 - hosts: all,!localhost
   name: "Create stack core volumes"

@@ -10,6 +10,7 @@
 
 
     - name: stop nomad service
+      when: serviceconfig.changed
       failed_when: false
       service:
         name: nomad

@@ -10,5 +10,5 @@
 
 
   vars:
-    postgres_volume: /opt/deployments/core/postgres
+    postgres_volume: "{{nomad_volumes_dir}}/core/postgres"
 

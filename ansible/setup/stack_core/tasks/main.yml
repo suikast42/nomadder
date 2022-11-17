@@ -2,6 +2,21 @@
   when: is_master_0
   run_once: true
   block:
+    - name: "Deploy traefik v {{version_traefik}}"
+      import_tasks: deploy_ingress.yml
+
+    - name: "Wait until nexus is available over ingress controller"
+      uri:
+        url: 'https://nexus.{{tls_san}}'
+        return_content: yes
+        validate_certs: no
+        status_code:
+          - 200
+      until: uri_output.status == 200
+      retries: 24 # Retries for 24 * 5 seconds = 120 seconds = 2 minutes
+      delay: 5 # Every 5 seconds
+      register: uri_output
+
     - name: "Build keycloak v {{version_keycloak}}"
       import_tasks: build_keycloak.yml
 
@@ -12,8 +27,7 @@
         mode: '0755'
         path: "{{core_deployment_dir}}"
 
-    - name: "Deploy traefik v {{version_traefik}}"
-      import_tasks: deploy_ingress.yml
+
 
     - name: "Deploy keycloak v {{version_keycloak}}"
       import_tasks: deploy_security.yml
