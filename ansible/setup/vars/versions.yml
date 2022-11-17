@@ -3,8 +3,10 @@ vault_checksum: "sha256:aa2ed532d9a0ecc8635fed63cb3fb6de472b4c01ca622a9a199cd92a
 uninstall_vault: false
 
 
-consul_version: "1.14.0"
-consul_checksum: "sha256:6907e0dc83a05acaa9de60217e44ce55bd05c98152dcef02f9258bd2a474f2b3"
+#consul_version: "1.14.0"
+#consul_checksum: "sha256:6907e0dc83a05acaa9de60217e44ce55bd05c98152dcef02f9258bd2a474f2b3"
+consul_version: "1.13.3"
+consul_checksum: "sha256:5370b0b5bf765530e28cb80f90dcb47bd7d6ba78176c1ab2430f56e460ed279c"
 uninstall_consul: false
 
 
@@ -35,3 +37,5 @@ uninstall_nexus: false
 
 version_docker_compose: "2.11.1"
 uninstall_compose: false
+
+version_busy_box_init_container: "1.28"

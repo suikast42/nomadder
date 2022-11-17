@@ -26,4 +26,3 @@
     - version_grafana_mimir: "2.4.0"
     - version_grafana_mimir_nomadder: "{{version_grafana_mimir}}.13"
     - stack_deployment_dir: "{{master_0_job_dir}}/observability"
-    - version_busy_box_init_container: "1.28"

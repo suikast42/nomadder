@@ -23,6 +23,14 @@ job "security" {
       connect {
         sidecar_service {}
       }
+     check {
+        name     = "security_postgres_ping"
+        type     = "script"
+        command  = "pg_isready"
+        task     = "security_postgres"
+        interval = "10s"
+        timeout  = "2s"
+      }
     }
 
     task "security_postgres" {
@@ -98,6 +106,26 @@ job "security" {
 
 
     }
+      task "await-for-keycloak" {
+        driver = "docker"
+
+        config {
+          image        = "{{registry_dns}}/busybox:{{version_busy_box_init_container}}"
+          command      = "sh"
+          args         = ["-c", "echo -n 'Waiting for service keycloak'; until nslookup keycloak.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
+          #network_mode = "host"
+        }
+
+        resources {
+          cpu    = 200
+          memory = 128
+        }
+
+        lifecycle {
+          hook    = "prestart"
+          sidecar = false
+        }
+      }
     task "forwardauth" {
       driver = "docker"
       env {
@@ -180,6 +208,26 @@ job "security" {
         timeout  = "2s"
       }
     }
+      task "await-for-security-postgres" {
+        driver = "docker"
+
+        config {
+          image        = "{{registry_dns}}/busybox:{{version_busy_box_init_container}}"
+          command      = "sh"
+          args         = ["-c", "echo -n 'Waiting for service security-postgres'; until nslookup security-postgres.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
+          #network_mode = "host"
+        }
+
+        resources {
+          cpu    = 200
+          memory = 128
+        }
+
+        lifecycle {
+          hook    = "prestart"
+          sidecar = false
+        }
+      }
     task "keycloak" {
       driver = "docker"
       env {
