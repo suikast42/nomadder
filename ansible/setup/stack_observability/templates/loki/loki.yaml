@@ -4,6 +4,9 @@ server:
   http_listen_port: 3100
 
 ingester:
+  wal:
+    enabled: true
+    dir: /data/loki/wal
   lifecycler:
     address: 127.0.0.1
     ring:
@@ -26,10 +29,10 @@ schema_config:
 
 storage_config:
   boltdb:
-    directory: /tmp/loki/index
+    directory: /data/loki/index
 
   filesystem:
-    directory: /tmp/loki/chunks
+    directory: /data/loki/chunks
 
 limits_config:
   enforce_metric_name: false

@@ -10,8 +10,12 @@ datasources:
     version: 1
     editable: true
     jsonData:
+      manageAlerts: "true"
       httpHeaderName1: 'X-Scope-OrgID'
       alertmanagerUid: 'alertmanager'
+      httpMethod: "POST"
+      prometheusType: "Mimir"
+      prometheusVersion: "{{version_grafana_mimir}}"
     secureJsonData:
       httpHeaderValue1: 'demo'
     isDefault: true
@@ -25,6 +29,19 @@ datasources:
     editable: true
     jsonData:
       httpHeaderName1: 'X-Scope-OrgID'
-      implementation: 'cortex'
+      implementation: 'mimir'
+    secureJsonData:
+      httpHeaderValue1: 'demo'
+  - name: Loki
+    uid: loki
+    type: loki
+    access: proxy
+    orgId: 1
+    url: http://localhost:8001
+    version: 1
+    editable: true
+    jsonData:
+      alertmanagerUid: 'alertmanager'
+      httpHeaderName1: 'X-Scope-OrgID'
     secureJsonData:
       httpHeaderValue1: 'demo'

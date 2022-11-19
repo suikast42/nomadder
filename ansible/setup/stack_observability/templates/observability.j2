@@ -24,8 +24,12 @@ job "observability" {
             sidecar_service {
               proxy {
                 upstreams {
-                  destination_name = "mimir-1"
+                  destination_name = "mimir"
                   local_bind_port  = 8000
+                }
+               upstreams {
+                 destination_name = "loki"
+                 local_bind_port  = 8001
                 }
             }
           }
@@ -82,7 +86,7 @@ job "observability" {
     }
   }
 
-  group "mimir-1"{
+  group "mimir"{
     volume "stack_observability_mimir_volume" {
       type      = "host"
       source    = "stack_observability_mimir_volume"
@@ -98,7 +102,7 @@ job "observability" {
 
 
     service{
-      name ="mimir-1"
+      name ="mimir"
       port= "9009"
       connect{
         sidecar_service {}
@@ -119,7 +123,7 @@ job "observability" {
             timeout  = "2s"
           }
       }
-      task "mimir-1"{
+      task "mimir"{
         volume_mount {
           volume      = "stack_observability_mimir_volume"
           destination = "/data"
@@ -171,4 +175,84 @@ job "observability" {
 
     }
   }
+   group "loki"{
+      volume "stack_observability_loki_volume" {
+        type      = "host"
+        source    = "stack_observability_loki_volume"
+        read_only = false
+      }
+        count = 1
+        network {
+          mode = "bridge"
+          port "http" {
+            to = 3100
+          }
+          port "cli" {
+            to = 7946
+          }
+          port "grpc" {
+            to = 9095
+          }
+        }
+
+
+      service{
+        name ="loki"
+        port= "3100"
+        connect{
+          sidecar_service {}
+        }
+        tags = [
+            "traefik.enable=true",
+            "traefik.consulcatalog.connect=true",
+            "traefik.http.routers.loki.tls=true",
+            "traefik.http.routers.loki.rule=Host(`loki.{{tls_san}}`)"
+          ]
+            check {
+              name  = "health"
+              type  = "http"
+              port ="http"
+              path="/ready"
+              interval = "10s"
+              timeout  = "2s"
+            }
+        }
+        task "loki"{
+          volume_mount {
+            volume      = "stack_observability_loki_volume"
+            destination = "/data"
+          }
+
+           driver = "docker"
+           config {
+           image = "{{registry_dns}}/grafana/loki:{{version_grafana_loki}}"
+           ports = ["http","cli","grpc"]
+           args = [
+             "-config.file","/config/loki.yaml"
+           ]
+          volumes = [
+            "local/loki.tpl:/config/loki.yaml"
+          ]
+           }
+        resources {
+          cpu    = 1000
+          memory = 2048
+        }
+
+     artifact {
+       source      = "https://nexus.{{tls_san}}/repository/raw/config/stack/observability/loki.yaml"
+       mode= "file"
+       destination = "local/loki.tpl"
+     }
+
+
+      template {
+        change_mode   = "restart"
+        right_delimiter = "++"
+        left_delimiter = "++"
+        source        = "local/loki.tpl"
+        destination = "local/loki.yaml"
+      }
+      }
+    }
 }

@@ -1,3 +1,4 @@
 *.nomad
 Dockerfile*
 mimir.yaml
+loki.yaml
