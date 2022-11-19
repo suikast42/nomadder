@@ -20,5 +20,12 @@ a|[source,shell]
 dig @127.0.0.1 -p 8600 consul.service.consul SRV
 ----
 
+|Metrics API
+a|[source,shell]
+----
+https://consul.cloud.private/v1/agent/host
+----
+
+
 |===
 

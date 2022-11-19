@@ -1,0 +1,13 @@
+.Nomad CLI cheatsheet
+|===
+|Description |Command
+
+|Metrics API
+a|[source,shell]
+----
+https://nomad.cloud.private/v1/metrics
+----
+
+
+|===
+
