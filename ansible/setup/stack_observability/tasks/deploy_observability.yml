@@ -21,6 +21,12 @@
       src: loki/loki.yaml
       dest: "{{role_path}}/files/loki.yaml"
 
+  - name: Template tempo.yaml
+    delegate_to: localhost
+    template:
+      force: yes
+      src: tempo/tempo.yaml
+      dest: "{{role_path}}/files/tempo.yaml"
 
   - name: "Copy observability.nomad"
     become: true
@@ -28,14 +34,6 @@
       force: true
       src: observability.nomad
       dest: "{{stack_deployment_dir}}/observability.nomad"
-      mode: '0755'
-
-  - name: "Copy mimir.yaml"
-    become: true
-    copy:
-      force: true
-      src: mimir.yaml
-      dest: "{{stack_deployment_dir}}/mimir.yaml"
       mode: '0755'
 
   - name: Upload mimir.yml to nexus
@@ -58,6 +56,15 @@
     debug:
       msg: "{{ result }}"
 
+  - name: Upload tempo.yaml to nexus
+    delegate_to: localhost
+    shell:
+      cmd: "curl -k --user '{{registry_user}}:{{registry_password}}' --upload-file {{role_path}}/files/tempo.yaml https://{{nexus_dns}}/repository/raw/config/stack/observability/tempo.yaml"
+    register: result
+
+  - name: "Upload result tempo.yaml"
+    debug:
+      msg: "{{ result }}"
 
   #mimir_config="$(cat {{stack_deployment_dir}}/datasources.yaml)"
   - name: "Create Variables in nomad"

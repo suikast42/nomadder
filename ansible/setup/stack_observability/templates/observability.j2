@@ -31,6 +31,10 @@ job "observability" {
                  destination_name = "loki"
                  local_bind_port  = 8001
                 }
+               upstreams {
+                 destination_name = "tempo-http"
+                 local_bind_port  = 8002
+               }
             }
           }
         }
@@ -175,76 +179,89 @@ job "observability" {
 
     }
   }
-   group "loki"{
-      volume "stack_observability_loki_volume" {
-        type      = "host"
-        source    = "stack_observability_loki_volume"
-        read_only = false
+ group "loki"{
+    volume "stack_observability_loki_volume" {
+      type      = "host"
+      source    = "stack_observability_loki_volume"
+      read_only = false
+    }
+    count = 1
+    network {
+      mode = "bridge"
+      port "http" {
+        to = 3100
       }
-        count = 1
-        network {
-          mode = "bridge"
-          port "http" {
-            to = 3100
-          }
-          port "cli" {
-            to = 7946
-          }
-          port "grpc" {
-            to = 9095
-          }
-        }
+      port "cli" {
+        to = 7946
+      }
+      port "grpc" {
+        to = 9095
+      }
+    }
 
-
-      service{
-        name ="loki"
-        port= "3100"
-        connect{
-          sidecar_service {}
-        }
-        tags = [
-            "traefik.enable=true",
-            "traefik.consulcatalog.connect=true",
-            "traefik.http.routers.loki.tls=true",
-            "traefik.http.routers.loki.rule=Host(`loki.{{tls_san}}`)"
-          ]
-            check {
-              name  = "health"
-              type  = "http"
-              port ="http"
-              path="/ready"
-              interval = "10s"
-              timeout  = "2s"
-            }
-        }
-        task "loki"{
-          volume_mount {
-            volume      = "stack_observability_loki_volume"
-            destination = "/data"
-          }
-
-           driver = "docker"
-           config {
-           image = "{{registry_dns}}/grafana/loki:{{version_grafana_loki}}"
-           ports = ["http","cli","grpc"]
-           args = [
-             "-config.file","/config/loki.yaml"
-           ]
-          volumes = [
-            "local/loki.tpl:/config/loki.yaml"
-          ]
+ service {
+   name ="loki"
+   port= "3100"
+   connect {
+     sidecar_service {
+     proxy {
+        upstreams {
+           # For sending traces to tempo
+           destination_name = "tempo-jaeger"
+           local_bind_port  = 8002
            }
-        resources {
-          cpu    = 1000
-          memory = 2048
         }
+     }
+   }
+   tags = [
+     "traefik.enable=true",
+     "traefik.consulcatalog.connect=true",
+     "traefik.http.routers.loki.tls=true",
+     "traefik.http.routers.loki.rule=Host(`loki.{{tls_san}}`)"
+     ]
+     check {
+       name  = "health"
+       type  = "http"
+       port ="http"
+       path="/ready"
+       interval = "10s"
+       timeout  = "2s"
+       }
+ }
+
+     task "loki"{
+       volume_mount {
+         volume      = "stack_observability_loki_volume"
+         destination = "/data"
+       }
+
+     driver = "docker"
+     env {
+       JAEGER_AGENT_HOST= "${NOMAD_UPSTREAM_IP_tempo_jaeger}"
+       JAEGER_ENDPOINT = "http://${NOMAD_UPSTREAM_ADDR_tempo_jaeger}/api/traces" # send traces to Tempo
+       JAEGER_SAMPLER_TYPE = const
+       JAEGER_SAMPLER_PARAM = 1
+       }
+    config {
+       image = "{{registry_dns}}/grafana/loki:{{version_grafana_loki}}"
+       ports = ["http","cli","grpc"]
+       args = [
+        "-config.file","/config/loki.yaml"
+       ]
+    volumes = [
+      "local/loki.tpl:/config/loki.yaml"
+      ]
+    }
+    resources {
+       cpu    = 1000
+       memory = 2048
+    }
 
      artifact {
        source      = "https://nexus.{{tls_san}}/repository/raw/config/stack/observability/loki.yaml"
        mode= "file"
        destination = "local/loki.tpl"
      }
-
 
       template {
         change_mode   = "restart"
@@ -255,4 +272,120 @@ job "observability" {
       }
       }
     }
+  group "tempo"{
+    volume "stack_observability_tempo_volume" {
+      type      = "host"
+      source    = "stack_observability_tempo_volume"
+      read_only = false
+    }
+      count = 1
+      network {
+        mode = "bridge"
+        port "jaeger" {
+          to = 14268
+        }
+        port "tempo" {
+          to = 3200
+        }
+        port "otlp_grpc" {
+          to = 4317
+        }
+        port "otlp_http" {
+          to = 4318
+        }
+        port "zipkin" {
+          to = 9411
+        }
+      }
+    service{
+      name ="tempo-http"
+      port= "3200"
+      connect {
+           sidecar_service {}
+      }
+      tags = [
+          "traefik.enable=true",
+          "traefik.consulcatalog.connect=true",
+          "traefik.http.routers.tempo_http.tls=true",
+          "traefik.http.routers.tempo_http.rule=Host(`tempo.{{tls_san}}`)",
+ #         "traefik.http.routers.tempo_http.middlewares=traefik-forward-auth"
+        ]
+          check {
+            name  = "health"
+            type  = "http"
+            port ="tempo"
+            path="/ready"
+            interval = "10s"
+            timeout  = "2s"
+          }
+      }
+   service{
+       name ="tempo-jaeger"
+       port= "14268"
+       connect{
+         sidecar_service {
+ 		proxy {
+           upstreams {
+              # Sending metrics to mimir
+              # See metrics_generator: in tempo.yaml
+              destination_name = "mimir"
+              local_bind_port  = 8000
+             }
+           }
+ 		 }
+  	  }
+       tags = [
+           "traefik.enable=true",
+           "traefik.consulcatalog.connect=true",
+           "traefik.http.routers.tempo-jaeger.tls=true",
+           "traefik.http.routers.tempo-jaeger.rule=Host(`tempojaeger.{{tls_san}}`)",
+  #         "traefik.http.routers.tempo-jaeger.middlewares=traefik-forward-auth"
+         ]
+           check {
+             name  = "health"
+             type  = "http"
+             port ="tempo"
+             path="/ready"
+             interval = "10s"
+             timeout  = "2s"
+           }
+         }
+
+      task "tempo"{
+        volume_mount {
+          volume      = "stack_observability_tempo_volume"
+          destination = "/data"
+        }
+
+         driver = "docker"
+         config {
+         image = "{{registry_dns}}/grafana/tempo:{{version_grafana_tempo}}"
+         ports = ["jaeger","tempo","otlp_grpc","otlp_http","zipkin"]
+         args = [
+           "-config.file","/config/tempo.yaml"
+         ]
+        volumes = [
+          "local/tempo.tpl:/config/tempo.yaml"
+        ]
+         }
+      resources {
+        cpu    = 1000
+        memory = 2048
+      }
+
+   artifact {
+     source      = "https://nexus.{{tls_san}}/repository/raw/config/stack/observability/tempo.yaml"
+     mode= "file"
+     destination = "local/tempo.tpl"
+   }
+
+    template {
+      change_mode   = "restart"
+      right_delimiter = "++"
+      left_delimiter = "++"
+      source        = "local/tempo.tpl"
+      destination = "local/tempo.yaml"
+    }
+    }
+  }
 }

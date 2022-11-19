@@ -16,6 +16,11 @@ datasources:
       httpMethod: "POST"
       prometheusType: "Mimir"
       prometheusVersion: "{{version_grafana_mimir}}"
+      derivedFields:
+        - datasourceUid: tempo
+          matcherRegex: (?:traceID|trace_id)=(\w+)
+          name: TraceID
+          url: $${__value.raw}
     secureJsonData:
       httpHeaderValue1: 'demo'
     isDefault: true
@@ -43,5 +48,19 @@ datasources:
     jsonData:
       alertmanagerUid: 'alertmanager'
       httpHeaderName1: 'X-Scope-OrgID'
+    secureJsonData:
+      httpHeaderValue1: 'demo'
+  - name: Tempo
+    uid: tempo
+    type: tempo
+    access: proxy
+    orgId: 1
+    url: http://localhost:8002
+    version: 1
+    editable: true
+    jsonData:
+      httpMethod: GET
+      serviceMap:
+        datasourceUid: mimir
     secureJsonData:
       httpHeaderValue1: 'demo'
