@@ -3,6 +3,12 @@ job "observability" {
   datacenters = ["{{data_center}}"]
 
   group "grafana" {
+    volume "stack_observability_grafana_volume" {
+      type      = "host"
+      source    = "stack_observability_grafana_volume"
+      read_only = false
+    }
+
     count = 1
     network {
       mode = "bridge"
@@ -41,6 +47,11 @@ job "observability" {
         }
     }
     task "grafana" {
+     volume_mount {
+        volume      = "stack_observability_grafana_volume"
+        destination = "/var/lib/grafana"
+      }
+
       driver = "docker"
       env {
         GF_AUTH_OAUTH_AUTO_LOGIN= "true"
@@ -72,7 +83,11 @@ job "observability" {
   }
 
   group "mimir-1"{
-
+    volume "stack_observability_mimir_volume" {
+      type      = "host"
+      source    = "stack_observability_mimir_volume"
+      read_only = false
+    }
       count = 1
       network {
         mode = "bridge"
@@ -105,6 +120,11 @@ job "observability" {
           }
       }
       task "mimir-1"{
+        volume_mount {
+          volume      = "stack_observability_mimir_volume"
+          destination = "/data"
+        }
+
          driver = "docker"
          config {
          image = "{{registry_dns}}/grafana/mimir:{{version_grafana_mimir}}"
