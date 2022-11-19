@@ -32,7 +32,7 @@ uninstall_docker: false
 update_certificates: false
 
 version_nexus: "3.43.0"
-version_nexus_initlzr: "1.0.0.Alpha9"
+version_nexus_initlzr: "1.0.0.Alpha10"
 uninstall_nexus: false
 
 version_docker_compose: "2.11.1"

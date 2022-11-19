@@ -1,9 +1,10 @@
-# Test {{ '{{' }} env "NOMAD_HOST_PORT_grafana"  {{ '}}' }}
+# Test {{ '{{' }} env "NOMAD_TASK_NAME"  {{ '}}' }}
 # Do not use this configuration in production.
 # It is for demonstration purposes only.
 # Run Mimir in single process mode, with all components running in 1 process.
 target: all,alertmanager,overrides-exporter
 
+#bar: ++  env "NOMAD_TASK_NAME"  ++
 blocks_storage:
   backend: filesystem
   bucket_store:
@@ -44,3 +45,4 @@ server:
 store_gateway:
   sharding_ring:
     replication_factor: 1
+

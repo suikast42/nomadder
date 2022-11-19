@@ -905,7 +905,8 @@
         "https://ingress.{{tls_san}}/_oauth",
         "https://nomad.{{tls_san}}/_oauth",
         "https://consul.{{tls_san}}/_oauth",
-        "https://whoami.{{tls_san}}/_oauth"
+        "https://whoami.{{tls_san}}/_oauth",
+        "https://mimir.{{tls_san}}/_oauth"
       ],
       "webOrigins": [
         ""

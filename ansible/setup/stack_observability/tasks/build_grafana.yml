@@ -46,6 +46,11 @@
         src: grafana/grafana2.ini
         dest: "{{docker_build_dir_grafana}}/grafana2.ini"
 
+    - name: Copy content of directory 'files'
+      copy:
+        src: templates/grafana/provisioning/    # let / at the end for copy the content of the folder
+        dest: "{{docker_build_dir_grafana}}/provisioning"
+
     - name: Template dockerfile grafana
       template:
         force: yes
