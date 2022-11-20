@@ -9,7 +9,7 @@ curl  -s  -N \
 --cacert "${NOMAD_CACERT}" \
 --cert "${NOMAD_CLIENT_CERT}" \
 --key "${NOMAD_CLIENT_KEY}" \
-"${NOMAD_ADDR}/v1/metrics" | jq .
+"${NOMAD_ADDR}/v1/metrics" \| jq .
 ----
 
 |Nomd event stream API
@@ -19,7 +19,7 @@ curl  -s  -N \
 --cacert "${NOMAD_CACERT}" \
 --cert "${NOMAD_CLIENT_CERT}" \
 --key "${NOMAD_CLIENT_KEY}" \
-"${NOMAD_ADDR}/v1/event/stream" | jq .
+"${NOMAD_ADDR}/v1/event/stream" \| jq .
 ----
 
 
