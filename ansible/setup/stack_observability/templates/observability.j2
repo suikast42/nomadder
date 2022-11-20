@@ -352,6 +352,28 @@ job "observability" {
              timeout  = "2s"
            }
          }
+   service{
+       name ="tempo-zipkin"
+       port= "9411"
+       connect{
+         sidecar_service {}
+  	  }
+       tags = [
+           "traefik.enable=true",
+           "traefik.consulcatalog.connect=true",
+           "traefik.http.routers.tempo-zipkin.tls=true",
+           "traefik.http.routers.tempo-zipkin.rule=Host(`tempozipkin.{{tls_san}}`)",
+  #         "traefik.http.routers.tempo-zipkin.middlewares=traefik-forward-auth"
+         ]
+           check {
+             name  = "health"
+             type  = "http"
+             port ="tempo"
+             path="/ready"
+             interval = "10s"
+             timeout  = "2s"
+           }
+         }
 
       task "tempo"{
         volume_mount {
@@ -374,6 +396,7 @@ job "observability" {
         cpu    = 1000
         memory = 2048
       }
+
 
    artifact {
      source      = "https://nexus.{{tls_san}}/repository/raw/config/stack/observability/tempo.yaml"
