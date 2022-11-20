@@ -5,7 +5,21 @@
 |Metrics API
 a|[source,shell]
 ----
-https://nomad.cloud.private/v1/metrics
+curl  -s  -N \
+--cacert "${NOMAD_CACERT}" \
+--cert "${NOMAD_CLIENT_CERT}" \
+--key "${NOMAD_CLIENT_KEY}" \
+"${NOMAD_ADDR}/v1/metrics" | jq .
+----
+
+|Nomd event stream API
+a|[source,shell]
+----
+curl  -s  -N \
+--cacert "${NOMAD_CACERT}" \
+--cert "${NOMAD_CLIENT_CERT}" \
+--key "${NOMAD_CLIENT_KEY}" \
+"${NOMAD_ADDR}/v1/event/stream" | jq .
 ----
 
 

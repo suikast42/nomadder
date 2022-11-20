@@ -273,6 +273,8 @@ job "observability" {
       }
     }
   group "tempo"{
+
+
     volume "stack_observability_tempo_volume" {
       type      = "host"
       source    = "stack_observability_tempo_volume"
@@ -365,7 +367,7 @@ job "observability" {
            "-config.file","/config/tempo.yaml"
          ]
         volumes = [
-          "local/tempo.tpl:/config/tempo.yaml"
+          "local/tempo.yaml:/config/tempo.yaml"
         ]
          }
       resources {
