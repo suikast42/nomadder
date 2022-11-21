@@ -71,7 +71,9 @@ job "ingress" {
 
           #### set TLS
           "traefik.http.routers.traefik.tls=true",
+  {% if enable_oauth_middleware %}
           "traefik.http.routers.traefik.middlewares=traefik-forward-auth"
+  {% endif %}
         ]
         check {
           name     = "alive"
@@ -163,7 +165,9 @@ job "ingress" {
      entryPoints = ["https"]
      rule = "Host(`consul.{{tls_san}}`) "
      service = "consul"
+ {% if enable_oauth_middleware %}
      middlewares = ["traefik-forward-auth@consulcatalog"]
+ {% endif %}
        # will terminate the TLS request
  #     [http.routers.consul.tls]
       [[http.routers.consul.tls.domains]]
@@ -175,7 +179,9 @@ job "ingress" {
     entryPoints = ["https"]
     rule = "Host(`nomad.{{tls_san}}`) "
     service = "nomad"
-    middlewares = ["traefik-forward-auth@consulcatalog"]
+ {% if enable_oauth_middleware %}
+     middlewares = ["traefik-forward-auth@consulcatalog"]
+ {% endif %}
     [[http.routers.nomad.tls.domains]]
       #main = "{{tls_san}}"
       sans = ["nomad.{{tls_san}}"]
@@ -185,7 +191,9 @@ job "ingress" {
     entryPoints = ["https"]
     rule = "Host(`vault.{{tls_san}}`) "
     service = "vault"
-    middlewares = ["traefik-forward-auth@consulcatalog"]
+ {% if enable_oauth_middleware %}
+     middlewares = ["traefik-forward-auth@consulcatalog"]
+ {% endif %}
     [[http.routers.vault.tls.domains]]
       sans = ["vault.{{tls_san}}"]
 
@@ -263,6 +271,21 @@ job "ingress" {
   ca = "{{base_cert_dir}}/ca/cluster-ca.crt"
   cert = "{{base_cert_dir}}/ingress/nomad-ingress.pem"
   key = "{{base_cert_dir}}/ingress/nomad-ingress-key.pem"
+
+[tracing]
+  [tracing.zipkin]
+    httpEndpoint = "https://tempozipkin.{{tls_san}}/api/v2/spans"
+    sameSpan = true
+
+[metrics]
+  [metrics.prometheus]
+    buckets = [0.1,0.3,1.2,5.0,7.5,9.5,9.9]
+    addEntryPointsLabels = true
+    addRoutersLabels = true
+    addServicesLabels = true
+[accessLog]
+  filePath = "/logs/access.log"
+  format = "json"
 
 [log]
   level = "DEBUG"

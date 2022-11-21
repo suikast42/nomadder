@@ -72,3 +72,6 @@ consul_conf_dir: "/etc/consul.d"
 nomad_group: nomad
 nomad_user: nomad
 nomad_conf_dir: "/etc/nomad.d"
+
+# enables traefik middlware for oauth authentication
+enable_oauth_middleware: true
