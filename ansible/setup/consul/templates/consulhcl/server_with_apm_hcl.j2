@@ -93,50 +93,49 @@ config_entries {
       config {
         # configures all sidecar proxies to expose Prometheus metrics.
         envoy_prometheus_bind_addr = "0.0.0.0:9102"
-        envoy_extra_static_clusters_json = <<EOL
-          {
-            "connect_timeout": "3.000s",
-            "dns_lookup_family": "V4_ONLY",
-            "lb_policy": "ROUND_ROBIN",
-            "load_assignment": {
-                "cluster_name": "tempo-zipkin.service.consul",
-                "endpoints": [
-                    {
-                        "lb_endpoints": [
-                            {
-                                "endpoint": {
-                                    "address": {
-                                        "socket_address": {
-                                            "address": "tempozipkin.{{tls_san}}",
-                                            "port_value": 443,
-                                            "protocol": "TCP"
-                                        }
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                ]
-            },
-            "name": "zipkin",
-            "type": "STRICT_DNS"
-          }
-        EOL
-
         envoy_tracing_json = <<EOF
         {
           "http":{
             "name":"envoy.tracers.zipkin",
             "typedConfig":{
               "@type":"type.googleapis.com/envoy.config.trace.v3.ZipkinConfig",
-              "collector_cluster":"tempo-zipkin.service.consul",
-              "collector_hostname": "tempo-zipkin.service.consul"
+              "collector_cluster":"collector_cluster_name",
               "collector_endpoint_version":"HTTP_JSON",
               "collector_endpoint":"/api/v2/spans",
               "shared_span_context":true,
-              "trace_id_128bit": true
+               "trace_id_128bit": true
             }
           }
+        }
+        EOF
+
+        envoy_extra_static_clusters_json = <<EOF
+        {
+          "connect_timeout":"3.000s",
+          "dns_lookup_family":"V4_ONLY",
+          "lb_policy":"ROUND_ROBIN",
+          "load_assignment":{
+            "cluster_name":"collector_cluster_name",
+            "endpoints":[
+              {
+                "lb_endpoints":[
+                  {
+                    "endpoint":{
+                      "address":{
+                        "socket_address":{
+                           "address": "10.21.21.42",
+                           "port_value": 9411,
+                           "protocol":"TCP"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "name":"collector_cluster_name",
+          "type":"STRICT_DNS"
         }
         EOF
       }
