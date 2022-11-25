@@ -26,6 +26,29 @@ a|[source,shell]
 https://consul.cloud.private/v1/agent/host
 ----
 
+|Write consul connect service default
+a|[source,shell]
+----
+Create file  service.json
+{
+    "Kind": "service-defaults",
+    "Name": "count-dashboard",
+    "Protocol": "http"
+}
+consul config write service.json
+----
+
+|List services
+a|[source,shell]
+----
+consul catalog services
+----
+
+|Service details
+a|[source,shell]
+----
+consul watch -type  service -service <service name>
+----
 
 |===
 

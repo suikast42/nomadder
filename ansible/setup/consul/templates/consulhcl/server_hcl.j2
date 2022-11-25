@@ -32,11 +32,13 @@ ui_config{
 }
 addresses {
     grpc = "127.0.0.1"
+  #  grpc_tls = "127.0.0.1"
 }
 ports {
     http = -1
     https = 8501
     grpc = 8502
+  #  grpc_tls = 8503
 }
 connect {
      enabled = true
@@ -77,23 +79,4 @@ tls{
 telemetry {
   disable_hostname = true
   prometheus_retention_time = "72h"
-}
-
-# Global configuration
-enable_central_service_config = true
-
-# Consul service mesh configuration
-config_entries {
-  bootstrap = [
-    {
-      kind = "proxy-defaults"
-      name = "global"
-      #https://developer.hashicorp.com/consul/docs/connect/distributed-tracing
-      #https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/trace/v3/zipkin.proto
-      config {
-        # configures all sidecar proxies to expose Prometheus metrics.
-        envoy_prometheus_bind_addr = "0.0.0.0:9102"
-      }
-    }
-  ]
 }

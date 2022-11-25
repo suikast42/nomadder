@@ -6,6 +6,7 @@ After=network-online.target
 ConditionFileNotEmpty=/etc/consul.d/client.hcl
 
 [Service]
+#-/ is not an error set the env file a optional
 EnvironmentFile=-/etc/consul.d/consul.env
 User={{consul_user}}
 Group={{consul_group}}

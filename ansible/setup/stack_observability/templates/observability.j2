@@ -296,6 +296,7 @@ job "observability" {
           to = 4318
         }
         port "zipkin" {
+          static= 9411
           to = 9411
         }
       }
@@ -355,13 +356,10 @@ job "observability" {
    service{
        name ="tempo-zipkin"
        port= "9411"
-       connect{
-         sidecar_service {}
-  	  }
        tags = [
            "traefik.enable=true",
-           "traefik.consulcatalog.connect=true",
-           "traefik.http.routers.tempo-zipkin.tls=true",
+           "traefik.consulcatalog.connect=false",
+           "traefik.http.routers.tempo-zipkin.tls=false",
            "traefik.http.routers.tempo-zipkin.rule=Host(`tempozipkin.{{tls_san}}`)",
   #         "traefik.http.routers.tempo-zipkin.middlewares=traefik-forward-auth"
          ]

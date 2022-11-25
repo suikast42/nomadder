@@ -274,7 +274,8 @@ job "ingress" {
 
 [tracing]
   [tracing.zipkin]
-    httpEndpoint = "https://tempozipkin.{{tls_san}}/api/v2/spans"
+    #httpEndpoint = "http://tempo-zipkin.service.consul/api/v2/spans"
+    httpEndpoint = "http://10.21.21.42:9411/api/v2/spans"
     sameSpan = true
 
 [metrics]
@@ -286,6 +287,19 @@ job "ingress" {
 [accessLog]
   filePath = "/logs/access.log"
   format = "json"
+
+[experimental.plugins.traefik-add-trace-id]
+  moduleName = "github.com/trinnylondon/traefik-add-trace-id"
+  version = "v0.1.5"
+
+[http]
+  [http.middlewares]
+    [http.middlewares.my-traefik-add-trace-id]
+      [http.middlewares.my-traefik-add-trace-id.plugin]
+        [http.middlewares.my-traefik-add-trace-id.plugin.traefik-add-trace-id]
+          headerName = "X-Trace-Id"
+          headerPrefix = ""
+          verbose = "true"
 
 [log]
   level = "DEBUG"

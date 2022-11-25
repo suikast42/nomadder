@@ -3,30 +3,30 @@ vault_checksum: "sha256:aa2ed532d9a0ecc8635fed63cb3fb6de472b4c01ca622a9a199cd92a
 uninstall_vault: false
 
 
-#consul_version: "1.14.0"
-#consul_checksum: "sha256:6907e0dc83a05acaa9de60217e44ce55bd05c98152dcef02f9258bd2a474f2b3"
+#consul_version: "1.14.1"
+#consul_checksum: "sha256:e544964cf4df3fc18f58bb875bdbad4c7a6ff746ab7f7f6b0d7a0d469893490d"
 consul_version: "1.13.3"
 consul_checksum: "sha256:5370b0b5bf765530e28cb80f90dcb47bd7d6ba78176c1ab2430f56e460ed279c"
 uninstall_consul: false
 
 
-consul_template_version: "0.29.4"
-consul_template_checksum: "sha256:7e27ad0a0642fe869097d5c516304889f51e5e52f53f5b5d8d2d0a601feef8d5"
+consul_template_version: "0.29.5"
+consul_template_checksum: "sha256:24aa8c67a2ac95c03524d62dd0e1815359e8c9689324b48e9c75ed2b6e25a5c8"
 update_consul_template: false
 uninstall_consul_template: false
 
-nomad_version: "1.4.2"
-nomad_checksum: "sha256:6e24efd6dfba0ba2df31347753f615cae4d3632090e68fc90933e51e640f7afc"
+nomad_version: "1.4.3"
+nomad_checksum: "sha256:15ab8fd2da071d93852f59b9a8833e3a764986ef8140c6b11f87621391e63902"
 uninstall_nomad: false
 
 nomad_plugin_cni_version: "1.1.1"
 nomad_plugin_cni_checksum: "sha256:b275772da4026d2161bf8a8b41ed4786754c8a93ebfb6564006d5da7f23831e5"
 uninstall_nomad_plugin_cni: false
 
-version_cfssl: 1.6.1
+version_cfssl: 1.6.3
 update_cfssl: false
 
-docker_version: "20.10.17"
+docker_version: "20.10.21"
 uninstall_docker: false
 
 update_certificates: false
@@ -35,7 +35,7 @@ version_nexus: "3.43.0"
 version_nexus_initlzr: "1.0.0.Alpha10"
 uninstall_nexus: false
 
-version_docker_compose: "2.11.1"
+version_docker_compose: "2.12.2"
 uninstall_compose: false
 
 version_busy_box_init_container: "1.28"

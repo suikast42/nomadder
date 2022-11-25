@@ -50,6 +50,9 @@ job "countdash_app_mesh" {
       connect {
         sidecar_service {
           proxy {
+#            config {
+#              protocol = "http"
+#            }
             upstreams {
               destination_name = "count-api"
               local_bind_port  = 8080
