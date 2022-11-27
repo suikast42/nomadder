@@ -1,0 +1,148 @@
+- name: "Create user {{grafana_agent_user}}"
+  include_tasks: common/tasks/user.yml
+  vars:
+    create_user: "{{grafana_agent_user}}"
+    create_group: "{{grafana_agent_group}}"
+    create_usr_conf_dir: "{{grafana_agent_config_dir}}"
+
+- name: Grafana agent uninstall
+  become: true
+  when: uninstall_grafana_agent|bool == true
+  block:
+    - name: stop grafana agent service
+      failed_when: false
+      service:
+        name: grafana.agent
+        state: stopped
+        enabled: false
+
+    - name: "Delete grafana agent installation"
+      ansible.builtin.file:
+        path: /usr/local/bin/grafana-agent
+        state: absent
+        mode: '0755'
+
+    - name: "Delete grafana agent installation"
+      ansible.builtin.file:
+        path: /usr/local/bin/grafana-agentctl
+        state: absent
+        mode: '0755'
+
+    - name: "Delete grafana agent conf dir {{grafana_agent_config_dir}}"
+      ansible.builtin.file:
+        path: "{{grafana_agent_config_dir}}"
+        state: absent
+        mode: '0755'
+
+- name : Check grafana agent installation present
+  stat:
+    path: /usr/local/bin/grafana-agent
+  register: agnetinstalled
+
+
+
+- name: "Install grafana agent"
+  become: true
+  when: not agnetinstalled.stat.exists
+  block:
+
+
+  - name: "Create agent conf dir  {{grafana_agent_config_dir}} if needed"
+    become: true
+    ansible.builtin.file:
+      path: "{{grafana_agent_config_dir}}"
+      state: directory
+
+  - name: "Create tmp install dir for grafana agent {{tmp_install_dir_base}} if needed"
+    become: true
+    ansible.builtin.file:
+      path: "{{tmp_install_dir_base}}"
+      state: directory
+
+
+  - name: "Download grafana agent v {{version_grafana_agent}}"
+    delay: 0
+    async: 300
+    poll: 1
+    get_url:
+      url: https://github.com/grafana/agent/releases/download/v{{version_grafana_agent}}/agent-linux-amd64.zip
+      dest: "{{tmp_install_dir_base}}/agent-linux-amd64.zip"
+    register: agent_download
+
+  - name:  "Download grafana agent ctl v {{version_grafana_agent}}"
+    delay: 0
+    async: 300
+    poll: 1
+    get_url:
+      url: https://github.com/grafana/agent/releases/download/v{{version_grafana_agent}}/agentctl-linux-amd64.zip
+      dest: "{{tmp_install_dir_base}}/agentctl-linux-amd64.zip"
+    register: agentctl_download
+
+  - name: "Unzip grafana agent"
+    unarchive:
+      src: "{{agent_download.dest}}"
+      dest: "{{tmp_install_dir_base}}"
+      copy: no
+
+  - name: "Unzip grafana agent ctl"
+    unarchive:
+      src: "{{agentctl_download.dest}}"
+      dest: "{{tmp_install_dir_base}}"
+      copy: no
+
+  - name: "Unzip grafana agent"
+    shell: |
+        chmod {{ansible_ssh_user}}:{{ansible_ssh_user}} *
+        mv agent-linux-amd64 /usr/local/bin/grafana-agent
+        mv agentctl-linux-amd64 /usr/local/bin/grafana-agentctl
+    args:
+      chdir: "{{tmp_install_dir_base}}"
+
+
+#  always:
+#    - name : Finally
+#      block:
+#        - name: "Delete {{tmp_install_dir_base}} "
+#          file:
+#            path: "{{tmp_install_dir_base}}"
+#            state: absent
+
+- name: Grafana agent config
+  become: true
+  block:
+
+    - name: Template grafana.agent.service
+      template:
+        force: yes
+        src: service/grafana.agent.service.j2
+        dest: /etc/systemd/system/grafana.agent.service
+      register: systemdconfig
+
+    - name: Template grafana agent config
+      template:
+        force: yes
+        src: config/agent-config.yaml
+        dest: "{{grafana_agent_config_dir}}/agent-config.yaml"
+      register: serviceconfig
+
+    - name: stop grafana agent service
+      when: systemdconfig.changed or serviceconfig.changed
+      failed_when: false
+      service:
+        name: grafana.agent
+        state: stopped
+
+    - name: Reload systemd
+      when: systemdconfig.changed
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: start grafana agent service
+      service:
+        name: grafana.agent
+        state: started
+        enabled: yes
+      register: agentservice
+      until: agentservice.status.ActiveState == "active"
+      retries: 10
+      delay: 5

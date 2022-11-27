@@ -1,0 +1,14 @@
+- name: Deploy core stack
+  block:
+    - name: "Install grafana agent v {{version_grafana_agent}}"
+      import_tasks: install_grafana_agent.yml
+
+
+
+  vars:
+    - tmp_install_dir_base: "/tmp/grafana_agent"
+    - version_grafana_agent: "0.29.0"
+    - uninstall_grafana_agent: false
+    - grafana_agent_group: grafana_agent
+    - grafana_agent_user: grafana_agent
+    - grafana_agent_config_dir: "/etc/grafana.agent.d"
