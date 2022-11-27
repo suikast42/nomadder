@@ -12,3 +12,5 @@ metrics:
             - targets: ["127.0.0.1:12345"]
       remote_write:
         - url: http://mimir.service.consul:9009/api/v1/push
+          headers:
+            X-Scope-OrgID: 1

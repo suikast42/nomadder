@@ -6,7 +6,7 @@ datasources:
     uid: mimir
     access: proxy
     orgId: 1
-    url: http://localhost:8000/prometheus
+    url: http://mimir.service.consul:9009/prometheus
     version: 1
     editable: true
     jsonData:
@@ -29,7 +29,7 @@ datasources:
     type: alertmanager
     access: proxy
     orgId: 1
-    url: http://localhost:8000/alertmanager
+    url: http://mimir.service.consul:9009/alertmanager
     version: 1
     editable: true
     jsonData:
@@ -42,7 +42,7 @@ datasources:
     type: loki
     access: proxy
     orgId: 1
-    url: http://localhost:8001
+    url: http://loki.service.consul:3100
     version: 1
     editable: true
     jsonData:
@@ -54,7 +54,7 @@ datasources:
     type: tempo
     uid: tempo
     orgId: 1
-    url: http://localhost:8002
+    url: http://tempo.service.consul:3200
     version: 1
     # Access mode - proxy (server in the UI) or direct (browser in the UI).
     access: proxy

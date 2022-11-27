@@ -26,18 +26,6 @@ job "observability" {
                 config {
                    protocol = "http"
                 }
-                upstreams {
-                  destination_name = "mimir"
-                  local_bind_port  = 8000
-                }
-               upstreams {
-                 destination_name = "loki"
-                 local_bind_port  = 8001
-                }
-               upstreams {
-                 destination_name = "tempo-http"
-                 local_bind_port  = 8002
-               }
             }
           }
         }
@@ -103,6 +91,7 @@ job "observability" {
       network {
         mode = "bridge"
         port "api" {
+          static= 9009
           to = 9009
         }
       }
@@ -110,10 +99,7 @@ job "observability" {
 
     service{
       name ="mimir"
-      port= "9009"
-      connect{
-       sidecar_service {}
-      }
+      port= "api"
       check {
         name  = "health"
         type  = "http"
@@ -185,30 +171,22 @@ job "observability" {
     network {
       mode = "bridge"
       port "http" {
+        static = 3100
         to = 3100
       }
       port "cli" {
+        static = 7946
         to = 7946
       }
       port "grpc" {
+        static = 9005
         to = 9095
       }
     }
 
  service {
    name ="loki"
-   port= "3100"
-   connect {
-     sidecar_service {
-     proxy {
-        upstreams {
-           # For sending traces to tempo
-           destination_name = "tempo-jaeger"
-           local_bind_port  = 8002
-           }
-        }
-     }
-   }
+   port= "http"
    check {
      name  = "health"
      type  = "http"
@@ -278,6 +256,7 @@ job "observability" {
           to = 14268
         }
         port "tempo" {
+          static =  3200
           to = 3200
         }
         port "otlp_grpc" {
@@ -294,11 +273,8 @@ job "observability" {
         }
       }
     service{
-      name ="tempo-http"
-      port= "3200"
-      connect {
-           sidecar_service {}
-      }
+      name ="tempo"
+      port= "tempo"
       check {
         name  = "health"
         type  = "http"
