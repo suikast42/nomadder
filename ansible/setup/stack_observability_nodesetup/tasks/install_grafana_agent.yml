@@ -22,6 +22,12 @@
         state: absent
         mode: '0755'
 
+    - name: "Delete grafana agent  working dir"
+      ansible.builtin.file:
+        path: "{{grafana_agent_working_dir}}"
+        state: absent
+        mode: '0755'
+
     - name: "Delete grafana agent installation"
       ansible.builtin.file:
         path: /usr/local/bin/grafana-agentctl
@@ -46,6 +52,15 @@
   when: not agnetinstalled.stat.exists
   block:
 
+
+  - name: "Create agent working conf dir  {{grafana_agent_working_dir}} if needed"
+    become: true
+    ansible.builtin.file:
+      path: "{{grafana_agent_working_dir}}"
+      state: directory
+      owner: "{{grafana_agent_user}}"
+      group: "{{grafana_agent_group}}"
+      mode: '0755'
 
   - name: "Create agent conf dir  {{grafana_agent_config_dir}} if needed"
     become: true

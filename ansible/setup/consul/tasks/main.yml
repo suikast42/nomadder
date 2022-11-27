@@ -38,7 +38,7 @@
     consul_initial_agent_token: "e95b599e-166e-7d80-08ad-aee76e7ddf19"
     consul_encrypt_key: "G1CHAD7wwu0tU28BlKkirSahTJ/Tqpo9ClOAycQAUwE="
     secint_build_dir: "/etc/ssl/private/secint"
-    consul_data_dir: "{{systemd_install_dir}}/consul/data"
+    consul_data_dir: "{{service_working_dir_base}}/core/consul/data"
     consul_client_jwt_dir: "{{consul_data_dir}}/tokens/jwt"
     consul_client_jwt_file: "{{consul_client_jwt_dir}}/{{host_name}}.jwt"
     consul_cert_path: "{{base_cert_dir}}/consul"

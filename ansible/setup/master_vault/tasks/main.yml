@@ -19,7 +19,7 @@
   - name: Set local cert files
     set_fact:
       # Persistence path on vaults' host
-      vault_data_dir: "{{systemd_install_dir}}/vault/data"
+      vault_data_dir: "{{service_working_dir_base}}/core/vault/data"
       vault_cert: "{{vault_cert_path}}/vault.pem"
       vault_cert_key: "{{vault_cert_path}}/vault-key.pem"
       cacheable: true

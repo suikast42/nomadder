@@ -5,7 +5,11 @@ Description=Grafana Agent
 User={{grafana_agent_user}}
 Group={{grafana_agent_group}}
 ExecStart=/usr/local/bin/grafana-agent -config.file={{grafana_agent_config_dir}}/agent-config.yaml
-Restart=always
+ExecReload=/bin/kill --signal HUP $MAINPID
+KillMode=process
+KillSignal=SIGTERM
+Restart=on-failure
+LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target

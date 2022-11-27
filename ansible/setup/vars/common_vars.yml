@@ -54,7 +54,7 @@ local_cert_gen_path: "{{local_ca_copy_path}}/{{host_name}}"
 local_ca_cert_conf: "{{role_path}}/../certificates_generate/files/cfssl/config.json"
 local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"
 local_cluster_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/cluster-ca"
-systemd_install_dir:  /opt/services/core
+service_working_dir_base:  /opt/services
 master_0_job_dir:  /opt/nomadjobs
 nomad_volumes_dir:  /opt/nomadvolumes
 base_cert_dir: /etc/opt/certs

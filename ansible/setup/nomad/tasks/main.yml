@@ -39,7 +39,7 @@
     nomad_cert: "{{nomad_cert_path}}/nomad.pem"
     nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"
     nomad_cli_cert: "{{nomad_cert_path}}/nomad-cli.pem"
-    nomad_data_dir: "{{systemd_install_dir}}/nomad/data"
+    nomad_data_dir: "{{service_working_dir_base}}/core/nomad/data"
     nomad_dns: "nomad.{{tls_san}}"
     nomad_encrypt_key: "4PRfoE6Mj9dHTLpnzmYD1+THdlyAo2Ji4U6ewMumpAw="
     nomad_infra_image: "{{registry_dns}}/google_containers/pause-amd64:3.1"

@@ -12,3 +12,4 @@
     - grafana_agent_group: grafana_agent
     - grafana_agent_user: grafana_agent
     - grafana_agent_config_dir: "/etc/grafana.agent.d"
+    - grafana_agent_working_dir: "{{service_working_dir_base}}/observability/grafana_agent"
