@@ -74,4 +74,4 @@ nomad_user: nomad
 nomad_conf_dir: "/etc/nomad.d"
 
 # enables traefik middlware for oauth authentication
-enable_oauth_middleware: false
+enable_oauth_middleware: true

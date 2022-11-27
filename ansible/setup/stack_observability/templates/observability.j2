@@ -284,19 +284,22 @@ job "observability" {
       network {
         mode = "bridge"
         port "jaeger" {
+          static =  14268
           to = 14268
         }
         port "tempo" {
           to = 3200
         }
         port "otlp_grpc" {
+          static =  4317
           to = 4317
         }
         port "otlp_http" {
+          static =  4318
           to = 4318
         }
         port "zipkin" {
-          static= 9411
+          static =  9411
           to = 9411
         }
       }
@@ -322,57 +325,46 @@ job "observability" {
             timeout  = "2s"
           }
       }
-   service{
-       name ="tempo-jaeger"
-       port= "14268"
-       connect{
-         sidecar_service {
- 		proxy {
-           upstreams {
-              # Sending metrics to mimir
-              # See metrics_generator: in tempo.yaml
-              destination_name = "mimir"
-              local_bind_port  = 8000
-             }
-           }
- 		 }
-  	  }
-       tags = [
-           "traefik.enable=true",
-           "traefik.consulcatalog.connect=true",
-           "traefik.http.routers.tempo-jaeger.tls=true",
-           "traefik.http.routers.tempo-jaeger.rule=Host(`tempojaeger.{{tls_san}}`)",
-  #         "traefik.http.routers.tempo-jaeger.middlewares=traefik-forward-auth"
-         ]
-           check {
-             name  = "health"
-             type  = "http"
-             port ="tempo"
-             path="/ready"
-             interval = "10s"
-             timeout  = "2s"
-           }
-         }
-   service{
+    service{
        name ="tempo-zipkin"
-       port= "9411"
-       tags = [
-           "traefik.enable=true",
-           "traefik.consulcatalog.connect=false",
-           "traefik.http.routers.tempo-zipkin.tls=false",
-           "traefik.http.routers.tempo-zipkin.rule=Host(`tempozipkin.{{tls_san}}`)",
-  #         "traefik.http.routers.tempo-zipkin.middlewares=traefik-forward-auth"
-         ]
-           check {
-             name  = "health"
-             type  = "http"
-             port ="tempo"
-             path="/ready"
-             interval = "10s"
-             timeout  = "2s"
-           }
+       port= "zipkin"
+       check {
+         name     = "tempo_zipkin_check"
+         type     = "tcp"
+         interval = "10s"
+         timeout  = "1s"
+        }
+       }
+     service{
+        name ="tempo-jaeger"
+        port= "jaeger"
+        check {
+          name     = "tempo_jagger_check"
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "1s"
          }
-
+      }
+     service{
+        name ="tempo-otlp-grpc"
+        port= "otlp_grpc"
+        check {
+          name     = "tempo_otlp_grpc_check"
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "1s"
+         }
+      }
+     service{
+        name ="tempo-otlp-http"
+        port= "otlp_http"
+        check {
+          name     = "tempo_otlp_http_check"
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "1s"
+         }
+      }
       task "tempo"{
         volume_mount {
           volume      = "stack_observability_tempo_volume"

@@ -27,6 +27,17 @@ variable "image" {
 job "ingress" {
   datacenters = [var.datacenter]
   type        = "system"
+  # only one Traefik instance will be restarted at a time, with 1 minute delay between each such action
+  # and automatic rollback to the previous version if the new one doesn't pass the health check
+  update {
+    max_parallel = 1
+    stagger      = "1m"
+    auto_revert  = true
+  }
+  # Nomad will wait for 30s after sending the kill signal to the task before forcefully shutting it down
+  # by default it's 10s ( not enough to properly drain connections )
+  # and the maximum is limited by the max_kill_timeout setting on the Nomad client ( default 30s)
+
 
   group "traefik" {
     volume "cert_ingress" {
@@ -47,14 +58,12 @@ job "ingress" {
       port "https" {
         static = var.ingress_https
       }
-      port "ui" {
-        static = 8081
-      }
     }
 
 
     task "traefik" {
       driver = "docker"
+      kill_timeout = "30s"
       service {
         name = "traefik"
         tags = [
@@ -99,8 +108,11 @@ job "ingress" {
           "local/traefik.toml:/etc/traefik/traefik.toml",
           "local/certconfig.toml:/etc/traefik/certconfig.toml"
         ]
+        ports = ["http", "https"]
       }
             template {
+              right_delimiter = "++"
+              left_delimiter = "++"
               data = <<EOF
 [http.serversTransports]
 [http.serversTransports.default]
@@ -226,6 +238,8 @@ job "ingress" {
               destination = "local/certconfig.toml"
             }
       template {
+        right_delimiter = "++"
+        left_delimiter = "++"
         data = <<EOF
 [entryPoints]
     [entryPoints.http]
@@ -237,13 +251,6 @@ job "ingress" {
     [entryPoints.https]
     address = ":443"
 
-    [entryPoints.traefik]
-    address = ":8081"
-# TCP / UDP over one port
-#  [entryPoints.tcpep]
-#    address = ":3179"
-#  [entryPoints.udpep]
-#    address = ":3179/udp"
 [api]
     dashboard = true
     insecure  = true
@@ -261,6 +268,8 @@ job "ingress" {
     connectAware = true
     connectByDefault = false
     watch = true
+    # applied if no traefik.http.routers.{name-of-your-choice}.rule  tag found
+    defaultRule = "Host(`{{'{{'}} .Name {{'}}'}}.{{tls_san}}`)"
 
   [providers.consulCatalog.endpoint]
       address = "127.0.0.1:8501"
@@ -274,9 +283,10 @@ job "ingress" {
 
 [tracing]
   [tracing.zipkin]
-    #httpEndpoint = "http://tempo-zipkin.service.consul/api/v2/spans"
-    httpEndpoint = "http://10.21.21.42:9411/api/v2/spans"
+    httpEndpoint = "http://tempo-zipkin.service.consul:9411/api/v2/spans"
+    #httpEndpoint = "http://10.21.21.42:9411/api/v2/spans"
     sameSpan = true
+    id128Bit = true
 
 [metrics]
   [metrics.prometheus]

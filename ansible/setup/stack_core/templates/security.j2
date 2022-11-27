@@ -101,7 +101,7 @@ job "security" {
         "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders= X-Forwarded-User",
         "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeadersRegex= ^X-",
         "traefik.http.middlewares.traefik-forward-auth.forwardauth.trustForwardHeader=true",
-        "traefik.http.middlewares.test-auth.forwardauth.tls.insecureSkipVerify=true"
+      #  "traefik.http.middlewares.test-auth.forwardauth.tls.insecureSkipVerify=true"
       ]
 
 

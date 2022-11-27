@@ -36,7 +36,7 @@
     - docker_build_dir: "/tmp/dockerbuild"
     - nomad_cli_cert: "{{base_cert_dir}}/nomad/nomad-cli.pem"
     - nomad_cli_cert_key: "{{base_cert_dir}}/nomad/nomad-cli-key.pem"
-    - version_traefik: "2.9.4"
+    - version_traefik: "2.9.5"
     - version_keycloak: "20.0.1"
     - version_keycloak_nomadder: "{{version_keycloak}}.3"
     - version_mesosphere: "3.1.0"

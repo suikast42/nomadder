@@ -21,6 +21,8 @@ endif::imagesdir[]
 * [[_900_link_hasicrop_stack_install,HashiCrop stack install alternatives]]https://discuss.hashicorp.com/t/nomad-cluster-for-smart-home/33833[HashiCrop stack install alternatives]
 * [[_900_link_hasicrop_stack_install_es,HashiCrop stack install elasticsearch]]https://itnext.io/elasticsearch-on-nomad-ae685b762779[HashiCrop stack install elasticsearch]
 * [[_900_link_LGTM_Stack_docker_compose_exmaple,LGTM stack docker compose example]]https://github.com/grafana/agent/blob/main/example/docker-compose/docker-compose.yaml[LGTM stack docker compose example]
+* [[_900_link_Consul_Troubleshooting,Consul Trouble Shooting]]https://developer.hashicorp.com/consul/tutorials/datacenter-operations/troubleshooting[Consul Trouble Shooting]
+* [[_900_link_Consul_Template,Consul Template]]https://github.com/hashicorp/consul-template/blob/main/docs/templating-language.md#service[Consul Template]
 
 
 

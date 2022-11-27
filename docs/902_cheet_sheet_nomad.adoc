@@ -12,7 +12,7 @@ curl  -s  -N \
 "${NOMAD_ADDR}/v1/metrics" \| jq .
 ----
 
-|Nomd event stream API
+|Nomad event stream API
 a|[source,shell]
 ----
 curl  -s  -N \
@@ -21,6 +21,16 @@ curl  -s  -N \
 --key "${NOMAD_CLIENT_KEY}" \
 "${NOMAD_ADDR}/v1/event/stream" \| jq .
 ----
+
+|Consul service address in Templates
+a|[source,shell]
+----
+# !! When service changes then the templates will be re rendered
+{{ range service "<consul service name>" }}
+  {{ .Address }}:{{ .Port }}
+ {{ end }}
+----
+
 
 
 |===
