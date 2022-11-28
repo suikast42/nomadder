@@ -15,7 +15,7 @@ ui_config{
    }
    metrics_provider = "prometheus"
    metrics_proxy {
-     base_url = "https://mimir.{{tls_san}}/prometheus"
+     base_url = "http://mimir.service.consul:9009/prometheus"
 
      add_headers = [
  #      {
