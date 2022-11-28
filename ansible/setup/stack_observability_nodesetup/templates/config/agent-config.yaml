@@ -45,8 +45,8 @@ traces:
     - name: default
       remote_write:
         - endpoint: http://tempo-otlp-grpc.service.consul:4317
-          headers:
-            X-Scope-OrgID: 1
+#          headers:
+#            X-Scope-OrgID: 1
           insecure: true
       receivers:
         jaeger:
@@ -65,6 +65,11 @@ integrations:
 
   node_exporter:
     enabled: true
+    relabel_configs:
+      - action: replace
+        source_labels:
+          - agent_hostname
+        target_label: instance
 
 #  cadvisor:
 #    enabled: true
