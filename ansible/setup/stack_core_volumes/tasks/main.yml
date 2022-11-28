@@ -7,7 +7,18 @@
     loop:
       - { name: 'security_postgres_volume' , path: '{{postgres_volume}}'}
 
-
+  - name: restart nomad if needed
+    become: true
+    # fact comes from task nomad/tasks/nomad_volumes.yml
+    when: volume_changed | bool == true
+    service:
+      name: nomad
+      state: restarted
+    register: nomadService
+    until: nomadService.status.ActiveState == "active"
+    async: 300
+    retries: 10
+    delay: 5
 
   vars:
     postgres_volume: "{{nomad_volumes_dir}}/core/postgres"

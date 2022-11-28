@@ -10,9 +10,23 @@
       - { name: 'stack_observability_loki_volume' , path: '{{stack_observability_loki_volume}}'}
       - { name: 'stack_observability_tempo_volume' , path: '{{stack_observability_tempo_volume}}'}
 
+  - name: restart nomad if needed
+    become: true
+    # fact comes from task nomad/tasks/nomad_volumes.yml
+    when: volume_changed | bool == true
+    service:
+      name: nomad
+      state: restarted
+    register: nomadService
+    until: nomadService.status.ActiveState == "active"
+    async: 300
+    retries: 10
+    delay: 5
+
   vars:
-    stack_observability_grafana_volume: "{{nomad_volumes_dir}}/observability/grafana"
-    stack_observability_mimir_volume: "{{nomad_volumes_dir}}/observability/mimir"
-    stack_observability_loki_volume: "{{nomad_volumes_dir}}/observability/loki"
-    stack_observability_tempo_volume: "{{nomad_volumes_dir}}/observability/tempo"
+    stack_observability_volume: "{{nomad_volumes_dir}}/observability"
+    stack_observability_grafana_volume: "{{stack_observability_volume}}/grafana"
+    stack_observability_mimir_volume: "{{stack_observability_volume}}/mimir"
+    stack_observability_loki_volume: "{{stack_observability_volume}}/loki"
+    stack_observability_tempo_volume: "{{stack_observability_volume}}/tempo"
 
