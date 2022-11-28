@@ -1,0 +1,17 @@
+.Mimir Rest
+|===
+|Description |Command
+
+
+|Curl label values
+a|[source,shell]
+----
+curl -H "X-Scope-OrgID:1" http://mimir.service.consul:9009/prometheus/api/v1/label/agent_hostname/values
+----
+
+
+
+
+
+
+

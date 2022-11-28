@@ -3,7 +3,7 @@
 # It is for demonstration purposes only.
 # Run Mimir in single process mode, with all components running in 1 process.
 target: all,alertmanager,overrides-exporter
-
+multitenancy_enabled: false
 #bar: ++  env "NOMAD_TASK_NAME"  ++
 blocks_storage:
   backend: filesystem
@@ -45,4 +45,7 @@ server:
 store_gateway:
   sharding_ring:
     replication_factor: 1
+
+limits:
+  max_label_names_per_series: 42
 

@@ -22,11 +22,11 @@ job "observability" {
           port = "3000"
           connect {
             sidecar_service {
-              proxy {
-                config {
-                   protocol = "http"
-                }
-            }
+#              proxy {
+#                config {
+#                   protocol = "http"
+#                }
+#            }
           }
         }
         tags = [

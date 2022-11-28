@@ -2,8 +2,10 @@
 Description=Grafana Agent
 
 [Service]
-User={{grafana_agent_user}}
-Group={{grafana_agent_group}}
+#User={{grafana_agent_user}}
+#Group={{grafana_agent_group}}
+User= root
+Group= root
 ExecStart=/usr/local/bin/grafana-agent -config.file={{grafana_agent_config_dir}}/agent-config.yaml
 ExecReload=/bin/kill --signal HUP $MAINPID
 KillMode=process

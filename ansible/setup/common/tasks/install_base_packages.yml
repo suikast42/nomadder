@@ -38,6 +38,7 @@
       - open-iscsi
       - nfs-common
       - python3-docker
+      - cadvisor
 
     state: present
   register: install_apt
