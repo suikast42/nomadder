@@ -9,6 +9,14 @@ metrics:
       - url: http://mimir.service.consul:9009/api/v1/push
 #        headers:
 #          X-Scope-OrgID: 1
+# example how to realize node exporter with local scraping from local gent
+# But the node exporter have more convenient options
+#  configs:
+#    - name: default
+#      scrape_configs:
+#        - job_name: node
+#          static_configs:
+#            - targets: [ 'localhost:12345' ]
 
 
 #logs:
@@ -56,6 +64,7 @@ traces:
 
 integrations:
   agent:
+    # Enables the Agent integration, allowing the Agent to automatically
     enabled: true
     relabel_configs:
       - action: replace

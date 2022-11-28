@@ -46,13 +46,14 @@
         src: grafana/grafana2.ini
         dest: "{{docker_build_dir_grafana}}/grafana2.ini"
 
-    - name: Template grafana provisioning
+    - name: Template grafana provisioning datasources
       template:
         src: "{{ item.src }}"
-        dest: "{{docker_build_dir_grafana}}/provisioning/" # The ending slash is very important here. Indicates a folder
+        dest: "{{docker_build_dir_grafana}}/provisioning/datasources" # The ending slash is very important here. Indicates a folder
         force: yes
-      with_filetree: templates/grafana/provisioning
+      with_filetree: templates/grafana/provisioning/datasources
       when: item.state == 'file'
+
 #
 #    - name: Copy content of directory 'files'
 #      copy:
