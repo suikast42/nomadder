@@ -251,6 +251,13 @@ job "ingress" {
     [entryPoints.https]
     address = ":443"
 
+    [entryPoints.traefik]
+    address = ":8081"
+# TCP / UDP over one port
+#  [entryPoints.tcpep]
+#    address = ":3179"
+#  [entryPoints.udpep]
+#    address = ":3179/udp"
 [api]
     dashboard = true
     insecure  = true
