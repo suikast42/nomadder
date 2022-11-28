@@ -80,6 +80,18 @@ integrations:
           - agent_hostname
         target_label: instance
 
+  consul_exporter:
+    enabled: true
+    scrape_interval: 5s
+    server: https://localhost:8501
+    ca_file: "{{cluster_intermediate_ca_bundle}}"
+    cert_file: "{{consul_cert}}"
+    key_file: "{{consul_cert_key}}"
+    relabel_configs:
+      - action: replace
+        source_labels:
+          - agent_hostname
+        target_label: instance
 #  cadvisor:
 #    enabled: true
 #    docker_only: true
