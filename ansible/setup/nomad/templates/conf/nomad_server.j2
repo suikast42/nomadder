@@ -3,11 +3,18 @@ name = "{{host_name}}"
 datacenter = "{{data_center}}"
 data_dir =  "{{nomad_data_dir}}"
 
-
 server {
   enabled = true
   bootstrap_expect =  {{masters|length}}
   encrypt = "{{nomad_encrypt_key}}"
+}
+
+bind_addr = "0.0.0.0" # the default
+advertise {
+  # Defaults to the first private IP address.
+  http = "{{host_ip}}"
+  rpc  = "{{host_ip}}"
+  serf = "{{host_ip}}"
 }
 
 tls {

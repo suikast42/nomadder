@@ -16,4 +16,7 @@
     - consul_cert_path: "{{base_cert_dir}}/consul"
     - consul_cert: "{{consul_cert_path}}/consul.pem"
     - consul_cert_key: "{{consul_cert_path}}/consul-key.pem"
-
+    - nomad_cert_path: "{{base_cert_dir}}/nomad"
+    - nomad_cert_path: "{{ base_cert_dir }}/nomad"
+    - nomad_cert: "{{nomad_cert_path}}/nomad.pem"
+    - nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"

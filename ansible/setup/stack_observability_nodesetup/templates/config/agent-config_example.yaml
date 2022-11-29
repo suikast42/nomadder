@@ -9,33 +9,59 @@ metrics:
       - url: http://mimir.service.consul:9009/api/v1/push
 #        headers:
 #          X-Scope-OrgID: 1
+# example how to realize node exporter with local scraping from local gent
+# But the node exporter have more convenient options
   configs:
-    - name: integrations
+#    - name: test_cfg
+#      scrape_configs:
+#        - job_name: node_test
+#          static_configs:
+#            - targets: [ 'hansi:12345' ]
+    - name: nomad_cfg
       scrape_configs:
-        # Scrape metrics from nomad
-        - job_name: integrations/nomad
-          metrics_path: /v1/metrics
-          tls_config:
-            insecure_skip_verify: false
-            ca_file: "{{cluster_intermediate_ca_bundle}}"
-            cert_file: "{{nomad_cert}}"
-            key_file: "{{nomad_cert_key}}"
-          scheme: https
-          params:
-            format:
-              - prometheus
-          static_configs:
-            - targets: ['localhost:4646']
-              # Add label for imported dashboard
-              labels:
-                host: "{{host_name}}"
-          relabel_configs:
-            # Replace the instance label with the hostname.
-            # Otherwise, localhost:4646 will be tracked in this label
-            - source_labels: [ instance ]
-              replacement: "{{host_name}}"
-              target_label: instance
-              action: replace
+      # fetch nomad metrics from consul service discovery.
+      # You need only one agent for that.
+      # You need only one agent for that.
+       - job_name: integrations/nomad_exporter
+         static_configs:
+         params:
+           format:
+             - prometheus
+         scrape_interval: 5s
+         metrics_path: /v1/metrics
+         scheme: https
+         consul_sd_configs:
+           - server: https://localhost:8501
+             #token: e95b599e-166e-7d80-08ad-aee76e7ddf19
+             tls_config:
+               insecure_skip_verify: false
+               ca_file: "{{cluster_intermediate_ca_bundle}}"
+               cert_file: "{{consul_cert}}"
+               key_file: "{{consul_cert_key}}"
+             datacenter: "{{data_center}}"
+             tag_separator: ','
+             scheme: https
+             services:
+               - nomad-client
+               - nomad
+#         bearer_token: <secret>
+         tls_config:
+           insecure_skip_verify: false
+           ca_file: "{{cluster_intermediate_ca_bundle}}"
+           cert_file: "{{nomad_cert}}"
+           key_file: "{{nomad_cert_key}}"
+         relabel_configs:
+           - source_labels: [ __meta_consul_tags ]
+             separator: ;
+             regex: (.*)http(.*)
+             replacement: $1
+             action: keep
+           - source_labels: [ __meta_consul_address ]
+             separator: ;
+             regex: (.*)
+             target_label: __meta_consul_service_address
+             replacement: $1
+             action: replace
 
 
 #logs:
@@ -91,7 +117,6 @@ integrations:
           - agent_hostname
         target_label: instance
 
-  # Scrape metrics from linux host
   node_exporter:
     enabled: true
     relabel_configs:
@@ -100,7 +125,6 @@ integrations:
           - agent_hostname
         target_label: instance
 
-  # Scrape metrics from consul
   consul_exporter:
     enabled: true
     scrape_interval: 5s
@@ -113,3 +137,12 @@ integrations:
         source_labels:
           - agent_hostname
         target_label: instance
+#  cadvisor:
+#    enabled: true
+#    docker_only: true
+#    instance: localhost:9090
+#    relabel_configs:
+#      - action: replace
+#        replacement: integrations/docker
+#        target_label: job
+
