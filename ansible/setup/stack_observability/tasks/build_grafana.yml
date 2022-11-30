@@ -34,6 +34,11 @@
         path: "{{docker_build_dir_grafana}}"
         state: directory
 
+    - name: "Create docker build dir datasources dir {{docker_build_dir_grafana}}/provisioning/datasources if needed"
+      file:
+        path: "{{docker_build_dir_grafana}}/provisioning/datasources"
+        state: directory
+
     - name: Template dockerfile grafana
       template:
         force: yes
