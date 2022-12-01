@@ -80,7 +80,6 @@
 
 - debug:
     msg: "{{ install_pip2 }}"
-
 #- name: "Update pip and install pip modules"
 #  delay: 0
 #  async: 120
