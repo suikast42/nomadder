@@ -1,5 +1,5 @@
 server:
-  log_level: debug
+  log_level: error
 
 metrics:
   wal_directory: "{{grafana_agent_working_dir}}/wal"
