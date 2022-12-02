@@ -14,13 +14,19 @@
 
 timezone= "Etc/UTC"
 
+# Vector's API (disabled by default)
+# Enable and try it out with the `vector top` command
+[api]
+enabled = true
+# address = "127.0.0.1:8686"
+
 [sources.source_internal_logs]
 type = "internal_logs"
 
 [sources.source_journald]
 type = "journald"
 current_boot_only = true
-exclude_units = ["vector" ]
+exclude_units = ["vector"]
 exclude_matches = { }
 include_units = [ ]
 include_matches = { }
@@ -42,7 +48,8 @@ docker_host = "unix:///var/run/docker.sock"
 
 [sinks.sink_stdout]
 type = "console"
-inputs = ["source_journald","source_docker_logs" ]
+inputs = ["source_internal_logs","source_journald","source_docker_logs" ]
+#inputs = ["source_internal_logs"]
 target = "stdout"
 
 [sinks.sink_stdout.encoding]
