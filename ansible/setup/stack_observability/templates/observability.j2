@@ -362,4 +362,120 @@ job "observability" {
     }
     }
   }
+
+    group "nats"{
+       volume "stack_observability_nats_volume" {
+          type      = "host"
+          source    = "stack_observability_nats_volume"
+          read_only = false
+        }
+     count = 1
+      restart {
+           attempts = 10
+           interval = "5m"
+           delay    = "25s"
+           mode     = "delay"
+         }
+      network {
+        mode = "bridge"
+        port "client" {
+          static =  4222
+          to = 4222
+        }
+        port "http" {
+          static =  8222
+          to = 8222
+        }
+        port "cluster" {
+          static =  6222
+          to = 6222
+        }
+
+      }
+        service {
+              port = "client"
+              name = "nats"
+
+              check {
+                 type     = "http"
+                 port     = "http"
+                 path     = "/connz"
+                 interval = "5s"
+                 timeout  = "2s"
+              }
+            }
+
+      task "nats-prometheus-exporter" {
+        lifecycle {
+          hook = "poststart"
+          sidecar = true
+        }
+
+        driver = "docker"
+        config {
+            image = "{{registry_dns}}/natsio/prometheus-nats-exporter:{{version_nats_prometheus_exporter}}"
+            args = [
+              "-varz",
+              "-channelz",
+              "-connz",
+              "-gatewayz",
+              "-leafz",
+              "-serverz",
+              "-subz",
+              "-jsz=all",
+              "http://localhost:8222"
+            ]
+        }
+      }
+
+    task "nats" {
+         volume_mount {
+            volume      = "stack_observability_nats_volume"
+            destination = "/data/jetstream"
+          }
+             driver = "docker"
+             config {
+             image = "{{registry_dns}}/nats:{{version_nats_server}}-alpine"
+             ports = ["client","http","cluster"]
+             args = [
+               "-c","/config/nats.conf"
+             ]
+            volumes = [
+              "local/nats.conf:/config/nats.conf"
+            ]
+             }
+          resources {
+            cpu    = 2000
+            memory = 2048
+          }
+          template {
+             destination = "local/nats.conf"
+             change_mode = "restart"
+             right_delimiter = "++"
+             left_delimiter = "++"
+             data        = <<EOF
+# Client port of 4222 on all interfaces
+port: 4222
+
+# HTTP monitoring port
+monitor_port: 8222
+server_name: $NOMAD_TASK_NAME
+trace: true
+http_port: 8222
+
+
+jetstream {
+  store_dir: /data/jetstream
+
+  # 1GB
+  max_memory_store: 2G
+
+  # 10GB
+  max_file_store: 10G
+}
+              EOF
+          }
+       }
+
+    }
 }
