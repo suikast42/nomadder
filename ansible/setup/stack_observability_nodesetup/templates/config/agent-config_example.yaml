@@ -21,7 +21,6 @@ metrics:
       scrape_configs:
       # fetch nomad metrics from consul service discovery.
       # You need only one agent for that.
-      # You need only one agent for that.
        - job_name: integrations/nomad_exporter
          static_configs:
          params:

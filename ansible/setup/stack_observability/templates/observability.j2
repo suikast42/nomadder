@@ -390,6 +390,9 @@ job "observability" {
           static =  6222
           to = 6222
         }
+        port "prometheus-exporter" {
+            to = 7222
+        }
 
       }
         service {
@@ -403,7 +406,19 @@ job "observability" {
                  interval = "5s"
                  timeout  = "2s"
               }
-            }
+      }
+
+        service {
+           port = "prometheus-exporter"
+           name = "prometheus-exporter"
+           check {
+              type     = "http"
+              port     = "http"
+              path     = "/v1/metrics"
+              interval = "5s"
+              timeout  = "2s"
+           }
+      }
 
       task "nats-prometheus-exporter" {
         lifecycle {
@@ -414,6 +429,7 @@ job "observability" {
         driver = "docker"
         config {
             image = "{{registry_dns}}/natsio/prometheus-nats-exporter:{{version_nats_prometheus_exporter}}"
+            ports = ["prometheus_exporter"]
             args = [
               "-varz",
               "-channelz",
@@ -478,4 +494,59 @@ jetstream {
        }
 
     }
+  group "grafana-agent"{
+       # Grafana agent is deployed on every node and scrapes the general nomad job metrics
+       # This agent deployed is for scraping special service metrics like databases brokers etc
+       volume "stack_observability_grafana_agent_volume" {
+          type      = "host"
+          source    = "stack_observability_grafana_agent_volume"
+          read_only = false
+        }
+          count = 1
+           restart {
+                attempts = 10
+                interval = "5m"
+                delay    = "25s"
+                mode     = "delay"
+              }
+    task "grafana-agent" {
+         volume_mount {
+            volume      = "stack_observability_grafana_agent_volume"
+            destination = "/data/wal"
+          }
+       driver = "docker"
+       config {
+
+         image = "{{registry_dns}}/grafana/agent:v{{version_grafana_agent}}"
+         args = [
+             "-config.file","/config/agent.yaml"
+          ]
+          volumes = [
+            "local/agent.yaml:/config/agent.yaml"
+        ]
+        }
+        resources {
+          cpu    = 500
+          memory = 256
+        }
+template {
+ destination = "local/agent.yaml"
+ change_mode = "restart"
+ right_delimiter = "++"
+ left_delimiter = "++"
+ data        = <<EOF
+server:
+  log_level: debug
+
+metrics:
+  wal_directory: "/data/wal"
+  global:
+    scrape_interval: 5s
+    remote_write:
+      - url: http://mimir.service.consul:9009/api/v1/push
+
+              EOF
+  }
+  }
+  }
 }
