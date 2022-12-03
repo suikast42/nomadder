@@ -391,7 +391,7 @@ job "observability" {
           to = 6222
         }
         port "prometheus-exporter" {
-            to = 7222
+              to = 7777
         }
 
       }
@@ -410,16 +410,16 @@ job "observability" {
 
         service {
            port = "prometheus-exporter"
-           name = "prometheus-exporter"
+           # Change the service selector in garafa agent config as well if you cange this name
+           name = "nats-prometheus-exporter"
            check {
               type     = "http"
-              port     = "http"
-              path     = "/v1/metrics"
+              port     = "prometheus-exporter"
+              path     = "/metrics"
               interval = "5s"
               timeout  = "2s"
            }
       }
-
       task "nats-prometheus-exporter" {
         lifecycle {
           hook = "poststart"
@@ -428,6 +428,8 @@ job "observability" {
 
         driver = "docker"
         config {
+           # for debugging
+          #  image = "{{registry_dns}}/{{stack_name}}/prometheus-nats-exporter:{{version_nats_prometheus_exporter_nomadder}}"
             image = "{{registry_dns}}/natsio/prometheus-nats-exporter:{{version_nats_prometheus_exporter}}"
             ports = ["prometheus_exporter"]
             args = [
@@ -439,7 +441,8 @@ job "observability" {
               "-serverz",
               "-subz",
               "-jsz=all",
-              "http://localhost:8222"
+              "-use_internal_server_id",
+              "http://localhost:${NOMAD_PORT_http}"
             ]
         }
       }
@@ -470,15 +473,15 @@ job "observability" {
              right_delimiter = "++"
              left_delimiter = "++"
              data        = <<EOF
-# Client port of 4222 on all interfaces
-port: 4222
+# Client port of ++ env "NOMAD_PORT_client" ++ on all interfaces
+port: ++ env "NOMAD_PORT_client" ++
 
 # HTTP monitoring port
-monitor_port: 8222
-server_name: $NOMAD_TASK_NAME
+monitor_port: ++ env "NOMAD_PORT_http" ++
+server_name: "++ env "NOMAD_ALLOC_NAME" ++"
 trace: true
-http_port: 8222
-
+http_port: ++ env "NOMAD_PORT_http" ++
+#http: nats.service.consul:++ env "NOMAD_PORT_http" ++
 
 jetstream {
   store_dir: /data/jetstream
@@ -543,8 +546,27 @@ metrics:
   global:
     scrape_interval: 5s
     remote_write:
-      - url: http://mimir.service.consul:9009/api/v1/push
-
+++- range service "mimir" ++
+      - url: http://++.Name++.service.consul:++.Port++/api/v1/push
+++- end ++
+  configs:
+    - name: integrations
+      scrape_configs:
+        - job_name: integrations/nats-prometheus-exporter
+          metrics_path: /metrics
+          static_configs:
+++- range service "nats-prometheus-exporter" ++
+             # Scrape metrics from ++.Name++
+            - targets: ['++.Name++.service.consul:++.Port++']
+++- end ++
+              labels:
+                host: ++ env "node.unique.name" ++
+          relabel_configs:
+            # Replace the instance label with nats-prometheus-exporter.
+            - source_labels: [ instance ]
+              replacement: "nats-prometheus-exporter"
+              target_label: instance
+              action: replace
               EOF
   }
   }

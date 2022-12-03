@@ -5,6 +5,10 @@
     - name: "Build grafana v {{version_grafana}}"
       import_tasks: build_grafana.yml
 
+    - name: "Build nats_prometheus_exporter v {{version_nats_prometheus_exporter_nomadder}}"
+      import_tasks: build_nats_exporter.yml
+
+
     - name: "Create {{stack_deployment_dir}} if needed"
       become: true
       file:
@@ -28,4 +32,5 @@
     - version_grafana_agent: "0.29.0"
     - version_nats_server: "2.9.8"
     - version_nats_prometheus_exporter: "0.10.1"
+    - version_nats_prometheus_exporter_nomadder: "0.10.1.0"
     - stack_deployment_dir: "{{master_0_job_dir}}/observability"

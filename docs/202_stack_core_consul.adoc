@@ -64,6 +64,34 @@ whoami.service.consul.  0       IN      SRV     1 1 29864 0a15152a.addr.nomadder
 
 Consul is able to register one service multiple times. The dns server changes on every dns request the order of the healthy services. So that the client took everytime the first entry. That mean that is not a service load balancing like traefik does.
 
+=== Consul Teplate
+.Consul Template
+[source,hcl]
+----
+# The - suppresses the geretation of new lines
+# Query for all consul services . A reference to *dependency.CatalogSnippet
+# Name and Tags
+{{- range services }}
+  #Query the the service. A refrence to *dependency.HealthService
+  {{- range service .Name }}
+    {{ .Name}} {{.Tags}}
+   {{- end}}
+{{- end }}
+----
+
+.Consul Template with conditions
+[source,hcl]
+----
+{{- range services }}
+  {{- range service .Name }}
+    {{- if .Tags | contains "prometheus_exporter"}}
+      {{ .Name}} : {{.Port}} {{.Tags }}
+  {{- end}}
+{{- end}}
+----
+
+
+{{- end }}
 [[_200_link_consul_agent_client_mode,vault_delete_ca]]https://groups.google.com/g/consul-tool/c/VI1xd8wG-0w[What is purpose and intent of Consul Agents running in Client mode]
 
 
