@@ -1,5 +1,4 @@
 ---
-#TODO make nameserver entry for all workers
 - hosts: localhost
   vars_files:
     - vars/common_vars.yml
@@ -47,3 +46,14 @@
   gather_facts: yes
   roles:
     - {role: stack_observability_nodesetup, tags: ['stack_observability_nodes','grafana_agent']}
+
+- hosts: all
+  name: "Stack observability cli tools setups"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+    - vars/job_secrets.yml
+  gather_facts: yes
+  roles:
+    - {role: stack_observability_cli_tools, tags: ['stack_observability_cli_tools','cli_tools']}
