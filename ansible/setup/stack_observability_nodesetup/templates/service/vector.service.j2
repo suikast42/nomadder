@@ -5,16 +5,22 @@ After=network-online.target
 Requires=network-online.target
 
 [Service]
+AmbientCapabilities=CAP_NET_BIND_SERVICE
 User=root
 Group=root
 Environment=VECTOR_LOG=error
 ExecStartPre=/usr/bin/vector validate
 ExecStart=/usr/bin/vector
-ExecReload=/usr/bin/vector validate
-ExecReload=/bin/kill -HUP $MAINPID
-Restart=no
-AmbientCapabilities=CAP_NET_BIND_SERVICE
-EnvironmentFile=-/etc/default/vector
+ExecReload=/bin/kill --signal HUP $MAINPID
+KillMode=process
+KillSignal=SIGTERM
+Restart=on-failure
+RestartSec=10
+LimitNOFILE=65536
+TimeoutSec=10
+
+## StartLimitIntervalSec is used for systemd versions >= 230
+StartLimitIntervalSec = 10s
 
 [Install]
 WantedBy=multi-user.target
