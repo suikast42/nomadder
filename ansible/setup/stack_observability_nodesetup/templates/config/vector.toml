@@ -54,3 +54,13 @@ target = "stdout"
 
 [sinks.sink_stdout.encoding]
 codec = "json"
+
+[sinks.sink_nats_journald]
+type = "nats"
+inputs = [ "source_journald" ]
+url = "nats://nats.service.consul:4222"
+# Template syntax is useable here https://vector.dev/docs/reference/configuration/template-syntax/
+subject = "ingress.logs.journald"
+
+[sinks.sink_nats_journald.encoding]
+codec = "json"

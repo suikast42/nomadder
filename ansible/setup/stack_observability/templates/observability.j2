@@ -457,7 +457,8 @@ job "observability" {
              image = "{{registry_dns}}/nats:{{version_nats_server}}-alpine"
              ports = ["client","http","cluster"]
              args = [
-               "-c","/config/nats.conf"
+               "-c","/config/nats.conf",
+               "-js"
              ]
             volumes = [
               "local/nats.conf:/config/nats.conf"

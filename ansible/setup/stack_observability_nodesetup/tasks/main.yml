@@ -10,7 +10,7 @@
     - tmp_install_dir_base: "/tmp/grafana_agent"
     - version_grafana_agent: "0.29.0"
     - uninstall_grafana_agent: false
-    - version_vector_agent: "0.25.2-1"
+    - version_vector_agent: "0.26.0-1"
     - uninstall_vector_agent: false
     - grafana_agent_group: grafana_agent
     - grafana_agent_user: grafana_agent
