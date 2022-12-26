@@ -1,3 +1,4 @@
+
 # Test {{ '{{' }} env "NOMAD_TASK_NAME"  {{ '}}' }}
 # Do not use this configuration in production.
 # It is for demonstration purposes only.

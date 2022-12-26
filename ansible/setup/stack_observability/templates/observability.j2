@@ -480,7 +480,12 @@ port: ++ env "NOMAD_PORT_client" ++
 # HTTP monitoring port
 monitor_port: ++ env "NOMAD_PORT_http" ++
 server_name: "++ env "NOMAD_ALLOC_NAME" ++"
-trace: true
+#If true enable protocol trace log messages. Excludes the system account.
+trace: false
+#If true enable protocol trace log messages. Includes the system account.
+trace_verbose: false
+#if true enable debug log messages
+debug: false
 http_port: ++ env "NOMAD_PORT_http" ++
 #http: nats.service.consul:++ env "NOMAD_PORT_http" ++
 

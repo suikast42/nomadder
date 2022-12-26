@@ -38,5 +38,39 @@
       chdir: /tmp
       creates: /usr/local/bin/damon # oh-my-posh is already installed
 
+  - name: "Download protoc v{{version_protoc}}"
+    get_url:
+      url: https://github.com/protocolbuffers/protobuf/releases/download/v{{version_protoc}}/protoc-{{version_protoc}}-linux-x86_64.zip
+      dest: /tmp/protoc.tgz
+      mode: 0755
+    register: protoc_download
+
+  - name: "Create tmp dir"
+    file:
+      path: "/tmp/protoc"
+      state: directory
+      mode: '0755'
+
+  - name: "Unzip protoc"
+    become: true
+    unarchive:
+      src: "{{protoc_download.dest}}"
+      dest: "/tmp/protoc"
+      copy: no
+
+  - name: "Install protoc in /usr/local/bin"
+    register: installProto
+    failed_when: installProto.rc != 0
+    shell: |
+      go install google.golang.org/protobuf/cmd/protoc-gen-go@v{{version_proto_gen}} 
+      go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v{{version_proto_grpc}}
+      sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-go  /usr/local/bin
+      sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-go-grpc  /usr/local/bin
+      sudo mv bin/protoc   /usr/local/bin
+      sudo mv include   /usr/local/bin/include
+    args:
+      chdir: "/tmp/protoc"
+      creates: /usr/local/bin/protoc
+
   tags:
     - localhost
