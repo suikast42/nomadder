@@ -59,6 +59,19 @@ connection_name ="{{host_name}}-ingress-journald"
 #buffer.type = "disk"
 encoding.codec ="json"
 healthcheck = true
+
+[sinks.sink_nats_docker]
+type = "nats"
+inputs = [ "source_docker_logs" ]
+url = "nats://nats.service.consul:4222"
+#url = "nats://10.21.21.42:4222"
+# Template syntax is useable here https://vector.dev/docs/reference/configuration/template-syntax/
+subject = "ingress.logs.docker"
+connection_name ="{{host_name}}-ingress-journald"
+#buffer.type = "disk"
+encoding.codec ="json"
+healthcheck = true
+
 ## Log sources to standdardsaztion channels END
 
 

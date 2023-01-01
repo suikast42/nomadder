@@ -70,6 +70,8 @@ metrics:
 traces:
   configs:
     - name: default
+      service_graphs:
+        enabled: true
       remote_write:
         - endpoint: http://tempo-otlp-grpc.service.consul:4317
 #          headers:

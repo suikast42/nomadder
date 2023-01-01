@@ -1,8 +1,28 @@
 auth_enabled: false
 
 server:
+  #default 3100
   http_listen_port: 3100
+  #default 9005
+  grpc_listen_port: 9005
+  # Max gRPC message size that can be received
+  # CLI flag: -server.grpc-max-recv-msg-size-bytes
+  #default 4194304 -> 4MB
+  grpc_server_max_recv_msg_size: 419430400
 
+  # Max gRPC message size that can be sent
+  # CLI flag: -server.grpc-max-send-msg-size-bytes
+  #default 4194304 -> 4MB
+  grpc_server_max_send_msg_size:  419430400
+
+  # Limit on the number of concurrent streams for gRPC calls (0 = unlimited)
+  # CLI flag: -server.grpc-max-concurrent-streams
+  grpc_server_max_concurrent_streams:  100
+
+  # Log only messages with the given severity or above. Supported values [debug,
+  # info, warn, error]
+  # CLI flag: -log.level
+  log_level: "info"
 ingester:
   wal:
     enabled: true
