@@ -67,6 +67,12 @@ plugin "docker" {
 #      enabled = true
 #      selinuxlabel = "z"
 #    }
+    logging {
+      type = "journald"
+       config {
+          labels-regex =".*"
+       }
+    }
     extra_labels = ["job_name", "job_id", "task_group_name", "task_name", "namespace", "node_name", "node_id"]
     gc {
       image       = true

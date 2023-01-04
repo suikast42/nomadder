@@ -1,7 +1,7 @@
 {
+  "log-driver": "journald",
   "log-opts": {
-    "max-size": "20m",
-    "max-file": "2"
+    "labels-regex" :".*"
   },
   "icc": false,
   "tls": true,

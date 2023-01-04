@@ -4,6 +4,11 @@ services:
 
   nexus-initlzr:
     image: suikast42/nexus-initlzr:{{version_nexus_initlzr}}
+    labels:
+      - "com.hashicorp.nomad.job_name=nexus-initlzr"
+      - "com.hashicorp.nomad.namespace=default"
+      - "com.hashicorp.nomad.task_group_name=nexus"
+      - "com.hashicorp.nomad.task_name=nexus-initlz"
     environment:
     # Let the default admin password as admin123
       NEXUS_ADDRESS: {{host_ip}}
@@ -19,13 +24,18 @@ services:
     hostname: nexus
     mem_limit: 4096M
     restart: always
+    labels:
+      - "com.hashicorp.nomad.job_name=nexus"
+      - "com.hashicorp.nomad.namespace=default"
+      - "com.hashicorp.nomad.task_group_name=nexus"
+      - "com.hashicorp.nomad.task_name=nexus"
     environment:
       # Let the default admin password as admin123
       NEXUS_SECURITY_RANDOMPASSWORD : false
-    logging:
-      options:
-        max-size: '100m'
-        max-file: '1'
+#    logging:
+#      options:
+#        max-size: '100m'
+#        max-file: '1'
     ports:
       - '5000:5000'
       - '5001:5001'

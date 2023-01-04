@@ -1,4 +1,4 @@
-- name: Keycloak docker build
+- name: Nats exporter docker build
   run_once: true
   block:
   - name: "Search for {{registry_ip}}/{{stack_name}}/prometheus-nats-exporter:{{version_nats_prometheus_exporter_nomadder}} in nexus"
@@ -29,9 +29,9 @@
   - name: Image build
     when: not image_exists_on_nexus
     block:
-    - name: "Create docker build dir {{docker_build_dir}} if needed"
+    - name: "Create docker build dir {{docker_build_dir_prom_exporter}} if needed"
       file:
-        path: "{{docker_build_dir}}"
+        path: "{{docker_build_dir_prom_exporter}}"
         state: directory
 
 
@@ -40,7 +40,7 @@
       template:
         force: yes
         src: nats_prometheus_exporter/DockerfileNatsPromExporter
-        dest: "{{docker_build_dir}}/Dockerfile"
+        dest: "{{docker_build_dir_prom_exporter}}/Dockerfile"
 
 
 
@@ -56,7 +56,7 @@
     - name: "Build and push nats_prometheus_exporter image v {{version_nats_prometheus_exporter_nomadder}}"
       community.docker.docker_image:
         build:
-          path: "{{docker_build_dir}}"
+          path: "{{docker_build_dir_prom_exporter}}"
         name: "{{push_registry}}/{{stack_name}}/prometheus-nats-exporter"
   #      repository: "{{registry_dns}}"
         tag: "{{version_nats_prometheus_exporter_nomadder}}"
@@ -66,10 +66,10 @@
   always:
     - name : Finally
       block:
-        - name: "Delete {{docker_build_dir}}"
+        - name: "Delete {{docker_build_dir_prom_exporter}}"
           become: true
           file:
-            path: "{{docker_build_dir }}"
+            path: "{{docker_build_dir_prom_exporter}}"
             state: absent
         - name: "Logout {{registry_dns}}"
           # do not trigger a change
@@ -79,4 +79,4 @@
             registry_url: "{{registry_dns}}"
 
   vars:
-    - docker_build_dir: "{{docker_build_dir}}/nats_prometheus_exporter"
+    - docker_build_dir_prom_exporter: "{{docker_build_dir}}/nats_prometheus_exporter"

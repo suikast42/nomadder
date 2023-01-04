@@ -26,12 +26,12 @@ uninstall_nomad_plugin_cni: false
 version_cfssl: 1.6.3
 update_cfssl: false
 
-docker_version: "20.10.21"
+docker_version: "20.10.22"
 uninstall_docker: false
 
 update_certificates: false
 
-version_nexus: "3.43.0"
+version_nexus: "3.45.0"
 version_nexus_initlzr: "1.0.0.Alpha10"
 uninstall_nexus: false
 

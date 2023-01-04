@@ -1,5 +1,8 @@
 - name: Deploy core stack
   block:
+    - name: "Config journald"
+      import_tasks: config_journald.yml
+
     - name: "Install grafana agent v {{version_grafana_agent}}"
       import_tasks: install_grafana_agent.yml
 
@@ -8,8 +11,8 @@
 
   vars:
     - tmp_install_dir_base: "/tmp/grafana_agent"
-    - version_grafana_agent: "0.29.0"
-    - uninstall_grafana_agent: false
+    - version_grafana_agent: "0.30.1"
+    - uninstall_grafana_agent: true
     - version_vector_agent: "0.26.0-1"
     - uninstall_vector_agent: false
     - grafana_agent_group: grafana_agent
