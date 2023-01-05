@@ -1,0 +1,30 @@
+# TODO http://docs.grafana.org/administration/provisioning/ import datasource and dashboard
+FROM {{registry_dns}}/grafana/grafana:{{version_grafana}} as builder
+
+MAINTAINER Süleyman Vurucu <sueleyman.vurucu@amova.eu>
+
+ENV GF_PATHS_PLUGINS=/data/grafana/plugins
+#
+#USER root
+#RUN mkdir -p /data/grafana/plugins && chown -R grafana:grafana /data/grafana/plugins
+#RUN mkdir -p /var/lib/grafana/dashboards && chown -R grafana:grafana /var/lib/grafana/dashboards
+
+COPY installPlugins.sh /home/grafana/installPlugins.sh
+
+USER root
+RUN chmod +x /home/grafana/installPlugins.sh
+RUN  sh /home/grafana/installPlugins.sh
+COPY --from=tarampampam/curl:7.78.0 /bin/curl /bin/curl
+
+FROM {{registry_dns}}/grafana/grafana:{{version_grafana}}
+ENV GF_PATHS_PLUGINS=/data/grafana/plugins
+COPY --from=builder /data/grafana/plugins /data/grafana/plugins
+COPY --from=builder /bin/curl /bin/curl
+COPY provisioning/datasources/* /etc/grafana/provisioning/datasources/
+COPY grafana2.ini /etc/grafana/grafana2.ini
+#COPY /src/main/resources/docker/provisioning/dashboards/ /etc/grafana/provisioning/dashboards/
+#COPY /src/main/resources/docker/dashboards/provisioning/*  /etc/grafana/provisioning/dashboards/
+#COPY /src/main/resources/docker/dashboards/logs/* /var/lib/grafana/dashboards/logs/
+#COPY /src/main/resources/docker/dashboards/nodes/* /var/lib/grafana/dashboards/nodes/
+#COPY /src/main/resources/docker/dashboards/docker/* /var/lib/grafana/dashboards/docker/
+EXPOSE 3000

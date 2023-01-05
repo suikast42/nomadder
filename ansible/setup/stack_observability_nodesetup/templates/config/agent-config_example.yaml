@@ -1,0 +1,147 @@
+server:
+  log_level: debug
+
+metrics:
+  wal_directory: "{{grafana_agent_working_dir}}/wal"
+  global:
+    scrape_interval: 10s
+    remote_write:
+      - url: http://mimir.service.consul:9009/api/v1/push
+#        headers:
+#          X-Scope-OrgID: 1
+# example how to realize node exporter with local scraping from local gent
+# But the node exporter have more convenient options
+  configs:
+#    - name: test_cfg
+#      scrape_configs:
+#        - job_name: node_test
+#          static_configs:
+#            - targets: [ 'hansi:12345' ]
+    - name: nomad_cfg
+      scrape_configs:
+      # fetch nomad metrics from consul service discovery.
+      # You need only one agent for that.
+       - job_name: integrations/nomad_exporter
+         static_configs:
+         params:
+           format:
+             - prometheus
+         scrape_interval: 5s
+         metrics_path: /v1/metrics
+         scheme: https
+         consul_sd_configs:
+           - server: https://localhost:8501
+             #token: e95b599e-166e-7d80-08ad-aee76e7ddf19
+             tls_config:
+               insecure_skip_verify: false
+               ca_file: "{{cluster_intermediate_ca_bundle}}"
+               cert_file: "{{consul_cert}}"
+               key_file: "{{consul_cert_key}}"
+             datacenter: "{{data_center}}"
+             tag_separator: ','
+             scheme: https
+             services:
+               - nomad-client
+               - nomad
+#         bearer_token: <secret>
+         tls_config:
+           insecure_skip_verify: false
+           ca_file: "{{cluster_intermediate_ca_bundle}}"
+           cert_file: "{{nomad_cert}}"
+           key_file: "{{nomad_cert_key}}"
+         relabel_configs:
+           - source_labels: [ __meta_consul_tags ]
+             separator: ;
+             regex: (.*)http(.*)
+             replacement: $1
+             action: keep
+           - source_labels: [ __meta_consul_address ]
+             separator: ;
+             regex: (.*)
+             target_label: __meta_consul_service_address
+             replacement: $1
+             action: replace
+
+
+#logs:
+#  configs:
+#    - name: default
+#      clients:
+#        - url:  http://loki.service.consul:3100/api/v1/push
+#      positions:
+#        filename: "{{grafana_agent_working_dir}}/logpos/positions.yaml"
+#      target_config:
+#        sync_period: 10s
+#      scrape_configs:
+#        - job_name: integrations/docker
+#          docker_sd_configs:
+#            - host: unix:///var/run/docker.sock
+#              refresh_interval: 5s
+#          relabel_configs:
+#            - action: replace
+#              replacement: integrations/docker
+#              source_labels:
+#                - __meta_docker_container_id
+#              target_label: job
+#            - source_labels:
+#                - __meta_docker_container_name
+#              regex: '/(.*)'
+#              target_label: container
+#            - source_labels:
+#                - __meta_docker_container_log_stream
+#              target_label: stream
+
+
+traces:
+  configs:
+    - name: default
+      remote_write:
+        - endpoint: http://tempo-otlp-grpc.service.consul:4317
+#          headers:
+#            X-Scope-OrgID: 1
+          insecure: true
+      receivers:
+        jaeger:
+          protocols:
+            thrift_http:
+
+
+integrations:
+  agent:
+    # Enables the Agent integration, allowing the Agent to automatically
+    enabled: true
+    relabel_configs:
+      - action: replace
+        source_labels:
+          - agent_hostname
+        target_label: instance
+
+  node_exporter:
+    enabled: true
+    relabel_configs:
+      - action: replace
+        source_labels:
+          - agent_hostname
+        target_label: instance
+
+  consul_exporter:
+    enabled: true
+    scrape_interval: 5s
+    server: https://localhost:8501
+    ca_file: "{{cluster_intermediate_ca_bundle}}"
+    cert_file: "{{consul_cert}}"
+    key_file: "{{consul_cert_key}}"
+    relabel_configs:
+      - action: replace
+        source_labels:
+          - agent_hostname
+        target_label: instance
+#  cadvisor:
+#    enabled: true
+#    docker_only: true
+#    instance: localhost:9090
+#    relabel_configs:
+#      - action: replace
+#        replacement: integrations/docker
+#        target_label: job
+

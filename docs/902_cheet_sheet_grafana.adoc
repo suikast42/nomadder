@@ -1,0 +1,25 @@
+.Keycloak Rest
+|===
+|Description |Command
+
+
+|export grafana datasource
+a|[source,shell]
+----
+curl -ks \
+-d "client_id=grafana" \
+-d "client_secret=ipsdmGYL0JjCPEptKk393IFAtpD7Srbt" \
+-d "username=admin" \
+-d "password=admin" \
+-d "grant_type=password" \
+"https://security.cloud.private/realms/nomadder/protocol/openid-connect/token"  \| jq -r '.access_token'
+
+curl -ks  -H 'Accept: application/json' -H "Authorization: Bearer ${JWT_TOKEN}" "https://grafana.cloud.private/api/datasources"
+----
+
+
+
+
+
+curl -H "X-Scope-OrgID:1" http://mimir.service.consul:9009/prometheus/api/v1/label/agent_hostname/values
+

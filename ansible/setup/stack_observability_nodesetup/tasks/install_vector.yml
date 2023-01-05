@@ -1,0 +1,98 @@
+- name: Grafana agent uninstall
+  become: true
+  when: uninstall_vector_agent|bool == true
+  block:
+    - name: stop vector agent service
+      failed_when: false
+      service:
+        name: vector
+        state: stopped
+        enabled: false
+
+    - name: "Uninstall vector"
+      failed_when: false
+      apt:
+       name: vector
+       state: absent
+
+    - name: Remove the user vector
+      ansible.builtin.user:
+        name: vector
+        state: absent
+        remove: yes
+
+    - name: Delete group vector
+      ansible.builtin.group:
+        name: vector
+        state: absent
+
+    - name: "Delete vector config"
+      ansible.builtin.file:
+        path:  /etc/vector/vector.toml
+        state: absent
+
+- name : Check grafana agent installation present
+  stat:
+    path: /usr/bin/vector
+  register: agnetinstalled
+
+- name: Install vector agent
+  become: true
+  when: not agnetinstalled.stat.exists
+  block:
+    - name: Add datadog vector apt repo
+      shell: |
+        curl -1sLf \
+        'https://repositories.timber.io/public/vector/cfg/setup/bash.deb.sh' \
+        | sudo -E bash
+
+
+    - name: "Update installed packages"
+      apt:
+        only_upgrade: true
+        update_cache: true
+        force_apt_get: true
+        state: latest
+      register: update
+
+    - name: "Vector agent v {{version_vector_agent}}"
+      apt:
+        name:
+          - "vector={{version_vector_agent}}"
+
+
+
+- name: Vector agent config
+  become: true
+  block:
+    - name: Template vector conf
+      template:
+        force: yes
+        src: config/vector.toml
+        dest: /etc/vector/vector.toml
+      register: config
+
+
+    - name: Template grafana.agent.service
+      template:
+        force: yes
+        src: service/vector.service.j2
+        dest: /etc/systemd/system/vector.service
+      register: systemdconfig
+
+
+    - name: Reload systemd
+      when: systemdconfig.changed
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: Restart vector agent
+      when: config.changed or systemdconfig.changed
+      service:
+        name: vector
+        state: restarted
+        enabled: yes
+      register: agentservice
+      until: agentservice.status.ActiveState == "active"
+      retries: 10
+      delay: 5

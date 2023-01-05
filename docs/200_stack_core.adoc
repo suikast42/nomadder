@@ -1,4 +1,6 @@
 <<<
+include::202_stack_core_nomad.adoc[]
+<<<
 include::202_stack_core_consul.adoc[]
 
 <<<

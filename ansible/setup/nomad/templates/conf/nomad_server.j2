@@ -3,11 +3,18 @@ name = "{{host_name}}"
 datacenter = "{{data_center}}"
 data_dir =  "{{nomad_data_dir}}"
 
-
 server {
   enabled = true
   bootstrap_expect =  {{masters|length}}
   encrypt = "{{nomad_encrypt_key}}"
+}
+
+bind_addr = "0.0.0.0" # the default
+advertise {
+  # Defaults to the first private IP address.
+  http = "{{host_ip}}"
+  rpc  = "{{host_ip}}"
+  serf = "{{host_ip}}"
 }
 
 tls {
@@ -44,4 +51,42 @@ consul{
  ca_file   = "{{cluster_intermediate_ca_bundle}}"
  cert_file = "{{nomad_cert}}"
  key_file  = "{{nomad_cert_key}}"
+}
+
+telemetry {
+  collection_interval = "1s"
+  disable_hostname = true
+  prometheus_metrics = true
+  publish_allocation_metrics = true
+  publish_node_metrics = true
+}
+
+plugin "docker" {
+  config {
+#    volumes {
+#      enabled = true
+#      selinuxlabel = "z"
+#    }
+    logging {
+      type = "journald"
+       config {
+          labels-regex =".*"
+       }
+    }
+    extra_labels = ["job_name", "job_id", "task_group_name", "task_name", "namespace", "node_name", "node_id"]
+    gc {
+      image       = true
+      image_delay = "3m"
+      container   = true
+
+      dangling_containers {
+        enabled        = true
+        dry_run        = false
+        period         = "5m"
+        creation_grace = "5m"
+      }
+    }
+
+#    allow_privileged = true
+  }
 }

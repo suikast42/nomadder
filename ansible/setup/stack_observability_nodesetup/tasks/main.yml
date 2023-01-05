@@ -1,0 +1,28 @@
+- name: Deploy core stack
+  block:
+    - name: "Config journald"
+      import_tasks: config_journald.yml
+
+    - name: "Install grafana agent v {{version_grafana_agent}}"
+      import_tasks: install_grafana_agent.yml
+
+    - name: "Install vector agent v {{version_vector_agent}}"
+      import_tasks: install_vector.yml
+
+  vars:
+    - tmp_install_dir_base: "/tmp/grafana_agent"
+    - version_grafana_agent: "0.30.1"
+    - uninstall_grafana_agent: true
+    - version_vector_agent: "0.26.0-1"
+    - uninstall_vector_agent: false
+    - grafana_agent_group: grafana_agent
+    - grafana_agent_user: grafana_agent
+    - grafana_agent_config_dir: "/etc/grafana.agent.d"
+    - grafana_agent_working_dir: "{{service_working_dir_base}}/observability/grafana_agent"
+    - consul_cert_path: "{{base_cert_dir}}/consul"
+    - consul_cert: "{{consul_cert_path}}/consul.pem"
+    - consul_cert_key: "{{consul_cert_path}}/consul-key.pem"
+    - nomad_cert_path: "{{base_cert_dir}}/nomad"
+    - nomad_cert_path: "{{ base_cert_dir }}/nomad"
+    - nomad_cert: "{{nomad_cert_path}}/nomad.pem"
+    - nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"

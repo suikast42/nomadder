@@ -8,11 +8,13 @@ host_ips:
   - "{{ ansible_eth0.ipv4.address }}"
   - "{{ ansible_eth1.ipv4.address }}"
 master_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
+worker_01_ip: "{{ hostvars[groups['workers'][0]]['ansible_host'] | default(groups['workers'][0]) }}"
 registry_ip: "{{ hostvars[groups['build'][0]]['ansible_host'] | default(groups['build'][0]) }}"
 registry_port: "5000"
 registry_port_push: "5001"
 registry_port_http: "5002"
 registry_dns: "registry.{{tls_san}}"
+push_registry : "{{registry_ip}}:{{registry_port_push}}"
 nexus_dns: "nexus.{{tls_san}}"
 security_dns: "security.{{tls_san}}"
 masters: "{{ groups['masters'] }}"
@@ -37,6 +39,7 @@ vault_hosts:
 
 
 
+core_realm: "nomadder"
 # consul and nomad datacenter name
 data_center: "nomadder1"
 #cert path on nodes
@@ -51,8 +54,9 @@ local_cert_gen_path: "{{local_ca_copy_path}}/{{host_name}}"
 local_ca_cert_conf: "{{role_path}}/../certificates_generate/files/cfssl/config.json"
 local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"
 local_cluster_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/cluster-ca"
-systemd_install_dir:  /opt/services/core
-master_0_job_dir:  /opt/deployments
+service_working_dir_base:  /opt/services
+master_0_job_dir:  /opt/nomadjobs
+nomad_volumes_dir:  /opt/nomadvolumes
 base_cert_dir: /etc/opt/certs
 notify_cert_change: false
 
@@ -68,3 +72,6 @@ consul_conf_dir: "/etc/consul.d"
 nomad_group: nomad
 nomad_user: nomad
 nomad_conf_dir: "/etc/nomad.d"
+
+# enables traefik middlware for oauth authentication
+enable_oauth_middleware: true

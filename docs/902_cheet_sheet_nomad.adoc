@@ -1,0 +1,37 @@
+.Nomad CLI cheatsheet
+|===
+|Description |Command
+
+|Metrics API
+a|[source,shell]
+----
+curl  -s  -N \
+--cacert "${NOMAD_CACERT}" \
+--cert "${NOMAD_CLIENT_CERT}" \
+--key "${NOMAD_CLIENT_KEY}" \
+"${NOMAD_ADDR}/v1/metrics" \| jq .
+----
+
+|Nomad event stream API
+a|[source,shell]
+----
+curl  -s  -N \
+--cacert "${NOMAD_CACERT}" \
+--cert "${NOMAD_CLIENT_CERT}" \
+--key "${NOMAD_CLIENT_KEY}" \
+"${NOMAD_ADDR}/v1/event/stream" \| jq .
+----
+
+|Consul service address in Templates
+a|[source,shell]
+----
+# !! When service changes then the templates will be re rendered
+{{ range service "<consul service name>" }}
+  {{ .Address }}:{{ .Port }}
+ {{ end }}
+----
+
+
+
+|===
+

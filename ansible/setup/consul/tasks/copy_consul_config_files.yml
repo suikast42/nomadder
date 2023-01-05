@@ -6,8 +6,17 @@
       when: is_master_host
       template:
         force: yes # replace the remote file when contents are different than the source.
-        src: consulhcl/server_json.j2
-        dest: "{{consul_conf_dir}}/server.json"
+        src: consulhcl/server_hcl.j2
+        dest: "{{consul_conf_dir}}/server.hcl"
+        owner: "{{ consul_user }}"
+        group: "{{ consul_group }}"
+
+    - name: config file server global settings
+      when: is_master_host
+      template:
+        force: yes # replace the remote file when contents are different than the source.
+        src: consulhcl/server_global_settings_hcl.j2
+        dest: "{{consul_conf_dir}}/server_global_settings_hcl.hcl"
         owner: "{{ consul_user }}"
         group: "{{ consul_group }}"
 
@@ -15,7 +24,7 @@
       when: is_worker_host
       template:
         force: yes # replace the remote file when contents are different than the source.
-        src: consulhcl/client_json.j2
-        dest: "{{consul_conf_dir}}/client.json"
+        src: consulhcl/client_hcl.j2
+        dest: "{{consul_conf_dir}}/client.hcl"
         owner: "{{ consul_user }}"
         group: "{{ consul_group }}"

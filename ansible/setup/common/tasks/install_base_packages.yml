@@ -38,6 +38,7 @@
       - open-iscsi
       - nfs-common
       - python3-docker
+      - cadvisor
 
     state: present
   register: install_apt
@@ -79,7 +80,6 @@
 
 - debug:
     msg: "{{ install_pip2 }}"
-
 #- name: "Update pip and install pip modules"
 #  delay: 0
 #  async: 120
@@ -98,3 +98,13 @@
   apt:
     autoclean : true
     autoremove: true
+
+- name: Copy nomad tool damon
+  become: true
+  ansible.builtin.copy:
+    src: /usr/local/bin/damon
+    dest: /usr/local/bin/damon
+    force: yes
+    group: "{{ansible_user}}"
+    owner: "{{ansible_user}}"
+    mode: 0755

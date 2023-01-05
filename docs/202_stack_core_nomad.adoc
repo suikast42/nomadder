@@ -1,0 +1,46 @@
+=== Networking
+In nomad client config is a `network` stanza.
+You can bin there some interfaces to a named physical or virtual betwork on your host.
+
+.Bind two named networks
+[source,hcl]
+----
+ host_network "private" {
+   interface = "eth0"
+   #cidr = "203.0.113.0/24"
+   #reserved_ports = "22,80"
+}
+
+host_network "public" {
+    interface = "eth1"
+}
+----
+
+After that you can bind in a job stanza the service to a specific interface
+
+.Bind service to specific interface. For example make http availiable only through private network
+[source,hcl]
+----
+  network {
+    port "http-priv" {
+      static       = 80
+      host_network = "private"
+    }
+    port "https-priv" {
+      static       = 443
+      host_network = "private"
+    }
+
+    port "https-pub" {
+      static       = 443
+      host_network = "public"
+    }
+  }
+----
+
+
+
+
+[[_200_link_nomad_task_init,nomad task dependencies]]https://developer.hashicorp.com/nomad/tutorials/task-deps/task-dependencies-interjob[Express Inter-job Dependencies with Init Tasks]
+
+

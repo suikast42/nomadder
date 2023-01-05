@@ -1,0 +1,110 @@
+- name: Keycloak docker build
+  run_once: true
+  block:
+  - name: "Search for {{registry_ip}}/{{stack_name}}/grafana:{{version_grafana_nomadder}} in nexus"
+    uri:
+    # url :"https://{{nexus_dns}}/service/rest/v1/search?repository=dockerLocal&format=docker&name=stack/core/keycloak&version=19.0.2.0"
+      # In the first installation phase traefik is not available. Thus, we use the ip here.
+      url: "http://{{registry_ip}}:{{registry_port_http}}/service/rest/v1/search?repository=dockerLocal&format=docker&name={{stack_name}}/grafana&version={{version_grafana_nomadder}}"
+      method: GET
+      #Get json content back
+#      return_content: true
+      headers:
+        Content-Type: application/json
+#      user: "{{nexus_username}}"
+#      password: "{{nexus_password}}"
+#      force_basic_auth: yes
+      status_code:
+        - 200
+    register: nexus_response
+
+  - name: "Nexus response for grafana v {{version_grafana_nomadder}}"
+    debug:
+      msg: "{{nexus_response}}"
+
+  - name: "Set fact image exists on nexus {{ nexus_response.json['items']|length == 1}}"
+    set_fact:
+      image_exists_on_nexus: "{{ nexus_response.json['items']|length == 1}}"
+
+  - name: Image build
+    when: not image_exists_on_nexus
+    block:
+    - name: "Create docker build dir {{docker_build_dir_grafana}} if needed"
+      file:
+        path: "{{docker_build_dir_grafana}}"
+        state: directory
+
+    - name: "Create docker build dir datasources dir {{docker_build_dir_grafana}}/provisioning/datasources if needed"
+      file:
+        path: "{{docker_build_dir_grafana}}/provisioning/datasources"
+        state: directory
+
+    - name: Template dockerfile grafana
+      template:
+        force: yes
+        src: grafana/DockerfileGrafana
+        dest: "{{docker_build_dir_grafana}}/Dockerfile"
+
+    - name: Template dockerfile grafana
+      template:
+        force: yes
+        src: grafana/grafana2.ini
+        dest: "{{docker_build_dir_grafana}}/grafana2.ini"
+
+    - name: Template grafana provisioning datasources
+      template:
+        src: "{{ item.src }}"
+        dest: "{{docker_build_dir_grafana}}/provisioning/datasources" # The ending slash is very important here. Indicates a folder
+        force: yes
+      with_filetree: templates/grafana/provisioning/datasources
+      when: item.state == 'file'
+
+#
+#    - name: Copy content of directory 'files'
+#      copy:
+#        src: templates/grafana/provisioning/    # let / at the end for copy the content of the folder
+#        dest: "{{docker_build_dir_grafana}}/provisioning"
+
+    - name: Template dockerfile grafana
+      template:
+        force: yes
+        src: grafana/installPlugins.sh
+        dest: "{{docker_build_dir_grafana}}/installPlugins.sh"
+
+
+    - name: "Login {{registry_dns}}"
+      # do not trigger a change
+      changed_when: false
+      community.docker.docker_login:
+        registry_url: "{{push_registry}}"
+        username: "{{registry_user}}"
+        password: "{{registry_password}}"
+        reauthorize: yes
+
+    - name: "Build and push grafana image v {{version_grafana_nomadder}}"
+      community.docker.docker_image:
+        build:
+          path: "{{docker_build_dir_grafana}}"
+        name: "{{push_registry}}/{{stack_name}}/grafana"
+  #      repository: "{{registry_dns}}"
+        tag: "{{version_grafana_nomadder}}"
+        push: yes
+        source: build
+
+  always:
+    - name : Finally
+      block:
+        - name: "Delete {{docker_build_dir_grafana}}"
+          become: true
+          file:
+            path: "{{docker_build_dir_grafana }}"
+            state: absent
+        - name: "Logout {{registry_dns}}"
+          # do not trigger a change
+          changed_when: false
+          community.docker.docker_login:
+            state: absent
+            registry_url: "{{registry_dns}}"
+
+  vars:
+    - docker_build_dir_grafana: "{{docker_build_dir}}/grafana"

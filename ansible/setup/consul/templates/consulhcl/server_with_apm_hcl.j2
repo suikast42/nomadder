@@ -1,0 +1,144 @@
+datacenter = "{{data_center}}"
+data_dir =  "{{consul_data_dir}}"
+log_level = "INFO"
+node_name = "{{host_name}}"
+server = true
+bind_addr = "0.0.0.0"
+advertise_addr = "{{host_ip}}"
+client_addr = "0.0.0.0"
+encrypt = "{{consul_encrypt_key}}"
+# https://developer.hashicorp.com/consul/docs/connect/observability/ui-visualization
+ui_config{
+   enabled = true
+   dashboard_url_templates {
+       service = "https://grafana.{{tls_san}}/d/lDlaj-NGz/service-overview?orgId=1&var-service={{'{{'}}Service.Name{{'}}'}}&var-namespace={{'{{'}}Service.Namespace{{'}}'}}&var-partition={{'{{'}}Service.Partition{{'}}'}}&var-dc={{'{{'}}Datacenter{{'}}'}}"
+   }
+   metrics_provider = "prometheus"
+   metrics_proxy {
+     base_url = "https://mimir.{{tls_san}}/prometheus"
+
+     add_headers = [
+ #      {
+ #         name = "Authorization"
+ #         value = "Bearer <token>"
+ #      }
+       {
+          name = "X-Scope-OrgID"
+          value = "1"
+       }
+     ]
+     path_allowlist = ["/prometheus/api/v1/query_range", "/prometheus/api/v1/query"]
+   }
+}
+addresses {
+    grpc = "127.0.0.1"
+}
+ports {
+    http = -1
+    https = 8501
+    grpc = 8502
+}
+connect {
+     enabled = true
+}
+retry_join =  {{masters | to_json }}
+
+bootstrap_expect = {{masters|length}}
+
+auto_encrypt{
+    allow_tls = true
+}
+performance{
+    raft_multiplier = 1
+}
+
+node_meta{
+  node_type = "server"
+}
+tls{
+    defaults {
+        ca_file = "{{cluster_intermediate_ca_bundle}}"
+        cert_file = "{{consul_cert}}"
+        key_file = "{{consul_cert_key}}"
+        verify_incoming = true
+        verify_outgoing = true
+    }
+    internal_rpc {
+        verify_server_hostname = true
+    }
+}
+#watches = [
+#  {
+#    type = "checks"
+#    handler = "/usr/bin/health-check-handler.sh"
+#  }
+#]
+
+telemetry {
+  disable_hostname = true
+  prometheus_retention_time = "72h"
+}
+
+# Global configuration
+enable_central_service_config = true
+
+# Consul service mesh configuration
+config_entries {
+  bootstrap = [
+    {
+      kind = "proxy-defaults"
+      name = "global"
+      #https://developer.hashicorp.com/consul/docs/connect/distributed-tracing
+      #https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/trace/v3/zipkin.proto
+      config {
+        # configures all sidecar proxies to expose Prometheus metrics.
+        envoy_prometheus_bind_addr = "0.0.0.0:9102"
+        envoy_tracing_json = <<EOF
+        {
+          "http":{
+            "name":"envoy.tracers.zipkin",
+            "typedConfig":{
+              "@type":"type.googleapis.com/envoy.config.trace.v3.ZipkinConfig",
+              "collector_cluster":"collector_cluster_name",
+              "collector_endpoint_version":"HTTP_JSON",
+              "collector_endpoint":"/api/v2/spans",
+              "shared_span_context":true,
+               "trace_id_128bit": true
+            }
+          }
+        }
+        EOF
+
+        envoy_extra_static_clusters_json = <<EOF
+        {
+          "connect_timeout":"3.000s",
+          "dns_lookup_family":"V4_ONLY",
+          "lb_policy":"ROUND_ROBIN",
+          "load_assignment":{
+            "cluster_name":"collector_cluster_name",
+            "endpoints":[
+              {
+                "lb_endpoints":[
+                  {
+                    "endpoint":{
+                      "address":{
+                        "socket_address":{
+                           "address": "10.21.21.42",
+                           "port_value": 9411,
+                           "protocol":"TCP"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "name":"collector_cluster_name",
+          "type":"STRICT_DNS"
+        }
+        EOF
+      }
+    }
+  ]
+}

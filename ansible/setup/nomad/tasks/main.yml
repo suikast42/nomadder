@@ -14,11 +14,7 @@
         name: nomad
         groups: docker
         state: present
-#    - name: Create nomad volumes
-#      when: is_worker_host
-#      include_tasks: nomad_volumes.yml
-#      loop:
-#        - { name: 'nexus_workdir' , path: '/opt/deployments/core/nexus/workdir'}
+
 
     - name: Install nomad
       include_tasks: nomad_install.yml
@@ -43,7 +39,7 @@
     nomad_cert: "{{nomad_cert_path}}/nomad.pem"
     nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"
     nomad_cli_cert: "{{nomad_cert_path}}/nomad-cli.pem"
-    nomad_data_dir: "{{systemd_install_dir}}/nomad/data"
+    nomad_data_dir: "{{service_working_dir_base}}/core/nomad/data"
     nomad_dns: "nomad.{{tls_san}}"
     nomad_encrypt_key: "4PRfoE6Mj9dHTLpnzmYD1+THdlyAo2Ji4U6ewMumpAw="
     nomad_infra_image: "{{registry_dns}}/google_containers/pause-amd64:3.1"

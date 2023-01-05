@@ -12,7 +12,7 @@
         name: consul
         state: stopped
 
-    - name: "Create user {consul_user}}"
+    - name: "Create user {{consul_user}}"
       include_tasks: common/tasks/user.yml
       vars:
         create_user: "{{consul_user}}"

@@ -1,0 +1,58 @@
+- name : Check nats cli installation present
+  stat:
+    path: /usr/local/bin/nats
+  register: natsCliInstalled
+
+- name: "Install nats cli {{version_nats_cli}}"
+  when: not natsCliInstalled.stat.exists or update_nats_cli | bool == true
+  block:
+    - name: "Delete local checkout path if exists"
+      run_once: true
+      become: true
+      delegate_to: localhost
+      file:
+        path: "{{compile_path}}"
+        state: absent
+
+    - name: "Create local checkout path not if exists"
+      run_once: true
+      become: true
+      delegate_to: localhost
+      file:
+        path: "{{compile_path}}"
+        state: directory
+        mode: '0777'
+
+    - name: "Install nats cli {{version_nats_cli}}"
+      run_once: true
+      delegate_to: localhost
+      shell: |
+        go install github.com/nats-io/natscli/nats@v{{version_nats_cli}}
+      args:
+        chdir:  "{{compile_path}}"
+
+
+    - name: "Copy  nats cli {{version_nats_cli}}"
+      become: true
+      run_once: true
+      when: is_local_host
+      ansible.builtin.copy:
+        src: "/home/{{ansible_user}}/go/bin/nats"
+        dest: /usr/local/bin/nats
+        force: yes
+        group: "{{ansible_user}}"
+        owner: "{{ansible_user}}"
+        mode: 0755
+
+    - name: "Copy  nats cli {{version_nats_cli}}"
+      become: true
+      when: is_master_host
+      ansible.builtin.copy:
+        src: "/usr/local/bin/nats"
+        dest: /usr/local/bin/nats
+        force: yes
+        group: "{{ansible_user}}"
+        owner: "{{ansible_user}}"
+        mode: 0755
+  vars:
+    compile_path:  /tmp/natscli

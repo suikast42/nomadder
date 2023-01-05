@@ -1,0 +1,123 @@
+#                                    __   __  __
+#                                    \ \ / / / /
+#                                     \ V / / /
+#                                      \_/  \/
+#
+#                                    V E C T O R
+#                                   Configuration
+#
+# ------------------------------------------------------------------------------
+# Website: https://vector.dev
+# Docs: https://vector.dev/docs
+# Chat: https://chat.vector.dev
+# ------------------------------------------------------------------------------
+
+timezone= "Etc/UTC"
+
+# Vector's API (disabled by default)
+# Enable and try it out with the `vector top` command
+[api]
+enabled = true
+# address = "127.0.0.1:8686"
+
+## Log sources begin
+[sources.source_internal_logs]
+type = "internal_logs"
+
+[sources.source_journald]
+type = "journald"
+current_boot_only = true
+exclude_units = ["vector"]
+exclude_matches = { }
+include_units = [ ]
+include_matches = { }
+
+
+#[sources.source_docker_logs]
+#type = "docker_logs"
+## If disabled docker.sock will be used
+#docker_host = "unix:///var/run/docker.sock"
+##include_containers = [ ]
+##include_labels = [ ]
+##include_images = [ ]
+##exclude_containers = []
+##tls.ca_file = "/usr/local/share/ca-certificates/cloudlocal/cluster-ca-bundle.pem"
+##tls.crt_file = "/etc/opt/certs/docker/docker-server.pem"
+##tls.key_file = "/etc/opt/certs/docker/docker-server-key.pem"
+
+## Log sources END
+
+## Log sources to standdardsaztion channels Begin
+[sinks.sink_nats_journald]
+type = "nats"
+inputs = [ "source_journald" ]
+url = "nats://nats.service.consul:4222"
+#url = "nats://10.21.21.42:4222"
+# Template syntax is useable here https://vector.dev/docs/reference/configuration/template-syntax/
+subject = "ingress.logs.journald"
+connection_name ="{{host_name}}-ingress-journald"
+#buffer.type = "disk"
+encoding.codec ="json"
+healthcheck = true
+
+#[sinks.sink_nats_docker]
+#type = "nats"
+#inputs = [ "source_docker_logs" ]
+#url = "nats://nats.service.consul:4222"
+##url = "nats://10.21.21.42:4222"
+## Template syntax is useable here https://vector.dev/docs/reference/configuration/template-syntax/
+#subject = "ingress.logs.docker"
+#connection_name ="{{host_name}}-ingress-journald"
+##buffer.type = "disk"
+#encoding.codec ="json"
+#healthcheck = true
+
+## Log sources to standdardsaztion channels END
+
+
+### Stanbdarized source to monitoring sink BEGIN
+#
+## All proccessed ecs logs are present in this stream
+## This must be shipped to loki or elasticsearch
+#[sources.process_nats_ecs_logs]
+#type = "nats"
+#url = "nats://nats.service.consul:4222"
+#subject = "egress.logs.ecs"
+#connection_name ="{{host_name}}-egres-ecs"
+#decoding.codec ="json"
+#queue= "ecsToLoki"
+#
+##Loki
+#[sinks.destination_loki]
+#type = "loki"
+#inputs = [ "process_nats_ecs_logs" ]
+#endpoint = "http://loki.service.consul:3100"
+#compression = "snappy"
+#healthcheck.enabled = true
+#acknowledgements.enabled = true
+#
+#[sinks.destination_loki.labels]
+#forwarder = "vector"
+##event = "{{ '{{' }} event_field {{ '}}' }}"
+##key = "value"
+##"\"{{ '{{' }} event_field {{ '}}' }}\"" = "{{ '{{' }} another_event_field {{ '}}' }}"
+##"pod_labels_*" = "{{ '{{' }} kubernetes.pod_labels {{ '}}' }}"
+#
+#[sinks.destination_loki.encoding]
+#codec = "json"
+
+
+## Stanbdarized source to monitoring sink END
+#[sinks.sink_stdout]
+#type = "console"
+#inputs = ["source_internal_logs","source_journald","source_docker_logs" ]
+##inputs = ["source_internal_logs"]
+#target = "stdout"
+#
+#[sinks.sink_stdout.encoding]
+#codec = "json"
+#healthcheck = false
+
+
+## Stanbdarized source to monitoring sink END
+

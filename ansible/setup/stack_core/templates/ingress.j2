@@ -27,6 +27,17 @@ variable "image" {
 job "ingress" {
   datacenters = [var.datacenter]
   type        = "system"
+  # only one Traefik instance will be restarted at a time, with 1 minute delay between each such action
+  # and automatic rollback to the previous version if the new one doesn't pass the health check
+  update {
+    max_parallel = 1
+    stagger      = "1m"
+    auto_revert  = true
+  }
+  # Nomad will wait for 30s after sending the kill signal to the task before forcefully shutting it down
+  # by default it's 10s ( not enough to properly drain connections )
+  # and the maximum is limited by the max_kill_timeout setting on the Nomad client ( default 30s)
+
 
   group "traefik" {
     volume "cert_ingress" {
@@ -47,14 +58,12 @@ job "ingress" {
       port "https" {
         static = var.ingress_https
       }
-      port "ui" {
-        static = 8081
-      }
     }
 
 
     task "traefik" {
       driver = "docker"
+      kill_timeout = "30s"
       service {
         name = "traefik"
         tags = [
@@ -71,7 +80,9 @@ job "ingress" {
 
           #### set TLS
           "traefik.http.routers.traefik.tls=true",
+  {% if enable_oauth_middleware %}
           "traefik.http.routers.traefik.middlewares=traefik-forward-auth"
+  {% endif %}
         ]
         check {
           name     = "alive"
@@ -97,8 +108,11 @@ job "ingress" {
           "local/traefik.toml:/etc/traefik/traefik.toml",
           "local/certconfig.toml:/etc/traefik/certconfig.toml"
         ]
+        ports = ["http", "https"]
       }
             template {
+              right_delimiter = "++"
+              left_delimiter = "++"
               data = <<EOF
 [http.serversTransports]
 [http.serversTransports.default]
@@ -163,7 +177,9 @@ job "ingress" {
      entryPoints = ["https"]
      rule = "Host(`consul.{{tls_san}}`) "
      service = "consul"
+ {% if enable_oauth_middleware %}
      middlewares = ["traefik-forward-auth@consulcatalog"]
+ {% endif %}
        # will terminate the TLS request
  #     [http.routers.consul.tls]
       [[http.routers.consul.tls.domains]]
@@ -175,7 +191,9 @@ job "ingress" {
     entryPoints = ["https"]
     rule = "Host(`nomad.{{tls_san}}`) "
     service = "nomad"
-    middlewares = ["traefik-forward-auth@consulcatalog"]
+ {% if enable_oauth_middleware %}
+     middlewares = ["traefik-forward-auth@consulcatalog"]
+ {% endif %}
     [[http.routers.nomad.tls.domains]]
       #main = "{{tls_san}}"
       sans = ["nomad.{{tls_san}}"]
@@ -185,7 +203,9 @@ job "ingress" {
     entryPoints = ["https"]
     rule = "Host(`vault.{{tls_san}}`) "
     service = "vault"
-    middlewares = ["traefik-forward-auth@consulcatalog"]
+ {% if enable_oauth_middleware %}
+     middlewares = ["traefik-forward-auth@consulcatalog"]
+ {% endif %}
     [[http.routers.vault.tls.domains]]
       sans = ["vault.{{tls_san}}"]
 
@@ -218,6 +238,8 @@ job "ingress" {
               destination = "local/certconfig.toml"
             }
       template {
+        right_delimiter = "++"
+        left_delimiter = "++"
         data = <<EOF
 [entryPoints]
     [entryPoints.http]
@@ -253,6 +275,8 @@ job "ingress" {
     connectAware = true
     connectByDefault = false
     watch = true
+    # applied if no traefik.http.routers.{name-of-your-choice}.rule  tag found
+    defaultRule = "Host(`{{'{{'}} .Name {{'}}'}}.{{tls_san}}`)"
 
   [providers.consulCatalog.endpoint]
       address = "127.0.0.1:8501"
@@ -263,6 +287,36 @@ job "ingress" {
   ca = "{{base_cert_dir}}/ca/cluster-ca.crt"
   cert = "{{base_cert_dir}}/ingress/nomad-ingress.pem"
   key = "{{base_cert_dir}}/ingress/nomad-ingress-key.pem"
+
+[tracing]
+  [tracing.zipkin]
+    httpEndpoint = "http://tempo-zipkin.service.consul:9411/api/v2/spans"
+    #httpEndpoint = "http://10.21.21.42:9411/api/v2/spans"
+    sameSpan = true
+    id128Bit = true
+
+[metrics]
+  [metrics.prometheus]
+    buckets = [0.1,0.3,1.2,5.0,7.5,9.5,9.9]
+    addEntryPointsLabels = true
+    addRoutersLabels = true
+    addServicesLabels = true
+[accessLog]
+  filePath = "/logs/access.log"
+  format = "json"
+
+[experimental.plugins.traefik-add-trace-id]
+  moduleName = "github.com/trinnylondon/traefik-add-trace-id"
+  version = "v0.1.5"
+
+[http]
+  [http.middlewares]
+    [http.middlewares.my-traefik-add-trace-id]
+      [http.middlewares.my-traefik-add-trace-id.plugin]
+        [http.middlewares.my-traefik-add-trace-id.plugin.traefik-add-trace-id]
+          headerName = "X-Trace-Id"
+          headerPrefix = ""
+          verbose = "true"
 
 [log]
   level = "DEBUG"

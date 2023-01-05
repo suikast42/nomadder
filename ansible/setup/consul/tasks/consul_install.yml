@@ -20,6 +20,11 @@
         path: "{{consul_data_dir}}"
         state: absent
 
+    - name: "Delete consul dir  {{consul_client_jwt_dir}} if present"
+      ansible.builtin.file:
+        path: "{{consul_client_jwt_dir}}"
+        state: absent
+
     - name: "Delete consul conf dir  {{consul_conf_dir}} if present"
       ansible.builtin.file:
         path: "{{consul_conf_dir}}"
@@ -27,7 +32,7 @@
 
     - name: "Delete consul cert dir  {{consul_cert_path}} if present"
       ansible.builtin.file:
-        path: "{{  consul_cert_path}}"
+        path: "{{consul_cert_path}}"
         state: absent
 
     - name: "Delete Consul installation"

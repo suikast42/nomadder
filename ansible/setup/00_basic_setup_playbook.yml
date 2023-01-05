@@ -1,6 +1,8 @@
 ---
 # At first install additional stuff that needed for localhost
 - hosts: localhost
+  vars_files:
+    - vars/versions.yml
   name: "Setup local environment"
   gather_facts: no
   roles:

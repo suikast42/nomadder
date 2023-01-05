@@ -1,0 +1,55 @@
+#  This file is part of systemd.
+#
+#  systemd is free software; you can redistribute it and/or modify it under the
+#  terms of the GNU Lesser General Public License as published by the Free
+#  Software Foundation; either version 2.1 of the License, or (at your option)
+#  any later version.
+#
+# Entries in this file show the compile time defaults. Local configuration
+# should be created by either modifying this file, or by creating "drop-ins" in
+# the journald.conf.d/ subdirectory. The latter is generally recommended.
+# Defaults can be restored by simply deleting this file and all drop-ins.
+#
+# Use 'systemd-analyze cat-config systemd/journald.conf' to display the full config.
+#
+# See journald.conf(5) for details.
+#https://www.freedesktop.org/software/systemd/man/journald.conf.html
+[Journal]
+#Storage=auto
+#Compress=yes
+#Seal=yes
+#SplitMode=uid
+#SyncIntervalSec=5m
+#Configures the rate limiting that is applied to all messages generated on the system.
+#If, in the time interval defined by RateLimitIntervalSec=, more messages than specified in RateLimitBurst= are logged by a service,
+#all further messages within the interval are dropped until the interval is over.
+#A message about the number of dropped messages is generated.
+#This rate limiting is applied per-service, so that two services which log do not interfere with each other's limits.
+#Defaults to 10000 messages in 30s.
+#The time specification for RateLimitIntervalSec= may be specified in the following units: "s", "min", "h", "ms", "us". To turn off any kind of rate limiting,
+#set either value to 0.
+RateLimitIntervalSec=10s
+RateLimitBurst=10000
+#SystemMaxUse=
+#SystemKeepFree=
+#SystemMaxFileSize=
+#SystemMaxFiles=100
+#RuntimeMaxUse=
+#RuntimeKeepFree=
+#RuntimeMaxFileSize=
+#RuntimeMaxFiles=100
+#MaxRetentionSec=
+#MaxFileSec=1month
+#ForwardToSyslog=yes
+#ForwardToKMsg=no
+#ForwardToConsole=no
+#ForwardToWall=yes
+#TTYPath=/dev/console
+#MaxLevelStore=debug
+#MaxLevelSyslog=debug
+#MaxLevelKMsg=notice
+#MaxLevelConsole=info
+#MaxLevelWall=emerg
+#LineMax=48K
+#ReadKMsg=yes
+#Audit=no

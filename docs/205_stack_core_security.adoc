@@ -1,17 +1,17 @@
 === Keycloak
 
-After first install.
+Manual creation of nomadder realm with client ingress
 
 . Create realm nomadder
-. Create client scopes groups and opendid with default assign type
+. Create client scopes groups and openid with default assign type
 . create client ingres
 * Client authentication on
 * Authorization  on
 * Implicit flow checked
 * Valid redirect URIs *
-* add client scopes groups and opendid
+* add client scopes groups and openid
 
-.Create user and set its passowrd
+.Create user and set its password
 
 . Export the realm settings
 . If the exported setting contains policies with
@@ -19,3 +19,5 @@ After first install.
 *    "type" : "resource",
 Delete it
 . Search for secret ******** and replace it with your secret
+The Users are not exported.
+You must create the users by your self in the exported document.

@@ -1,0 +1,32 @@
+.Keycloak Rest
+|===
+|Description |Command
+
+
+|Access Token
+a|[source,shell]
+----
+curl -ks \
+-d "client_id=grafana" \
+-d "client_secret=ipsdmGYL0JjCPEptKk393IFAtpD7Srbt" \
+-d "username=admin" \
+-d "password=admin" \
+-d "grant_type=password" \
+"https://security.cloud.private/realms/nomadder/protocol/openid-connect/token"  \| jq -r '.access_token'
+----
+
+|ID Token
+a|[source,shell]
+----
+curl -sk  https://security.cloud.private/realms/nomadder/protocol/openid-connect/token \
+-d "grant_type=client_credentials" \
+-d "client_id=grafana" \
+-d "client_secret=ipsdmGYL0JjCPEptKk393IFAtpD7Srbt" \| jq -r '.access_token'
+----
+
+|===
+
+
+
+
+

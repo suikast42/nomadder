@@ -51,8 +51,8 @@
       changed_when: false
       community.docker.docker_login:
         registry_url: "{{push_registry}}"
-        username: "admin"
-        password: "cloudmaster"
+        username: "{{registry_user}}"
+        password: "{{registry_password}}"
         reauthorize: yes
 
     - name: "Build and push keycloak image v {{version_keycloak_nomadder}}"
@@ -82,4 +82,3 @@
 
   vars:
     - docker_build_dir_keycloak: "{{docker_build_dir}}/keycloak"
-    - push_registry : "{{registry_ip}}:{{registry_port_push}}"

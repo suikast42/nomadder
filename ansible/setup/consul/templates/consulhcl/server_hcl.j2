@@ -1,0 +1,82 @@
+datacenter = "{{data_center}}"
+data_dir =  "{{consul_data_dir}}"
+log_level = "INFO"
+node_name = "{{host_name}}"
+server = true
+bind_addr = "0.0.0.0"
+advertise_addr = "{{host_ip}}"
+client_addr = "0.0.0.0"
+encrypt = "{{consul_encrypt_key}}"
+# https://developer.hashicorp.com/consul/docs/connect/observability/ui-visualization
+ui_config{
+   enabled = true
+   dashboard_url_templates {
+       service = "https://grafana.{{tls_san}}/d/lDlaj-NGz/service-overview?orgId=1&var-service={{'{{'}}Service.Name{{'}}'}}&var-namespace={{'{{'}}Service.Namespace{{'}}'}}&var-partition={{'{{'}}Service.Partition{{'}}'}}&var-dc={{'{{'}}Datacenter{{'}}'}}"
+   }
+   metrics_provider = "prometheus"
+   metrics_proxy {
+     base_url = "http://mimir.service.consul:9009/prometheus"
+
+     add_headers = [
+ #      {
+ #         name = "Authorization"
+ #         value = "Bearer <token>"
+ #      }
+       {
+          name = "X-Scope-OrgID"
+          value = "1"
+       }
+     ]
+     path_allowlist = ["/prometheus/api/v1/query_range", "/prometheus/api/v1/query"]
+   }
+}
+addresses {
+    grpc = "127.0.0.1"
+  #  grpc_tls = "127.0.0.1"
+}
+ports {
+    http = -1
+    https = 8501
+    grpc = 8502
+  #  grpc_tls = 8503
+}
+connect {
+     enabled = true
+}
+retry_join =  {{masters | to_json }}
+
+bootstrap_expect = {{masters|length}}
+
+auto_encrypt{
+    allow_tls = true
+}
+performance{
+    raft_multiplier = 1
+}
+
+node_meta{
+  node_type = "server"
+}
+tls{
+    defaults {
+        ca_file = "{{cluster_intermediate_ca_bundle}}"
+        cert_file = "{{consul_cert}}"
+        key_file = "{{consul_cert_key}}"
+        verify_incoming = true
+        verify_outgoing = true
+    }
+    internal_rpc {
+        verify_server_hostname = true
+    }
+}
+#watches = [
+#  {
+#    type = "checks"
+#    handler = "/usr/bin/health-check-handler.sh"
+#  }
+#]
+
+telemetry {
+  disable_hostname = true
+  prometheus_retention_time = "72h"
+}

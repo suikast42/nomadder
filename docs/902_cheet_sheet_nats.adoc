@@ -1,0 +1,14 @@
+.NATS cheatsheet
+|===
+|Description |Command
+
+| Create a jetstream consumer from cli
+a|[source,shell]
+----
+# The stream and consumer 'egress' must exists
+nats consumer next  --ack --count=100 EgressStream egress
+----
+
+
+|===
+

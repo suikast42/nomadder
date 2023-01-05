@@ -1,10 +1,8 @@
 job "countdash_app_mesh" {
   datacenters = ["nomadder1"]
-
   group "api" {
     network {
       mode = "bridge"
-
     }
 
     service {
@@ -35,31 +33,26 @@ job "countdash_app_mesh" {
       mode = "bridge"
 
       port "http" {
-        #        static= 9002
         to = 9002
       }
     }
 
     service {
       name = "count-dashboard"
-      port = "http"
+      port = "9002"
             tags = [
               "traefik.enable=true",
               "traefik.consulcatalog.connect=true",
               "traefik.http.routers.count-dashboard.tls=true",
-      #        "traefik.http.routers.count-dashboard.tls.options=mtls",
-#              "traefik.http.routers.count-dashboard.entrypoints=https",
-#              "traefik.http.services.count-dashboard.loadbalancer.server.scheme=https",
-              "traefik.http.routers.count-dashboard.rule=Host(`count.cloud.private`)",
-#              "traefik.http.routers.count-dashboard.tls.domains[0].main=cloud.private",
-#              "traefik.http.routers.count-dashboard.tls.domains[0].sans=count.cloud.private"
+              "traefik.http.routers.count-dashboard.rule=Host(`count.cloud.private`)"
             ]
 
       connect {
-
-
         sidecar_service {
           proxy {
+#            config {
+#              protocol = "http"
+#            }
             upstreams {
               destination_name = "count-api"
               local_bind_port  = 8080

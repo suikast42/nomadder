@@ -1,0 +1,82 @@
+- name: Nats exporter docker build
+  run_once: true
+  block:
+  - name: "Search for {{registry_ip}}/{{stack_name}}/prometheus-nats-exporter:{{version_nats_prometheus_exporter_nomadder}} in nexus"
+    uri:
+    # url :"https://{{nexus_dns}}/service/rest/v1/search?repository=dockerLocal&format=docker&name=stack/core/keycloak&version=19.0.2.0"
+      # In the first installation phase traefik is not available. Thus, we use the ip here.
+      url: "http://{{registry_ip}}:{{registry_port_http}}/service/rest/v1/search?repository=dockerLocal&format=docker&name={{stack_name}}/prometheus-nats-exporter&version={{version_nats_prometheus_exporter_nomadder}}"
+      method: GET
+      #Get json content back
+#      return_content: true
+      headers:
+        Content-Type: application/json
+#      user: "{{nexus_username}}"
+#      password: "{{nexus_password}}"
+#      force_basic_auth: yes
+      status_code:
+        - 200
+    register: nexus_response
+
+  - name: "Nexus response for prometheus-nats-exporter v {{version_nats_prometheus_exporter_nomadder}}"
+    debug:
+      msg: "{{nexus_response}}"
+
+  - name: "Set fact image exists on nexus {{ nexus_response.json['items']|length == 1}}"
+    set_fact:
+      image_exists_on_nexus: "{{ nexus_response.json['items']|length == 1}}"
+
+  - name: Image build
+    when: not image_exists_on_nexus
+    block:
+    - name: "Create docker build dir {{docker_build_dir_prom_exporter}} if needed"
+      file:
+        path: "{{docker_build_dir_prom_exporter}}"
+        state: directory
+
+
+
+    - name: Template dockerfile nats_prometheus_exporter
+      template:
+        force: yes
+        src: nats_prometheus_exporter/DockerfileNatsPromExporter
+        dest: "{{docker_build_dir_prom_exporter}}/Dockerfile"
+
+
+
+    - name: "Login {{registry_dns}}"
+      # do not trigger a change
+      changed_when: false
+      community.docker.docker_login:
+        registry_url: "{{push_registry}}"
+        username: "{{registry_user}}"
+        password: "{{registry_password}}"
+        reauthorize: yes
+
+    - name: "Build and push nats_prometheus_exporter image v {{version_nats_prometheus_exporter_nomadder}}"
+      community.docker.docker_image:
+        build:
+          path: "{{docker_build_dir_prom_exporter}}"
+        name: "{{push_registry}}/{{stack_name}}/prometheus-nats-exporter"
+  #      repository: "{{registry_dns}}"
+        tag: "{{version_nats_prometheus_exporter_nomadder}}"
+        push: yes
+        source: build
+
+  always:
+    - name : Finally
+      block:
+        - name: "Delete {{docker_build_dir_prom_exporter}}"
+          become: true
+          file:
+            path: "{{docker_build_dir_prom_exporter}}"
+            state: absent
+        - name: "Logout {{registry_dns}}"
+          # do not trigger a change
+          changed_when: false
+          community.docker.docker_login:
+            state: absent
+            registry_url: "{{registry_dns}}"
+
+  vars:
+    - docker_build_dir_prom_exporter: "{{docker_build_dir}}/nats_prometheus_exporter"

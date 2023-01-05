@@ -1,4 +1,19 @@
 ---
+- hosts: localhost
+  vars_files:
+    - vars/common_vars.yml
+  tasks:
+  - name: Add nameserver to localhost
+    become: true
+    lineinfile:
+      state: present
+      path: /etc/resolv.conf
+      firstmatch: yes
+      insertbefore: "nameserver.*"
+      line: "nameserver {{worker_01_ip}}"
+    tags:
+      - always
+
 # start the deployment jobs on master_0
 - hosts: all,!localhost
   name: "Create stack core volumes"
@@ -9,6 +24,7 @@
   gather_facts: yes
   roles:
     - {role: stack_core_volumes, tags: ['stack_core','stack_core_volumes']}
+    - {role: stack_observability_volumes, tags: ['stack_observability','stack_observability_volumes']}
 
 - hosts: masters[0]
   name: "Master [0] stack core deployment"
@@ -20,3 +36,26 @@
   gather_facts: yes
   roles:
     - {role: stack_core, tags: ['stack_core','stack_core_build']}
+    - {role: stack_observability, tags: ['stack_observability','stack_observability_build']}
+
+- hosts: all,!localhost
+  name: "Stack observability node setups"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+    - vars/job_secrets.yml
+  gather_facts: yes
+  roles:
+    - {role: stack_observability_nodesetup, tags: ['stack_observability_nodes','grafana_agent','vector_agent']}
+
+- hosts: all
+  name: "Stack observability cli tools setups"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+    - vars/job_secrets.yml
+  gather_facts: yes
+  roles:
+    - {role: stack_observability_cli_tools, tags: ['stack_observability_cli_tools','cli_tools']}

@@ -20,5 +20,61 @@ a|[source,shell]
 dig @127.0.0.1 -p 8600 consul.service.consul SRV
 ----
 
+|Metrics API
+a|[source,shell]
+----
+https://consul.cloud.private/v1/agent/host
+----
+
+|Write consul connect service default
+a|[source,shell]
+----
+Create file  service.json
+{
+    "Kind": "service-defaults",
+    "Name": "count-dashboard",
+    "Protocol": "http"
+}
+consul config write service.json
+----
+
+|List services
+a|[source,shell]
+----
+consul catalog services
+----
+
+|Service details
+a|[source,shell]
+----
+consul watch -type  service -service <service name>
+----
+
+| Capture service port
+a|[source,shell]
+----
+dig count-dashboard.service.consul SRV
+----
+
+| Profile consul
+a|[source,shell]
+----
+# Creates an archive with debug data after  interrupt this command
+consul debug
+----
+
+| List Peers
+a|[source,shell]
+----
+# Creates an archive with debug data after  interrupt this command
+ consul operator raft list-peers
+----
+
+| Consul monitoring
+a|[source,shell]
+----
+consul monitor -log-level debug
+----
 |===
+
 

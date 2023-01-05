@@ -23,6 +23,14 @@ job "security" {
       connect {
         sidecar_service {}
       }
+     check {
+        name     = "security_postgres_ping"
+        type     = "script"
+        command  = "pg_isready"
+        task     = "security_postgres"
+        interval = "10s"
+        timeout  = "2s"
+      }
     }
 
     task "security_postgres" {
@@ -38,7 +46,7 @@ job "security" {
         POSTGRES_INITDB_ARGS = "--encoding=UTF8"
       }
       config {
-        image = "registry.cloud.private/postgres:{{version_postgres_keycloak}}"
+        image = "{{registry_dns}}/postgres:{{version_postgres_keycloak}}"
         volumes = [
           "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
         ]
@@ -93,11 +101,31 @@ job "security" {
         "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders= X-Forwarded-User",
         "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeadersRegex= ^X-",
         "traefik.http.middlewares.traefik-forward-auth.forwardauth.trustForwardHeader=true",
-        "traefik.http.middlewares.test-auth.forwardauth.tls.insecureSkipVerify=true"
+      #  "traefik.http.middlewares.test-auth.forwardauth.tls.insecureSkipVerify=true"
       ]
 
 
     }
+      task "await-for-keycloak" {
+        driver = "docker"
+
+        config {
+          image        = "{{registry_dns}}/busybox:{{version_busy_box_init_container}}"
+          command      = "sh"
+          args         = ["-c", "echo -n 'Waiting for service keycloak'; until nslookup keycloak.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
+          #network_mode = "host"
+        }
+
+        resources {
+          cpu    = 200
+          memory = 128
+        }
+
+        lifecycle {
+          hook    = "prestart"
+          sidecar = false
+        }
+      }
     task "forwardauth" {
       driver = "docker"
       env {
@@ -180,6 +208,26 @@ job "security" {
         timeout  = "2s"
       }
     }
+      task "await-for-security-postgres" {
+        driver = "docker"
+
+        config {
+          image        = "{{registry_dns}}/busybox:{{version_busy_box_init_container}}"
+          command      = "sh"
+          args         = ["-c", "echo -n 'Waiting for service security-postgres'; until nslookup security-postgres.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
+          #network_mode = "host"
+        }
+
+        resources {
+          cpu    = 200
+          memory = 128
+        }
+
+        lifecycle {
+          hook    = "prestart"
+          sidecar = false
+        }
+      }
     task "keycloak" {
       driver = "docker"
       env {
@@ -215,6 +263,7 @@ job "security" {
       KEYCLOAK_ADMIN_PASSWORD      = {{ '{{' }}.keycloak_password{{ '}}' }}
       KC_DB_PASSWORD               = {{ '{{' }}.keycloak_db_password{{ '}}' }}
       KC_NOMADDER_CLIENT_SECRET    = {{ '{{' }}.keycloak_ingress_secret{{ '}}' }}
+      KC_NOMADDER_CLIENT_SECRET_GRAFANA    = {{ '{{' }}.keycloak_secret_observability_grafana{{ '}}' }}
     {{ '{{' }}- end -{{ '}}' }}
     EOF
          }

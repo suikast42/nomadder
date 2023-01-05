@@ -2,11 +2,18 @@ log_level = "DEBUG"
 name = "{{host_name}}"
 datacenter = "{{data_center}}"
 data_dir =  "{{nomad_data_dir}}"
-
+bind_addr = "0.0.0.0" # the default
+advertise {
+  # Defaults to the first private IP address.
+  http = "{{host_ip}}"
+  rpc  = "{{host_ip}}"
+  serf = "{{host_ip}}"
+}
 client {
   enabled = true
   meta {
     node_type= "worker"
+    connect.log_level = "debug"
   }
   host_volume "ca_cert" {
     path      = "/usr/local/share/ca-certificates/cloudlocal"
@@ -61,5 +68,43 @@ consul{
 plugin "docker"{
 config{
     infra_image = "{{nomad_infra_image}}"
+  }
+}
+
+telemetry {
+  collection_interval = "1s"
+  disable_hostname = true
+  prometheus_metrics = true
+  publish_allocation_metrics = true
+  publish_node_metrics = true
+}
+
+plugin "docker" {
+  config {
+#    volumes {
+#      enabled = true
+#      selinuxlabel = "z"
+#    }
+    extra_labels = ["job_name", "job_id", "task_group_name", "task_name", "namespace", "node_name", "node_id"]
+    logging {
+      type = "journald"
+       config {
+          labels-regex =".*"
+       }
+    }
+    gc {
+      image       = true
+      image_delay = "3m"
+      container   = true
+
+      dangling_containers {
+        enabled        = true
+        dry_run        = false
+        period         = "5m"
+        creation_grace = "5m"
+      }
+    }
+
+#    allow_privileged = true
   }
 }

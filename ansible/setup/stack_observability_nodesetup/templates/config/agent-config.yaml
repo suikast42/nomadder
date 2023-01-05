@@ -1,0 +1,117 @@
+server:
+  log_level: error
+
+metrics:
+  wal_directory: "{{grafana_agent_working_dir}}/wal"
+  global:
+    scrape_interval: 10s
+    remote_write:
+      - url: http://mimir.service.consul:9009/api/v1/push
+#        headers:
+#          X-Scope-OrgID: 1
+  configs:
+    - name: integrations
+      scrape_configs:
+        # Scrape metrics from nomad
+        - job_name: integrations/nomad
+          metrics_path: /v1/metrics
+          tls_config:
+            insecure_skip_verify: false
+            ca_file: "{{cluster_intermediate_ca_bundle}}"
+            cert_file: "{{nomad_cert}}"
+            key_file: "{{nomad_cert_key}}"
+          scheme: https
+          params:
+            format:
+              - prometheus
+          static_configs:
+            - targets: ['localhost:4646']
+              # Add label for imported dashboard
+              labels:
+                host: "{{host_name}}"
+          relabel_configs:
+            # Replace the instance label with the hostname.
+            # Otherwise, localhost:4646 will be tracked in this label
+            - source_labels: [ instance ]
+              replacement: "{{host_name}}"
+              target_label: instance
+              action: replace
+
+
+#logs:
+#  configs:
+#    - name: default
+#      clients:
+#        - url:  http://loki.service.consul:3100/api/v1/push
+#      positions:
+#        filename: "{{grafana_agent_working_dir}}/logpos/positions.yaml"
+#      target_config:
+#        sync_period: 10s
+#      scrape_configs:
+#        - job_name: integrations/docker
+#          docker_sd_configs:
+#            - host: unix:///var/run/docker.sock
+#              refresh_interval: 5s
+#          relabel_configs:
+#            - action: replace
+#              replacement: integrations/docker
+#              source_labels:
+#                - __meta_docker_container_id
+#              target_label: job
+#            - source_labels:
+#                - __meta_docker_container_name
+#              regex: '/(.*)'
+#              target_label: container
+#            - source_labels:
+#                - __meta_docker_container_log_stream
+#              target_label: stream
+
+
+traces:
+  configs:
+    - name: default
+      service_graphs:
+        enabled: true
+      remote_write:
+        - endpoint: http://tempo-otlp-grpc.service.consul:4317
+#          headers:
+#            X-Scope-OrgID: 1
+          insecure: true
+      receivers:
+        jaeger:
+          protocols:
+            thrift_http:
+
+
+integrations:
+  agent:
+    # Enables the Agent integration, allowing the Agent to automatically
+    enabled: true
+    relabel_configs:
+      - action: replace
+        source_labels:
+          - agent_hostname
+        target_label: instance
+
+  # Scrape metrics from linux host
+  node_exporter:
+    enabled: true
+    relabel_configs:
+      - action: replace
+        source_labels:
+          - agent_hostname
+        target_label: instance
+
+  # Scrape metrics from consul
+  consul_exporter:
+    enabled: true
+    scrape_interval: 5s
+    server: https://localhost:8501
+    ca_file: "{{cluster_intermediate_ca_bundle}}"
+    cert_file: "{{consul_cert}}"
+    key_file: "{{consul_cert_key}}"
+    relabel_configs:
+      - action: replace
+        source_labels:
+          - agent_hostname
+        target_label: instance

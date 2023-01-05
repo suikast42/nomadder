@@ -1,0 +1,8 @@
+FROM natsio/prometheus-nats-exporter:{{version_nats_prometheus_exporter}} as base
+# The base omages is build by scratch. It has no /bin/sh for debugging
+FROM alpine:3.17.0
+COPY --from=base /prometheus-nats-exporter /prometheus-nats-exporter
+
+EXPOSE 7777
+ENTRYPOINT ["/prometheus-nats-exporter"]
+CMD ["--help"]

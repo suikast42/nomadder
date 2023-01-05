@@ -1,0 +1,23 @@
+[Unit]
+Description=Grafana Agent
+
+
+[Service]
+#User={{grafana_agent_user}}
+#Group={{grafana_agent_group}}
+User= root
+Group= root
+ExecStart=/usr/local/bin/grafana-agent -config.file={{grafana_agent_config_dir}}/agent-config.yaml
+ExecReload=/bin/kill --signal HUP $MAINPID
+KillMode=process
+KillSignal=SIGTERM
+Restart=on-failure
+RestartSec=10
+LimitNOFILE=65536
+TimeoutSec=10
+
+## StartLimitIntervalSec is used for systemd versions >= 230
+StartLimitIntervalSec = 10s
+
+[Install]
+WantedBy=multi-user.target

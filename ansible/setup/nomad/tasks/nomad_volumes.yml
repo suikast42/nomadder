@@ -20,14 +20,12 @@
       owner: "{{ nomad_user }}"
       group: "{{ nomad_group }}"
 
-  - name: restart nomad if needed
-    become: true
+  - name: Set volume changed
     when: template.changed or volume.changed
-    service:
-      name: nomad
-      state: restarted
-    register: nomadService
-    until: nomadService.status.ActiveState == "active"
-    async: 300
-    retries: 10
-    delay: 5
+    set_fact:
+      volume_changed: true
+
+  - name: Set volume changed default
+    when: volume_changed is not defined
+    set_fact:
+      volume_changed: false

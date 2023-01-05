@@ -1,0 +1,36 @@
+- name: Create postgres volume
+  when: host_name == 'worker-01'
+  block:
+
+  - name: Create stack core postgres volumes
+    include_tasks: nomad/tasks/nomad_volumes.yml
+    loop:
+      - { name: 'stack_observability_grafana_volume' , path: '{{stack_observability_grafana_volume}}'}
+      - { name: 'stack_observability_mimir_volume' , path: '{{stack_observability_mimir_volume}}'}
+      - { name: 'stack_observability_loki_volume' , path: '{{stack_observability_loki_volume}}'}
+      - { name: 'stack_observability_tempo_volume' , path: '{{stack_observability_tempo_volume}}'}
+      - { name: 'stack_observability_nats_volume' , path: '{{stack_observability_nats_volume}}'}
+      - { name: 'stack_observability_grafana_agent_volume' , path: '{{stack_observability_grafana_agent_volume}}'}
+
+  - name: restart nomad if needed
+    become: true
+    # fact comes from task nomad/tasks/nomad_volumes.yml
+    when: volume_changed | bool == true
+    service:
+      name: nomad
+      state: restarted
+    register: nomadService
+    until: nomadService.status.ActiveState == "active"
+    async: 300
+    retries: 10
+    delay: 5
+
+  vars:
+    stack_observability_volume: "{{nomad_volumes_dir}}/observability"
+    stack_observability_grafana_volume: "{{stack_observability_volume}}/grafana"
+    stack_observability_mimir_volume: "{{stack_observability_volume}}/mimir"
+    stack_observability_loki_volume: "{{stack_observability_volume}}/loki"
+    stack_observability_tempo_volume: "{{stack_observability_volume}}/tempo"
+    stack_observability_nats_volume: "{{stack_observability_volume}}/nats"
+    stack_observability_grafana_agent_volume: "{{stack_observability_volume}}/grafana_agent"
+

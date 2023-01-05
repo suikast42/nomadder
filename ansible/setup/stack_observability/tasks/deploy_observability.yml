@@ -1,0 +1,102 @@
+- name: Deploy observability
+  block:
+  - name: Template observability.j2
+    delegate_to: localhost
+    template:
+      force: yes
+      src: observability.j2
+      dest: "{{role_path}}/files/observability.nomad"
+
+  - name: Template mimir.yml
+    delegate_to: localhost
+    template:
+      force: yes
+      src: mimir/mimir.yaml
+      dest: "{{role_path}}/files/mimir.yaml"
+
+  - name: Template loki.yaml
+    delegate_to: localhost
+    template:
+      force: yes
+      src: loki/loki.yaml
+      dest: "{{role_path}}/files/loki.yaml"
+
+  - name: Template tempo.yaml
+    delegate_to: localhost
+    template:
+      force: yes
+      src: tempo/tempo.yaml
+      dest: "{{role_path}}/files/tempo.yaml"
+
+  - name: "Copy observability.nomad"
+    become: true
+    copy:
+      force: true
+      src: observability.nomad
+      dest: "{{stack_deployment_dir}}/observability.nomad"
+      mode: '0755'
+
+  - name: Upload mimir.yml to nexus
+    delegate_to: localhost
+    shell:
+      cmd: "curl -k --user '{{registry_user}}:{{registry_password}}' --upload-file {{role_path}}/files/mimir.yaml https://{{nexus_dns}}/repository/raw/config/stack/observability/mimir.yaml"
+    register: result
+
+  - name: "Upload result mimir.yml"
+    debug:
+      msg: "{{ result }}"
+
+  - name: Upload loki.yaml to nexus
+    delegate_to: localhost
+    shell:
+      cmd: "curl -k --user '{{registry_user}}:{{registry_password}}' --upload-file {{role_path}}/files/loki.yaml https://{{nexus_dns}}/repository/raw/config/stack/observability/loki.yaml"
+    register: result
+
+  - name: "Upload result loki.yaml"
+    debug:
+      msg: "{{ result }}"
+
+  - name: Upload tempo.yaml to nexus
+    delegate_to: localhost
+    shell:
+      cmd: "curl -k --user '{{registry_user}}:{{registry_password}}' --upload-file {{role_path}}/files/tempo.yaml https://{{nexus_dns}}/repository/raw/config/stack/observability/tempo.yaml"
+    register: result
+
+  - name: "Upload result tempo.yaml"
+    debug:
+      msg: "{{ result }}"
+
+  #mimir_config="$(cat {{stack_deployment_dir}}/datasources.yaml)"
+  - name: "Create Variables in nomad"
+    shell: |
+      nomad var put -force {{nomad_observability_job_path}} \
+      keycloak_secret_observability_grafana={{keycloak_secret_observability_grafana}} 
+
+    environment:
+      - NOMAD_ADDR: "https://localhost:4646"
+      - NOMAD_CACERT: "{{cluster_intermediate_ca_bundle}}"
+      - NOMAD_CLIENT_CERT: "{{nomad_cli_cert}}"
+      - NOMAD_CLIENT_KEY: "{{nomad_cli_cert_key}}"
+
+
+
+  #
+  #    - name: "Slurp {{stack_deployment_dir}}/observability.nomad from master_0"
+  #      ansible.builtin.slurp:
+  #        src: "{{stack_deployment_dir}}/observability.nomad"
+  #      register: job
+
+  - name: Create job
+    community.general.nomad_job:
+      # host: "{{masters[0]}}"
+      client_cert: "{{nomad_cli_cert}}"
+      client_key: "{{nomad_cli_cert_key}}"
+      host: localhost
+      state: present
+      force_start: true
+      #        content: "{{ job.content | b64decode }}"
+      content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/observability.nomad') }}"
+      timeout: 120
+
+  vars:
+    nomad_observability_job_path: nomad/jobs/observability
