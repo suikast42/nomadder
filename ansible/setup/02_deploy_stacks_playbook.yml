@@ -11,6 +11,8 @@
       firstmatch: yes
       insertbefore: "nameserver.*"
       line: "nameserver {{worker_01_ip}}"
+    tags:
+      - always
 
 # start the deployment jobs on master_0
 - hosts: all,!localhost
