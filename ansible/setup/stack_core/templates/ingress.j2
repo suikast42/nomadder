@@ -27,6 +27,7 @@ variable "image" {
 job "ingress" {
   datacenters = [var.datacenter]
   type        = "system"
+
   # only one Traefik instance will be restarted at a time, with 1 minute delay between each such action
   # and automatic rollback to the previous version if the new one doesn't pass the health check
   update {
@@ -40,6 +41,12 @@ job "ingress" {
 
 
   group "traefik" {
+    restart {
+      attempts = -1
+      interval = "5s"
+      delay = "5s"
+      mode = "delay"
+    }
     volume "cert_ingress" {
       type      = "host"
       source    = "cert_ingress"

@@ -22,7 +22,7 @@ server:
   # Log only messages with the given severity or above. Supported values [debug,
   # info, warn, error]
   # CLI flag: -log.level
-  log_level: "info"
+  log_level: "warn"
 ingester:
   wal:
     enabled: true
@@ -68,5 +68,17 @@ limits_config:
   # The limit to length of chunk store queries. 0 to disable.
   max_query_length: 0
   max_entries_limit_per_query: 20000
+  max_query_series: 100000
+  max_query_parallelism: 2
+  # Alter the log line timestamp during ingestion when the timestamp is the same as the
+  # previous entry for the same stream. When enabled, if a log line in a push request has
+  # the same timestamp as the previous line for the same stream, one nanosecond is added
+  # to the log line. This will preserve the received order of log lines with the exact
+  # same timestamp when they are queried, by slightly altering their stored timestamp.
+  # NOTE: This is imperfect, because Loki accepts out of order writes, and another push
+  # request for the same stream could contain duplicate timestamps to existing
+  # entries and they will not be incremented.
+  # CLI flag: -validation.increment-duplicate-timestamps
+  increment_duplicate_timestamp: true
 #  reject_old_samples: true
 #  reject_old_samples_max_age: 168h

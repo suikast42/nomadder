@@ -2,7 +2,19 @@ job "security" {
   type = "service"
   datacenters = ["{{data_center}}"]
 
+    reschedule {
+      delay          = "10s"
+      delay_function = "constant"
+      unlimited      = true
+    }
+
   group "keycloak-db" {
+     restart {
+       attempts = -1
+       interval = "5s"
+       delay = "5s"
+       mode = "delay"
+     }
     volume "security_postgres_volume" {
       type      = "host"
       source    = "security_postgres_volume"
@@ -76,6 +88,12 @@ job "security" {
   }
 
   group "keycloak-ingress" {
+     restart {
+       attempts = -1
+       interval = "5s"
+       delay = "5s"
+       mode = "delay"
+     }
     volume "ca_cert" {
       type      = "host"
       source    = "ca_cert"
@@ -169,6 +187,12 @@ job "security" {
   }
 
   group "keycloak" {
+     restart {
+       attempts = -1
+       interval = "5s"
+       delay = "5s"
+       mode = "delay"
+     }
     count = 1
     network {
       mode = "bridge"
