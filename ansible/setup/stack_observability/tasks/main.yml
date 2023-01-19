@@ -31,7 +31,7 @@
     - version_grafana_tempo: "1.5.0"
     - version_grafana_agent: "0.30.1"
     - version_nats_server: "2.9.11"
-    - version_logunifer: "0.0.26"
+    - version_logunifer: "0.0.27"
     - version_nats_prometheus_exporter: "0.10.1"
     - version_nats_prometheus_exporter_nomadder: "0.10.1.0"
     - stack_deployment_dir: "{{master_0_job_dir}}/observability"

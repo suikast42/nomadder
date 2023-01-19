@@ -1,6 +1,6 @@
 - name: Install cli tools
   block:
-    - name: "Install nats cli v {{version_vector_agent}}"
+    - name: "Install nats cli v {{version_nats_cli}}"
       import_tasks: install_nats_cli.yml
 
 

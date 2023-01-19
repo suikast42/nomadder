@@ -17,12 +17,12 @@
     - tmp_install_dir_base: "/tmp/grafana_agent"
     - version_grafana_agent: "0.30.2"
     - uninstall_grafana_agent: false
-    - version_vector_agent: "0.26.0-1"
+    - version_vector_agent: "0.27.0-1"
+    - uninstall_vector_agent: true
     - version_nomad_event_sink: "0.2.0"
     - uninstall_version_nomad_event_sink: false
     - nomad_event_sink_working_dir: "{{service_working_dir_base}}/nomad_event_sink"
     - nomad_event_sink_config_dir: "/etc/nomad_event_sink.d"
-    - uninstall_vector_agent: false
     - grafana_agent_group: grafana_agent
     - grafana_agent_user: grafana_agent
     - grafana_agent_config_dir: "/etc/grafana.agent.d"
