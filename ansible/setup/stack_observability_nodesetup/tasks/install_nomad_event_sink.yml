@@ -1,0 +1,121 @@
+- name: Nomad event sink agent uninstall
+  become: true
+  when: uninstall_version_nomad_event_sink|bool == true
+  block:
+    - name: Nomad event sink agent service
+      failed_when: false
+      service:
+        name: nomad_event_sink.service
+        state: stopped
+        enabled: false
+
+    - name: "Delete Nomad event sink agent installation"
+      ansible.builtin.file:
+        path: /usr/local/bin/nomad-events-sink
+        state: absent
+        mode: '0755'
+
+    - name: "Nomad event sink agent working dir"
+      ansible.builtin.file:
+        path: "{{nomad_event_sink_working_dir}}"
+        state: absent
+        mode: '0755'
+
+    - name: "Nomad event sink agent config dir"
+      ansible.builtin.file:
+        path: "{{nomad_event_sink_config_dir}}"
+        state: absent
+        mode: '0755'
+
+- name: Check grafana agent installation present
+  stat:
+    path: "{{nomad_event_sink_working_dir}}/nomad-events-sink"
+  register: agnetinstalled
+
+- name: "Install grafana agent"
+  become: true
+  when: not agnetinstalled.stat.exists
+  block:
+
+    - name: "Nomad event sink agent data dir {{nomad_event_sink_working_dir}} if needed"
+      ansible.builtin.file:
+        path: "{{nomad_event_sink_working_dir}}/data"
+        state: directory
+
+
+    - name: "Nomad event sink agent config dir {{nomad_event_sink_config_dir}} if needed"
+      ansible.builtin.file:
+        path: "{{nomad_event_sink_config_dir}}"
+        state: directory
+
+    # original repo https://github.com/mr-karan//nomad-events-sink.git
+    # forked to suikast42 for deployment stability
+    - name: Checkout Nomad event sink agent source
+      delegate_to: localhost
+      become: false
+      run_once: true
+      shell: |
+        git clone https://github.com/suikast42/nomad-events-sink.git
+        cd nomad-events-sink
+        git fetch --all
+        git checkout v{{version_nomad_event_sink}}
+      args:
+        chdir: /tmp
+
+    - name: Build Nomad event sink agent from source
+      delegate_to: localhost
+      become: false
+      run_once: true
+      shell: |
+        make
+        mv /tmp/nomad-events-sink/bin/nomad-events-sink.bin /tmp/nomad-events-sink/bin/nomad-events-sink
+      args:
+        chdir: /tmp/nomad-events-sink
+        creates: /tmp/nomad-events-sink/bin/nomad-events-sink # oh-my-posh is already installed
+
+    - name: Copy nomad_event_sink installation
+      ansible.builtin.copy:
+        src: /tmp/nomad-events-sink/bin/nomad-events-sink
+        dest: /usr/local/bin
+        force: yes
+        mode: 0755
+
+- name: Nomad event sink config
+  become: true
+  block:
+
+    - name: Template nomad_event_sink.service
+      template:
+        force: yes
+        src: service/nomad_event_sink.service.j2
+        dest: /etc/systemd/system/nomad_event_sink.service
+      register: systemdconfig
+
+    - name: Template nomad_event_sink.toml
+      template:
+        force: yes
+        src: config/nomad_event_sink.toml
+        dest: "{{nomad_event_sink_config_dir}}/nomad_event_sink.toml"
+      register: serviceconfig
+
+    - name: stop nomad_event_sink agent service
+      when: systemdconfig.changed or serviceconfig.changed
+      failed_when: false
+      service:
+        name: nomad_event_sink
+        state: stopped
+
+    - name: Reload systemd
+      when: systemdconfig.changed
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: start nomad_event_sink agent service
+      service:
+        name: nomad_event_sink
+        state: started
+        enabled: yes
+      register: agentservice
+      until: agentservice.status.ActiveState == "active"
+      retries: 10
+      delay: 5

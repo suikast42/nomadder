@@ -19,9 +19,9 @@ nomad_version: "1.4.3"
 nomad_checksum: "sha256:15ab8fd2da071d93852f59b9a8833e3a764986ef8140c6b11f87621391e63902"
 uninstall_nomad: false
 
-nomad_plugin_cni_version: "1.1.1"
-nomad_plugin_cni_checksum: "sha256:b275772da4026d2161bf8a8b41ed4786754c8a93ebfb6564006d5da7f23831e5"
-uninstall_nomad_plugin_cni: false
+nomad_plugin_cni_version: "1.2.0"
+nomad_plugin_cni_checksum: "sha256:f3a841324845ca6bf0d4091b4fc7f97e18a623172158b72fc3fdcdb9d42d2d37"
+uninstall_nomad_plugin_cni: true
 
 version_cfssl: 1.6.3
 update_cfssl: false

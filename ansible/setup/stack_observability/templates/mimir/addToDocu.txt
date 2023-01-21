@@ -1,0 +1,7 @@
+Mimir Datassource
+http://localhost:8000/prometheus
+Alert Manager Datasource
+http://localhost:8000/alertmanager
+Access -> Browser
+
+X-Scope-OrgID $ensured_x_scope_orgid;

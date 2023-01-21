@@ -73,7 +73,7 @@
       register: config
 
 
-    - name: Template grafana.agent.service
+    - name: Template vector.service.j2
       template:
         force: yes
         src: service/vector.service.j2

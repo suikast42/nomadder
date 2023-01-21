@@ -1,0 +1,27 @@
+[Unit]
+Description=Nomad event sink v {{version_nomad_event_sink}}
+
+
+[Service]
+#User={{grafana_agent_user}}
+#Group={{grafana_agent_group}}
+User= root
+Group= root
+Environment="NOMAD_ADDR=https://localhost:4646"
+Environment="NOMAD_CACERT={{cluster_intermediate_ca_bundle}}"
+Environment="NOMAD_CLIENT_CERT={{nomad_cli_cert}}"
+Environment="NOMAD_CLIENT_KEY={{nomad_cli_cert_key}}"
+ExecStart=/usr/local/bin/nomad-events-sink --config {{nomad_event_sink_config_dir}}/nomad_event_sink.toml
+ExecReload=/bin/kill --signal HUP $MAINPID
+KillMode=process
+KillSignal=SIGTERM
+Restart=on-failure
+RestartSec=10
+LimitNOFILE=65536
+TimeoutSec=10
+
+## StartLimitIntervalSec is used for systemd versions >= 230
+#StartLimitIntervalSec = 10s
+
+[Install]
+WantedBy=multi-user.target

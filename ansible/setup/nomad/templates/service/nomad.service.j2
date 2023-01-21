@@ -1,14 +1,18 @@
 [Unit]
-Description=Nomad
-Documentation=https://www.nomadproject.io/docs/
-Wants=network-online.target
-After=network-online.target
-
 # When using Nomad with Consul it is not necessary to start Consul first. These
 # lines start Consul before Nomad as an optimization to avoid Nomad logging
 # that Consul is unavailable at startup.
-Wants=consul.service
-After=consul.service
+Description=Nomad
+Documentation=https://www.nomadproject.io/docs/
+{% if is_master_host  %}
+Wants=network-online.target,consul.service
+After=network-online.target,consul.service
+{% else %}
+Wants=network-online.target,containerd.service,docker.service,consul.service
+After=network-online.target,containerd.service,docker.service,consul.service
+{% endif %}
+
+
 
 [Service]
 {% if is_worker_host  %}

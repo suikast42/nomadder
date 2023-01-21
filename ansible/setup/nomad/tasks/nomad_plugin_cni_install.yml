@@ -2,7 +2,7 @@
   become: true
   block:
 
-    - name: "Delete nomad plugin cno dir {{plugin_dir}} if present"
+    - name: "Delete nomad plugin cni dir {{plugin_dir}} if present"
       when: uninstall_nomad|bool == true or uninstall_nomad_plugin_cni|bool == true
       ansible.builtin.file:
         path: "{{plugin_dir}}"
@@ -25,7 +25,7 @@
           state: directory
           mode: '0755'
 
-      - name: Download nomad binary
+      - name: Download nomad plugin cni binary
         get_url:
           url: https://github.com/containernetworking/plugins/releases/download/v{{nomad_plugin_cni_version}}/cni-plugins-linux-amd64-v{{nomad_plugin_cni_version}}.tgz
           dest: /tmp/cni-plugins-linux-amd64-{{nomad_plugin_cni_version}}_linux_amd64.zip
@@ -35,7 +35,7 @@
           checksum: "{{nomad_plugin_cni_checksum}}"
         register: nomad_plugin_download
 
-      - name: "Unzip nomad plugin archive to {{plugin_dir}}"
+      - name: "Unzip nomad plugin cni archive to {{plugin_dir}}"
         unarchive:
           src: "{{nomad_plugin_download.dest}}"
           dest: "{{plugin_dir}}"
@@ -43,6 +43,13 @@
           owner: "{{ nomad_user }}"
           group: "{{ nomad_group }}"
           mode: 0755
+
+      - name: Template host_bridge_network_conf.j2
+        become: true
+        template:
+          force: yes
+          src: conf/host_bridge_network_conf.j2
+          dest: /etc/sysctl.d/bridge.conf
 
   vars:
     plugin_dir: "/opt/cni/bin"
