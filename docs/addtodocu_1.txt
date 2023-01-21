@@ -1,0 +1,19 @@
+Fix traceroute installation
+https://developer.apple.com/forums/thread/91878
+$ mv /usr/local/bin/traceroute /usr/local/bin/traceroute.bak
+$ ln -s /usr/sbin/traceroute /usr/local/bin/traceroute
+$ traceroute www.google.com
+
+
+-- DNS config
+dnsmasq config(/etc/dnsmasq.d/10-consul) add:
+(for all worker nodes)
+address=/cloud.private/10.21.21.42
+Windows client
+Add at least one of dnsmasq servers to vmnet2
+WSL client
+Add at least one of dnsmasq servers to /etc/resolv.conf
+
+
+-- Architecure docu like
+https://github.com/adavarski/Hashicorp-Nomad-Consul-Ansible

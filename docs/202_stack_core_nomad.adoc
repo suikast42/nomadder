@@ -1,3 +1,9 @@
+=== Nomad Reference Architecture
+https://developer.hashicorp.com/nomad/tutorials/enterprise/production-reference-architecture-vm-with-consul#ra
+
+=== Nomad Deployment Guide
+https://developer.hashicorp.com/nomad/tutorials/enterprise/production-deployment-guide-vm-with-consul
+
 === Networking
 In nomad client config is a `network` stanza.
 You can bin there some interfaces to a named physical or virtual betwork on your host.
