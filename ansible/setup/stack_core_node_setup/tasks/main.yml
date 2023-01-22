@@ -1,0 +1,4 @@
+- name: Install minio admin cli
+  import_tasks: install_minio_admin.yml
+
+

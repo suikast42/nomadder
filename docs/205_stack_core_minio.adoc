@@ -1,0 +1,2 @@
+=== Configuration
+https://min.io/docs/minio/linux/reference/minio-server/minio-server.html#minio-server-environment-variables

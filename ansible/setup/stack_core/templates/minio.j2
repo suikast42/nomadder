@@ -1,0 +1,107 @@
+job "minio" {
+  datacenters = ["{{data_center}}"]
+  type = "service"
+  reschedule {
+    delay          = "10s"
+    delay_function = "constant"
+    unlimited      = true
+  }
+
+  group "minio" {
+    count = 1
+    restart {
+      attempts = -1
+      interval = "5s"
+      delay = "5s"
+      mode = "delay"
+    }
+    network {
+      mode = "bridge"
+      port "http" {
+        to = 9000
+      }
+      port "console" {
+        to = 9001
+      }
+    }
+    task "minio" {
+      driver = "docker"
+
+      config {
+        image = "{{registry_dns}}/minio/minio:{{version_minio}}"
+        command = "server"
+        args = [
+          "/data",
+          "--console-address",
+          ":9001"
+          ]
+         ports = ["http","console"]
+      }
+
+     env {
+        MINIO_PROMETHEUS_AUTH_TYPE = "public"
+
+        MINIO_PROMETHEUS_URL     = "http://mimir.service.consul:9009/prometheus"
+        CONSOLE_MINIO_REGION     = "{{data_center}}"
+        MINIO_PROMETHEUS_JOB_ID  = "minio-job"
+      }
+    template {
+       destination = "${NOMAD_SECRETS_DIR}/env.vars"
+       env         = true
+       change_mode = "restart"
+       data        = <<EOF
+       {{ '{{' }}- with nomadVar "{{nomad_minio_job_path}}" -{{ '}}' }}
+          MINIO_ROOT_USER      = {{ '{{' }}.minio_root_user{{ '}}' }}
+          MINIO_ROOT_PASSWORD  =  {{ '{{' }}.minio_root_password{{ '}}' }}
+        {{ '{{' }}- end -{{ '}}' }}
+       EOF
+    }
+
+      resources {
+        memory = 4096
+        cpu= 1000
+      }
+
+      service {
+        port = "http"
+        name = "minio"
+        tags = [
+         "frontend",
+         "minio",
+         "traefik.enable=true",
+         "traefik.consulcatalog.connect=false",
+         "traefik.http.routers.minio.tls=true",
+         "traefik.http.routers.minio.rule=Host(`minio.{{tls_san}}`)",
+        ]
+
+        check {
+          type     = "http"
+          path     = "/minio/health/live"
+          port     = "http"
+          interval = "30s"
+          timeout  = "2s"
+       }
+     }
+      service {
+           port = "console"
+           name = "minio-console"
+           tags = [
+             "console",
+             "minio",
+             "traefik.enable=true",
+             "traefik.consulcatalog.connect=false",
+             "traefik.http.routers.minio-console.tls=true",
+             "traefik.http.routers.minio-console.rule=Host(`minio.console.{{tls_san}}`)",
+           ]
+           check {
+             type     = "http"
+             path     = "/"
+             port     = "console"
+             interval = "30s"
+             timeout  = "2s"
+           }
+         }
+      }
+  }
+
+}
