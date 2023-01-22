@@ -9,6 +9,11 @@ job "minio" {
 
   group "minio" {
     count = 1
+    volume "stack_core_minio_volume" {
+      type      = "host"
+      source    = "core_minio_volume"
+      read_only = false
+    }
     restart {
       attempts = -1
       interval = "5s"
@@ -25,6 +30,11 @@ job "minio" {
       }
     }
     task "minio" {
+      volume_mount {
+         volume      = "stack_core_minio_volume"
+         destination = "/data"
+      }
+
       driver = "docker"
 
       config {
