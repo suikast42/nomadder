@@ -14,6 +14,11 @@ job "minio" {
       source    = "core_minio_volume"
       read_only = false
     }
+   volume "ca_cert" {
+      type      = "host"
+      source    = "ca_cert"
+      read_only = true
+    }
     restart {
       attempts = -1
       interval = "5s"
@@ -34,7 +39,12 @@ job "minio" {
          volume      = "stack_core_minio_volume"
          destination = "/data"
       }
-
+      volume_mount {
+        volume      = "ca_cert"
+        # the server searches in the /CAs path at that specified directory.
+        # Do not change the sub folder name CAs
+        destination = "/certs/CAs"
+      }
       driver = "docker"
 
       config {
@@ -43,14 +53,23 @@ job "minio" {
         args = [
           "/data",
           "--console-address",
-          ":9001"
+          ":9001",
+          "--certs-dir",
+          "/certs"
           ]
          ports = ["http","console"]
       }
 
      env {
+        #MINIO_IDENTITY_OPENID_CONFIG_URL="https://security.{{tls_san}}/realms/nomadder/.well-known/openid-configuration"
+        #MINIO_IDENTITY_OPENID_CLIENT_ID="minio"
+        #MINIO_IDENTITY_OPENID_CLIENT_SECRET="u1wDFQh8pJgg8DyY6DGNc6yoW0SJnfg3"
+        #MINIO_IDENTITY_OPENID_CLAIM_NAME= "groups"
+        ##MINIO_IDENTITY_OPENID_CLAIM_PREFIX="mino."
+        ## MINIO_IDENTITY_OPENID_COMMENT="<string>"
+        #MINIO_IDENTITY_OPENID_SCOPES="openid,profile,email"
+        #MINIO_IDENTITY_OPENID_REDIRECT_URI="https://minio.console.{{tls_san}}/oauth_callback"
         MINIO_PROMETHEUS_AUTH_TYPE = "public"
-
         MINIO_PROMETHEUS_URL     = "http://mimir.service.consul:9009/prometheus"
         CONSOLE_MINIO_REGION     = "{{data_center}}"
         MINIO_PROMETHEUS_JOB_ID  = "minio-job"
