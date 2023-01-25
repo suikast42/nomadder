@@ -561,8 +561,8 @@ jetstream {
         ]
         }
         resources {
-          cpu    = 500
-          memory = 256
+          cpu    = 100
+          memory = 32
         }
 template {
  destination = "local/agent.yaml"
@@ -599,18 +599,6 @@ metrics:
               replacement: "nats-prometheus-exporter"
               target_label: instance
               action: replace
-++- $services := service "minio" -++
-++- if $services ++
-        - job_name: integrations/minio
-          metrics_path: /minio/v2/metrics/cluster
-          scheme: http
-          static_configs:
-++- range $services  ++
-             # Scrape metrics from ++.Name++
-            - targets: ['++.Name++.service.consul:++.Port++']
-++- end ++
-++- end ++
-
 EOF
   }
   }

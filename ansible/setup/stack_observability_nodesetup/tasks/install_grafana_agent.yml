@@ -76,21 +76,21 @@
       state: directory
 
 
-  - name: "Download grafana agent v {{version_grafana_agent}}"
+  - name: "Download grafana agent v {{version_grafana_agent_nodes}}"
     delay: 0
     async: 300
     poll: 1
     get_url:
-      url: https://github.com/grafana/agent/releases/download/v{{version_grafana_agent}}/agent-linux-amd64.zip
+      url: https://github.com/grafana/agent/releases/download/v{{version_grafana_agent_nodes}}/agent-linux-amd64.zip
       dest: "{{tmp_install_dir_base}}/agent-linux-amd64.zip"
     register: agent_download
 
-  - name:  "Download grafana agent ctl v {{version_grafana_agent}}"
+  - name:  "Download grafana agent ctl v {{version_grafana_agent_nodes}}"
     delay: 0
     async: 300
     poll: 1
     get_url:
-      url: https://github.com/grafana/agent/releases/download/v{{version_grafana_agent}}/agentctl-linux-amd64.zip
+      url: https://github.com/grafana/agent/releases/download/v{{version_grafana_agent_nodes}}/agentctl-linux-amd64.zip
       dest: "{{tmp_install_dir_base}}/agentctl-linux-amd64.zip"
     register: agentctl_download
 

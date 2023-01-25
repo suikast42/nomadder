@@ -8,6 +8,7 @@ job "minio" {
   }
 
   group "minio" {
+
     count = 1
     volume "stack_core_minio_volume" {
       type      = "host"
@@ -34,6 +35,7 @@ job "minio" {
         to = 9001
       }
     }
+
     task "minio" {
       volume_mount {
          volume      = "stack_core_minio_volume"
@@ -61,6 +63,8 @@ job "minio" {
       }
 
      env {
+        HOSTNAME = "${NOMAD_ALLOC_NAME}"
+        MINIO_SERVER_URL = "https://minio.{{tls_san}}"
         #MINIO_IDENTITY_OPENID_CONFIG_URL="https://security.{{tls_san}}/realms/nomadder/.well-known/openid-configuration"
         #MINIO_IDENTITY_OPENID_CLIENT_ID="minio"
         #MINIO_IDENTITY_OPENID_CLIENT_SECRET="u1wDFQh8pJgg8DyY6DGNc6yoW0SJnfg3"
@@ -71,8 +75,10 @@ job "minio" {
         #MINIO_IDENTITY_OPENID_REDIRECT_URI="https://minio.console.{{tls_san}}/oauth_callback"
         MINIO_PROMETHEUS_AUTH_TYPE = "public"
         MINIO_PROMETHEUS_URL     = "http://mimir.service.consul:9009/prometheus"
-        CONSOLE_MINIO_REGION     = "{{data_center}}"
-        MINIO_PROMETHEUS_JOB_ID  = "minio-job"
+        MINIO_PROMETHEUS_JOB_ID  = "integrations/minio"
+       # CONSOLE_PROMETHEUS_URL     = "http://mimir.service.consul:9009/prometheus"
+       # CONSOLE_MINIO_REGION     = "{{data_center}}"
+       # CONSOLE_PROMETHEUS_JOB_ID  = "integrations/minio"
       }
     template {
        destination = "${NOMAD_SECRETS_DIR}/env.vars"
@@ -131,6 +137,67 @@ job "minio" {
            }
          }
       }
-  }
 
+
+    task "minio-exporter" {
+  lifecycle {
+      hook = "poststart"
+      sidecar = true
+    }
+       driver = "docker"
+       config {
+
+         image = "{{registry_dns}}/grafana/agent:v{{version_grafana_agent}}"
+         args = [
+             "-config.file","/config/agent.yaml"
+          ]
+          volumes = [
+            "local/agent.yaml:/config/agent.yaml"
+        ]
+        }
+        resources {
+          cpu    = 250
+          memory = 64
+        }
+template {
+ destination = "local/agent.yaml"
+ change_mode = "restart"
+ right_delimiter = "++"
+ left_delimiter = "++"
+ data        = <<EOF
+server:
+  log_level: debug
+
+metrics:
+  wal_directory: "/tmp/wal"
+  global:
+    scrape_interval: 5s
+    remote_write:
+++- range service "mimir" ++
+      - url: http://++.Name++.service.consul:++.Port++/api/v1/push
+++- end ++
+  configs:
+    - name: integrations
+      scrape_configs:
+        - job_name: integrations/minio
+          metrics_path: /minio/v2/metrics/cluster
+          scheme: http
+          static_configs:
+            - targets: ['localhost:9000']
+              labels:
+                host: ++ env "node.unique.name" ++
+          relabel_configs:
+            # Replace the instance label with nats-prometheus-exporter.
+            - source_labels: [ instance ]
+              replacement:  ++ env "NOMAD_ALLOC_NAME" ++
+              target_label: instance
+              action: replace
+            - source_labels: [ server ]
+              replacement:  ++ env "NOMAD_ADDR_http" ++
+              target_label: server
+              action: replace
+EOF
+  }
+  }
+  }
 }
