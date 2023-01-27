@@ -436,8 +436,13 @@ job "observability" {
 
         service {
            port = "prometheus-exporter"
-           # Change the service selector in garafa agent config as well if you cange this name
+           # Change the service selector in grafana agent config as well if you cange this name
            name = "nats-prometheus-exporter"
+           tags = [
+                "prometheus",
+                 "prometheus:server_id=${NOMAD_ALLOC_NAME}",
+                 "prometheus:version={{version_nats_server}}",
+           ]
            check {
               type     = "http"
               port     = "prometheus-exporter"
@@ -530,24 +535,45 @@ jetstream {
 
     }
   group "grafana-agent"{
+     count = 1
+
+     # Grafana agent is deployed on every node and scrapes the general nomad job metrics
+     # This agent deployed for scraping metrics from consul services.
      restart {
        attempts = 10
        interval = "5m"
        delay = "5s"
        mode = "delay"
      }
-       # Grafana agent is deployed on every node and scrapes the general nomad job metrics
-       # This agent deployed is for scraping special service metrics like databases brokers etc
+
        volume "stack_observability_grafana_agent_volume" {
           type      = "host"
           source    = "stack_observability_grafana_agent_volume"
           read_only = false
         }
-          count = 1
+       volume "ca_certs" {
+          type      = "host"
+          source    = "ca_cert"
+          read_only = true
+        }
+       volume "cert_consul" {
+          type      = "host"
+          source    = "cert_consul"
+          read_only = true
+        }
+
     task "grafana-agent" {
          volume_mount {
             volume      = "stack_observability_grafana_agent_volume"
             destination = "/data/wal"
+          }
+         volume_mount {
+            volume      = "ca_certs"
+            destination = "/certs/ca"
+          }
+         volume_mount {
+            volume      = "cert_consul"
+            destination = "/certs/consul"
           }
        driver = "docker"
        config {
@@ -562,7 +588,7 @@ jetstream {
         }
         resources {
           cpu    = 100
-          memory = 32
+          memory = 64
         }
 template {
  destination = "local/agent.yaml"
@@ -571,7 +597,7 @@ template {
  left_delimiter = "++"
  data        = <<EOF
 server:
-  log_level: debug
+  log_level: info
 
 metrics:
   wal_directory: "/data/wal"
@@ -584,21 +610,94 @@ metrics:
   configs:
     - name: integrations
       scrape_configs:
-        - job_name: integrations/nats-prometheus-exporter
-          metrics_path: /metrics
-          static_configs:
-++- range service "nats-prometheus-exporter" ++
-             # Scrape metrics from ++.Name++
-            - targets: ['++.Name++.service.consul:++.Port++']
-++- end ++
-              labels:
-                host: ++ env "node.unique.name" ++
+        - job_name: "integrations/consul_sd"
+          consul_sd_configs:
+            - server: "consul.service.consul:8501"
+              tags: ["prometheus"]
+              tls_config:
+                insecure_skip_verify: true
+                ca_file: "/certs/ca/ca.crt"
+                cert_file: "/certs/consul/consul.pem"
+                key_file: "/certs/consul/consul-key.pem"
+              datacenter: "{{data_center}}"
+              scheme: https
           relabel_configs:
-            # Replace the instance label with nats-prometheus-exporter.
-            - source_labels: [ instance ]
-              replacement: "nats-prometheus-exporter"
+            - source_labels: [__meta_consul_node]
               target_label: instance
-              action: replace
+            - source_labels: [__meta_consul_service]
+              target_label: service
+#            - source_labels: [__meta_consul_tags]
+#              separator:     ','
+#              regex:         'prometheus:([^=]+)=([^,]+)'
+#              target_label:  '$${1}'
+#              replacement:   '$${2}'
+            - source_labels: [__meta_consul_tags]
+              separator:     ','
+              regex:         '.*,prometheus:server_id=([^,]+),.*'
+              target_label:  'server_id'
+              replacement:   '$${1}'
+            - source_labels: [__meta_consul_tags]
+              separator:     ','
+              regex:         '.*,prometheus:version=([^,]+),.*'
+              target_label:  'version'
+              replacement:   '$${1}'
+            - source_labels: ['__meta_consul_tags']
+              target_label: 'labels'
+              regex: '(.+)'
+              replacement: '$${1}'
+              action: 'keep'
+ #           - action: replace
+ #             replacement: '1'
+ #             target_label: 'test'
+          metric_relabel_configs:
+            - action: labeldrop
+              regex: 'exported_.*'
+
+
+        - job_name: "integrations/consul_sd_minio"
+          metrics_path: "/minio/v2/metrics/cluster"
+          consul_sd_configs:
+            - server: "consul.service.consul:8501"
+              tags: ["prometheus_minio"]
+              tls_config:
+                insecure_skip_verify: true
+                ca_file: "/certs/ca/ca.crt"
+                cert_file: "/certs/consul/consul.pem"
+                key_file: "/certs/consul/consul-key.pem"
+              datacenter: "{{data_center}}"
+              scheme: https
+          relabel_configs:
+            - source_labels: [__meta_consul_node]
+              target_label: instance
+            - source_labels: [__meta_consul_service]
+              target_label: service
+#            - source_labels: [__meta_consul_tags]
+#              separator:     ','
+#              regex:         'prometheus:([^=]+)=([^,]+)'
+#              target_label:  '$${1}'
+#              replacement:   '$${2}'
+            - source_labels: [__meta_consul_tags]
+              separator:     ','
+              regex:         '.*,prometheus:server=([^,]+),.*'
+              target_label:  'server'
+              replacement:   '$${1}'
+            - source_labels: [__meta_consul_tags]
+              separator:     ','
+              regex:         '.*,prometheus:version=([^,]+),.*'
+              target_label:  'version'
+              replacement:   '$${1}'
+            - source_labels: ['__meta_consul_tags']
+              target_label: 'labels'
+              regex: '(.+)'
+              replacement: '$${1}'
+              action: 'keep'
+#            - action: replace
+#              replacement: '38'
+#              target_label: 'test'
+          metric_relabel_configs:
+            - action: labeldrop
+              regex: 'exported_.*'
+
 EOF
   }
   }

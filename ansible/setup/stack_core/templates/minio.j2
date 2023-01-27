@@ -101,8 +101,11 @@ job "minio" {
         port = "http"
         name = "minio"
         tags = [
+         "prometheus_minio",
          "frontend",
          "minio",
+         "prometheus:server=${NOMAD_ALLOC_NAME}",
+         "prometheus:version={{version_minio}}",
          "traefik.enable=true",
          "traefik.consulcatalog.connect=false",
          "traefik.http.routers.minio.tls=true",
@@ -137,67 +140,5 @@ job "minio" {
            }
          }
       }
-
-
-    task "minio-exporter" {
-  lifecycle {
-      hook = "poststart"
-      sidecar = true
-    }
-       driver = "docker"
-       config {
-
-         image = "{{registry_dns}}/grafana/agent:v{{version_grafana_agent}}"
-         args = [
-             "-config.file","/config/agent.yaml"
-          ]
-          volumes = [
-            "local/agent.yaml:/config/agent.yaml"
-        ]
-        }
-        resources {
-          cpu    = 250
-          memory = 64
-        }
-template {
- destination = "local/agent.yaml"
- change_mode = "restart"
- right_delimiter = "++"
- left_delimiter = "++"
- data        = <<EOF
-server:
-  log_level: debug
-
-metrics:
-  wal_directory: "/tmp/wal"
-  global:
-    scrape_interval: 5s
-    remote_write:
-++- range service "mimir" ++
-      - url: http://++.Name++.service.consul:++.Port++/api/v1/push
-++- end ++
-  configs:
-    - name: integrations
-      scrape_configs:
-        - job_name: integrations/minio
-          metrics_path: /minio/v2/metrics/cluster
-          scheme: http
-          static_configs:
-            - targets: ['localhost:9000']
-              labels:
-                host: ++ env "node.unique.name" ++
-          relabel_configs:
-            # Replace the instance label with nats-prometheus-exporter.
-            - source_labels: [ instance ]
-              replacement:  ++ env "NOMAD_ALLOC_NAME" ++
-              target_label: instance
-              action: replace
-            - source_labels: [ server ]
-              replacement:  ++ env "NOMAD_ADDR_http" ++
-              target_label: server
-              action: replace
-EOF
-  }
-  }
   }
 }

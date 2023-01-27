@@ -21,7 +21,7 @@ uninstall_nomad: false
 
 nomad_plugin_cni_version: "1.2.0"
 nomad_plugin_cni_checksum: "sha256:f3a841324845ca6bf0d4091b4fc7f97e18a623172158b72fc3fdcdb9d42d2d37"
-uninstall_nomad_plugin_cni: true
+uninstall_nomad_plugin_cni: false
 
 version_cfssl: 1.6.3
 update_cfssl: false
