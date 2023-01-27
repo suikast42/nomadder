@@ -113,11 +113,20 @@ job "minio" {
         ]
 
         check {
+          name      = "minio-live"
           type     = "http"
           path     = "/minio/health/live"
           port     = "http"
-          interval = "30s"
+          interval = "10s"
           timeout  = "2s"
+       }
+      check {
+          name      = "minio-live"
+          type     = "http"
+          path     = "/minio/health/ready"
+          port     = "http"
+          interval = "15s"
+          timeout  = "4s"
        }
      }
       service {

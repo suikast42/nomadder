@@ -51,5 +51,28 @@ a|[source,shell]
 ----
 ansible-playbook playbbok.yml  --ask-vault-pass --extra-vars "key1=value1,key2,value2" --tags="tag1,tag2"
 ----
+
+| Async command with sync point
+a|[source,yaml]
+----
+- name: Run an async task
+  ansible.builtin.yum:
+    name: docker-io
+    state: present
+  # Fire and forget here. Do not wait with poll 0
+  async: 1000
+  poll: 0
+  register: yum_sleeper
+
+- name: Check on an async task
+  async_status:
+    jid: "{{ yum_sleeper.ansible_job_id }}"
+  register: job_result
+  until: job_result.finished
+  # Wait for the status of yum_sleeper
+  retries: 100
+  delay: 10
+----
+
 |===
 

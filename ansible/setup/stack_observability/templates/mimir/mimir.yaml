@@ -1,11 +1,11 @@
 
-# Test {{ '{{' }} env "NOMAD_TASK_NAME"  {{ '}}' }}
+# Test ++ env "NOMAD_ALLOC_NAME"  ++
 # Do not use this configuration in production.
 # It is for demonstration purposes only.
 # Run Mimir in single process mode, with all components running in 1 process.
 target: all,alertmanager,overrides-exporter
 multitenancy_enabled: false
-#bar: ++  env "NOMAD_TASK_NAME"  ++
+#bar: ++  env "NOMAD_ALLOC_NAME"  ++
 blocks_storage:
   backend: filesystem
   bucket_store:

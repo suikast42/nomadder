@@ -1,5 +1,51 @@
 - name: Deploy observability
   block:
+  - name: "Delete local conf dir if exists"
+    changed_when: false
+    delegate_to: localhost
+    run_once: true
+    ansible.builtin.file:
+      path: "{{local_template_conf_dir}}"
+      state: absent
+
+  - name: "Create grafana agent conf dir if not exists"
+    delegate_to: localhost
+    changed_when: false
+    run_once: true
+    ansible.builtin.file:
+      path: "{{local_template_conf_dir}}/grafana_agent"
+      state: directory
+      mode: '0755'
+
+  - name: "Create mimir conf dir if not exists"
+    delegate_to: localhost
+    changed_when: false
+    run_once: true
+    ansible.builtin.file:
+      path: "{{local_template_conf_dir}}/mimir"
+      state: directory
+      mode: '0755'
+
+
+  - name: "Create tempo conf dir if not exists"
+    delegate_to: localhost
+    changed_when: false
+    run_once: true
+    ansible.builtin.file:
+      path: "{{local_template_conf_dir}}/tempo"
+      state: directory
+      mode: '0755'
+
+
+  - name: "Create loki conf dir if not exists"
+    delegate_to: localhost
+    changed_when: false
+    run_once: true
+    ansible.builtin.file:
+      path: "{{local_template_conf_dir}}/loki"
+      state: directory
+      mode: '0755'
+
   - name: Template observability.j2
     delegate_to: localhost
     template:
@@ -12,21 +58,29 @@
     template:
       force: yes
       src: mimir/mimir.yaml
-      dest: "{{role_path}}/files/mimir.yaml"
+      dest: "{{role_path}}/files/configs/mimir/mimir.tpl"
 
   - name: Template loki.yaml
     delegate_to: localhost
     template:
       force: yes
       src: loki/loki.yaml
-      dest: "{{role_path}}/files/loki.yaml"
+      dest: "{{role_path}}/files/configs/loki/loki.tpl"
 
   - name: Template tempo.yaml
     delegate_to: localhost
     template:
       force: yes
       src: tempo/tempo.yaml
-      dest: "{{role_path}}/files/tempo.yaml"
+      dest: "{{role_path}}/files/configs/tempo/tempo.tpl"
+
+  - name: Template grafana_agent agent.yaml
+    delegate_to: localhost
+    template:
+      force: yes
+      src: grafana_agent/agent.j2
+      dest: "{{role_path}}/files/configs/grafana_agent/agent.tpl"
+
 
   - name: "Copy observability.nomad"
     become: true
@@ -36,37 +90,20 @@
       dest: "{{stack_deployment_dir}}/observability.nomad"
       mode: '0755'
 
-  - name: Upload mimir.yml to nexus
-    delegate_to: localhost
-    shell:
-      cmd: "curl -k --user '{{registry_user}}:{{registry_password}}' --upload-file {{role_path}}/files/mimir.yaml https://{{nexus_dns}}/repository/raw/config/stack/observability/mimir.yaml"
-    register: result
+  - name: "Delete remote configs"
+    become: true
+    ansible.builtin.file:
+      path: "{{stack_deployment_dir}}/configs"
+      state: absent
 
-  - name: "Upload result mimir.yml"
-    debug:
-      msg: "{{ result }}"
+  - name: "observability.nomad templates to {{stack_deployment_dir}}/configs"
+    become: true
+    copy:
+      force: true
+      src: "{{role_path}}/files/configs"
+      dest: "{{stack_deployment_dir}}"
+      mode: '0755'
 
-  - name: Upload loki.yaml to nexus
-    delegate_to: localhost
-    shell:
-      cmd: "curl -k --user '{{registry_user}}:{{registry_password}}' --upload-file {{role_path}}/files/loki.yaml https://{{nexus_dns}}/repository/raw/config/stack/observability/loki.yaml"
-    register: result
-
-  - name: "Upload result loki.yaml"
-    debug:
-      msg: "{{ result }}"
-
-  - name: Upload tempo.yaml to nexus
-    delegate_to: localhost
-    shell:
-      cmd: "curl -k --user '{{registry_user}}:{{registry_password}}' --upload-file {{role_path}}/files/tempo.yaml https://{{nexus_dns}}/repository/raw/config/stack/observability/tempo.yaml"
-    register: result
-
-  - name: "Upload result tempo.yaml"
-    debug:
-      msg: "{{ result }}"
-
-  #mimir_config="$(cat {{stack_deployment_dir}}/datasources.yaml)"
   - name: "Create Variables in nomad"
     shell: |
       nomad var put -force {{nomad_observability_job_path}} \
@@ -86,17 +123,42 @@
   #        src: "{{stack_deployment_dir}}/observability.nomad"
   #      register: job
 
-  - name: Create job
+#  - name: Create job
+#    community.general.nomad_job:
+#      # host: "{{masters[0]}}"
+#      client_cert: "{{nomad_cli_cert}}"
+#      client_key: "{{nomad_cli_cert_key}}"
+#      host: localhost
+#      state: present
+#      force_start: true
+#      #        content: "{{ job.content | b64decode }}"
+#      content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/observability.nomad') }}"
+#      timeout: 120
+
+  # The ansible nomad module can't handle jobs with files in template stanza
+  # See https://github.com/ansible-collections/community.general/issues/5902
+  - name: "Create job"
+    async: 120
+    poll: 5
+    shell: nomad job run observability.nomad
+    environment:
+      - NOMAD_ADDR: "https://localhost:4646"
+      - NOMAD_CACERT: "{{cluster_intermediate_ca_bundle}}"
+      - NOMAD_CLIENT_CERT: "{{nomad_cli_cert}}"
+      - NOMAD_CLIENT_KEY: "{{nomad_cli_cert_key}}"
+    args:
+      chdir: "{{stack_deployment_dir}}"
+
+  - name: Force job to start observability
     community.general.nomad_job:
-      # host: "{{masters[0]}}"
       client_cert: "{{nomad_cli_cert}}"
       client_key: "{{nomad_cli_cert_key}}"
       host: localhost
       state: present
-      force_start: true
-      #        content: "{{ job.content | b64decode }}"
-      content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/observability.nomad') }}"
+      name: observability
       timeout: 120
+      force_start: true
 
   vars:
-    nomad_observability_job_path: nomad/jobs/observability
+    - nomad_observability_job_path: nomad/jobs/observability
+    - local_template_conf_dir: "{{role_path}}/files/configs"

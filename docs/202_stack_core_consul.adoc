@@ -160,7 +160,7 @@ consul-template -template test.tpl -dry
 template {
 destination = "local/agent.yaml"
 right_delimiter = "++"
-          left_delimiter = "++"
+left_delimiter = "++"
 source ="test.tpl"
 }
 ----
