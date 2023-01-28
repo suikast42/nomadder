@@ -44,7 +44,5 @@
     - version_keycloak_nomadder: "{{version_keycloak}}.0"
     - version_mesosphere: "3.1.0"
     - version_postgres_keycloak: "14.5"
-    - version_minio: "RELEASE.2023-01-20T02-05-44Z"
-    - version_minio_mc_admin: "RELEASE.2023-01-11T03-14-16Z"
     - core_deployment_dir: "{{master_0_job_dir}}/core"
 

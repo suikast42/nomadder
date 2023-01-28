@@ -1,5 +1,6 @@
 - name: Deploy observability
   block:
+
   - name: "Delete local conf dir if exists"
     changed_when: false
     delegate_to: localhost
@@ -7,6 +8,15 @@
     ansible.builtin.file:
       path: "{{local_template_conf_dir}}"
       state: absent
+
+  - name: "Create shell script dir if not exists"
+    delegate_to: localhost
+    changed_when: false
+    run_once: true
+    ansible.builtin.file:
+      path: "{{local_template_conf_dir}}/shell"
+      state: directory
+      mode: '0755'
 
   - name: "Create grafana agent conf dir if not exists"
     delegate_to: localhost
@@ -48,6 +58,7 @@
 
   - name: Template observability.j2
     delegate_to: localhost
+    changed_when: false
     template:
       force: yes
       src: observability.j2
@@ -55,6 +66,7 @@
 
   - name: Template mimir.yml
     delegate_to: localhost
+    changed_when: false
     template:
       force: yes
       src: mimir/mimir.yaml
@@ -62,6 +74,7 @@
 
   - name: Template loki.yaml
     delegate_to: localhost
+    changed_when: false
     template:
       force: yes
       src: loki/loki.yaml
@@ -69,6 +82,7 @@
 
   - name: Template tempo.yaml
     delegate_to: localhost
+    changed_when: false
     template:
       force: yes
       src: tempo/tempo.yaml
@@ -76,11 +90,20 @@
 
   - name: Template grafana_agent agent.yaml
     delegate_to: localhost
+    changed_when: false
     template:
       force: yes
       src: grafana_agent/agent.j2
       dest: "{{role_path}}/files/configs/grafana_agent/agent.tpl"
 
+
+  - name: Template shell script create_buckets.sh
+    delegate_to: localhost
+    changed_when: false
+    template:
+      force: yes
+      src: shell/create_buckets.sh
+      dest: "{{role_path}}/files/configs/shell/create_buckets.tpl"
 
   - name: "Copy observability.nomad"
     become: true
@@ -92,12 +115,14 @@
 
   - name: "Delete remote configs"
     become: true
+    changed_when: false
     ansible.builtin.file:
       path: "{{stack_deployment_dir}}/configs"
       state: absent
 
   - name: "observability.nomad templates to {{stack_deployment_dir}}/configs"
     become: true
+    changed_when: false
     copy:
       force: true
       src: "{{role_path}}/files/configs"
@@ -105,9 +130,14 @@
       mode: '0755'
 
   - name: "Create Variables in nomad"
+    register: createvars
+    failed_when: createvars.rc != 0
     shell: |
       nomad var put -force {{nomad_observability_job_path}} \
-      keycloak_secret_observability_grafana={{keycloak_secret_observability_grafana}} 
+      keycloak_secret_observability_grafana={{keycloak_secret_observability_grafana}} \
+      minio_loki_user={{minio_root_user}} \
+      minio_loki_secret={{minio_root_password}}
+      
 
     environment:
       - NOMAD_ADDR: "https://localhost:4646"

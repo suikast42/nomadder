@@ -49,4 +49,5 @@ After that you can bind in a job stanza the service to a specific interface
 
 [[_200_link_nomad_task_init,nomad task dependencies]]https://developer.hashicorp.com/nomad/tutorials/task-deps/task-dependencies-interjob[Express Inter-job Dependencies with Init Tasks]
 
+[[_200_link_nomad_hcl_lang,nomad hcl lang functions]]https://developer.hashicorp.com/nomad/docs/job-specification/hcl2[Nomad hcl lang functions]
 
