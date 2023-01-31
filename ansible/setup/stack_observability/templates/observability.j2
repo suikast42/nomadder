@@ -125,6 +125,52 @@ job "observability" {
         timeout  = "2s"
        }
     }
+       task "mimir-create-buckets"{
+         driver = "docker"
+         user ="root"
+         env {
+             MINIO_BUCKET="mimir"
+         }
+        template{
+          destination = "${NOMAD_SECRETS_DIR}/env.vars"
+           env         = true
+           right_delimiter = "++"
+           left_delimiter = "++"
+           data = <<EOF
+           ++- with nomadVar "{{nomad_observability_job_path}}" -++
+               MINIO_USER= ++ .minio_mimir_user ++
+               MINIO_PASSWORD= ++ .minio_mimir_secret ++
+           ++- end -++
+          EOF
+        }
+        template{
+            right_delimiter = "++"
+            left_delimiter = "++"
+            data = file(abspath("./configs/shell/create_buckets.tpl"))
+            destination = "local/create_buckets.sh"
+        }
+        config {
+           image        = "{{registry_dns}}/minio/mc:{{version_minio_mc_admin}}"
+           volumes      = ["local/create_buckets.sh:/create_buckets.sh"]
+           entrypoint = ["/bin/sh","/create_buckets.sh"]
+           #network_mode = "host
+        }
+        resources {
+          cpu    = 200
+          memory = 128
+        }
+
+        lifecycle {
+          hook    = "prestart"
+          sidecar = false
+        }
+       restart {
+         attempts = 10
+         interval = "2m"
+         delay = "10s"
+         mode = "fail"
+        }
+      }
       task "mimir"{
         volume_mount {
           volume      = "stack_observability_mimir_volume"
@@ -291,6 +337,7 @@ job "observability" {
       }
     }
   group "tempo"{
+
      restart {
        attempts = 10
        interval = "5m"
@@ -379,6 +426,53 @@ job "observability" {
           timeout  = "1s"
          }
       }
+           task "tempo-create-buckets"{
+             driver = "docker"
+             user ="root"
+             env {
+                 MINIO_BUCKET="tempo"
+             }
+            template{
+              destination = "${NOMAD_SECRETS_DIR}/env.vars"
+               env         = true
+               right_delimiter = "++"
+               left_delimiter = "++"
+               data = <<EOF
+               ++- with nomadVar "{{nomad_observability_job_path}}" -++
+                   MINIO_USER= ++ .minio_tempo_user ++
+                   MINIO_PASSWORD= ++ .minio_tempo_secret ++
+               ++- end -++
+              EOF
+            }
+            template{
+                right_delimiter = "++"
+                left_delimiter = "++"
+                data = file(abspath("./configs/shell/create_buckets.tpl"))
+                destination = "local/create_buckets.sh"
+            }
+            config {
+               image        = "{{registry_dns}}/minio/mc:{{version_minio_mc_admin}}"
+               volumes      = ["local/create_buckets.sh:/create_buckets.sh"]
+               entrypoint = ["/bin/sh","/create_buckets.sh"]
+               #network_mode = "host
+            }
+            resources {
+              cpu    = 200
+              memory = 128
+            }
+
+            lifecycle {
+              hook    = "prestart"
+              sidecar = false
+            }
+           restart {
+             attempts = 10
+             interval = "2m"
+             delay = "10s"
+             mode = "fail"
+            }
+          }
+
       task "tempo"{
         volume_mount {
           volume      = "stack_observability_tempo_volume"

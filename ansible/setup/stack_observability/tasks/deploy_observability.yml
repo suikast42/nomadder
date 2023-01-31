@@ -136,8 +136,11 @@
       nomad var put -force {{nomad_observability_job_path}} \
       keycloak_secret_observability_grafana={{keycloak_secret_observability_grafana}} \
       minio_loki_user={{minio_root_user}} \
-      minio_loki_secret={{minio_root_password}}
-      
+      minio_loki_secret={{minio_root_password}} \
+      minio_tempo_user={{minio_root_user}} \
+      minio_tempo_secret={{minio_root_password}} \
+      minio_mimir_user={{minio_root_user}} \
+      minio_mimir_secret={{minio_root_password}}      
 
     environment:
       - NOMAD_ADDR: "https://localhost:4646"
