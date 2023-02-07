@@ -24,7 +24,7 @@ createbucket(){
 }
 
 addpolicy(){
-    mc policy set public myminio/$MINIO_BUCKET
+    mc anonymous set public myminio/$MINIO_BUCKET
     result=$?
     if [ $result -gt 0 ]; then
       echo "Can't set public policy. Return code is: $result "
