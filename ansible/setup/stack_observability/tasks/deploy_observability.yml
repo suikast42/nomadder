@@ -64,28 +64,28 @@
       src: observability.j2
       dest: "{{role_path}}/files/observability.nomad"
 
-  - name: Template mimir.yml
+  - name: Template mimir.j2
     delegate_to: localhost
     changed_when: false
     template:
       force: yes
-      src: mimir/mimir.yaml
+      src: mimir/mimir.j2
       dest: "{{role_path}}/files/configs/mimir/mimir.tpl"
 
-  - name: Template loki.yaml
+  - name: Template loki.j2
     delegate_to: localhost
     changed_when: false
     template:
       force: yes
-      src: loki/loki.yaml
+      src: loki/loki.j2
       dest: "{{role_path}}/files/configs/loki/loki.tpl"
 
-  - name: Template tempo.yaml
+  - name: Template tempo.j2
     delegate_to: localhost
     changed_when: false
     template:
       force: yes
-      src: tempo/tempo.yaml
+      src: tempo/tempo.j2
       dest: "{{role_path}}/files/configs/tempo/tempo.tpl"
 
   - name: Template grafana_agent agent.yaml
