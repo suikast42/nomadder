@@ -1,0 +1,609 @@
+job "observability" {
+  type = "service"
+  datacenters = ["{{data_center}}"]
+   reschedule {
+      delay          = "10s"
+      delay_function = "constant"
+      unlimited      = true
+    }
+  group "grafana" {
+     restart {
+       attempts = 10
+       interval = "5m"
+       delay = "5s"
+       mode = "delay"
+     }
+    volume "stack_observability_grafana_volume" {
+      type      = "host"
+      source    = "stack_observability_grafana_volume"
+      read_only = false
+    }
+
+    count = 1
+    network {
+      mode = "bridge"
+      port "ui" {
+        to = 3000
+      }
+    }
+    service {
+          name = "grafana"
+          #      port = "ui"
+          port = "3000"
+          connect {
+            sidecar_service {
+#              proxy {
+#                config {
+#                   protocol = "http"
+#                }
+#            }
+          }
+        }
+        tags = [
+          "traefik.enable=true",
+          "traefik.consulcatalog.connect=true",
+          "traefik.http.routers.grafana.tls=true",
+          "traefik.http.routers.grafana.rule=Host(`grafana.{{tls_san}}`)",
+        ]
+
+        check {
+          name     = "health"
+          type     = "http"
+          port     = "ui"
+          path     = "/health"
+          interval = "10s"
+          timeout  = "2s"
+        }
+    }
+    task "grafana" {
+     volume_mount {
+        volume      = "stack_observability_grafana_volume"
+        destination = "/var/lib/grafana"
+      }
+
+      driver = "docker"
+      env {
+        GF_AUTH_OAUTH_AUTO_LOGIN= "true"
+        GF_PATHS_CONFIG  = "/etc/grafana/grafana2.ini"
+        GF_PATHS_PLUGINS = "/data/grafana/plugins"
+        GF_SERVER_DOMAIN = "grafana.{{tls_san}}"
+        GF_SERVER_ROOT_URL = "https://grafana.{{tls_san}}"
+        GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH = "contains(realm_access.roles[*], 'admin') && 'GrafanaAdmin' || contains(realm_access.roles[*], 'editor') && 'Editor' || 'Viewer'"
+      }
+      config {
+        image = "{{registry_dns}}/{{stack_name}}/grafana:{{version_grafana_nomadder}}"
+        ports = ["ui"]
+      }
+      resources {
+        cpu    = 1000
+        memory = 2048
+      }
+      template {
+         destination = "${NOMAD_SECRETS_DIR}/env.vars"
+         env         = true
+         change_mode = "restart"
+         data        = <<EOF
+          {{ '{{' }} with nomadVar "{{nomad_observability_job_path}}" {{ '}}' }}
+            GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET    = {{ '{{' }}.keycloak_secret_observability_grafana{{ '}}' }}
+          {{ '{{' }} end {{ '}}' }}
+          EOF
+      }
+    }
+  }
+
+  group "mimir"{
+     restart {
+       attempts = 10
+       interval = "5m"
+       delay = "5s"
+       mode = "delay"
+     }
+    volume "stack_observability_mimir_volume" {
+      type      = "host"
+      source    = "stack_observability_mimir_volume"
+      read_only = false
+    }
+      count = 1
+      network {
+        mode = "bridge"
+        port "api" {
+          static= 9009
+          to = 9009
+        }
+      }
+
+
+    service{
+      name ="mimir"
+      port= "api"
+      check {
+        name  = "health"
+        type  = "http"
+        port ="api"
+        path="/ready"
+        interval = "10s"
+        timeout  = "2s"
+       }
+    }
+      task "mimir"{
+        volume_mount {
+          volume      = "stack_observability_mimir_volume"
+          destination = "/data"
+        }
+
+         driver = "docker"
+         config {
+         image = "{{registry_dns}}/grafana/mimir:{{version_grafana_mimir}}"
+         ports = ["api"]
+         args = [
+           "-config.file","/config/mimir.yaml"
+         ]
+        volumes = [
+          "local/mimir.yml:/config/mimir.yaml"
+        ]
+         }
+      resources {
+        cpu    = 1000
+        memory = 2048
+      }
+
+    template {
+      change_mode   = "restart"
+      right_delimiter = "++"
+      left_delimiter = "++"
+      data = file(abspath("./configs/mimir/mimir.tpl"))
+      destination = "local/mimir.yml"
+    }
+
+
+ #     template {
+ #       change_mode   = "restart"
+ #       destination = "local/mimir.tpl"
+ #       right_delimiter = "++"
+ #       left_delimiter = "++"
+ #       data        = <<EOH
+ #       ++ with nomadVar "{{nomad_observability_job_path}}"  ++
+ #         ++ .mimir_config ++
+ #        ++ end  ++
+ #       EOH
+ #       }
+
+    }
+  }
+ group "loki"{
+     restart {
+       attempts = 10
+       interval = "5m"
+       delay = "5s"
+       mode = "delay"
+     }
+    volume "stack_observability_loki_volume" {
+      type      = "host"
+      source    = "stack_observability_loki_volume"
+      read_only = false
+    }
+    count = 1
+    network {
+      mode = "bridge"
+      port "http" {
+        static = 3100
+        to = 3100
+      }
+      port "cli" {
+        static = 7946
+        to = 7946
+      }
+      port "grpc" {
+        static = 9005
+        to = 9095
+      }
+    }
+
+ service {
+   name ="loki"
+   port= "http"
+   check {
+     name  = "health"
+     type  = "http"
+     port ="http"
+     path="/ready"
+     interval = "10s"
+     timeout  = "2s"
+    }
+ }
+
+     task "loki"{
+       volume_mount {
+         volume      = "stack_observability_loki_volume"
+         destination = "/data"
+       }
+
+     driver = "docker"
+     env {
+       JAEGER_AGENT_HOST= "tempo.service.consul"
+       JAEGER_ENDPOINT = "http://tempo.service.consul:14268/api/traces" # send traces to Tempo
+       JAEGER_REPORTER_LOG_SPANS=true
+       }
+    config {
+       image = "{{registry_dns}}/grafana/loki:{{version_grafana_loki}}"
+       ports = ["http","cli","grpc"]
+       args = [
+        "-config.file","/config/loki.yaml"
+       ]
+    volumes = [
+      "local/loki.yaml:/config/loki.yaml"
+      ]
+    }
+    resources {
+       cpu    = 4000
+       memory = 2048
+    }
+
+      template {
+        change_mode   = "restart"
+        right_delimiter = "++"
+        left_delimiter = "++"
+        data = file(abspath("./configs/loki/loki.tpl"))
+        destination = "local/loki.yaml"
+      }
+      }
+    }
+  group "tempo"{
+     restart {
+       attempts = 10
+       interval = "5m"
+       delay = "5s"
+       mode = "delay"
+     }
+
+    volume "stack_observability_tempo_volume" {
+      type      = "host"
+      source    = "stack_observability_tempo_volume"
+      read_only = false
+    }
+      count = 1
+      network {
+        mode = "bridge"
+        port "jaeger" {
+          static =  14268
+          to = 14268
+        }
+        port "tempo" {
+          static =  3200
+          to = 3200
+        }
+        port "otlp_grpc" {
+          static =  4317
+          to = 4317
+        }
+        port "otlp_http" {
+          static =  4318
+          to = 4318
+        }
+        port "zipkin" {
+          static =  9411
+          to = 9411
+        }
+      }
+    service{
+      name ="tempo"
+      port= "tempo"
+      check {
+        name  = "health"
+        type  = "http"
+        port ="tempo"
+        path="/ready"
+        interval = "10s"
+        timeout  = "2s"
+       }
+    }
+    service{
+       name ="tempo-zipkin"
+       port= "zipkin"
+       check {
+         name     = "tempo_zipkin_check"
+         type     = "tcp"
+         interval = "10s"
+         timeout  = "1s"
+        }
+       }
+     service{
+        name ="tempo-jaeger"
+        port= "jaeger"
+        check {
+          name     = "tempo_jagger_check"
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "1s"
+         }
+      }
+     service{
+        name ="tempo-otlp-grpc"
+        port= "otlp_grpc"
+        check {
+          name     = "tempo_otlp_grpc_check"
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "1s"
+         }
+      }
+     service{
+        name ="tempo-otlp-http"
+        port= "otlp_http"
+        check {
+          name     = "tempo_otlp_http_check"
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "1s"
+         }
+      }
+      task "tempo"{
+        volume_mount {
+          volume      = "stack_observability_tempo_volume"
+          destination = "/data"
+        }
+
+         driver = "docker"
+         config {
+         image = "{{registry_dns}}/grafana/tempo:{{version_grafana_tempo}}"
+         ports = ["jaeger","tempo","otlp_grpc","otlp_http","zipkin"]
+         args = [
+           "-config.file","/config/tempo.yaml"
+         ]
+        volumes = [
+          "local/tempo.yaml:/config/tempo.yaml"
+        ]
+         }
+      resources {
+        cpu    = 1000
+        memory = 2048
+      }
+
+     template {
+       change_mode   = "restart"
+       right_delimiter = "++"
+       left_delimiter = "++"
+       data = file(abspath("./configs/tempo/tempo.tpl"))
+       destination = "local/tempo.yaml"
+     }
+    }
+  }
+
+    group "nats"{
+      restart {
+        attempts = -1
+       interval = "5s"
+        delay = "5s"
+        mode = "delay"
+      }
+       volume "stack_observability_nats_volume" {
+          type      = "host"
+          source    = "stack_observability_nats_volume"
+          read_only = false
+        }
+     count = 1
+      network {
+        mode = "bridge"
+        port "client" {
+          static =  4222
+          to = 4222
+        }
+        port "http" {
+          static =  8222
+          to = 8222
+        }
+        port "cluster" {
+          static =  6222
+          to = 6222
+        }
+        port "prometheus-exporter" {
+              to = 7777
+        }
+
+      }
+        service {
+              port = "client"
+              name = "nats"
+
+              check {
+                 type     = "http"
+                 port     = "http"
+                 path     = "/connz"
+                 interval = "5s"
+                 timeout  = "2s"
+              }
+      }
+
+        service {
+           port = "prometheus-exporter"
+           # Change the service selector in grafana agent config as well if you cange this name
+           name = "nats-prometheus-exporter"
+           tags = [
+                "prometheus",
+                 "prometheus:server_id=${NOMAD_ALLOC_NAME}",
+                 "prometheus:version={{version_nats_server}}",
+           ]
+           check {
+              type     = "http"
+              port     = "prometheus-exporter"
+              path     = "/metrics"
+              interval = "5s"
+              timeout  = "2s"
+           }
+      }
+      task "nats-prometheus-exporter" {
+        lifecycle {
+          hook = "poststart"
+          sidecar = true
+        }
+
+        driver = "docker"
+        config {
+           # for debugging
+          #  image = "{{registry_dns}}/{{stack_name}}/prometheus-nats-exporter:{{version_nats_prometheus_exporter_nomadder}}"
+            image = "{{registry_dns}}/natsio/prometheus-nats-exporter:{{version_nats_prometheus_exporter}}"
+            ports = ["prometheus_exporter"]
+            args = [
+              "-varz",
+              "-channelz",
+              "-connz",
+              "-gatewayz",
+              "-leafz",
+              "-serverz",
+              "-subz",
+              "-jsz=all",
+              "-use_internal_server_id",
+              "http://localhost:${NOMAD_PORT_http}"
+            ]
+        }
+      }
+
+    task "nats" {
+         volume_mount {
+            volume      = "stack_observability_nats_volume"
+            destination = "/data/jetstream"
+          }
+             driver = "docker"
+             config {
+             image = "{{registry_dns}}/nats:{{version_nats_server}}-alpine"
+             ports = ["client","http","cluster"]
+             args = [
+               "-c","/config/nats.conf",
+               "-js"
+             ]
+            volumes = [
+              "local/nats.conf:/config/nats.conf"
+            ]
+             }
+          resources {
+            cpu    = 2000
+            memory = 2048
+          }
+          template {
+             destination = "local/nats.conf"
+             change_mode = "restart"
+             right_delimiter = "++"
+             left_delimiter = "++"
+             data        = <<EOF
+# Client port of ++ env "NOMAD_PORT_client" ++ on all interfaces
+port: ++ env "NOMAD_PORT_client" ++
+
+# HTTP monitoring port
+monitor_port: ++ env "NOMAD_PORT_http" ++
+server_name: "++ env "NOMAD_ALLOC_NAME" ++"
+#If true enable protocol trace log messages. Excludes the system account.
+trace: false
+#If true enable protocol trace log messages. Includes the system account.
+trace_verbose: false
+#if true enable debug log messages
+debug: false
+http_port: ++ env "NOMAD_PORT_http" ++
+#http: nats.service.consul:++ env "NOMAD_PORT_http" ++
+
+jetstream {
+  store_dir: /data/jetstream
+
+  # 1GB
+  max_memory_store: 2G
+
+  # 10GB
+  max_file_store: 10G
+}
+              EOF
+          }
+       }
+
+    }
+  group "grafana-agent"{
+     count = 1
+
+     # Grafana agent is deployed on every node and scrapes the general nomad job metrics
+     # This agent deployed for scraping metrics from consul services.
+     restart {
+       attempts = 10
+       interval = "5m"
+       delay = "5s"
+       mode = "delay"
+     }
+
+       volume "stack_observability_grafana_agent_volume" {
+          type      = "host"
+          source    = "stack_observability_grafana_agent_volume"
+          read_only = false
+        }
+       volume "ca_certs" {
+          type      = "host"
+          source    = "ca_cert"
+          read_only = true
+        }
+       volume "cert_consul" {
+          type      = "host"
+          source    = "cert_consul"
+          read_only = true
+        }
+
+    task "grafana-agent" {
+         volume_mount {
+            volume      = "stack_observability_grafana_agent_volume"
+            destination = "/data/wal"
+          }
+         volume_mount {
+            volume      = "ca_certs"
+            destination = "/certs/ca"
+          }
+         volume_mount {
+            volume      = "cert_consul"
+            destination = "/certs/consul"
+          }
+       driver = "docker"
+       config {
+
+         image = "{{registry_dns}}/grafana/agent:v{{version_grafana_agent}}"
+         args = [
+             "-config.file","/config/agent.yaml"
+          ]
+          volumes = [
+            "local/agent.yaml:/config/agent.yaml"
+        ]
+        }
+        resources {
+          cpu    = 100
+          memory = 64
+        }
+	   template {
+         right_delimiter = "++"
+         left_delimiter = "++"
+         data = file(abspath("./configs/grafana_agent/agent.tpl"))
+         destination = "local/agent.yaml"
+         change_mode = "restart"
+       }
+    }
+  }
+   group "logunifier"{
+     restart {
+       attempts = 10
+       interval = "5m"
+       delay = "5s"
+       mode = "delay"
+     }
+     count = 1
+     task "logunifier" {
+          driver = "docker"
+          config {
+            image = "{{registry_dns}}/suikast42/logunifier:{{version_logunifer}}"
+            args = [
+                "-loglevel",
+                "debug",
+                "-natsServers",
+                "nats.service.consul:4222",
+                "-lokiServers",
+                "loki.service.consul:9005",
+             ]
+           }
+           resources {
+             cpu    = 500
+             memory = 256
+           }
+     }
+  }
+}
