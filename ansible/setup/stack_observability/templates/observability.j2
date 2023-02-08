@@ -132,11 +132,16 @@ job "observability" {
         }
 
          driver = "docker"
+         env {
+           JAEGER_AGENT_HOST= "tempo.service.consul"
+           JAEGER_ENDPOINT = "http://tempo.service.consul:14268/api/traces" # send traces to Tempo
+           JAEGER_REPORTER_LOG_SPANS=true
+         }
          config {
          image = "{{registry_dns}}/grafana/mimir:{{version_grafana_mimir}}"
          ports = ["api"]
          args = [
-           "-config.file","/config/mimir.yaml"
+           "-config.file","/config/mimir.yaml","-config.expand-env","true",
          ]
         volumes = [
           "local/mimir.yml:/config/mimir.yaml"
@@ -228,7 +233,7 @@ job "observability" {
        image = "{{registry_dns}}/grafana/loki:{{version_grafana_loki}}"
        ports = ["http","cli","grpc"]
        args = [
-        "-config.file","/config/loki.yaml"
+        "-config.file","/config/loki.yaml","-config.expand-env","true"
        ]
     volumes = [
       "local/loki.yaml:/config/loki.yaml"
@@ -348,7 +353,7 @@ job "observability" {
          image = "{{registry_dns}}/grafana/tempo:{{version_grafana_tempo}}"
          ports = ["jaeger","tempo","otlp_grpc","otlp_http","zipkin"]
          args = [
-           "-config.file","/config/tempo.yaml"
+           "-config.file","/config/tempo.yaml","-config.expand-env","true"
          ]
         volumes = [
           "local/tempo.yaml:/config/tempo.yaml"

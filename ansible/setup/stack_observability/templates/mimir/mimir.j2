@@ -2,21 +2,76 @@
 # Test ++ env "NOMAD_ALLOC_NAME"  ++
 # Do not use this configuration in production.
 # It is for demonstration purposes only.
+
 # Run Mimir in single process mode, with all components running in 1 process.
 target: all,alertmanager,overrides-exporter
+# Disable tendency support.
 multitenancy_enabled: false
-#bar: ++  env "NOMAD_ALLOC_NAME"  ++
+
+server:
+  http_listen_port: 9009
+  log_level: debug
+  # Configure the server to allow messages up to 100MB.
+  grpc_server_max_recv_msg_size: 104857600
+  grpc_server_max_send_msg_size: 104857600
+  grpc_server_max_concurrent_streams: 1000
+
 blocks_storage:
   backend: filesystem
   bucket_store:
-    sync_dir: /data/mimir/tsdb-sync
+    sync_dir: /data/tsdb-sync
   filesystem:
-    dir: /data/mimir/data/tsdb
+    dir: /data/blocks
   tsdb:
-    dir: /data/mimir/tsdb
+    dir: /data/tsdb
+ #   retention_period: 1m
+
+ruler_storage:
+  backend: filesystem
+  filesystem:
+    dir: /data/rules
+
+alertmanager_storage:
+  backend: filesystem
+  filesystem:
+    dir: /data/alarms
+
+frontend:
+  grpc_client_config:
+    grpc_compression: snappy
+
+frontend_worker:
+  grpc_client_config:
+    grpc_compression: snappy
+
+ingester_client:
+  grpc_client_config:
+    grpc_compression: snappy
+
+query_scheduler:
+  grpc_client_config:
+    grpc_compression: snappy
+
+alertmanager:
+  data_dir: /data/alertmanager
+#  retention: 120h
+  sharding_ring:
+    replication_factor: 1
+  alertmanager_client:
+    grpc_compression: snappy
+
+ruler:
+  query_frontend:
+    grpc_client_config:
+      grpc_compression: snappy
 
 compactor:
-  data_dir: /data/mimir/compactor
+#  compaction_interval: 1m
+#  deletion_delay: 2m
+  max_closing_blocks_concurrency: 2
+  max_opening_blocks_concurrency: 4
+  symbols_flushers_concurrency: 4
+  data_dir: /data/compactor
   sharding_ring:
     kvstore:
       store: memberlist
@@ -29,24 +84,20 @@ distributor:
 
 ingester:
   ring:
+    replication_factor: 1
     instance_addr: 127.0.0.1
     kvstore:
       store: memberlist
-    replication_factor: 1
-
-ruler_storage:
-  backend: filesystem
-  filesystem:
-    dir: /data/mimir/rules
-
-server:
-  http_listen_port: 9009
-  log_level: debug
 
 store_gateway:
   sharding_ring:
     replication_factor: 1
 
-limits:
-  max_label_names_per_series: 42
 
+limits:
+  # Limit queries to 5 years. You can override this on a per-tenant basis.
+  max_total_query_length: 43680h
+  max_label_names_per_series: 42
+  # Allow ingestion of out-of-order samples up to 2 hours since the latest received sample for the series.
+  out_of_order_time_window: 2h
+ # compactor_blocks_retention_period: 10m

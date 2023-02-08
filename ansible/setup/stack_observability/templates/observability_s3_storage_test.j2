@@ -98,11 +98,11 @@ job "observability" {
        delay = "5s"
        mode = "delay"
      }
-    volume "stack_observability_mimir_volume" {
-      type      = "host"
-      source    = "stack_observability_mimir_volume"
-      read_only = false
-    }
+     volume "stack_observability_mimir_volume" {
+       type      = "host"
+       source    = "stack_observability_mimir_volume"
+       read_only = false
+     }
       count = 1
       network {
         mode = "bridge"
@@ -153,7 +153,6 @@ job "observability" {
            image        = "{{registry_dns}}/minio/mc:{{version_minio_mc_admin}}"
            volumes      = ["local/create_buckets.sh:/create_buckets.sh"]
            entrypoint = ["/bin/sh","/create_buckets.sh"]
-           #network_mode = "host
         }
         resources {
           cpu    = 200
@@ -171,18 +170,24 @@ job "observability" {
          mode = "fail"
         }
       }
-      task "mimir"{
-        volume_mount {
-          volume      = "stack_observability_mimir_volume"
-          destination = "/data"
-        }
 
+      task "mimir"{
          driver = "docker"
+         volume_mount {
+           volume      = "stack_observability_mimir_volume"
+           destination = "/data"
+         }
+         env {
+           JAEGER_AGENT_HOST= "tempo.service.consul"
+           JAEGER_ENDPOINT = "http://tempo.service.consul:14268/api/traces" # send traces to Tempo
+           JAEGER_REPORTER_LOG_SPANS=true
+          }
          config {
          image = "{{registry_dns}}/grafana/mimir:{{version_grafana_mimir}}"
          ports = ["api"]
+
          args = [
-           "-config.file","/config/mimir.yaml"
+           "-config.file","/config/mimir.yaml","-config.expand-env","true"
          ]
         volumes = [
           "local/mimir.yml:/config/mimir.yaml"
@@ -193,13 +198,25 @@ job "observability" {
         memory = 2048
       }
 
-    template {
-      change_mode   = "restart"
-      right_delimiter = "++"
-      left_delimiter = "++"
-      data = file(abspath("./configs/mimir/mimir.tpl"))
-      destination = "local/mimir.yml"
-    }
+      template{
+         destination = "${NOMAD_SECRETS_DIR}/env.vars"
+         env         = true
+         right_delimiter = "++"
+         left_delimiter = "++"
+         data = <<EOF
+         ++- with nomadVar "{{nomad_observability_job_path}}" -++
+             MINIO_USER= ++ .minio_mimir_user ++
+             MINIO_PASSWORD= ++ .minio_mimir_secret ++
+         ++- end -++
+        EOF
+      }
+      template {
+        change_mode   = "restart"
+        right_delimiter = "++"
+        left_delimiter = "++"
+        data = file(abspath("./configs/mimir/mimir.tpl"))
+        destination = "local/mimir.yml"
+      }
 
 
  #     template {
@@ -254,7 +271,7 @@ job "observability" {
      port ="http"
      path="/ready"
      interval = "10s"
-     timeout  = "2s"
+     timeout  = "20s"
     }
  }
      task "loki-create-buckets"{
@@ -314,7 +331,7 @@ job "observability" {
        env {
          JAEGER_AGENT_HOST= "tempo.service.consul"
          JAEGER_ENDPOINT = "http://tempo.service.consul:14268/api/traces" # send traces to Tempo
-        JAEGER_REPORTER_LOG_SPANS=true
+         JAEGER_REPORTER_LOG_SPANS=true
          }
       config {
          image = "{{registry_dns}}/grafana/loki:{{version_grafana_loki}}"
@@ -497,7 +514,7 @@ job "observability" {
          image = "{{registry_dns}}/grafana/tempo:{{version_grafana_tempo}}"
          ports = ["jaeger","tempo","otlp_grpc","otlp_http","zipkin"]
          args = [
-           "-config.file","/config/tempo.yaml"
+           "-config.file","/config/tempo.yaml","-config.expand-env","true"
          ]
         volumes = [
           "local/tempo.yaml:/config/tempo.yaml"
