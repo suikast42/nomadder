@@ -24,7 +24,7 @@ blocks_storage:
     dir: /data/blocks
   tsdb:
     dir: /data/tsdb
- #   retention_period: 1m
+    retention_period: 10m
 
 ruler_storage:
   backend: filesystem
@@ -76,23 +76,14 @@ compactor:
     kvstore:
       store: memberlist
 
-distributor:
-  ring:
-    instance_addr: 127.0.0.1
-    kvstore:
-      store: memberlist
 
 ingester:
   ring:
     replication_factor: 1
-    instance_addr: 127.0.0.1
-    kvstore:
-      store: memberlist
 
 store_gateway:
   sharding_ring:
     replication_factor: 1
-
 
 limits:
   # Limit queries to 5 years. You can override this on a per-tenant basis.
@@ -100,4 +91,6 @@ limits:
   max_label_names_per_series: 42
   # Allow ingestion of out-of-order samples up to 2 hours since the latest received sample for the series.
   out_of_order_time_window: 2h
- # compactor_blocks_retention_period: 10m
+  # delete old blocks from long-term storage.
+  compactor_blocks_retention_period: 10m
+  ingestion_rate: 100000
