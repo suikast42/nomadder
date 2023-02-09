@@ -61,6 +61,7 @@ StartLimitIntervalSec = 10s
 # StartLimitInterval = 10s
 
 TasksMax=infinity
+#The default systemd configuration for Nomad should set OOMScoreAdjust=-1000 to avoid OOMing the Nomad process.
 OOMScoreAdjust=-1000
 
 [Install]

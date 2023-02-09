@@ -22,6 +22,22 @@ curl  -s  -N \
 "${NOMAD_ADDR}/v1/event/stream" \| jq .
 ----
 
+|Update the MemoryOversubscriptionEnabled value
+a|[source,shell]
+----
+curl  -s  -N \
+--cacert "${NOMAD_CACERT}" \
+--cert "${NOMAD_CLIENT_CERT}" \
+--key "${NOMAD_CLIENT_KEY}" \
+"${NOMAD_ADDR}/v1/operator/scheduler/configuration" \|\
+jq '.SchedulerConfig \| .MemoryOversubscriptionEnabled=true' \|\
+curl \
+--cacert "${NOMAD_CACERT}" \
+--cert "${NOMAD_CLIENT_CERT}" \
+--key "${NOMAD_CLIENT_KEY}" \
+-X PUT $NOMAD_ADDR/v1/operator/scheduler/configuration -d @-
+----
+
 |Consul service address in Templates
 a|[source,shell]
 ----

@@ -47,6 +47,13 @@ client {
   host_network "nomad" {
     interface = "nomad"
   }
+  reserved {
+  # cpu (int: 0) - Specifies the amount of CPU to reserve, in MHz.
+  # cores (int: 0) - Specifies the number of CPU cores to reserve.
+  # memory (int: 0) - Specifies the amount of memory to reserve, in MB.
+  # disk (int: 0) - Specifies the amount of disk to reserve, in MB.
+  # reserved_ports (string: "") - Specifies a comma-separated list of ports to reserve on all fingerprinted network devices. Ranges can be specified by using a hyphen separating the two inclusive ends. See also host_network for reserving ports on specific host networks.
+  }
 }
 
 tls {
