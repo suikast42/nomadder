@@ -26,7 +26,7 @@ server:
 ingester:
   wal:
     enabled: true
-    dir: /data/loki/wal
+    dir: /data/wal
   lifecycler:
     address: 127.0.0.1
     ring:
@@ -41,30 +41,39 @@ ruler:
   storage:
     type: local
     local:
-      directory: /data/loki/rules
-  rule_path: /data/loki/scratch
-  alertmanager_url: http://127.0.0.1
+      directory: /data/rules
+  rule_path: /data/scratch
+  alertmanager_url: http://mimir.service.consul:9009/alertmanager
   ring:
     kvstore:
       store: memberlist
   enable_api: true
 
+compactor:
+  working_directory: /data/retention
+  shared_store: filesystem
+  compaction_interval: 10m
+  retention_enabled: true
+  retention_delete_delay: 2h
+  retention_delete_worker_count: 150
+
 schema_config:
   configs:
     - from: 2020-05-15
-      store: boltdb
+      store: boltdb-shipper
       object_store: filesystem
       schema: v11
       index:
         prefix: index_
-        period: 168h
+        period: 24h
 
 storage_config:
-  boltdb:
-    directory: /data/loki/index
-
+  boltdb_shipper:
+    active_index_directory: /data/index
+    cache_location: /data/index-cache
+    shared_store: filesystem
   filesystem:
-    directory: /data/loki/chunks
+    directory: /data/chunks
 
 querier:
   multi_tenant_queries_enabled: false
@@ -106,3 +115,12 @@ limits_config:
   # entries and they will not be incremented.
   # CLI flag: -validation.increment-duplicate-timestamps
   increment_duplicate_timestamp: true
+  #Log data retention for all
+  retention_period: 24h
+  # Comment this out for fine grained retention
+#  retention_stream:
+#  - selector: '{namespace="dev"}'
+#    priority: 1
+#    period: 24h
+  # Comment this out for having overrides
+#  per_tenant_override_config: /etc/overrides.yaml
