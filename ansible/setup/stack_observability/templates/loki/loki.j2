@@ -31,11 +31,23 @@ ingester:
     address: 127.0.0.1
     ring:
       kvstore:
-        store: inmemory
+        store: memberlist
       replication_factor: 1
     final_sleep: 0s
   chunk_idle_period: 5m
   chunk_retain_period: 30s
+
+ruler:
+  storage:
+    type: local
+    local:
+      directory: /data/loki/rules
+  rule_path: /data/loki/scratch
+  alertmanager_url: http://127.0.0.1
+  ring:
+    kvstore:
+      store: memberlist
+  enable_api: true
 
 schema_config:
   configs:
@@ -71,9 +83,10 @@ limits_config:
   max_label_name_length: 4096
   max_label_value_length: 8092
   enforce_metric_name: false
-  reject_old_samples: false
-  # 5 years
-  reject_old_samples_max_age: 438000h
+  # Loki will reject any log lines that have already been processed and will not index them again
+  reject_old_samples: true
+  # 7d
+  reject_old_samples_max_age: 168h
   # The limit to length of chunk store queries. 0 to disable.
   max_query_length: 0
   # Maximum number of log entries that will be returned for a query.
@@ -93,5 +106,3 @@ limits_config:
   # entries and they will not be incremented.
   # CLI flag: -validation.increment-duplicate-timestamps
   increment_duplicate_timestamp: true
-#  reject_old_samples: true
-#  reject_old_samples_max_age: 168h
