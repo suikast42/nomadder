@@ -724,7 +724,7 @@ jetstream {
        driver = "docker"
        config {
 
-         image = "{{registry_dns}}/grafana/agent:v{{version_grafana_agent}}"
+         image = "{{registry_dns}}/grafana/agent:v{{version_grafana_agent_container}}"
          args = [
              "-config.file","/config/agent.yaml"
           ]

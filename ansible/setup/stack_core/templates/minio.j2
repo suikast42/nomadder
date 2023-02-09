@@ -112,16 +112,16 @@ job "minio" {
          "traefik.http.routers.minio.rule=Host(`minio.{{tls_san}}`)",
         ]
 
-        check {
-          name      = "minio-live"
-          type     = "http"
-          path     = "/minio/health/live"
-          port     = "http"
-          interval = "10s"
-          timeout  = "2s"
-       }
       check {
-          name      = "minio-live"
+        name      = "minio-live"
+        type     = "http"
+        path     = "/minio/health/live"
+        port     = "http"
+        interval = "10s"
+        timeout  = "2s"
+      }
+      check {
+          name      = "minio-ready"
           type     = "http"
           path     = "/minio/health/ready"
           port     = "http"

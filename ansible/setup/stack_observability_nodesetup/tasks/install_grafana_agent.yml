@@ -81,8 +81,8 @@
     async: 300
     poll: 1
     get_url:
-      url: https://github.com/grafana/agent/releases/download/v{{version_grafana_agent_nodes}}/agent-linux-amd64.zip
-      dest: "{{tmp_install_dir_base}}/agent-linux-amd64.zip"
+      url: https://github.com/grafana/agent/releases/download/v{{version_grafana_agent_nodes}}/grafana-agent-linux-amd64.zip
+      dest: "{{tmp_install_dir_base}}/grafana-agent-v{{version_grafana_agent_nodes}}-linux-amd64.zip"
     register: agent_download
 
   - name:  "Download grafana agent ctl v {{version_grafana_agent_nodes}}"
@@ -90,8 +90,8 @@
     async: 300
     poll: 1
     get_url:
-      url: https://github.com/grafana/agent/releases/download/v{{version_grafana_agent_nodes}}/agentctl-linux-amd64.zip
-      dest: "{{tmp_install_dir_base}}/agentctl-linux-amd64.zip"
+      url: https://github.com/grafana/agent/releases/download/v{{version_grafana_agent_nodes}}/grafana-agentctl-linux-amd64.zip
+      dest: "{{tmp_install_dir_base}}/grafana-agentctl-v{{version_grafana_agent_nodes}}-linux-amd64.zip"
     register: agentctl_download
 
   - name: "Unzip grafana agent"
@@ -109,8 +109,8 @@
   - name: "Unzip grafana agent"
     shell: |
         chmod {{ansible_ssh_user}}:{{ansible_ssh_user}} *
-        mv agent-linux-amd64 /usr/local/bin/grafana-agent
-        mv agentctl-linux-amd64 /usr/local/bin/grafana-agentctl
+        mv grafana-agent-linux-amd64 /usr/local/bin/grafana-agent
+        mv grafana-agentctl-linux-amd64 /usr/local/bin/grafana-agentctl
     args:
       chdir: "{{tmp_install_dir_base}}"
 

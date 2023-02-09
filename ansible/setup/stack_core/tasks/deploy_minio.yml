@@ -40,17 +40,26 @@
       content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/minio.nomad') }}"
       timeout: 120
 
-  - name: " Wait https://minio.console.{{tls_san}} is available"
+  - name: Install minio admin cli
+    import_tasks: install_minio_admin.yml
+
+  - name: "Wait https://minio.console.{{tls_san}} is available"
     uri:
-      url: "https://minio.console.{{tls_san}}"
+      url: 'https://minio.{{tls_san}}'
       return_content: yes
       validate_certs: no
       status_code:
-        - 200
-    until: uri_output.status == 200
-    retries: 24 # Retries for 24 * 5 seconds = 120 seconds = 2 minutes
+        - 400 # AccessDenied
+        - 403 # Forbidden
+    until: uri_output.status == 400 or uri_output.status == 403 #AccessDenied or Forbidden
+    retries: 60000 # Retries for 24 * 5 seconds = 120 seconds = 2 minutes
     delay: 5 # Every 5 seconds
     register: uri_output
+
+
+#  - name: "Debug"
+#    debug:
+#      msg: "{{ uri_output }}"
 
   - name: "Add minio server to cli"
     become: false
