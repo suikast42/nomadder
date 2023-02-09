@@ -56,6 +56,15 @@ storage_config:
 
 querier:
   multi_tenant_queries_enabled: false
+  max_concurrent: 4096
+  query_store_only: false
+
+query_scheduler:
+  max_outstanding_requests_per_tenant: 4096
+
+query_range:
+  cache_results: true
+
 limits_config:
   ingestion_rate_mb: 64
   ingestion_burst_size_mb: 8
@@ -67,9 +76,13 @@ limits_config:
   reject_old_samples_max_age: 438000h
   # The limit to length of chunk store queries. 0 to disable.
   max_query_length: 0
+  # Maximum number of log entries that will be returned for a query.
   max_entries_limit_per_query: 20000
+  # Limit the maximum of unique series that is returned by a metric query.
   max_query_series: 100000
-  max_query_parallelism: 2
+  # Maximum number of queries that will be scheduled in parallel by the frontend.
+  max_query_parallelism: 64
+  split_queries_by_interval: 24h
   # Alter the log line timestamp during ingestion when the timestamp is the same as the
   # previous entry for the same stream. When enabled, if a log line in a push request has
   # the same timestamp as the previous line for the same stream, one nanosecond is added

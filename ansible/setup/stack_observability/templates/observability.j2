@@ -204,18 +204,23 @@ job "observability" {
       }
     }
 
- service {
-   name ="loki"
-   port= "http"
-   check {
-     name  = "health"
-     type  = "http"
-     port ="http"
-     path="/ready"
-     interval = "10s"
-     timeout  = "2s"
-    }
- }
+     service {
+       name ="loki"
+       port= "http"
+       tags = [
+             "prometheus",
+             "prometheus:server_id=${NOMAD_ALLOC_NAME}",
+             "prometheus:version={{version_nats_server}}",
+          ]
+       check {
+         name  = "health"
+         type  = "http"
+         port ="http"
+         path="/ready"
+         interval = "10s"
+         timeout  = "2s"
+        }
+     }
 
      task "loki"{
        volume_mount {
@@ -233,7 +238,7 @@ job "observability" {
        image = "{{registry_dns}}/grafana/loki:{{version_grafana_loki}}"
        ports = ["http","cli","grpc"]
        args = [
-        "-config.file","/config/loki.yaml","-config.expand-env","true"
+        "-config.file","/config/loki.yaml","-config.expand-env","true","-print-config-stderr","true",
        ]
     volumes = [
       "local/loki.yaml:/config/loki.yaml"

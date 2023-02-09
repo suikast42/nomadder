@@ -12,6 +12,7 @@ metrics:
   configs:
     - name: integrations
       scrape_configs:
+          # grab all metric endpoints with stadanrd /metrics endpoint
         - job_name: "integrations/consul_sd"
           consul_sd_configs:
             - server: "consul.service.consul:8501"

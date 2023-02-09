@@ -1,0 +1,6 @@
+=== Storage retention Configuration
+https://grafana.com/docs/loki/latest/operations/storage/retention/[Storage retention]
+
+=== Understand loki queries
+https://taisho6339.gitbook.io/grafana-loki-deep-dive/query-process/split-a-query-into-someones[Queries_1]
+https://taisho6339.gitbook.io/grafana-loki-deep-dive/query-process/schedule-queries-to-queriers[Queries_2]
