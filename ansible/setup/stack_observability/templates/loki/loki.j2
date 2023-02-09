@@ -43,7 +43,12 @@ ruler:
     local:
       directory: /data/rules
   rule_path: /data/scratch
-  alertmanager_url: http://mimir.service.consul:9009/alertmanager
+++- range  $index, $service := service "mimir" -++
+++- if eq $index 0 ++
+  alertmanager_url: http://++$service.Name++.service.consul:++ $service.Port ++/alertmanager
+++- end ++
+++- end ++
+
   ring:
     kvstore:
       store: memberlist
