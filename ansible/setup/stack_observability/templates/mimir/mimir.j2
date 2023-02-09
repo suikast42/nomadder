@@ -20,12 +20,19 @@ blocks_storage:
   backend: filesystem
   bucket_store:
     sync_dir: /data/tsdb-sync
+    ignore_blocks_within: 10h
   filesystem:
     dir: /data/blocks
   tsdb:
     dir: /data/tsdb
-    retention_period: 10m
-
+    # Note that changing this requires changes to some other parameters like
+    # -querier.query-store-after,
+    # -querier.query-ingesters-within and
+    # -blocks-storage.bucket-store.ignore-blocks-within.
+    retention_period: 24h
+querier:
+  query_ingesters_within: 12h
+  query_store_after: 8h
 ruler_storage:
   backend: filesystem
   filesystem:
@@ -92,5 +99,6 @@ limits:
   # Allow ingestion of out-of-order samples up to 2 hours since the latest received sample for the series.
   out_of_order_time_window: 2h
   # delete old blocks from long-term storage.
-  compactor_blocks_retention_period: 10m
+  # Delete from storage metrics data older than 24 hours.
+  compactor_blocks_retention_period: 24h
   ingestion_rate: 100000

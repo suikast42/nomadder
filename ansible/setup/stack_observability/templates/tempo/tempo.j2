@@ -30,7 +30,7 @@ compactor:
     compaction_window: 1h              # blocks in this time window will be compacted together
     max_block_bytes: 100_000_000       # maximum size of compacted blocks
     block_retention: 1h
-    compacted_block_retention: 168h    # Duration to keep blocks 1w
+    compacted_block_retention: 24h    # Duration to keep blocks 1d
 
 metrics_generator:
   registry:
@@ -38,7 +38,7 @@ metrics_generator:
       source: tempo
       cluster: {{data_center}}
   storage:
-    path: /data/tempo/generator/wal
+    path: /data/generator/wal
     remote_write:
 ++- range service "mimir" ++
       - url: http://++.Name++.service.consul:++.Port++/api/v1/push
@@ -55,10 +55,10 @@ storage:
       index_downsample_bytes: 1000     # number of bytes per index record
       encoding: zstd                   # block encoding/compression.  options: none, gzip, lz4-64k, lz4-256k, lz4-1M, lz4, snappy, zstd, s2
     wal:
-      path: /data/tempo/wal             # where to store the the wal locally
+      path: /data/wal             # where to store the the wal locally
       encoding: snappy                 # wal encoding/compression.  options: none, gzip, lz4-64k, lz4-256k, lz4-1M, lz4, snappy, zstd, s2
     local:
-      path: /data/tempo/blocks
+      path: /data/blocks
     pool:
       max_workers: 100                 # worker pool determines the number of parallel requests to the object store backend
       queue_depth: 10000
