@@ -31,3 +31,22 @@
       retries: 10
       delay: 5
 
+    - name: Enable Memory Oversubscription
+      become: false
+      when: is_master_host
+      run_once: true
+      shell: |
+        curl  -s  -N \
+        --cacert "${NOMAD_CACERT}" \
+        --cert "${NOMAD_CLIENT_CERT}" \
+        --key "${NOMAD_CLIENT_KEY}" \
+        "${NOMAD_ADDR}/v1/operator/scheduler/configuration" |\
+        jq '.SchedulerConfig | .MemoryOversubscriptionEnabled=true' |\
+        curl \
+        --cacert "${NOMAD_CACERT}" \
+        --cert "${NOMAD_CLIENT_CERT}" \
+        --key "${NOMAD_CLIENT_KEY}" \
+        -X PUT $NOMAD_ADDR/v1/operator/scheduler/configuration -d @-
+      changed_when: false
+      #failed_when: install.rc > 2
+

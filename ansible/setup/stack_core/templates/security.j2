@@ -65,8 +65,9 @@ job "security" {
         ports = ["db"]
       }
       resources {
-        cpu    = 1000
-        memory = 2048
+        cpu    = 500
+        memory = 512
+        memory_max = 32768
       }
       template {
         data = <<EOF
@@ -137,6 +138,7 @@ job "security" {
         resources {
           cpu    = 200
           memory = 128
+          memory_max = 1024
         }
 
         lifecycle {
@@ -172,6 +174,7 @@ job "security" {
       resources {
         cpu    = 500
         memory = 256
+        memory_max = 32768
       }
       template {
               destination = "${NOMAD_SECRETS_DIR}/env.vars"
@@ -245,6 +248,7 @@ job "security" {
         resources {
           cpu    = 200
           memory = 128
+          memory_max = 1024
         }
 
         lifecycle {
@@ -275,8 +279,9 @@ job "security" {
         ]
       }
       resources {
-        cpu    = 1000
+        cpu    = 500
         memory = 2048
+        memory_max = 32768
       }
     template {
             destination = "${NOMAD_SECRETS_DIR}/env.vars"

@@ -75,8 +75,9 @@ job "observability" {
         ports = ["ui"]
       }
       resources {
-        cpu    = 1000
-        memory = 2048
+        cpu    = 500
+        memory = 512
+        memory_max = 4096
       }
       template {
          destination = "${NOMAD_SECRETS_DIR}/env.vars"
@@ -148,8 +149,9 @@ job "observability" {
         ]
          }
       resources {
-        cpu    = 1000
-        memory = 2048
+        cpu    = 500
+        memory = 512
+        memory_max = 32768
       }
 
     template {
@@ -245,8 +247,9 @@ job "observability" {
       ]
     }
     resources {
-       cpu    = 4000
-       memory = 2048
+       cpu    = 500
+       memory = 512
+       memory_max = 32768
     }
 
       template {
@@ -365,8 +368,9 @@ job "observability" {
         ]
          }
       resources {
-        cpu    = 1000
-        memory = 2048
+        cpu    = 500
+        memory = 512
+        memory_max = 32768
       }
 
      template {
@@ -486,8 +490,9 @@ job "observability" {
             ]
              }
           resources {
-            cpu    = 2000
-            memory = 2048
+            cpu    = 500
+            memory = 512
+            memory_max = 32768
           }
           template {
              destination = "local/nats.conf"
@@ -578,7 +583,8 @@ jetstream {
         }
         resources {
           cpu    = 100
-          memory = 128
+          memory = 64
+          memory_max = 2048
         }
 	   template {
          right_delimiter = "++"
@@ -611,8 +617,9 @@ jetstream {
              ]
            }
            resources {
-             cpu    = 500
-             memory = 256
+             cpu    = 100
+             memory = 64
+             memory_max = 2048
            }
      }
   }
