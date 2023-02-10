@@ -20,7 +20,7 @@ blocks_storage:
   backend: filesystem
   bucket_store:
     sync_dir: /data/tsdb-sync
-    ignore_blocks_within: 10h
+   #ignore_blocks_within: 10h # default 10h
   filesystem:
     dir: /data/blocks
   tsdb:
@@ -29,10 +29,10 @@ blocks_storage:
     # -querier.query-store-after,
     # -querier.query-ingesters-within and
     # -blocks-storage.bucket-store.ignore-blocks-within.
-    retention_period: 24h
+    # retention_period: 24h # default 24h
 querier:
-  query_ingesters_within: 12h
-  query_store_after: 8h
+  # query_ingesters_within: 13h # default 13h
+  #query_store_after: 12h #default 12h
 ruler_storage:
   backend: filesystem
   filesystem:
