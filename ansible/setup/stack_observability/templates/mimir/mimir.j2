@@ -73,8 +73,8 @@ ruler:
       grpc_compression: snappy
 
 compactor:
-#  compaction_interval: 1m
-#  deletion_delay: 2m
+#  compaction_interval: 1h # default 1h
+#  deletion_delay: 12h # default 12h
   max_closing_blocks_concurrency: 2
   max_opening_blocks_concurrency: 4
   symbols_flushers_concurrency: 4
@@ -99,6 +99,6 @@ limits:
   # Allow ingestion of out-of-order samples up to 2 hours since the latest received sample for the series.
   out_of_order_time_window: 2h
   # delete old blocks from long-term storage.
-  # Delete from storage metrics data older than 24 hours.
-  compactor_blocks_retention_period: 24h
+  # Delete from storage metrics data older than 1d.
+  compactor_blocks_retention_period: 1d
   ingestion_rate: 100000
