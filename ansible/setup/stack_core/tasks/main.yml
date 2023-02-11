@@ -28,9 +28,12 @@
         path: "{{core_deployment_dir}}"
 
 
-
     - name: "Deploy keycloak v {{version_keycloak}}"
       import_tasks: deploy_security.yml
+
+    - name: "Deploy minio {{version_minio}}"
+      import_tasks: deploy_minio.yml
+
   vars:
     - stack_name: "stack/core"
     - docker_build_dir: "/tmp/dockerbuild"

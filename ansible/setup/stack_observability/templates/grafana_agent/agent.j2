@@ -1,0 +1,102 @@
+server:
+  log_level: info
+
+metrics:
+  wal_directory: "/data/wal"
+  global:
+    scrape_interval: 5s
+    remote_write:
+++- range service "mimir" ++
+      - url: http://++.Name++.service.consul:++.Port++/api/v1/push
+++- end ++
+  configs:
+    - name: integrations
+      scrape_configs:
+          # grab all metric endpoints with stadanrd /metrics endpoint
+        - job_name: "integrations/consul_sd"
+          consul_sd_configs:
+            - server: "consul.service.consul:8501"
+              tags: ["prometheus"]
+              tls_config:
+                insecure_skip_verify: true
+                ca_file: "/certs/ca/ca.crt"
+                cert_file: "/certs/consul/consul.pem"
+                key_file: "/certs/consul/consul-key.pem"
+              datacenter: "{{data_center}}"
+              scheme: https
+          relabel_configs:
+            - source_labels: [__meta_consul_node]
+              target_label: instance
+            - source_labels: [__meta_consul_service]
+              target_label: service
+#            - source_labels: [__meta_consul_tags]
+#              separator:     ','
+#              regex:         'prometheus:([^=]+)=([^,]+)'
+#              target_label:  '$${1}'
+#              replacement:   '$${2}'
+            - source_labels: [__meta_consul_tags]
+              separator:     ','
+              regex:         '.*,prometheus:server_id=([^,]+),.*'
+              target_label:  'server_id'
+              replacement:   '$${1}'
+            - source_labels: [__meta_consul_tags]
+              separator:     ','
+              regex:         '.*,prometheus:version=([^,]+),.*'
+              target_label:  'version'
+              replacement:   '$${1}'
+            - source_labels: ['__meta_consul_tags']
+              target_label: 'labels'
+              regex: '(.+)'
+              replacement: '$${1}'
+              action: 'keep'
+ #           - action: replace
+ #             replacement: '1'
+ #             target_label: 'test'
+          metric_relabel_configs:
+            - action: labeldrop
+              regex: 'exported_.*'
+
+
+        - job_name: "integrations/consul_sd_minio"
+          metrics_path: "/minio/v2/metrics/cluster"
+          consul_sd_configs:
+            - server: "consul.service.consul:8501"
+              tags: ["prometheus_minio"]
+              tls_config:
+                insecure_skip_verify: true
+                ca_file: "/certs/ca/ca.crt"
+                cert_file: "/certs/consul/consul.pem"
+                key_file: "/certs/consul/consul-key.pem"
+              datacenter: "{{data_center}}"
+              scheme: https
+          relabel_configs:
+            - source_labels: [__meta_consul_node]
+              target_label: instance
+            - source_labels: [__meta_consul_service]
+              target_label: service
+#            - source_labels: [__meta_consul_tags]
+#              separator:     ','
+#              regex:         'prometheus:([^=]+)=([^,]+)'
+#              target_label:  '$${1}'
+#              replacement:   '$${2}'
+            - source_labels: [__meta_consul_tags]
+              separator:     ','
+              regex:         '.*,prometheus:server=([^,]+),.*'
+              target_label:  'server'
+              replacement:   '$${1}'
+            - source_labels: [__meta_consul_tags]
+              separator:     ','
+              regex:         '.*,prometheus:version=([^,]+),.*'
+              target_label:  'version'
+              replacement:   '$${1}'
+            - source_labels: ['__meta_consul_tags']
+              target_label: 'labels'
+              regex: '(.+)'
+              replacement: '$${1}'
+              action: 'keep'
+#            - action: replace
+#              replacement: '38'
+#              target_label: 'test'
+          metric_relabel_configs:
+            - action: labeldrop
+              regex: 'exported_.*'

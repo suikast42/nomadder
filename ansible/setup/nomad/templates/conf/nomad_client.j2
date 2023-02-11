@@ -23,7 +23,13 @@ client {
     path      = "{{base_cert_dir}}/ingress"
     read_only = true
   }
-
+  ## Cert consul client
+  ## Needed for consul_sd_configs
+  ## Should be deleted after resolve https://github.com/suikast42/nomadder/issues/100
+  host_volume "cert_consul" {
+    path      = "{{base_cert_dir}}/consul"
+    read_only = true
+  }
   host_network "private" {
     interface = "eth0"
     #cidr = "203.0.113.0/24"
@@ -40,6 +46,15 @@ client {
   }
   host_network "nomad" {
     interface = "nomad"
+  }
+  reserved {
+  # cpu (int: 0) - Specifies the amount of CPU to reserve, in MHz.
+  # cores (int: 0) - Specifies the number of CPU cores to reserve.
+  # memory (int: 0) - Specifies the amount of memory to reserve, in MB.
+  # disk (int: 0) - Specifies the amount of disk to reserve, in MB.
+  # reserved_ports (string: "") - Specifies a comma-separated list of ports to reserve on all fingerprinted network devices. Ranges can be specified by using a hyphen separating the two inclusive ends. See also host_network for reserving ports on specific host networks.
+    cpu    = 1000
+    memory = 2048
   }
 }
 

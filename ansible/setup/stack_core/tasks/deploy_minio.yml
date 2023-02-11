@@ -1,0 +1,69 @@
+- name: Deploy security
+  block:
+  - name: Template minio.j2
+    delegate_to: localhost
+    template:
+      force: yes
+      src: minio.j2
+      dest: "{{role_path}}/files/minio.nomad"
+
+
+  - name: "Create Variables in nomad"
+    shell: |
+      nomad var put -force {{nomad_minio_job_path}} \
+      minio_root_user={{minio_root_user}} \
+      minio_root_password={{minio_root_password}}
+    environment:
+      - NOMAD_ADDR: "https://localhost:4646"
+      - NOMAD_CACERT: "{{cluster_intermediate_ca_bundle}}"
+      - NOMAD_CLIENT_CERT: "{{nomad_cli_cert}}"
+      - NOMAD_CLIENT_KEY: "{{nomad_cli_cert_key}}"
+
+
+  - name: "Copy minio.nomad"
+    become: true
+    copy:
+      force: true
+      src: minio.nomad
+      dest: "{{core_deployment_dir}}/minio.nomad"
+      mode: '0755'
+
+  - name: Create job
+    community.general.nomad_job:
+      # host: "{{masters[0]}}"
+      client_cert: "{{nomad_cli_cert}}"
+      client_key: "{{nomad_cli_cert_key}}"
+      host: localhost
+      state: present
+      force_start: true
+      #        content: "{{ job.content | b64decode }}"
+      content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/minio.nomad') }}"
+      timeout: 120
+
+  - name: Install minio admin cli
+    import_tasks: install_minio_admin.yml
+
+  - name: "Wait https://minio.console.{{tls_san}} is available"
+    uri:
+      url: 'https://minio.{{tls_san}}'
+      return_content: yes
+      validate_certs: no
+      status_code:
+        - 400 # AccessDenied
+        - 403 # Forbidden
+    until: uri_output.status == 400 or uri_output.status == 403 #AccessDenied or Forbidden
+    retries: 60000 # Retries for 24 * 5 seconds = 120 seconds = 2 minutes
+    delay: 5 # Every 5 seconds
+    register: uri_output
+
+
+#  - name: "Debug"
+#    debug:
+#      msg: "{{ uri_output }}"
+
+  - name: "Add minio server to cli"
+    become: false
+    shell: |
+      mc config host add --insecure local https://minio.{{tls_san}} {{minio_root_user}} {{minio_root_password}}
+  vars:
+    nomad_minio_job_path: nomad/jobs/minio

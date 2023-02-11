@@ -1,6 +1,9 @@
 - name: nomad config files
   become: true
   block:
+    - name: Check if nomad service Exists
+      stat: path=/etc/systemd/system/nomad.service
+      register: nomad_service
 
     - name: config file server
       when: is_master_host
@@ -10,6 +13,7 @@
         dest: "{{nomad_conf_dir}}/server.hcl"
         owner: "{{ nomad_user }}"
         group: "{{ nomad_group }}"
+      register: cfgServer
 
     - name: config file client
       when: is_worker_host
@@ -18,4 +22,12 @@
         src: conf/nomad_client.j2
         dest: "{{nomad_conf_dir}}/client.hcl"
         owner: "{{ nomad_user }}"
-        group: "{{ nomad_group }}"
+      register: cfgClient
+
+
+    - name: "restart nomad service"
+      become: true
+      when: nomad_service.stat.exists and ( (cfgClient is defined and  cfgClient.changed) or (cfgServer is defined and cfgServer.changed))
+      service:
+        name: nomad
+        state: restarted

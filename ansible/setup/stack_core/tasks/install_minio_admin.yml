@@ -1,0 +1,43 @@
+- name: Install minio admin client
+  when: is_master_host
+  become: true
+  block:
+
+    - name: minio cli uninstall
+      when: uninstall_minio_admin|bool == true
+      file:
+        path: "{{install_file}}"
+        state: absent
+
+
+    - name : Check if minio installed
+      stat:
+        path: "{install_file}}"
+      register: cliinstalled
+
+    - name: "Install minio admin client {{cliinstalled.stat.exists}}"
+      when: not cliinstalled.stat.exists
+      block:
+      - name: "Install minio cli from https://dl.min.io/client/mc/release/linux-amd64/mc.{{version_minio_mc_admin}}"
+        delay: 0
+        async: 60
+        poll: 1
+        shell: |
+          curl https://dl.min.io/client/mc/release/linux-amd64/archive/mc.{{version_minio_mc_admin}} \
+            -o {{install_file}}
+        args:
+          creates: "{{install_file}}"
+
+      - name: "Chown {{install_file}}"
+        ansible.builtin.file:
+          path: "{{install_file}}"
+          owner: "{{ansible_ssh_user}}"
+          group: "{{ansible_ssh_user}}"
+          mode: '0700'
+
+      - name: "Install minio cli autocompletion"
+        become: false
+        shell: mc --autocompletion
+
+  vars:
+    - install_file: "/usr/local/bin/mc"

@@ -10,8 +10,8 @@ consul_checksum: "sha256:5370b0b5bf765530e28cb80f90dcb47bd7d6ba78176c1ab2430f56e
 uninstall_consul: false
 
 
-consul_template_version: "0.29.5"
-consul_template_checksum: "sha256:24aa8c67a2ac95c03524d62dd0e1815359e8c9689324b48e9c75ed2b6e25a5c8"
+consul_template_version: "0.30.0"
+consul_template_checksum: "sha256:c78db0f0eecc4d314a5130e3b4c8bd17086c6cd9080c4caf69c606de67cbe212"
 update_consul_template: false
 uninstall_consul_template: false
 
@@ -21,7 +21,7 @@ uninstall_nomad: false
 
 nomad_plugin_cni_version: "1.2.0"
 nomad_plugin_cni_checksum: "sha256:f3a841324845ca6bf0d4091b4fc7f97e18a623172158b72fc3fdcdb9d42d2d37"
-uninstall_nomad_plugin_cni: true
+uninstall_nomad_plugin_cni: false
 
 version_cfssl: 1.6.3
 update_cfssl: false
@@ -38,9 +38,15 @@ uninstall_nexus: false
 version_docker_compose: "2.12.2"
 uninstall_compose: false
 
-version_busy_box_init_container: "1.28"
-
-
 version_protoc: "21.12"
+
+
 version_proto_gen: "1.28.1"
 version_proto_grpc: "1.2.0"
+
+version_busy_box_init_container: "1.28"
+version_grafana_agent_container: "0.31.2"
+
+version_minio: "RELEASE.2023-02-09T05-16-53Z"
+version_minio_mc_admin: "RELEASE.2023-01-28T20-29-38Z"
+uninstall_minio_admin: false

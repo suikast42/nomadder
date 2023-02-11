@@ -75,9 +75,8 @@ job "observability" {
         ports = ["ui"]
       }
       resources {
-        cpu    = 500
-        memory = 512
-        memory_max = 4096
+        cpu    = 1000
+        memory = 2048
       }
       template {
          destination = "${NOMAD_SECRETS_DIR}/env.vars"
@@ -99,11 +98,11 @@ job "observability" {
        delay = "5s"
        mode = "delay"
      }
-    volume "stack_observability_mimir_volume" {
-      type      = "host"
-      source    = "stack_observability_mimir_volume"
-      read_only = false
-    }
+     volume "stack_observability_mimir_volume" {
+       type      = "host"
+       source    = "stack_observability_mimir_volume"
+       read_only = false
+     }
       count = 1
       network {
         mode = "bridge"
@@ -126,41 +125,98 @@ job "observability" {
         timeout  = "2s"
        }
     }
-      task "mimir"{
-        volume_mount {
-          volume      = "stack_observability_mimir_volume"
-          destination = "/data"
+       task "mimir-create-buckets"{
+         driver = "docker"
+         user ="root"
+         env {
+             MINIO_BUCKET="mimir"
+         }
+        template{
+          destination = "${NOMAD_SECRETS_DIR}/env.vars"
+           env         = true
+           right_delimiter = "++"
+           left_delimiter = "++"
+           data = <<EOF
+           ++- with nomadVar "{{nomad_observability_job_path}}" -++
+               MINIO_USER= ++ .minio_mimir_user ++
+               MINIO_PASSWORD= ++ .minio_mimir_secret ++
+           ++- end -++
+          EOF
+        }
+        template{
+            right_delimiter = "++"
+            left_delimiter = "++"
+            data = file(abspath("./configs/shell/create_buckets.tpl"))
+            destination = "local/create_buckets.sh"
+        }
+        config {
+           image        = "{{registry_dns}}/minio/mc:{{version_minio_mc_admin}}"
+           volumes      = ["local/create_buckets.sh:/create_buckets.sh"]
+           entrypoint = ["/bin/sh","/create_buckets.sh"]
+        }
+        resources {
+          cpu    = 200
+          memory = 128
         }
 
+        lifecycle {
+          hook    = "prestart"
+          sidecar = false
+        }
+       restart {
+         attempts = 10
+         interval = "2m"
+         delay = "10s"
+         mode = "fail"
+        }
+      }
+
+      task "mimir"{
          driver = "docker"
+         volume_mount {
+           volume      = "stack_observability_mimir_volume"
+           destination = "/data"
+         }
          env {
            JAEGER_AGENT_HOST= "tempo.service.consul"
            JAEGER_ENDPOINT = "http://tempo.service.consul:14268/api/traces" # send traces to Tempo
            JAEGER_REPORTER_LOG_SPANS=true
-         }
+          }
          config {
          image = "{{registry_dns}}/grafana/mimir:{{version_grafana_mimir}}"
          ports = ["api"]
+
          args = [
-           "-config.file","/config/mimir.yaml","-config.expand-env","true",
+           "-config.file","/config/mimir.yaml","-config.expand-env","true"
          ]
         volumes = [
           "local/mimir.yml:/config/mimir.yaml"
         ]
          }
       resources {
-        cpu    = 500
-        memory = 512
-        memory_max = 32768
+        cpu    = 1000
+        memory = 2048
       }
 
-    template {
-      change_mode   = "restart"
-      right_delimiter = "++"
-      left_delimiter = "++"
-      data = file(abspath("./configs/mimir/mimir.tpl"))
-      destination = "local/mimir.yml"
-    }
+      template{
+         destination = "${NOMAD_SECRETS_DIR}/env.vars"
+         env         = true
+         right_delimiter = "++"
+         left_delimiter = "++"
+         data = <<EOF
+         ++- with nomadVar "{{nomad_observability_job_path}}" -++
+             MINIO_USER= ++ .minio_mimir_user ++
+             MINIO_PASSWORD= ++ .minio_mimir_secret ++
+         ++- end -++
+        EOF
+      }
+      template {
+        change_mode   = "restart"
+        right_delimiter = "++"
+        left_delimiter = "++"
+        data = file(abspath("./configs/mimir/mimir.tpl"))
+        destination = "local/mimir.yml"
+      }
 
 
  #     template {
@@ -206,51 +262,100 @@ job "observability" {
       }
     }
 
-     service {
-       name ="loki"
-       port= "http"
-       tags = [
-             "prometheus",
-             "prometheus:server_id=${NOMAD_ALLOC_NAME}",
-             "prometheus:version={{version_nats_server}}",
-          ]
-       check {
-         name  = "health"
-         type  = "http"
-         port ="http"
-         path="/ready"
-         interval = "10s"
-         timeout  = "2s"
-        }
-     }
+ service {
+   name ="loki"
+   port= "http"
+   check {
+     name  = "health"
+     type  = "http"
+     port ="http"
+     path="/ready"
+     interval = "10s"
+     timeout  = "20s"
+    }
+ }
+     task "loki-create-buckets"{
+       driver = "docker"
+       user ="root"
+       env {
+           MINIO_BUCKET="loki"
+       }
+      template{
+        destination = "${NOMAD_SECRETS_DIR}/env.vars"
+         env         = true
+         right_delimiter = "++"
+         left_delimiter = "++"
+         data = <<EOF
+         ++- with nomadVar "{{nomad_observability_job_path}}" -++
+             MINIO_USER= ++ .minio_loki_user ++
+             MINIO_PASSWORD= ++ .minio_loki_secret ++
+         ++- end -++
+        EOF
+      }
+      template{
+          right_delimiter = "++"
+          left_delimiter = "++"
+          data = file(abspath("./configs/shell/create_buckets.tpl"))
+          destination = "local/create_buckets.sh"
+      }
+      config {
+         image        = "{{registry_dns}}/minio/mc:{{version_minio_mc_admin}}"
+         volumes      = ["local/create_buckets.sh:/create_buckets.sh"]
+         entrypoint = ["/bin/sh","/create_buckets.sh"]
+         #network_mode = "host
+      }
+      resources {
+        cpu    = 200
+        memory = 128
+      }
 
+      lifecycle {
+        hook    = "prestart"
+        sidecar = false
+      }
+     restart {
+       attempts = 10
+       interval = "2m"
+       delay = "10s"
+       mode = "fail"
+      }
+    }
      task "loki"{
+
        volume_mount {
          volume      = "stack_observability_loki_volume"
          destination = "/data"
        }
 
-     driver = "docker"
-     env {
-       JAEGER_AGENT_HOST= "tempo.service.consul"
-       JAEGER_ENDPOINT = "http://tempo.service.consul:14268/api/traces" # send traces to Tempo
-       JAEGER_REPORTER_LOG_SPANS=true
-       }
-    config {
-       image = "{{registry_dns}}/grafana/loki:{{version_grafana_loki}}"
-       ports = ["http","cli","grpc"]
-       args = [
-        "-config.file","/config/loki.yaml","-config.expand-env","true","-print-config-stderr","true",
-       ]
-    volumes = [
-      "local/loki.yaml:/config/loki.yaml"
-      ]
-    }
-    resources {
-       cpu    = 500
-       memory = 512
-       memory_max = 32768
-    }
+      driver = "docker"
+       env {
+         JAEGER_AGENT_HOST= "tempo.service.consul"
+         JAEGER_ENDPOINT = "http://tempo.service.consul:14268/api/traces" # send traces to Tempo
+         JAEGER_REPORTER_LOG_SPANS=true
+         }
+      config {
+         image = "{{registry_dns}}/grafana/loki:{{version_grafana_loki}}"
+         ports = ["http","cli","grpc"]
+         args = ["-config.file","/config/loki.yaml","-config.expand-env","true"]
+         volumes = ["local/loki.yaml:/config/loki.yaml"]
+      }
+      resources {
+         cpu    = 4000
+         memory = 2048
+      }
+
+      template{
+        destination = "${NOMAD_SECRETS_DIR}/env.vars"
+         env         = true
+         right_delimiter = "++"
+         left_delimiter = "++"
+         data = <<EOF
+         ++- with nomadVar "{{nomad_observability_job_path}}" -++
+             LOKI_MINIO_USER= ++ .minio_loki_user ++
+             LOKI_MINIO_PWD= ++ .minio_loki_secret ++
+         ++- end -++
+        EOF
+      }
 
       template {
         change_mode   = "restart"
@@ -262,6 +367,7 @@ job "observability" {
       }
     }
   group "tempo"{
+
      restart {
        attempts = 10
        interval = "5m"
@@ -350,6 +456,53 @@ job "observability" {
           timeout  = "1s"
          }
       }
+           task "tempo-create-buckets"{
+             driver = "docker"
+             user ="root"
+             env {
+                 MINIO_BUCKET="tempo"
+             }
+            template{
+              destination = "${NOMAD_SECRETS_DIR}/env.vars"
+               env         = true
+               right_delimiter = "++"
+               left_delimiter = "++"
+               data = <<EOF
+               ++- with nomadVar "{{nomad_observability_job_path}}" -++
+                   MINIO_USER= ++ .minio_tempo_user ++
+                   MINIO_PASSWORD= ++ .minio_tempo_secret ++
+               ++- end -++
+              EOF
+            }
+            template{
+                right_delimiter = "++"
+                left_delimiter = "++"
+                data = file(abspath("./configs/shell/create_buckets.tpl"))
+                destination = "local/create_buckets.sh"
+            }
+            config {
+               image        = "{{registry_dns}}/minio/mc:{{version_minio_mc_admin}}"
+               volumes      = ["local/create_buckets.sh:/create_buckets.sh"]
+               entrypoint = ["/bin/sh","/create_buckets.sh"]
+               #network_mode = "host
+            }
+            resources {
+              cpu    = 200
+              memory = 128
+            }
+
+            lifecycle {
+              hook    = "prestart"
+              sidecar = false
+            }
+           restart {
+             attempts = 10
+             interval = "2m"
+             delay = "10s"
+             mode = "fail"
+            }
+          }
+
       task "tempo"{
         volume_mount {
           volume      = "stack_observability_tempo_volume"
@@ -368,9 +521,8 @@ job "observability" {
         ]
          }
       resources {
-        cpu    = 500
-        memory = 512
-        memory_max = 32768
+        cpu    = 1000
+        memory = 2048
       }
 
      template {
@@ -490,9 +642,8 @@ job "observability" {
             ]
              }
           resources {
-            cpu    = 500
-            memory = 512
-            memory_max = 32768
+            cpu    = 2000
+            memory = 2048
           }
           template {
              destination = "local/nats.conf"
@@ -584,7 +735,6 @@ jetstream {
         resources {
           cpu    = 100
           memory = 64
-          memory_max = 2048
         }
 	   template {
          right_delimiter = "++"
@@ -617,9 +767,8 @@ jetstream {
              ]
            }
            resources {
-             cpu    = 100
-             memory = 64
-             memory_max = 2048
+             cpu    = 500
+             memory = 256
            }
      }
   }

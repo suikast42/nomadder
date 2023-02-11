@@ -91,7 +91,92 @@ Consul is able to register one service multiple times. The dns server changes on
 ----
 
 
+.Consul Template with conditions. Generate if service exists
+[source,hcl]
+----
+Services
+{{- $services := service "minio" -}}
+{{- if $services -}}
+    {{- range $services }}
+        {{- range service .Name }}
+            {{ .Name}}
+        {{- end}}
+    {{- end }}
 {{- end }}
+----
+
+
+.Consul Template Tags to map
+[source,hcl]
+----
+Services
+{{- $services := service "minio" -}}
+  {{- if $services -}}
+    {{- range $services }}
+      {{- range service .Name }}
+        {{ .Name}} {{.Tags | join ","| splitToMap "," "="  }}
+      {{- end}}
+    {{- end }}
+{{- end }}
+----
+
+
+.Consul Template select tags value
+First capture .Tags. Tags is an array value. Convert the array to a string field delimited by ",". Then convert the array entires delimited by "=" to a map and store it to local value. Access the value over the index value
+
+
+[source,hcl]
+----
+Services
+{{- $services := service "minio" -}}
+  {{- if $services -}}
+  {{- range $services -}}
+     {{- $labels := .Tags | join ","| splitToMap "," "=" -}}
+      {{- if index $labels "traefik.http.routers.minio.rule" -}}
+     label={{index $labels "traefik.http.routers.minio.rule"}}
+  {{- end }}
+{{- end }}
+----
+
+
+.Render template to a file
+[source,shell]
+----
+consul-template -template test.tpl:test.out -once
+----
+.Render template to stdout
+[source,shell]
+----
+consul-template -template test.tpl -dry
+----
+
+==== Consul Template rendering with config
+
+. Crate a cfg file
+
+.Render template config file
+[source,hcl]
+----
+template {
+destination = "local/agent.yaml"
+right_delimiter = "++"
+left_delimiter = "++"
+source ="test.tpl"
+}
+----
+
+. Execute the Template over config
+
+.Render template config file
+[source,shell]
+----
+consul-template  -config test.cfg -dry
+----
+
+
 [[_200_link_consul_agent_client_mode,vault_delete_ca]]https://groups.google.com/g/consul-tool/c/VI1xd8wG-0w[What is purpose and intent of Consul Agents running in Client mode]
+
+[[_200_link_consul_tpl_lang,consul_tpl_lang]]https://github.com/hashicorp/consul-template/blob/main/docs/templating-language.md[Templating Language]
+
 
 

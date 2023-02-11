@@ -1,6 +1,9 @@
 - name: Consul config files
   become: true
   block:
+    - name: Check if consul service Exists
+      stat: path=/etc/systemd/system/consul.service
+      register: consul_service
 
     - name: config file server
       when: is_master_host
@@ -10,6 +13,7 @@
         dest: "{{consul_conf_dir}}/server.hcl"
         owner: "{{ consul_user }}"
         group: "{{ consul_group }}"
+      register: cfgServer
 
     - name: config file server global settings
       when: is_master_host
@@ -19,6 +23,7 @@
         dest: "{{consul_conf_dir}}/server_global_settings_hcl.hcl"
         owner: "{{ consul_user }}"
         group: "{{ consul_group }}"
+      register: cfgServerGlobal
 
     - name: config file client
       when: is_worker_host
@@ -28,3 +33,11 @@
         dest: "{{consul_conf_dir}}/client.hcl"
         owner: "{{ consul_user }}"
         group: "{{ consul_group }}"
+      register: cfgClient
+
+    - name: restart consul service
+      become: true
+      when: consul_service.stat.exists and ( (cfgClient is defined and  cfgClient.changed) or (cfgServer is defined and cfgServer.changed)or (cfgServerGlobal is defined and cfgServerGlobal.changed))
+      service:
+        name: consul
+        state: restarted

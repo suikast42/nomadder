@@ -3,7 +3,7 @@
     - name: "Config journald"
       import_tasks: config_journald.yml
 
-    - name: "Install grafana agent v {{version_grafana_agent}}"
+    - name: "Install grafana agent v {{version_grafana_agent_nodes}}"
       import_tasks: install_grafana_agent.yml
 
     - name: "Install vector agent v {{version_vector_agent}}"
@@ -15,8 +15,8 @@
 
   vars:
     - tmp_install_dir_base: "/tmp/grafana_agent"
-    - version_grafana_agent: "0.30.2"
-    - uninstall_grafana_agent: false
+    - version_grafana_agent_nodes: "0.31.2"
+    - uninstall_grafana_agent: true
     - version_vector_agent: "0.27.0-1"
     - uninstall_vector_agent: true
     - version_nomad_event_sink: "0.2.0"

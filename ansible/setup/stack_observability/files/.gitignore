@@ -3,3 +3,4 @@ Dockerfile*
 mimir.yaml
 loki.yaml
 tempo.yaml
+configs

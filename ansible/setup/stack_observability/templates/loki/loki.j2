@@ -26,50 +26,90 @@ server:
 ingester:
   wal:
     enabled: true
-    dir: /data/loki/wal
+    dir: /data/wal
   lifecycler:
     address: 127.0.0.1
     ring:
       kvstore:
-        store: inmemory
+        store: memberlist
       replication_factor: 1
     final_sleep: 0s
   chunk_idle_period: 5m
   chunk_retain_period: 30s
 
+ruler:
+  storage:
+    type: local
+    local:
+      directory: /data/rules
+  rule_path: /data/scratch
+++- range  $index, $service := service "mimir" -++
+++- if eq $index 0 ++
+  alertmanager_url: http://++$service.Name++.service.consul:++ $service.Port ++/alertmanager
+++- end ++
+++- end ++
+
+  ring:
+    kvstore:
+      store: memberlist
+  enable_api: true
+
+compactor:
+  working_directory: /data/retention
+  shared_store: filesystem
+  compaction_interval: 10m
+  retention_enabled: true
+  retention_delete_delay: 2h
+  retention_delete_worker_count: 150
+
 schema_config:
   configs:
     - from: 2020-05-15
-      store: boltdb
+      store: boltdb-shipper
       object_store: filesystem
       schema: v11
       index:
         prefix: index_
-        period: 168h
+        period: 24h
 
 storage_config:
-  boltdb:
-    directory: /data/loki/index
-
+  boltdb_shipper:
+    active_index_directory: /data/index
+    cache_location: /data/index-cache
+    shared_store: filesystem
   filesystem:
-    directory: /data/loki/chunks
+    directory: /data/chunks
 
 querier:
   multi_tenant_queries_enabled: false
+  max_concurrent: 4096
+  query_store_only: false
+
+query_scheduler:
+  max_outstanding_requests_per_tenant: 10000
+
+query_range:
+  cache_results: true
+
 limits_config:
   ingestion_rate_mb: 64
   ingestion_burst_size_mb: 8
   max_label_name_length: 4096
   max_label_value_length: 8092
   enforce_metric_name: false
-  reject_old_samples: false
-  # 5 years
-  reject_old_samples_max_age: 438000h
+  # Loki will reject any log lines that have already been processed and will not index them again
+  reject_old_samples: true
+  # 7d
+  reject_old_samples_max_age: 168h
   # The limit to length of chunk store queries. 0 to disable.
   max_query_length: 0
+  # Maximum number of log entries that will be returned for a query.
   max_entries_limit_per_query: 20000
+  # Limit the maximum of unique series that is returned by a metric query.
   max_query_series: 100000
-  max_query_parallelism: 2
+  # Maximum number of queries that will be scheduled in parallel by the frontend.
+  max_query_parallelism: 64
+  split_queries_by_interval: 24h
   # Alter the log line timestamp during ingestion when the timestamp is the same as the
   # previous entry for the same stream. When enabled, if a log line in a push request has
   # the same timestamp as the previous line for the same stream, one nanosecond is added
@@ -80,5 +120,12 @@ limits_config:
   # entries and they will not be incremented.
   # CLI flag: -validation.increment-duplicate-timestamps
   increment_duplicate_timestamp: true
-#  reject_old_samples: true
-#  reject_old_samples_max_age: 168h
+  #Log data retention for all
+  retention_period: 24h
+  # Comment this out for fine grained retention
+#  retention_stream:
+#  - selector: '{namespace="dev"}'
+#    priority: 1
+#    period: 24h
+  # Comment this out for having overrides
+#  per_tenant_override_config: /etc/overrides.yaml
