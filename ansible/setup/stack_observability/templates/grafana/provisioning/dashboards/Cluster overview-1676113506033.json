@@ -1140,6 +1140,7 @@
           "mappings": [],
           "max": 100,
           "min": 0,
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1172,6 +1173,7 @@
           "fields": "",
           "values": false
         },
+        "text": {},
         "textMode": "auto"
       },
       "pluginVersion": "9.3.6",
@@ -1187,9 +1189,11 @@
           "instant": true,
           "interval": "",
           "legendFormat": "Killed",
+          "range": false,
           "refId": "A"
         }
       ],
+      "transformations": [],
       "type": "stat"
     },
     {
@@ -1993,7 +1997,7 @@
             "h": 13,
             "w": 24,
             "x": 0,
-            "y": 15
+            "y": 27
           },
           "id": 127,
           "options": {
@@ -2069,13 +2073,9 @@
       },
       {
         "current": {
-          "selected": true,
-          "text": [
-            "worker-01"
-          ],
-          "value": [
-            "worker-01"
-          ]
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
         },
         "datasource": {
           "type": "prometheus",
@@ -2135,6 +2135,6 @@
   "timezone": "",
   "title": "Cluster overview",
   "uid": "masiNomadCluster",
-  "version": 6,
+  "version": 8,
   "weekStart": ""
 }
