@@ -37,5 +37,8 @@
     when: is_master_0
     run_once: true
     import_tasks: install_cfssl.yml
+
+  - name: "copy check config sh to the nodes "
+    import_tasks: copy_check_config.yml
   tags:
     - nodes
