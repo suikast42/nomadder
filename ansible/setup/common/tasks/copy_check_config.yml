@@ -1,0 +1,15 @@
+- name: Copy check-config.sh
+  become: true
+  ansible.builtin.copy:
+    src: check-config.sh
+    dest: "/usr/local/bin/check-config.sh"
+    force: yes
+    group: "{{ansible_user}}"
+    owner: "{{ansible_user}}"
+    mode: 0755
+
+- name: dos2unix check-config.sh
+  become: true
+  changed_when: false
+  shell: |
+    dos2unix /usr/local/bin/check-config.sh
