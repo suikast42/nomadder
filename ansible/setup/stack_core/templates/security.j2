@@ -53,6 +53,10 @@ job "security" {
       driver = "docker"
       env {
         POSTGRES_USER        = "keycloak"
+        # tell pg_isready to use this user
+        # otherwise a error FATAL:  role "root" does not exist will logged
+        # on every check
+        PGUSER         = "keycloak"
         POSTGRES_DB          = "keycloak"
         PGDATA               = "/var/lib/postgresql/data/pgdata"
         POSTGRES_INITDB_ARGS = "--encoding=UTF8"

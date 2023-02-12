@@ -16,9 +16,9 @@
   vars:
     - tmp_install_dir_base: "/tmp/grafana_agent"
     - version_grafana_agent_nodes: "0.31.2"
-    - uninstall_grafana_agent: true
+    - uninstall_grafana_agent: false
     - version_vector_agent: "0.27.0-1"
-    - uninstall_vector_agent: true
+    - uninstall_vector_agent: false
     - version_nomad_event_sink: "0.2.0"
     - uninstall_version_nomad_event_sink: false
     - nomad_event_sink_working_dir: "{{service_working_dir_base}}/nomad_event_sink"
