@@ -45,8 +45,14 @@ After that you can bind in a job stanza the service to a specific interface
 ----
 
 
+=== Memory and cpu limits
+There are two main types of setting resources in nomad. The first in the nomad client configuration and the second is inside in the job configuration.
 
+The resource configuration in the client configuration reserves memory and cpu for operating nomad. after this reservation nomad subtracts this from the available resources for job scheduling.
 
+The resource configuration in the job configuration limits the job itself. If you don't enable https://developer.hashicorp.com/nomad/docs/job-specification/resources#memory-oversubscription[Memory Oversubscription] then the memory you defined is the min and max limit at the same time.
+
+=== Links
 [[_200_link_nomad_task_init,nomad task dependencies]]https://developer.hashicorp.com/nomad/tutorials/task-deps/task-dependencies-interjob[Express Inter-job Dependencies with Init Tasks]
 
 [[_200_link_nomad_hcl_lang,nomad hcl lang functions]]https://developer.hashicorp.com/nomad/docs/job-specification/hcl2[Nomad hcl lang functions]
