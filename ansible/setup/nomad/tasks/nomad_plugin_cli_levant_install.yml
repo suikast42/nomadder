@@ -1,0 +1,44 @@
+- name: "nomad cli tool levant"
+  become: true
+  block:
+
+    - name: "Delete cli tool levant {{install_file}} if present"
+      when: uninstall_cli_levant|bool == true
+      ansible.builtin.file:
+        path: "{{install_file}}"
+        state: absent
+
+    - name : Check cli tool levant  installation present
+      stat:
+        path: "{{install_file}}"
+      register: cliInstalled
+
+    - name: Install cli tool levant
+      when: not cliInstalled.stat.exists
+      block:
+
+      - name: Download cli tool levant
+        get_url:
+          url: https://releases.hashicorp.com/levant/{{nomad_cli_levant_version}}/levant_{{nomad_cli_levant_version}}_linux_amd64.zip
+          dest: /tmp/levant_{{nomad_cli_levant_version}}_linux_amd64.zip
+          owner: "{{ nomad_user }}"
+          group: "{{ nomad_group }}"
+          mode: 0755
+          checksum: "{{nomad_cli_levant_checkusum}}"
+        register: levant_download
+
+      - name: "Unzip cli tool levant {{install_file}}"
+        become: true
+        unarchive:
+          src: "{{levant_download.dest}}"
+          dest: "{{install_dir}}"
+          copy: no
+          owner: "{{ nomad_user }}"
+          group: "{{ nomad_group }}"
+          mode: 0755
+
+
+
+  vars:
+    install_dir: "/usr/local/bin"
+    install_file: "{{install_dir}}/levant"
