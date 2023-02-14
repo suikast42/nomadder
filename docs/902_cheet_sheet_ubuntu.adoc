@@ -21,6 +21,12 @@ a|[source,shell]
 apt-cache madison vector
 ----
 
+|Systemd Ubuntu Systemd Shutdown timeout
+a|[source,shell]
+----
+Add DefaultTimeoutStopSec to service systemd condif file.
+----
 
 
 |===
+
