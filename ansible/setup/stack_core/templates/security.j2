@@ -1,20 +1,31 @@
 job "security" {
   type = "service"
+  reschedule {
+    delay          = "10s"
+    delay_function = "constant"
+    unlimited      = true
+  }
+  update {
+      max_parallel      = 1
+      health_check      = "checks"
+      # Alloc is marked as unhealthy after this time
+      healthy_deadline  = "2m"
+      min_healthy_time  = "10s"
+  }
+
   datacenters = ["{{data_center}}"]
 
-    reschedule {
-      delay          = "10s"
-      delay_function = "constant"
-      unlimited      = true
+  group "keycloak-db" {
+    update {
+        healthy_deadline  = "1m"
     }
 
-  group "keycloak-db" {
-     restart {
-       attempts = -1
-       interval = "5s"
-       delay = "5s"
-       mode = "delay"
-     }
+    restart {
+      attempts = 1
+      interval = "1m"
+      delay = "5s"
+      mode = "fail"
+    }
     volume "security_postgres_volume" {
       type      = "host"
       source    = "security_postgres_volume"
@@ -40,8 +51,13 @@ job "security" {
         type     = "script"
         command  = "pg_isready"
         task     = "security_postgres"
-        interval = "10s"
+        interval = "5s"
         timeout  = "2s"
+        check_restart {
+          limit = 3
+          grace = "30s"
+          ignore_warnings = false
+        }
       }
     }
 
@@ -93,12 +109,12 @@ job "security" {
   }
 
   group "keycloak-ingress" {
-     restart {
-       attempts = -1
-       interval = "5s"
-       delay = "5s"
-       mode = "delay"
-     }
+    restart {
+      attempts = 1
+      interval = "1m"
+      delay = "5s"
+      mode = "fail"
+    }
     volume "ca_cert" {
       type      = "host"
       source    = "ca_cert"
@@ -162,7 +178,7 @@ job "security" {
         PROVIDER_URI  = "https://security.{{tls_san}}/realms/nomadder"
         #        OIDC_ISSUER   = "https://security.{{tls_san}}/realms/nomadder"
         CLIENT_ID     = "ingress"
-        LOG_LEVEL     = "debug"
+        LOG_LEVEL     = "warn"
         # Lifetime of cookie 60s
         LIFETIME = "60"
 
@@ -194,12 +210,12 @@ job "security" {
   }
 
   group "keycloak" {
-     restart {
-       attempts = -1
-       interval = "5s"
-       delay = "5s"
-       mode = "delay"
-     }
+    restart {
+      attempts = 2
+      interval = "1m"
+      delay = "5s"
+      mode = "fail"
+    }
     count = 1
     network {
       mode = "bridge"
@@ -237,6 +253,28 @@ job "security" {
         path="/health"
         interval = "10s"
         timeout  = "2s"
+      }
+      check {
+        name  = "live"
+        type  = "http"
+        port ="ui"
+        path="/health/live"
+        interval = "10s"
+        timeout  = "2s"
+      }
+      check {
+        name  = "ready"
+        type  = "http"
+        port ="ui"
+        path="/health/ready"
+        interval = "10s"
+        timeout  = "2s"
+        check_restart {
+          # Restart if 2m not ready
+          limit = 3
+          grace = "60s"
+          ignore_warnings = false
+        }
       }
     }
       task "await-for-security-postgres" {

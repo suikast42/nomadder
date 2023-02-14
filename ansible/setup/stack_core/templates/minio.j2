@@ -6,7 +6,13 @@ job "minio" {
     delay_function = "constant"
     unlimited      = true
   }
-
+  update {
+      max_parallel      = 1
+      health_check      = "checks"
+      # Alloc is marked as unhealthy after this time
+      healthy_deadline  = "2m"
+      min_healthy_time  = "10s"
+  }
   group "minio" {
 
     count = 1
@@ -21,10 +27,10 @@ job "minio" {
       read_only = true
     }
     restart {
-      attempts = -1
-      interval = "5s"
+      attempts = 3
+      interval = "2m"
       delay = "5s"
-      mode = "delay"
+      mode = "fail"
     }
     network {
       mode = "bridge"
@@ -126,8 +132,13 @@ job "minio" {
           type     = "http"
           path     = "/minio/health/ready"
           port     = "http"
-          interval = "15s"
+          interval = "10s"
           timeout  = "4s"
+          check_restart {
+            limit = 3
+            grace = "60s"
+            ignore_warnings = false
+          }
        }
      }
       service {
