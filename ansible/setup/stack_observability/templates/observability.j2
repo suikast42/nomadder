@@ -588,7 +588,44 @@ jetstream {
           source    = "cert_consul"
           read_only = true
         }
-
+      network {
+        mode = "bridge"
+        port "server" {}
+      }
+      service {
+           name = "grafana-agent-health"
+           #name = "${NOMAD_ALLOC_NAME}-health"
+           port = "server"
+           check {
+              type     = "http"
+              port     = "server"
+              path     = "/-/healthy"
+              interval = "10s"
+              timeout  = "2s"
+              check_restart {
+                limit = 3
+                grace = "30s"
+                ignore_warnings = false
+              }
+           }
+     }
+      service {
+           #name = "${NOMAD_ALLOC_NAME}-ready"
+           name = "grafana-agent-ready"
+           port = "server"
+           check {
+              type     = "http"
+              port     = "server"
+              path     = "/-/ready"
+              interval = "10s"
+              timeout  = "2s"
+              check_restart {
+                limit = 5
+                grace = "30s"
+                ignore_warnings = false
+              }
+           }
+     }
     task "grafana-agent" {
          volume_mount {
             volume      = "stack_observability_grafana_agent_volume"
@@ -606,8 +643,9 @@ jetstream {
        config {
 
          image = "{{registry_dns}}/grafana/agent:v{{version_grafana_agent_container}}"
+         #:${NOMAD_HOST_PORT_server} bind on all available interfaces in the container
          args = [
-             "-config.file","/config/agent.yaml"
+             "-config.file","/config/agent.yaml", "-server.http.address", ":${NOMAD_HOST_PORT_server}"
           ]
           volumes = [
             "local/agent.yaml:/config/agent.yaml"
