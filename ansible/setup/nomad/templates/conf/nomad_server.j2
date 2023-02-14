@@ -33,7 +33,11 @@ tls {
 
 ui {
   enabled =  true
-
+  label {
+   text =  "Fenerbache 1907"
+   background_color = "#163962"
+   text_color = "#ffed00"
+  }
   consul {
     ui_url = "https://consul.{{tls_san}}"
   }
@@ -46,11 +50,13 @@ ui {
 consul{
  ssl= true
  address = "127.0.0.1:8501"
+ grpc_address = "127.0.0.1:8503"
  # this works only with ACL enabled
  allow_unauthenticated= true
  ca_file   = "{{cluster_intermediate_ca_bundle}}"
- cert_file = "{{nomad_cert}}"
- key_file  = "{{nomad_cert_key}}"
+ grpc_ca_file   = "{{cluster_intermediate_ca_bundle}}"
+ cert_file = "{{consul_cert}}"
+ key_file  = "{{consul_cert_key}}"
 }
 
 telemetry {
