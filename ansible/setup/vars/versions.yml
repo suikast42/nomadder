@@ -3,10 +3,10 @@ vault_checksum: "sha256:aa2ed532d9a0ecc8635fed63cb3fb6de472b4c01ca622a9a199cd92a
 uninstall_vault: false
 
 
-#consul_version: "1.14.1"
-#consul_checksum: "sha256:e544964cf4df3fc18f58bb875bdbad4c7a6ff746ab7f7f6b0d7a0d469893490d"
-consul_version: "1.13.3"
-consul_checksum: "sha256:5370b0b5bf765530e28cb80f90dcb47bd7d6ba78176c1ab2430f56e460ed279c"
+#consul_version: "1.13.3"
+#consul_checksum: "sha256:5370b0b5bf765530e28cb80f90dcb47bd7d6ba78176c1ab2430f56e460ed279c"
+consul_version: "1.14.4"
+consul_checksum: "sha256:eafb7c853ce9cc1536bffa99325f8df365ff70a3b83c037836e63964a8adfd7a"
 uninstall_consul: false
 
 
@@ -15,8 +15,10 @@ consul_template_checksum: "sha256:c78db0f0eecc4d314a5130e3b4c8bd17086c6cd9080c4c
 update_consul_template: false
 uninstall_consul_template: false
 
-nomad_version: "1.4.3"
-nomad_checksum: "sha256:15ab8fd2da071d93852f59b9a8833e3a764986ef8140c6b11f87621391e63902"
+#nomad_version: "1.4.3"
+#nomad_checksum: "sha256:15ab8fd2da071d93852f59b9a8833e3a764986ef8140c6b11f87621391e63902"
+nomad_version: "1.5.0-beta.1"
+nomad_checksum: "sha256:b39111570c9842608aad3b9f493498107bcdd826440e22ac1a60d27eb6b547f5"
 uninstall_nomad: false
 
 nomad_plugin_cni_version: "1.2.0"
