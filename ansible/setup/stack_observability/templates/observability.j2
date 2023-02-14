@@ -1,17 +1,24 @@
 job "observability" {
   type = "service"
   datacenters = ["{{data_center}}"]
-   reschedule {
-      delay          = "10s"
-      delay_function = "constant"
-      unlimited      = true
-    }
+  reschedule {
+    delay          = "10s"
+    delay_function = "constant"
+    unlimited      = true
+  }
+  update {
+      max_parallel      = 1
+      health_check      = "checks"
+      # Alloc is marked as unhealthy after this time
+      healthy_deadline  = "2m"
+      min_healthy_time  = "10s"
+  }
   group "grafana" {
      restart {
-       attempts = 10
-       interval = "5m"
+       attempts = 3
+       interval = "2m"
        delay = "5s"
-       mode = "delay"
+       mode = "fail"
      }
     volume "stack_observability_grafana_volume" {
       type      = "host"
@@ -53,6 +60,11 @@ job "observability" {
           path     = "/health"
           interval = "10s"
           timeout  = "2s"
+          check_restart {
+            limit = 3
+            grace = "120s"
+            ignore_warnings = false
+          }
         }
     }
     task "grafana" {
@@ -94,10 +106,10 @@ job "observability" {
 
   group "mimir"{
      restart {
-       attempts = 10
-       interval = "5m"
+       attempts = 3
+       interval = "2m"
        delay = "5s"
-       mode = "delay"
+       mode = "fail"
      }
     volume "stack_observability_mimir_volume" {
       type      = "host"
@@ -124,6 +136,11 @@ job "observability" {
         path="/ready"
         interval = "10s"
         timeout  = "2s"
+        check_restart {
+          limit = 3
+          grace = "120s"
+          ignore_warnings = false
+        }
        }
     }
       task "mimir"{
@@ -179,10 +196,10 @@ job "observability" {
   }
  group "loki"{
      restart {
-       attempts = 10
-       interval = "5m"
+       attempts = 3
+       interval = "2m"
        delay = "5s"
-       mode = "delay"
+       mode = "fail"
      }
     volume "stack_observability_loki_volume" {
       type      = "host"
@@ -221,6 +238,11 @@ job "observability" {
          path="/ready"
          interval = "10s"
          timeout  = "2s"
+         check_restart {
+           limit = 3
+           grace = "120s"
+           ignore_warnings = false
+         }
         }
      }
 
@@ -263,10 +285,10 @@ job "observability" {
     }
   group "tempo"{
      restart {
-       attempts = 10
-       interval = "5m"
+       attempts = 3
+       interval = "2m"
        delay = "5s"
-       mode = "delay"
+       mode = "fail"
      }
 
     volume "stack_observability_tempo_volume" {
@@ -308,6 +330,11 @@ job "observability" {
         path="/ready"
         interval = "10s"
         timeout  = "2s"
+        check_restart {
+          limit = 3
+          grace = "120s"
+          ignore_warnings = false
+        }
        }
     }
     service{
@@ -385,10 +412,10 @@ job "observability" {
 
     group "nats"{
       restart {
-        attempts = -1
-       interval = "5s"
+        attempts = 3
+        interval = "2m"
         delay = "5s"
-        mode = "delay"
+        mode = "fail"
       }
        volume "stack_observability_nats_volume" {
           type      = "host"
@@ -425,6 +452,11 @@ job "observability" {
                  path     = "/connz"
                  interval = "5s"
                  timeout  = "2s"
+                 check_restart {
+                    limit = 3
+                    grace = "120s"
+                    ignore_warnings = false
+                 }
               }
       }
 
@@ -597,8 +629,8 @@ jetstream {
   }
    group "logunifier"{
      restart {
-       attempts = 10
-       interval = "5m"
+       attempts = 3
+       interval = "2m"
        delay = "5s"
        mode = "delay"
      }

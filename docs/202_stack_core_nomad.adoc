@@ -52,8 +52,56 @@ The resource configuration in the client configuration reserves memory and cpu f
 
 The resource configuration in the job configuration limits the job itself. If you don't enable https://developer.hashicorp.com/nomad/docs/job-specification/resources#memory-oversubscription[Memory Oversubscription] then the memory you defined is the min and max limit at the same time.
 
+=== Job resiliency configuration
+
+There are several mechanisms in nomad to control the schedule errors.
+
+==== reschedule
+job -> reschedule  | job -> group -> reschedule
+This handles the case where the specified number of restarts have been attempted and the task still isn’t running. This suggests the issue could be with the Nomad client such as a hardware failure or kernel deadlock. The reschedule stanza is used to specify details for rescheduling a failing task to another nomad client. For example, reschedule the task group an unlimited number of times and increase the delay between subsequent attempts exponentially, with a starting delay of 30 seconds up to a maximum of 1 hour.
+
+==== restart
+job -> group -> restart | job -> group -> task -> restart
+
+Specifies strategy for Nomad to restart failed tasks on the same nomad client. For example, if the application server has crashed, attempt 2 restarts within 30 minutes, delay 15s between each restart, and don’t try anymore restarts after those are exhausted.
+
+* `delay` - Instructs the client to wait until another interval before restarting the task.
+
+* `fail`- Instructs the client not to attempt to restart the task once the number of attempts have been used. This is the default behavior. This mode is useful for non-idempotent jobs which are unlikely to succeed after a few failures. The allocation will be marked as failed and the scheduler will attempt to reschedule the allocation according to the reschedule block.
+
+==== check
+job -> group -> service -> check |
+job -> group -> task -> service -> check
+
+The check block instructs Nomad to register a check associated with a service into the Nomad or Consul service provider.
+
+==== check_restart
+job -> group -> task -> service -> check_restart | job -> group -> task -> service -> check -> check_restart
+Specifies how Nomad should restart a task that is not yet failing, but has become unresponsive or otherwise unhealthy. Works together with Consul health checks. Nomad restarts tasks when a health check has failed. For example, restart the Redis task after its health check has failed 3 consecutive times, and wait 90 seconds after restarting the task to resume health checking.
+
+==== update
+job -> update  | job -> group -> update
+Specifies update strategy Nomad uses when deploying a new version of the task group. i.e. when nomad job run path/to/jobspec is run. For example, perform rolling updates 3 at a time and wait until all tasks for an allocation are running and their Consul health checks are passing for at least 10 seconds before considering the allocation healthy.
+
+==== migrate
+When a Nomad client needs to come out of service, it gets marked for draining and tasks will no longer be scheduled on it. Then Nomad will migrate all existing jobs to other clients. The migrate stanza specifies the strategy for migrating tasks off of draining nodes. For example, migrate one allocation at a time, and mark migrated allocations healthy once all their tasks are running and associated health checks are passing for 10 seconds or more within a 5 minute deadline.
+
+
+==== Wrap it up
+
+. Define a reschedule for whole job. This controls after which conditions nomad try to schedule the job to another node. But not the same as failed.
+
+. Define an update strategy on job or group level. This controls when a job or group allows considered as failed. For example if the healths checks not healthy after x minutes.
+
+. Define a restart  stanza on group or task level.
+
+. Define a check stanza for services. This registers a healthcheck ( health, ready etc.) endpoints that nomad calls cyclic.
+
+. Define a check_restart for checks that should trigger a restart. Restarts a task after limit*check_interval.
+
 === Links
 [[_200_link_nomad_task_init,nomad task dependencies]]https://developer.hashicorp.com/nomad/tutorials/task-deps/task-dependencies-interjob[Express Inter-job Dependencies with Init Tasks]
 
 [[_200_link_nomad_hcl_lang,nomad hcl lang functions]]https://developer.hashicorp.com/nomad/docs/job-specification/hcl2[Nomad hcl lang functions]
 
+[[_200_link_nomad_hcl_lang,nomad defaults]]https://medium.com/@obenaus.thomas/a-good-default-nomad-job-template-ea448b8a8cdd[A Good, Default Nomad Job Template]
