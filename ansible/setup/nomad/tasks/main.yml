@@ -23,7 +23,10 @@
       include_tasks: nomad_plugin_cni_install.yml
 
     - name: Install nomad cli tool levant
-      include_tasks: nomad_plugin_cli_levant_install.yml
+      include_tasks: nomad_cli_levant_install.yml
+
+    - name: Install nomad cli tool wander
+      include_tasks: nomad_cli_wander_install.yml
 
     - name: Nomad config
       include_tasks: copy_copy_config_files.yml

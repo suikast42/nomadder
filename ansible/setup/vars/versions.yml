@@ -29,6 +29,11 @@ nomad_cli_levant_version: "0.3.2"
 nomad_cli_levant_checkusum: "sha256:1e06180f8d8327e721e2ad4c9637d1f391034a22709473b8ed8ee19f1cad1570"
 uninstall_cli_levant: false
 
+nomad_cli_wander_version: "0.9.0"
+nomad_cli_wander_checkusum: "sha256:aea08e51b85b68a2a899b689f0e8d70cc8b0b54fe3883bd99c768894a7359dc8"
+uninstall_cli_wander: false
+
+
 version_cfssl: 1.6.3
 update_cfssl: false
 

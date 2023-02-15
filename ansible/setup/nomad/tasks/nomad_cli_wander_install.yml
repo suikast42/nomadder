@@ -1,0 +1,44 @@
+- name: "nomad cli tool wander"
+  become: true
+  block:
+
+    - name: "Delete cli tool wander {{install_file}} if present"
+      when: uninstall_cli_wander|bool == true
+      ansible.builtin.file:
+        path: "{{install_file}}"
+        state: absent
+
+    - name : Check cli tool wander  installation present
+      stat:
+        path: "{{install_file}}"
+      register: cliInstalled
+
+    - name: Install cli tool wander
+      when: not cliInstalled.stat.exists
+      block:
+
+      - name: Download cli tool wander
+        get_url:
+          url: https://github.com/robinovitch61/wander/releases/download/v{{nomad_cli_wander_version}}/wander_{{nomad_cli_wander_version}}_Linux_x86_64.tar.gz
+          dest: /tmp/wander_{{nomad_cli_wander_version}}_Linux_x86_64.tar.gz
+          owner: "{{ nomad_user }}"
+          group: "{{ nomad_group }}"
+          mode: 0755
+          checksum: "{{nomad_cli_wander_checkusum}}"
+        register: wander_download
+
+      - name: "Unzip cli tool wander {{install_file}}"
+        become: true
+        unarchive:
+          src: "{{wander_download.dest}}"
+          dest: "{{install_dir}}"
+          copy: no
+          owner: "{{ nomad_user }}"
+          group: "{{ nomad_group }}"
+          mode: 0755
+
+
+
+  vars:
+    install_dir: "/usr/local/bin"
+    install_file: "{{install_dir}}/wander"

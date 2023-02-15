@@ -27,16 +27,6 @@
 #    debug:
 #      msg: "{{build}}"
 
-  - name: Install damon nomad util
-    shell: |
-      sudo rm -R damon
-      git clone https://github.com/hashicorp/damon.git
-      cd damon
-      go build  -buildvcs=false ./cmd/damon
-      sudo mv damon /usr/local/bin
-    args:
-      chdir: /tmp
-      creates: /usr/local/bin/damon # oh-my-posh is already installed
 
   - name: "Download protoc v{{version_protoc}}"
     get_url:
