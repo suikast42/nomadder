@@ -679,12 +679,36 @@ jetstream {
        mode = "delay"
      }
      count = 1
+      network {
+        mode = "bridge"
+        port "health" {
+           to= 3000
+        }
+      }
+      service {
+           name = "logunifier-health"
+           #name = "${NOMAD_ALLOC_NAME}-health"
+           port = "health"
+           check {
+              type     = "http"
+              port     = "health"
+              path     = "/health"
+              interval = "10s"
+              timeout  = "2s"
+              check_restart {
+                limit = 3
+                grace = "30s"
+                ignore_warnings = false
+              }
+           }
+     }
      task "logunifier" {
      driver = "docker"
  {% if is_env_development %}
         config {
           image = "{{registry_dns}}/suikast42/logunifier:latest"
           force_pull = true
+          ports = ["health"]
           args = [
               "-loglevel",
               "debug",
@@ -697,6 +721,7 @@ jetstream {
  {% else %}
             config {
               image = "{{registry_dns}}/suikast42/logunifier:{{version_logunifer}}"
+              ports = ["health"]
               args = [
                   "-loglevel",
                   "debug",
