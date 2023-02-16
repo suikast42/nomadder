@@ -1,4 +1,19 @@
 ---
+# Abort playbook if wrong env is set
+- hosts: all,!localhost
+  gather_facts: true
+  vars_files:
+    - vars/common_vars.yml
+  tasks:
+    - name: "Check env will fail {{fail_when_not_development_env|bool == true }}"
+      changed_when: false
+      failed_when: fail_when_not_development_env|bool == true
+      shell: | 
+        echo current env is {{env}} and hostip is  {{host_ip}}
+      tags:
+        - always
+
+
 - hosts: localhost
   vars_files:
     - vars/common_vars.yml

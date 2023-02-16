@@ -1,4 +1,10 @@
 job "observability" {
+ {% if is_env_development %}
+  meta {
+    run_uuid = "${uuidv4()}"
+  }
+  {% endif %}
+
   type = "service"
   datacenters = ["{{data_center}}"]
   reschedule {
@@ -674,18 +680,34 @@ jetstream {
      }
      count = 1
      task "logunifier" {
-          driver = "docker"
-          config {
-            image = "{{registry_dns}}/suikast42/logunifier:{{version_logunifer}}"
-            args = [
-                "-loglevel",
-                "debug",
-                "-natsServers",
-                "nats.service.consul:4222",
-                "-lokiServers",
-                "loki.service.consul:9005",
-             ]
-           }
+     driver = "docker"
+ {% if is_env_development %}
+        config {
+          image = "{{registry_dns}}/suikast42/logunifier:latest"
+          force_pull = true
+          args = [
+              "-loglevel",
+              "debug",
+              "-natsServers",
+              "nats.service.consul:4222",
+              "-lokiServers",
+              "loki.service.consul:9005",
+           ]
+         }
+ {% else %}
+            config {
+              image = "{{registry_dns}}/suikast42/logunifier:{{version_logunifer}}"
+              args = [
+                  "-loglevel",
+                  "debug",
+                  "-natsServers",
+                  "nats.service.consul:4222",
+                  "-lokiServers",
+                  "loki.service.consul:9005",
+               ]
+             }
+ {% endif %}
+
            resources {
              cpu    = 100
              memory = 64
