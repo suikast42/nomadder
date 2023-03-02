@@ -46,7 +46,7 @@ job "ingress" {
 
   group "traefik" {
     restart {
-      attempts = 5
+      attempts = 10
       interval = "1m"
       delay = "5s"
       mode = "fail"

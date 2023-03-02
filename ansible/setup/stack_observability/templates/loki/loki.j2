@@ -80,7 +80,11 @@ storage_config:
     shared_store: filesystem
   filesystem:
     directory: /data/chunks
-
+  index_queries_cache_config:
+    enable_fifocache: false
+    embedded_cache:
+      max_size_mb: 4096
+      enabled: true
 querier:
   multi_tenant_queries_enabled: false
   max_concurrent: 4096
@@ -91,6 +95,28 @@ query_scheduler:
 
 query_range:
   cache_results: true
+  results_cache:
+    cache:
+      enable_fifocache: false
+      embedded_cache:
+        enabled: true
+
+chunk_store_config:
+  chunk_cache_config:
+    enable_fifocache: false
+    embedded_cache:
+      max_size_mb: 4096
+      enabled: true
+  write_dedupe_cache_config:
+    enable_fifocache: false
+    embedded_cache:
+      max_size_mb: 4096
+      enabled: true
+
+distributor:
+  ring:
+    kvstore:
+      store: memberlist
 
 limits_config:
   ingestion_rate_mb: 64

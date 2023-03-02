@@ -21,7 +21,7 @@ job "observability" {
   }
   group "grafana" {
      restart {
-       attempts = 3
+       attempts = 10
        interval = "2m"
        delay = "5s"
        mode = "fail"
@@ -63,7 +63,7 @@ job "observability" {
           name     = "health"
           type     = "http"
           port     = "ui"
-          path     = "/health"
+          path     = "/healthz"
           interval = "10s"
           timeout  = "2s"
           check_restart {
@@ -112,7 +112,7 @@ job "observability" {
 
   group "mimir"{
      restart {
-       attempts = 3
+       attempts = 10
        interval = "2m"
        delay = "5s"
        mode = "fail"
@@ -202,7 +202,7 @@ job "observability" {
   }
  group "loki"{
      restart {
-       attempts = 3
+       attempts = 10
        interval = "2m"
        delay = "5s"
        mode = "fail"
@@ -291,7 +291,7 @@ job "observability" {
     }
   group "tempo"{
      restart {
-       attempts = 3
+       attempts = 10
        interval = "2m"
        delay = "5s"
        mode = "fail"
@@ -418,7 +418,7 @@ job "observability" {
 
     group "nats"{
       restart {
-        attempts = 3
+        attempts = 10
         interval = "2m"
         delay = "5s"
         mode = "fail"
@@ -436,11 +436,9 @@ job "observability" {
           to = 4222
         }
         port "http" {
-          static =  8222
           to = 8222
         }
         port "cluster" {
-          static =  6222
           to = 6222
         }
         port "prometheus-exporter" {
@@ -448,22 +446,21 @@ job "observability" {
         }
 
       }
-        service {
-              port = "client"
-              name = "nats"
-
-              check {
-                 type     = "http"
-                 port     = "http"
-                 path     = "/connz"
-                 interval = "5s"
-                 timeout  = "2s"
-                 check_restart {
-                    limit = 3
-                    grace = "120s"
-                    ignore_warnings = false
-                 }
-              }
+      service {
+        port = "client"
+        name = "nats"
+        check {
+          type     = "http"
+          port     = "http"
+          path     = "/healthz"
+          interval = "5s"
+          timeout  = "2s"
+          check_restart {
+            limit = 3
+            grace = "60s"
+            ignore_warnings = false
+            }
+          }
       }
 
         service {
@@ -481,6 +478,11 @@ job "observability" {
               path     = "/metrics"
               interval = "5s"
               timeout  = "2s"
+              check_restart {
+                limit = 3
+                grace = "60s"
+                ignore_warnings = false
+               }
            }
       }
       task "nats-prometheus-exporter" {
@@ -576,7 +578,7 @@ jetstream {
        attempts = 10
        interval = "5m"
        delay = "5s"
-       mode = "delay"
+       mode = "fail"
      }
 
        volume "stack_observability_grafana_agent_volume" {
@@ -673,10 +675,10 @@ jetstream {
   }
    group "logunifier"{
      restart {
-       attempts = 3
+       attempts = 10
        interval = "2m"
        delay = "5s"
-       mode = "delay"
+       mode = "fail"
      }
      count = 1
       network {

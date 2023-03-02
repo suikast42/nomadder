@@ -10,7 +10,6 @@ services:
       - "com.hashicorp.nomad.task_group_name=nexus"
       - "com.hashicorp.nomad.task_name=nexus-initlz"
     environment:
-    # Let the default admin password as admin123
       NEXUS_ADDRESS: {{host_ip}}
       NEXUS_PORT: 5002
       NEXUS_SCHEME: "http"

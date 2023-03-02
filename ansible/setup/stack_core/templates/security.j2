@@ -21,7 +21,7 @@ job "security" {
     }
 
     restart {
-      attempts = 1
+      attempts = 10
       interval = "1m"
       delay = "5s"
       mode = "fail"
@@ -110,7 +110,7 @@ job "security" {
 
   group "keycloak-ingress" {
     restart {
-      attempts = 1
+      attempts = 10
       interval = "1m"
       delay = "5s"
       mode = "fail"
@@ -211,7 +211,7 @@ job "security" {
 
   group "keycloak" {
     restart {
-      attempts = 2
+      attempts = 10
       interval = "1m"
       delay = "5s"
       mode = "fail"
@@ -245,7 +245,6 @@ job "security" {
         "traefik.http.routers.keycloak.rule=Host(`{{security_dns}}`)",
       ]
 
-
       check {
         name  = "health"
         type  = "http"
@@ -276,6 +275,7 @@ job "security" {
           ignore_warnings = false
         }
       }
+
     }
       task "await-for-security-postgres" {
         driver = "docker"

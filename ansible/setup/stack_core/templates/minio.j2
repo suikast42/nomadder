@@ -27,7 +27,7 @@ job "minio" {
       read_only = true
     }
     restart {
-      attempts = 3
+      attempts = 10
       interval = "2m"
       delay = "5s"
       mode = "fail"

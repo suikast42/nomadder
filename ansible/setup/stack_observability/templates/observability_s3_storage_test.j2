@@ -11,7 +11,7 @@ job "observability" {
        attempts = 10
        interval = "5m"
        delay = "5s"
-       mode = "delay"
+       mode = "fail"
      }
     volume "stack_observability_grafana_volume" {
       type      = "host"
@@ -96,7 +96,7 @@ job "observability" {
        attempts = 10
        interval = "5m"
        delay = "5s"
-       mode = "delay"
+       mode = "fail"
      }
      volume "stack_observability_mimir_volume" {
        type      = "host"
@@ -238,7 +238,7 @@ job "observability" {
        attempts = 10
        interval = "5m"
        delay = "5s"
-       mode = "delay"
+       mode = "fail"
      }
     volume "stack_observability_loki_volume" {
       type      = "host"
@@ -372,7 +372,7 @@ job "observability" {
        attempts = 10
        interval = "5m"
        delay = "5s"
-       mode = "delay"
+       mode = "fail"
      }
 
     volume "stack_observability_tempo_volume" {
@@ -537,10 +537,10 @@ job "observability" {
 
     group "nats"{
       restart {
-        attempts = -1
+        attempts = 10
        interval = "5s"
         delay = "5s"
-        mode = "delay"
+        mode = "fail"
       }
        volume "stack_observability_nats_volume" {
           type      = "host"
@@ -689,7 +689,7 @@ jetstream {
        attempts = 10
        interval = "5m"
        delay = "5s"
-       mode = "delay"
+       mode = "fail"
      }
 
        volume "stack_observability_grafana_agent_volume" {
@@ -750,7 +750,7 @@ jetstream {
        attempts = 10
        interval = "5m"
        delay = "5s"
-       mode = "delay"
+       mode = "fail"
      }
      count = 1
      task "logunifier" {

@@ -1,12 +1,21 @@
-#https://www.keycloak.org/server/containers
-FROM {{registry_dns}}/keycloak/keycloak:{{version_keycloak}} as builder
+# Since kk image 21.0 the iumage does not privide a packet mamanager
+# Thus make a worarround with an alpine image
+#FROM registry.cloud.private/alpine:{{version_multi_stage_apline_container}} as stage1
+#RUN apk update &&\
+# apk upgrade &&\
+# apk add curl
+#RUN curl -ksL https://github.com/aerogear/keycloak-metrics-spi/releases/download/{{version_keycloak_metrics_spi}}/keycloak-metrics-spi-{{version_keycloak_metrics_spi}}.jar -o /tmp/keycloak-metrics-spi-{{version_keycloak_metrics_spi}}.jar
 
+
+#https://www.keycloak.org/server/containers
+FROM {{registry_dns}}/keycloak/keycloak:{{version_keycloak}} as stage2
+#COPY --from=stage1  /tmp/keycloak-metrics-spi-{{version_keycloak_metrics_spi}}.jar  /opt/keycloak/providers/keycloak-metrics-spi-{{version_keycloak_metrics_spi}}.jar
 ENV KC_HEALTH_ENABLED=true
 ENV KC_METRICS_ENABLED=true
 ENV KC_FEATURES=token-exchange
 ENV KC_DB=postgres
+#RUN echo "$(cat /etc/*-release)"
 # Install custom providers
-RUN curl -ksL https://github.com/aerogear/keycloak-metrics-spi/releases/download/2.5.3/keycloak-metrics-spi-2.5.3.jar -o /opt/keycloak/providers/keycloak-metrics-spi-2.5.3.jar
 COPY nomadder-realm.json /opt/keycloak/data/import/nomadder-realm.json
 #RUN echo $(whoami)
 USER root
@@ -16,6 +25,6 @@ RUN /opt/keycloak/bin/kc.sh build
 #RUN opt/keycloak/bin/kc.sh import --dir /data/import --override true
 
 FROM {{registry_dns}}/keycloak/keycloak:{{version_keycloak}}
-COPY --from=builder /opt/keycloak/ /opt/keycloak/
+COPY --from=stage2 /opt/keycloak/ /opt/keycloak/
 WORKDIR /opt/keycloak
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
