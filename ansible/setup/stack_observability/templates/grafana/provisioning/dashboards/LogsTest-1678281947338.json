@@ -38,7 +38,7 @@
       },
       "id": 7,
       "panels": [],
-      "title": "Row title",
+      "title": "Log level distribution for job type  $__interval",
       "type": "row"
     },
     {
@@ -189,7 +189,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.2",
+      "pluginVersion": "9.4.3",
       "repeat": "job_types",
       "repeatDirection": "h",
       "targets": [
@@ -199,14 +199,14 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "sum by(level) (count_over_time({ingress=\"vector-journald\",job_type=~\"$job_types\"}  [$__interval]))",
+          "expr": "sum by(level) (count_over_time({ingress=\"$ingress\",job_type=~\"$job_types\"}  [$__interval]))",
           "key": "Q-50af83e8-1f38-4ca0-8785-df5409a12c33-0",
           "legendFormat": "{{level}} ",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Log level distribution for job type $job_types",
+      "title": "$job_types ",
       "transformations": [],
       "transparent": true,
       "type": "stat"
@@ -377,7 +377,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "sum by(level) (count_over_time({ingress=\"vector-journald\"}  [1w]))",
+          "expr": "sum by(level) (count_over_time({ingress=\"$ingress\"}  [1w]))",
           "key": "Q-50af83e8-1f38-4ca0-8785-df5409a12c33-0",
           "legendFormat": "{{level}} ",
           "queryType": "range",
@@ -580,7 +580,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "sum by(level) (count_over_time({ingress=\"vector-journald\"}  [$__interval]))",
+          "expr": "sum by(level) (count_over_time({ingress=\"$ingress\"}  [$__interval]))",
           "key": "Q-50af83e8-1f38-4ca0-8785-df5409a12c33-0",
           "legendFormat": "{{level}} ",
           "queryType": "range",
@@ -646,7 +646,8 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   }
                 ]
               },
@@ -717,6 +718,7 @@
           "id": 5,
           "options": {
             "footer": {
+              "countRows": false,
               "fields": "",
               "reducer": [
                 "sum"
@@ -732,7 +734,7 @@
               }
             ]
           },
-          "pluginVersion": "9.3.6",
+          "pluginVersion": "9.4.3",
           "targets": [
             {
               "datasource": {
@@ -740,7 +742,7 @@
                 "uid": "loki"
               },
               "editorMode": "code",
-              "expr": "sum by(job_type, stack,job,level) (count_over_time({ingress=\"vector-journald\"} [1w] ))",
+              "expr": "sum by(job_type, stack,job,level) (count_over_time({ingress=\"$ingress\"} [1w] ))",
               "key": "Q-50af83e8-1f38-4ca0-8785-df5409a12c33-0",
               "legendFormat": "",
               "queryType": "instant",
@@ -844,6 +846,59 @@
       ],
       "title": "Row title",
       "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      },
+      "id": 15,
+      "panels": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
+          "gridPos": {
+            "h": 25,
+            "w": 24,
+            "x": 0,
+            "y": 20
+          },
+          "id": 13,
+          "options": {
+            "dedupStrategy": "exact",
+            "enableLogDetails": true,
+            "prettifyLogMessage": false,
+            "showCommonLabels": false,
+            "showLabels": false,
+            "showTime": true,
+            "sortOrder": "Descending",
+            "wrapLogMessage": false
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "loki",
+                "uid": "loki"
+              },
+              "editorMode": "builder",
+              "expr": "{ingress=\"$ingress\", job_type=~\"$job_types\"} |= `` | json | line_format `{{.job}}@{{.host_name}} [{{.log_levelEmoji}}  {{.level}}] [{{.tags}}]  {{.message}}`",
+              "key": "Q-eef4e925-e736-47be-9448-c35f4c6acf7d-0",
+              "queryType": "range",
+              "refId": "A"
+            }
+          ],
+          "title": "New Panel",
+          "transparent": true,
+          "type": "logs"
+        }
+      ],
+      "title": "Row title",
+      "type": "row"
     }
   ],
   "refresh": "5s",
@@ -867,6 +922,35 @@
       {
         "current": {
           "selected": true,
+          "text": "vector-journald",
+          "value": "vector-journald"
+        },
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "definition": "label_values(job_type)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "ingress",
+        "multi": false,
+        "name": "ingress",
+        "options": [],
+        "query": {
+          "label": "ingress",
+          "refId": "LokiVariableQueryEditor-VariableQuery",
+          "stream": "",
+          "type": 1
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
           "text": [
             "All"
           ],
@@ -879,7 +963,6 @@
           "uid": "loki"
         },
         "definition": "label_values(job_type)",
-        "error": {},
         "hide": 0,
         "includeAll": true,
         "label": "job_types",
@@ -889,7 +972,7 @@
         "query": {
           "label": "job_type",
           "refId": "LokiVariableQueryEditor-VariableQuery",
-          "stream": "",
+          "stream": "{ingress=\"$ingress\"}",
           "type": 1
         },
         "refresh": 1,
@@ -922,6 +1005,6 @@
   "timezone": "",
   "title": "LogsTest",
   "uid": "KMg_v90Vz",
-  "version": 32,
+  "version": 38,
   "weekStart": ""
 }

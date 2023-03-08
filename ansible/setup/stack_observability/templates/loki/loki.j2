@@ -125,11 +125,12 @@ limits_config:
   max_label_value_length: 8092
   enforce_metric_name: false
   # Loki will reject any log lines that have already been processed and will not index them again
-  reject_old_samples: true
-  # 7d
-  reject_old_samples_max_age: 168h
+  reject_old_samples: false
+  # 5y
+  reject_old_samples_max_age: 43800h
   # The limit to length of chunk store queries. 0 to disable.
-  max_query_length: 0
+  # 5y
+  max_query_length: 43800h
   # Maximum number of log entries that will be returned for a query.
   max_entries_limit_per_query: 20000
   # Limit the maximum of unique series that is returned by a metric query.

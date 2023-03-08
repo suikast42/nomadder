@@ -5,8 +5,8 @@ uninstall_vault: false
 
 #consul_version: "1.14.4"
 #consul_checksum: "sha256:eafb7c853ce9cc1536bffa99325f8df365ff70a3b83c037836e63964a8adfd7a"
-consul_version: "1.15.0"
-consul_checksum: "sha256:62a358ff2c3c08d19f15a92ea3130b05b547ab5a767ae13454eab7655a718c24"
+consul_version: "1.15.1"
+consul_checksum: "sha256:23f7eb0461dd01a95c5d56472b91c22d5dacec84f31f1846c0c9f9621f98f29f"
 uninstall_consul: true
 
 
@@ -55,7 +55,7 @@ version_proto_grpc: "1.2.0"
 
 version_busy_box_init_container: "1.28"
 version_multi_stage_apline_container: "3.17.2"
-version_grafana_agent_container: "0.32.0"
+version_grafana_agent_container: "0.32.1"
 
 version_minio: "RELEASE.2023-02-27T18-10-45Z"
 version_minio_mc_admin: "RELEASE.2023-02-28T00-12-59Z"
