@@ -15,6 +15,11 @@ client {
     node_type= "worker"
     connect.log_level = "debug"
   }
+  server_join {
+    retry_join =  {{masters | to_json }}
+    retry_max = 0
+    retry_interval = "15s"
+  }
   host_volume "ca_cert" {
     path      = "/usr/local/share/ca-certificates/cloudlocal"
     read_only = true
@@ -117,8 +122,8 @@ plugin "docker" {
       dangling_containers {
         enabled        = true
         dry_run        = false
-        period         = "5m"
-        creation_grace = "5m"
+        period         = "1m"
+        creation_grace = "1m"
       }
     }
 

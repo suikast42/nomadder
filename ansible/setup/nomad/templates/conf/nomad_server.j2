@@ -7,6 +7,12 @@ server {
   enabled = true
   bootstrap_expect =  {{masters|length}}
   encrypt = "{{nomad_encrypt_key}}"
+  rejoin_after_leave = true
+  server_join {
+    retry_join =  {{masters | to_json }}
+    retry_max = 0
+    retry_interval = "15s"
+  }
 }
 
 bind_addr = "0.0.0.0" # the default
@@ -65,34 +71,4 @@ telemetry {
   prometheus_metrics = true
   publish_allocation_metrics = true
   publish_node_metrics = true
-}
-
-plugin "docker" {
-  config {
-#    volumes {
-#      enabled = true
-#      selinuxlabel = "z"
-#    }
-    logging {
-      type = "journald"
-       config {
-          labels-regex =".*"
-       }
-    }
-    extra_labels = ["job_name", "job_id", "task_group_name", "task_name", "namespace", "node_name", "node_id"]
-    gc {
-      image       = true
-      image_delay = "3m"
-      container   = true
-
-      dangling_containers {
-        enabled        = true
-        dry_run        = false
-        period         = "5m"
-        creation_grace = "5m"
-      }
-    }
-
-#    allow_privileged = true
-  }
 }
