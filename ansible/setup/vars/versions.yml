@@ -15,9 +15,9 @@ consul_template_checksum: "sha256:c78db0f0eecc4d314a5130e3b4c8bd17086c6cd9080c4c
 update_consul_template: false
 uninstall_consul_template: false
 
-nomad_version: "1.5.0"
-nomad_checksum: "sha256:3f629ca10452f755580d238f95c0844d7ee9d9c3715f54fb4403fc85b219b720"
-uninstall_nomad: false
+nomad_version: "1.5.1"
+nomad_checksum: "sha256:da4b976dfcab27d16fc03e95719685d4ce603b13a3e5ba692df7c434024dc294"
+uninstall_nomad: true
 
 nomad_plugin_cni_version: "1.2.0"
 nomad_plugin_cni_checksum: "sha256:f3a841324845ca6bf0d4091b4fc7f97e18a623172158b72fc3fdcdb9d42d2d37"
