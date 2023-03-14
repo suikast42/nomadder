@@ -27,7 +27,11 @@ variable "image" {
 job "ingress" {
   datacenters = [var.datacenter]
   type        = "system"
-
+ {% if is_env_development %}
+  meta {
+    run_uuid = "${uuidv4()}"
+  }
+  {% endif %}
   # only one Traefik instance will be restarted at a time, with 1 minute delay between each such action
   # and automatic rollback to the previous version if the new one doesn't pass the health check
   update {

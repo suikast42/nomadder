@@ -1,5 +1,10 @@
 job "security" {
   type = "service"
+ {% if is_env_development %}
+  meta {
+    run_uuid = "${uuidv4()}"
+  }
+  {% endif %}
   reschedule {
     delay          = "10s"
     delay_function = "constant"
