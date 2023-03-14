@@ -41,7 +41,7 @@
         --cert "${NOMAD_CLIENT_CERT}" \
         --key "${NOMAD_CLIENT_KEY}" \
         "${NOMAD_ADDR}/v1/operator/scheduler/configuration" |\
-        jq '.SchedulerConfig | .MemoryOversubscriptionEnabled=true' |\
+        jq '.SchedulerConfig | .SchedulerAlgorithm= "spread" |  .MemoryOversubscriptionEnabled=true | .PreemptionConfig.SysBatchSchedulerEnabled=true | .PreemptionConfig.BatchSchedulerEnabled=true  | .PreemptionConfig.ServiceSchedulerEnabled=true'   |\
         curl \
         --cacert "${NOMAD_CACERT}" \
         --cert "${NOMAD_CLIENT_CERT}" \
