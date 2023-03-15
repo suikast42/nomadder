@@ -7,7 +7,7 @@ uninstall_vault: false
 #consul_checksum: "sha256:eafb7c853ce9cc1536bffa99325f8df365ff70a3b83c037836e63964a8adfd7a"
 consul_version: "1.15.1"
 consul_checksum: "sha256:23f7eb0461dd01a95c5d56472b91c22d5dacec84f31f1846c0c9f9621f98f29f"
-uninstall_consul: true
+uninstall_consul: false
 
 
 consul_template_version: "0.30.0"
@@ -17,7 +17,7 @@ uninstall_consul_template: false
 
 nomad_version: "1.5.1"
 nomad_checksum: "sha256:da4b976dfcab27d16fc03e95719685d4ce603b13a3e5ba692df7c434024dc294"
-uninstall_nomad: true
+uninstall_nomad: false
 
 nomad_plugin_cni_version: "1.2.0"
 nomad_plugin_cni_checksum: "sha256:f3a841324845ca6bf0d4091b4fc7f97e18a623172158b72fc3fdcdb9d42d2d37"
