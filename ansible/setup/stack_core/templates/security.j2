@@ -11,23 +11,23 @@ job "security" {
     unlimited      = true
   }
   update {
-      max_parallel      = 1
       health_check      = "checks"
       # Alloc is marked as unhealthy after this time
-      healthy_deadline  = "2m"
+      healthy_deadline  = "5m"
+      auto_revert  = true
+      # Mark the task as healthy after 10s positive check
       min_healthy_time  = "10s"
+      # Task is dead after failed checks in 1h
+      progress_deadline = "1h"
   }
 
   datacenters = ["{{data_center}}"]
 
   group "keycloak-db" {
-    update {
-        healthy_deadline  = "1m"
-    }
 
     restart {
-      attempts = 10
-      interval = "1m"
+      attempts = 1
+      interval = "1h"
       delay = "5s"
       mode = "fail"
     }
@@ -56,7 +56,7 @@ job "security" {
         type     = "script"
         command  = "pg_isready"
         task     = "security_postgres"
-        interval = "5s"
+        interval = "10s"
         timeout  = "2s"
         check_restart {
           limit = 3
@@ -114,9 +114,16 @@ job "security" {
   }
 
   group "keycloak-ingress" {
+
+    update {
+      # keycloak-ingress service has no health checks
+      # rely on task_states
+      health_check      = "task_states"
+      max_parallel      = 1
+    }
     restart {
-      attempts = 10
-      interval = "1m"
+      attempts = 1
+      interval = "1h"
       delay = "5s"
       mode = "fail"
     }
@@ -216,11 +223,14 @@ job "security" {
 
   group "keycloak" {
     restart {
-      attempts = 10
-      interval = "1m"
+      attempts = 1
+      interval = "1h"
       delay = "5s"
       mode = "fail"
     }
+     update {
+       max_parallel      = 1
+     }
     count = 1
     network {
       mode = "bridge"
@@ -257,6 +267,11 @@ job "security" {
         path="/health"
         interval = "10s"
         timeout  = "2s"
+        check_restart {
+           limit = 3
+           grace = "60s"
+           ignore_warnings = false
+        }
       }
       check {
         name  = "live"
@@ -274,7 +289,6 @@ job "security" {
         interval = "10s"
         timeout  = "2s"
         check_restart {
-          # Restart if 2m not ready
           limit = 3
           grace = "60s"
           ignore_warnings = false

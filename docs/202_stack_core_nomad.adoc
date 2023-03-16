@@ -89,15 +89,104 @@ When a Nomad client needs to come out of service, it gets marked for draining an
 
 ==== Wrap it up
 
-. Define a reschedule for whole job. This controls after which conditions nomad try to schedule the job to another node. But not the same as failed.
+. Define a reschedule for whole job.
++
+.reschedule for job definition unlimited
+[source,hcl]
+----
+reschedule {
+  delay          = "10s"
+  delay_function = "constant"
+  unlimited      = true
+}
+----
+This instructs nomad to try infinite schedule a failed task on the same node.
+If a task have a dynamic volume or is stales you can set another  limit for instruct the scheduler to schedule the task on another node.
 
-. Define an update strategy on job or group level. This controls when a job or group allows considered as failed. For example if the healths checks not healthy after x minutes.
++
+.reschedule job on another node failed deployment when more than 3 times failed
+[source,hcl]
+----
+reschedule {
+  attempts       = 3
+  interval       = "10m"
+  delay          = "5s"
+  delay_function = "constant"
+  unlimited      = false
+}
+----
+This will not schedule the deployment again if you have a single worker node.
 
-. Define a restart  stanza on group or task level.
+. Define a update stanza for the job
++
+[source,hcl]
+----
+update {
+  max_parallel      = 1
+  health_check      = "checks"
+  healthy_deadline  = "60s" #  Default should be check_restart_grace
+  min_healthy_time  = "20s" # Default should be 1 or two health check limits
+  progress_deadline = "1h"
+}
+----
+Every deployment is marked as dead if its' deployment not ready in 1h. If an allocation is started it marks as healthy it's health state is positive at least for min_healthy_time and unhealthy when it's check negative at least  healthy_deadline.
 
-. Define a check stanza for services. This registers a healthcheck ( health, ready etc.) endpoints that nomad calls cyclic.
+TIP: min_healthy_time should not be less then expected boot time of the service. At least the grace period.
 
-. Define a check_restart for checks that should trigger a restart. Restarts a task after limit*check_interval.
+. Define a restart stanza on group level
+
++
+[source,hcl]
+----
+restart {
+  # Restart if 3 of 4 check failed in check_interval
+  attempts = 1
+  interval = "1h"
+  delay = "1s"
+  mode = "fail"
+}
+----
++
+If a healthcheck fail nomad (check_restart interval * limit is reached) nomad restarts usually the container not the allocation. The restart stanza instruct nomad to look on an interval count of restart. The example above restarts the allocation at first restart of the container within in 1h.
+
+. Define a healthcheck with check_restart
++
+[source,hcl]
+----
+check {
+  name     = "fail_service health using http endpoint '/health'"
+  port     = "http"
+  type     = "http"
+  path     = "/health"
+  method   = "GET"
+  interval = "1s"
+  timeout  = "1s"
+  check_restart {
+    limit = 3
+    grace = "15s"
+    ignore_warnings = false
+   }
+  }
+----
+
+. The check above restarts an allocation ( if a new one should create depends on the configuration of the restart stanza) if a check fails in the interval range limit times. In the start phase of the allocation failed checks ignored in the  grace time.
+
+. Kill timeouts and Killsignal
++
+[source,hcl]
+----
+job "docs" {
+  group "example" {
+    task "server" {
+      # ...
+      kill_timeout = "45s" # Wait for kill
+      kill_signal = "SIGINT"  # Specifies a configurable kill signal for a task "SIGINT or SIGTERM is default for docker and CTRL_BREAK_EVENT  for raw_exec
+    }
+  }
+}
+----
+
+For playing with update strategies you can use test_deployments/fail-service_healtlhy_to_unhealtly_.nomad
 
 === Links
 [[_200_link_nomad_task_init,nomad task dependencies]]https://developer.hashicorp.com/nomad/tutorials/task-deps/task-dependencies-interjob[Express Inter-job Dependencies with Init Tasks]

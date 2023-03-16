@@ -61,6 +61,7 @@ client {
     cpu    = 1000
     memory = 2048
   }
+  max_kill_timeout  = "1m"
 }
 
 tls {
@@ -113,18 +114,6 @@ plugin "docker" {
        config {
           labels-regex =".*"
        }
-    }
-    gc {
-      image       = true
-      image_delay = "3m"
-      container   = true
-
-      dangling_containers {
-        enabled        = true
-        dry_run        = false
-        period         = "1m"
-        creation_grace = "1m"
-      }
     }
 
 #    allow_privileged = true

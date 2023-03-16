@@ -15,8 +15,12 @@ job "minio" {
       max_parallel      = 1
       health_check      = "checks"
       # Alloc is marked as unhealthy after this time
-      healthy_deadline  = "2m"
+      healthy_deadline  = "5m"
+      auto_revert  = true
+      # Mark the task as healthy after 10s positive check
       min_healthy_time  = "10s"
+      # Task is dead after failed checks in 1h
+      progress_deadline = "1h"
   }
   group "minio" {
 
@@ -32,8 +36,8 @@ job "minio" {
       read_only = true
     }
     restart {
-      attempts = 10
-      interval = "2m"
+      attempts = 1
+      interval = "1h"
       delay = "5s"
       mode = "fail"
     }
@@ -138,7 +142,7 @@ job "minio" {
           path     = "/minio/health/ready"
           port     = "http"
           interval = "10s"
-          timeout  = "4s"
+          timeout  = "2s"
           check_restart {
             limit = 3
             grace = "60s"
@@ -161,8 +165,13 @@ job "minio" {
              type     = "http"
              path     = "/"
              port     = "console"
-             interval = "30s"
+             interval = "10s"
              timeout  = "2s"
+             check_restart {
+               limit = 3
+               grace = "60s"
+               ignore_warnings = false
+             }
            }
          }
       }

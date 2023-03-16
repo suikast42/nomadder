@@ -13,19 +13,24 @@ job "observability" {
     unlimited      = true
   }
   update {
-      max_parallel      = 1
       health_check      = "checks"
+      max_parallel      = 1
       # Alloc is marked as unhealthy after this time
-      healthy_deadline  = "2m"
+      healthy_deadline  = "5m"
+      auto_revert  = true
+      # Mark the task as healthy after 10s positive check
       min_healthy_time  = "10s"
+      # Task is dead after failed checks in 1h
+      progress_deadline = "1h"
   }
   group "grafana" {
-     restart {
-       attempts = 10
-       interval = "2m"
-       delay = "5s"
-       mode = "fail"
-     }
+    restart {
+      attempts = 1
+      interval = "1h"
+      delay = "5s"
+      mode = "fail"
+    }
+
     volume "stack_observability_grafana_volume" {
       type      = "host"
       source    = "stack_observability_grafana_volume"
@@ -68,7 +73,7 @@ job "observability" {
           timeout  = "2s"
           check_restart {
             limit = 3
-            grace = "120s"
+            grace = "60s"
             ignore_warnings = false
           }
         }
@@ -111,12 +116,12 @@ job "observability" {
   }
 
   group "mimir"{
-     restart {
-       attempts = 10
-       interval = "2m"
-       delay = "5s"
-       mode = "fail"
-     }
+    restart {
+      attempts = 1
+      interval = "1h"
+      delay = "5s"
+      mode = "fail"
+    }
     volume "stack_observability_mimir_volume" {
       type      = "host"
       source    = "stack_observability_mimir_volume"
@@ -144,7 +149,7 @@ job "observability" {
         timeout  = "2s"
         check_restart {
           limit = 3
-          grace = "120s"
+          grace = "60s"
           ignore_warnings = false
         }
        }
@@ -201,12 +206,15 @@ job "observability" {
     }
   }
  group "loki"{
-     restart {
-       attempts = 10
-       interval = "2m"
-       delay = "5s"
-       mode = "fail"
-     }
+    restart {
+      attempts = 1
+      interval = "1h"
+      delay = "5s"
+      mode = "fail"
+    }
+    update {
+       max_parallel      = 1
+    }
     volume "stack_observability_loki_volume" {
       type      = "host"
       source    = "stack_observability_loki_volume"
@@ -246,7 +254,7 @@ job "observability" {
          timeout  = "2s"
          check_restart {
            limit = 3
-           grace = "120s"
+           grace = "60s"
            ignore_warnings = false
          }
         }
@@ -290,13 +298,12 @@ job "observability" {
       }
     }
   group "tempo"{
-     restart {
-       attempts = 10
-       interval = "2m"
-       delay = "5s"
-       mode = "fail"
-     }
-
+    restart {
+      attempts = 1
+      interval = "1h"
+      delay = "5s"
+      mode = "fail"
+    }
     volume "stack_observability_tempo_volume" {
       type      = "host"
       source    = "stack_observability_tempo_volume"
@@ -338,7 +345,7 @@ job "observability" {
         timeout  = "2s"
         check_restart {
           limit = 3
-          grace = "120s"
+          grace = "60s"
           ignore_warnings = false
         }
        }
@@ -417,12 +424,15 @@ job "observability" {
   }
 
     group "nats"{
-      restart {
-        attempts = 10
-        interval = "2m"
-        delay = "5s"
-        mode = "fail"
-      }
+        restart {
+          attempts = 1
+          interval = "1h"
+          delay = "5s"
+          mode = "fail"
+        }
+     update {
+        max_parallel      = 1
+     }
        volume "stack_observability_nats_volume" {
           type      = "host"
           source    = "stack_observability_nats_volume"
@@ -453,7 +463,7 @@ job "observability" {
           type     = "http"
           port     = "http"
           path     = "/healthz"
-          interval = "5s"
+          interval = "10s"
           timeout  = "2s"
           check_restart {
             limit = 3
@@ -574,13 +584,12 @@ jetstream {
 
      # Grafana agent is deployed on every node and scrapes the general nomad job metrics
      # This agent deployed for scraping metrics from consul services.
-     restart {
-       attempts = 10
-       interval = "5m"
-       delay = "5s"
-       mode = "fail"
-     }
-
+        restart {
+          attempts = 1
+          interval = "1h"
+          delay = "5s"
+          mode = "fail"
+        }
        volume "stack_observability_grafana_agent_volume" {
           type      = "host"
           source    = "stack_observability_grafana_agent_volume"
@@ -612,7 +621,7 @@ jetstream {
               timeout  = "2s"
               check_restart {
                 limit = 3
-                grace = "30s"
+                grace = "60s"
                 ignore_warnings = false
               }
            }
@@ -629,7 +638,7 @@ jetstream {
               timeout  = "2s"
               check_restart {
                 limit = 5
-                grace = "30s"
+                grace = "60s"
                 ignore_warnings = false
               }
            }
@@ -674,11 +683,16 @@ jetstream {
     }
   }
    group "logunifier"{
-     restart {
-       attempts = 10
-       interval = "2m"
-       delay = "5s"
-       mode = "fail"
+
+    restart {
+      # logunifier can fail more then once due to waiting for nats, loki and in future to elasticsearch
+      attempts = 3
+      interval = "1h"
+      delay = "5s"
+      mode = "fail"
+    }
+     update {
+       max_parallel      = 1
      }
      count = 1
       network {
@@ -699,7 +713,7 @@ jetstream {
               timeout  = "2s"
               check_restart {
                 limit = 3
-                grace = "30s"
+                grace = "60s"
                 ignore_warnings = false
               }
            }

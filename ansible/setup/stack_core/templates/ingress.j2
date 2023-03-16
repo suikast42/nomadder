@@ -32,16 +32,24 @@ job "ingress" {
     run_uuid = "${uuidv4()}"
   }
   {% endif %}
+#   System jobs don't have a reschedule policy
+#  reschedule {
+#    delay          = "10s"
+#    delay_function = "constant"
+#    unlimited      = true
+#  }
   # only one Traefik instance will be restarted at a time, with 1 minute delay between each such action
   # and automatic rollback to the previous version if the new one doesn't pass the health check
   update {
       max_parallel      = 1
       health_check      = "checks"
       # Alloc is marked as unhealthy after this time
-      healthy_deadline  = "1m"
-      stagger      = "1m"
+      healthy_deadline  = "2m"
       auto_revert  = true
+      # Mark the task as healthy after 10s positive check
       min_healthy_time  = "10s"
+      # Task is dead after failed checks in 1h
+      progress_deadline = "1h"
   }
   # Nomad will wait for 30s after sending the kill signal to the task before forcefully shutting it down
   # by default it's 10s ( not enough to properly drain connections )
@@ -50,8 +58,8 @@ job "ingress" {
 
   group "traefik" {
     restart {
-      attempts = 10
-      interval = "1m"
+      attempts = 1
+      interval = "1h"
       delay = "5s"
       mode = "fail"
     }
