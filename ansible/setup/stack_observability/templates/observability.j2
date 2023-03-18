@@ -95,6 +95,11 @@ job "observability" {
       }
       config {
         image = "{{registry_dns}}/{{stack_name}}/grafana:{{version_grafana_nomadder}}"
+        labels = {
+          "com.github.logunifier.application.name" = "grafana"
+          "com.github.logunifier.application.version" = "{{version_grafana_nomadder}}"
+          "com.github.logunifier.application.pattern.key" = "logfmt"
+        }
         ports = ["ui"]
       }
       resources {
@@ -168,6 +173,11 @@ job "observability" {
          }
          config {
          image = "{{registry_dns}}/grafana/mimir:{{version_grafana_mimir}}"
+         labels = {
+           "com.github.logunifier.application.name" = "mimir"
+           "com.github.logunifier.application.version" = "{{version_grafana_mimir}}"
+           "com.github.logunifier.application.pattern.key" = "logfmt"
+         }
          ports = ["api"]
          args = [
            "-config.file","/config/mimir.yaml","-config.expand-env","true",
@@ -274,6 +284,11 @@ job "observability" {
        }
     config {
        image = "{{registry_dns}}/grafana/loki:{{version_grafana_loki}}"
+       labels = {
+         "com.github.logunifier.application.name" = "loki"
+         "com.github.logunifier.application.version" = "{{version_grafana_loki}}"
+         "com.github.logunifier.application.pattern.key" = "logfmt"
+       }
        ports = ["http","cli","grpc"]
        args = [
         "-config.file","/config/loki.yaml","-config.expand-env","true","-print-config-stderr","true",
@@ -399,6 +414,11 @@ job "observability" {
          driver = "docker"
          config {
          image = "{{registry_dns}}/grafana/tempo:{{version_grafana_tempo}}"
+         labels = {
+           "com.github.logunifier.application.name" = "tempo"
+           "com.github.logunifier.application.version" = "{{version_grafana_tempo}}"
+           "com.github.logunifier.application.pattern.key" = "logfmt"
+         }
          ports = ["jaeger","tempo","otlp_grpc","otlp_http","zipkin"]
          args = [
            "-config.file","/config/tempo.yaml","-config.expand-env","true"
@@ -660,6 +680,11 @@ jetstream {
        config {
 
          image = "{{registry_dns}}/grafana/agent:v{{version_grafana_agent_container}}"
+         labels = {
+           "com.github.logunifier.application.name" = "grafana_agent"
+           "com.github.logunifier.application.version" = "{{version_grafana_agent_container}}"
+           "com.github.logunifier.application.pattern.key" = "logfmt"
+         }
          #:${NOMAD_HOST_PORT_server} bind on all available interfaces in the container
          args = [
              "-config.file","/config/agent.yaml", "-server.http.address", ":${NOMAD_HOST_PORT_server}"

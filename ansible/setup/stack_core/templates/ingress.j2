@@ -131,6 +131,11 @@ job "ingress" {
 
       config {
         image        = var.image
+        labels = {
+          "com.github.logunifier.application.name" = "traefik"
+          "com.github.logunifier.application.version" = "{{version_traefik}}"
+          "com.github.logunifier.application.pattern.key" = "logfmt"
+        }
         network_mode = "host"
         volumes = [
           "local/traefik.toml:/etc/traefik/traefik.toml",
