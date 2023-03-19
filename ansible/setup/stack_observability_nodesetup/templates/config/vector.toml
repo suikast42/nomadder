@@ -27,9 +27,17 @@ type = "internal_logs"
 [sources.source_journald]
 type = "journald"
 current_boot_only = true
-exclude_units = ["vector"]
+exclude_units = ["vector","docker","containerd","nomad_event_sink"]
 exclude_matches = { }
 include_units = [ ]
+include_matches = { }
+
+[sources.source_journald_logfmt]
+type = "journald"
+current_boot_only = true
+exclude_units = []
+exclude_matches = { }
+include_units = ["docker","containerd","nomad_event_sink"]
 include_matches = { }
 
 
@@ -43,10 +51,19 @@ decoding.codec = "json"
 
 ## Log sources END
 
+## Logfmt logunifer transform
+[transforms.transform_logfmt_logunifier]
+type = "remap"
+inputs = ["source_journald_logfmt"]
+source = '''
+ .COM_GITHUB_LOGUNIFIER_APPLICATION_PATTERN_KEY = "logfmt"
+'''
+## Logfmt logunifer transform END
+
 ## Log sources to standdardsaztion channels Begin
 [sinks.sink_nats_journald]
 type = "nats"
-inputs = [ "source_journald" ]
+inputs = [ "source_journald","transform_logfmt_logunifier" ]
 url = "nats://nats.service.consul:4222"
 #url = "nats://10.21.21.42:4222"
 # Template syntax is useable here https://vector.dev/docs/reference/configuration/template-syntax/
