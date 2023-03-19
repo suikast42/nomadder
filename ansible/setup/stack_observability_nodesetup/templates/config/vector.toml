@@ -55,8 +55,11 @@ decoding.codec = "json"
 [transforms.transform_logfmt_logunifier]
 type = "remap"
 inputs = ["source_journald_logfmt"]
+# Add COM_GITHUB_LOGUNIFIER_APPLICATION_PATTERN_KEY only for daemon processes
 source = '''
+if .SYSLOG_FACILITY == "3"{
  .COM_GITHUB_LOGUNIFIER_APPLICATION_PATTERN_KEY = "logfmt"
+}
 '''
 ## Logfmt logunifer transform END
 
