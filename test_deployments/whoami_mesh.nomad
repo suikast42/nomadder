@@ -16,6 +16,13 @@ job "whoami" {
 
       connect {
         sidecar_service {}
+        sidecar_task{
+          config{
+            labels = {
+              "com.github.logunifier.application.name" = "envoy"
+            }
+          }
+        }
       }
 
       tags = [

@@ -1,0 +1,2 @@
+## Line filter
+[{{.job}} 💻 {{.host_name}}] [{{.log_levelEmoji}}] {{.message}}   {{if .trace_trace_id}}  traceID={{.trace_trace_id}} {{end}}
