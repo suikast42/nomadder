@@ -1,5 +1,6 @@
 # see https://learn.hashicorp.com/tutorials/nomad/production-deployment-guide-vm-with-consul
 - name: nomad installation
+  when: update_nomad|bool == false
   block:
     - name: "Create user {{nomad_user}}"
       include_tasks: common/tasks/user.yml
@@ -34,6 +35,17 @@
     - name: Nomad service
       include_tasks: nomad_systemd_install.yml
 
+- name: nomad update
+  when: update_nomad|bool == true
+  block:
+    - name: Update nomad
+      include_tasks: nomad_update.yml
+
+    - name: Nomad config
+      include_tasks: copy_copy_config_files.yml
+
+    - name: Nomad service
+      include_tasks: nomad_systemd_install.yml
   vars:
     consul_cert_path: "{{base_cert_dir}}/consul"
     consul_cert: "{{consul_cert_path}}/consul.pem"

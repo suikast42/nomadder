@@ -201,6 +201,11 @@ job "security" {
       }
       config {
         image = "{{registry_dns}}/mesosphere/traefik-forward-auth:{{version_mesosphere}}"
+        labels = {
+          "com.github.logunifier.application.name" = "mesosphere"
+          "com.github.logunifier.application.version" = "{{version_mesosphere}}"
+          "com.github.logunifier.application.pattern.key" = "logfmt"
+        }
         ports = ["auth"]
       }
       resources {

@@ -1,0 +1,63 @@
+- name: nomad update
+  become: true
+  when: update_nomad|bool == true
+  block:
+    - name: stop nomad service
+      failed_when: false
+      service:
+        name: nomad
+        state: stopped
+        enabled: false
+
+    - name : Check nomad installation present
+      stat:
+        path: /usr/local/bin/nomad
+      register: nomadInstalled
+
+
+    - name: nomad install
+      become: true
+      when: nomadInstalled.stat.exists
+      block:
+
+        - name: Download nomad binary
+          get_url:
+            url: https://releases.hashicorp.com/nomad/{{nomad_version}}/nomad_{{nomad_version}}_linux_amd64.zip
+            dest: /tmp/nomad{{nomad_version}}_linux_amd64.zip
+            owner: "{{ nomad_user }}"
+            group: "{{ nomad_group }}"
+            mode: 0755
+            checksum: "{{nomad_checksum}}"
+          register: nomad_download
+
+        - name: "Unzip nomad archive"
+          unarchive:
+            src: "{{ nomad_download.dest }}"
+            dest: /usr/local/bin
+            copy: no
+            owner: "{{ nomad_user }}"
+            group: "{{ nomad_group }}"
+            mode: 0755
+
+        - name: Install nomad autocomplete for root
+          shell: |
+            nomad -autocomplete-install
+          register: install
+          changed_when: false
+          # a reinstall triggers an error. Ignore this
+          failed_when: install.rc > 2
+
+        - name: Install nomad autocomplete for user
+          become: false
+          shell: |
+            nomad -autocomplete-install
+          changed_when: false
+          register: install
+          # a reinstall triggers an error. Ignore this
+          failed_when: install.rc > 2
+
+    - name: start nomad service
+      service:
+        name: nomad
+        state: started
+        enabled: true
