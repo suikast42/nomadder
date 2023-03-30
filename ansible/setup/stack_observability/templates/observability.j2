@@ -56,6 +56,13 @@ job "observability" {
 #                }
 #            }
           }
+            sidecar_task{
+              config{
+                labels = {
+                  "com.github.logunifier.application.pattern.key" = "envoy"
+                }
+              }
+            }
         }
         tags = [
           "traefik.enable=true",
@@ -499,8 +506,8 @@ job "observability" {
            name = "nats-prometheus-exporter"
            tags = [
                 "prometheus",
-                 "prometheus:server_id=${NOMAD_ALLOC_NAME}",
-                 "prometheus:version={{version_nats_server}}",
+                "prometheus:server_id=${NOMAD_ALLOC_NAME}",
+                "prometheus:version={{version_nats_server}}",
            ]
            check {
               type     = "http"
@@ -526,6 +533,11 @@ job "observability" {
            # for debugging
           #  image = "{{registry_dns}}/{{stack_name}}/prometheus-nats-exporter:{{version_nats_prometheus_exporter_nomadder}}"
             image = "{{registry_dns}}/natsio/prometheus-nats-exporter:{{version_nats_prometheus_exporter}}"
+            labels = {
+                "com.github.logunifier.application.name" = "prometheus-nats-exporter"
+                "com.github.logunifier.application.version" = "{{version_nats_prometheus_exporter_nomadder}}"
+                "com.github.logunifier.application.pattern.key" = "tslevelmsg"
+             }
             ports = ["prometheus_exporter"]
             args = [
               "-varz",
@@ -550,6 +562,11 @@ job "observability" {
              driver = "docker"
              config {
              image = "{{registry_dns}}/nats:{{version_nats_server}}-alpine"
+             labels = {
+                "com.github.logunifier.application.name" = "nats"
+                "com.github.logunifier.application.version" = "{{version_nats_server}}"
+                "com.github.logunifier.application.pattern.key" = "tslevelmsg"
+             }
              ports = ["client","http","cluster"]
              args = [
                "-c","/config/nats.conf",
@@ -748,6 +765,12 @@ jetstream {
  {% if is_env_development %}
         config {
           image = "{{registry_dns}}/suikast42/logunifier:latest"
+          labels = {
+            "com.github.logunifier.application.name" = "logunifier"
+            "com.github.logunifier.application.version" = "latest"
+            "com.github.logunifier.application.pattern.key" = "tslevelmsg"
+            "com.github.logunifier.application.strip.ansi" = "true"
+          }
           force_pull = true
           ports = ["health"]
           args = [
@@ -762,6 +785,12 @@ jetstream {
  {% else %}
             config {
               image = "{{registry_dns}}/suikast42/logunifier:{{version_logunifer}}"
+              labels = {
+                "com.github.logunifier.application.name" = "logunifier"
+                "com.github.logunifier.application.version" = "{{version_logunifer}}"
+                "com.github.logunifier.application.pattern.key" = "tslevelmsg"
+                "com.github.logunifier.application.strip.ansi" = "true"
+              }
               ports = ["health"]
               args = [
                   "-loglevel",

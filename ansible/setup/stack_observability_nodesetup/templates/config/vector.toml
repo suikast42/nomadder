@@ -27,7 +27,7 @@ type = "internal_logs"
 [sources.source_journald]
 type = "journald"
 current_boot_only = true
-exclude_units = ["vector","docker","containerd","nomad_event_sink"]
+exclude_units = ["vector","docker","containerd","nomad_event_sink","consul","nomad"]
 exclude_matches = { }
 include_units = [ ]
 include_matches = { }
@@ -38,6 +38,14 @@ current_boot_only = true
 exclude_units = []
 exclude_matches = { }
 include_units = ["docker","containerd","nomad_event_sink"]
+include_matches = { }
+
+[sources.source_journald_tsLevelMsg]
+type = "journald"
+current_boot_only = true
+exclude_units = []
+exclude_matches = { }
+include_units = ["consul","nomad"]
 include_matches = { }
 
 
@@ -51,7 +59,7 @@ decoding.codec = "json"
 
 ## Log sources END
 
-## Logfmt logunifer transform
+## Logunifer add pattern key transform
 [transforms.transform_logfmt_logunifier]
 type = "remap"
 inputs = ["source_journald_logfmt"]
@@ -61,12 +69,23 @@ if .SYSLOG_FACILITY == "3"{
  .COM_GITHUB_LOGUNIFIER_APPLICATION_PATTERN_KEY = "logfmt"
 }
 '''
-## Logfmt logunifer transform END
+
+[transforms.transform_tsLevelMsg_logunifier]
+type = "remap"
+inputs = ["source_journald_tsLevelMsg"]
+# Add COM_GITHUB_LOGUNIFIER_APPLICATION_PATTERN_KEY only for daemon processes
+source = '''
+if .SYSLOG_FACILITY == "3"{
+ .COM_GITHUB_LOGUNIFIER_APPLICATION_PATTERN_KEY = "tslevelmsg"
+}
+'''
+
+## Logunifer add pattern key transform END
 
 ## Log sources to standdardsaztion channels Begin
 [sinks.sink_nats_journald]
 type = "nats"
-inputs = [ "source_journald","transform_logfmt_logunifier" ]
+inputs = [ "source_journald","transform_logfmt_logunifier","transform_tsLevelMsg_logunifier" ]
 url = "nats://nats.service.consul:4222"
 #url = "nats://10.21.21.42:4222"
 # Template syntax is useable here https://vector.dev/docs/reference/configuration/template-syntax/

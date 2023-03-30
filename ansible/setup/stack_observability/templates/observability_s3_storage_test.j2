@@ -37,6 +37,14 @@ job "observability" {
 #                   protocol = "http"
 #                }
 #            }
+
+          }
+          sidecar_task{
+            config{
+              labels = {
+                "com.github.logunifier.application.pattern.key" = "envoy"
+              }
+            }
           }
         }
         tags = [

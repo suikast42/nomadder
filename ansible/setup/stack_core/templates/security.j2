@@ -50,6 +50,13 @@ job "security" {
       port = "5432"
       connect {
         sidecar_service {}
+        sidecar_task{
+          config{
+            labels = {
+              "com.github.logunifier.application.pattern.key" = "envoy"
+            }
+          }
+        }
       }
      check {
         name     = "security_postgres_ping"
@@ -257,6 +264,13 @@ job "security" {
             }
           }
         }
+        sidecar_task{
+          config{
+            labels = {
+              "com.github.logunifier.application.pattern.key" = "envoy"
+            }
+          }
+        }
       }
       tags = [
         "traefik.enable=true",
@@ -339,6 +353,11 @@ job "security" {
       }
       config {
         image = "{{registry_dns}}/{{stack_name}}/keycloak:{{version_keycloak_nomadder}}"
+        labels = {
+          "com.github.logunifier.application.name" = "keycloak"
+          "com.github.logunifier.application.version" = "{{version_keycloak_nomadder}}"
+          "com.github.logunifier.application.pattern.key" = "tslevelmsg"
+        }
         ports = ["ui"]
         args = [
           "start", "--import-realm" , "--optimized"

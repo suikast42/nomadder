@@ -28,6 +28,7 @@ services:
       - "com.hashicorp.nomad.namespace=default"
       - "com.hashicorp.nomad.task_group_name=nexus"
       - "com.hashicorp.nomad.task_name=nexus"
+      - "com.github.logunifier.application.pattern.key=tslevelmsg"
     environment:
       # Let the default admin password as admin123
       NEXUS_SECURITY_RANDOMPASSWORD : false
