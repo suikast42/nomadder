@@ -14,6 +14,7 @@ client {
   meta {
     node_type= "worker"
     connect.log_level = "debug"
+ #   connect.sidecar_image: "{{registry_dns}}/envoyproxy/envoy:v{{version_consul}}"
   }
   server_join {
     retry_join =  {{masters | to_json }}
