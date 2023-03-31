@@ -24,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 13,
+  "id": 7,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -170,7 +170,7 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 8,
+        "w": 6,
         "x": 0,
         "y": 1
       },
@@ -189,7 +189,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.4.3",
+      "pluginVersion": "9.4.7",
       "repeat": "job_types",
       "repeatDirection": "h",
       "targets": [
@@ -343,7 +343,7 @@
         "h": 14,
         "w": 5,
         "x": 0,
-        "y": 4
+        "y": 10
       },
       "id": 4,
       "options": {
@@ -449,7 +449,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "debug"
+              "options": "debug "
             },
             "properties": [
               {
@@ -464,7 +464,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "error"
+              "options": "error "
             },
             "properties": [
               {
@@ -479,7 +479,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "fatal"
+              "options": "fatal "
             },
             "properties": [
               {
@@ -494,7 +494,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "info"
+              "options": "info "
             },
             "properties": [
               {
@@ -524,7 +524,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "unknown"
+              "options": "unknown "
             },
             "properties": [
               {
@@ -539,7 +539,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "warn"
+              "options": "warn "
             },
             "properties": [
               {
@@ -557,7 +557,7 @@
         "h": 13,
         "w": 19,
         "x": 5,
-        "y": 4
+        "y": 10
       },
       "id": 3,
       "options": {
@@ -590,6 +590,7 @@
       "title": "Log distrubution in $__interval",
       "transformations": [
         {
+          "disabled": true,
           "id": "labelsToFields",
           "options": {
             "mode": "columns",
@@ -606,7 +607,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 18
+        "y": 24
       },
       "id": 9,
       "panels": [
@@ -646,8 +647,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               },
@@ -853,7 +853,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 19
+        "y": 25
       },
       "id": 15,
       "panels": [
@@ -921,9 +921,9 @@
       },
       {
         "current": {
-          "selected": true,
-          "text": "vector-journald",
-          "value": "vector-journald"
+          "selected": false,
+          "text": "ingress.logs.journald",
+          "value": "ingress.logs.journald"
         },
         "datasource": {
           "type": "loki",
@@ -984,7 +984,7 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {
@@ -1005,6 +1005,6 @@
   "timezone": "",
   "title": "LogsTest",
   "uid": "KMg_v90Vz",
-  "version": 38,
+  "version": 3,
   "weekStart": ""
 }
