@@ -1,37 +1,51 @@
-#https://learn.hashicorp.com/tutorials/consul/deployment-guide
-- name: Consul installation
+- name: consul setup
   block:
-  - name: "Create user {{consul_user}}"
-    include_tasks: common/tasks/user.yml
-    vars:
-      create_user: "{{consul_user}}"
-      create_group: "{{consul_group}}"
-      create_usr_conf_dir: "{{consul_conf_dir}}"
+  #https://learn.hashicorp.com/tutorials/consul/deployment-guide
+  - name: Consul installation
+    block:
+    - name: "Create user {{consul_user}}"
+      include_tasks: common/tasks/user.yml
+      vars:
+        create_user: "{{consul_user}}"
+        create_group: "{{consul_group}}"
+        create_usr_conf_dir: "{{consul_conf_dir}}"
 
 
-  - name: "Install consul"
-    import_tasks: consul_install.yml
+    - name: "Install consul"
+      import_tasks: consul_install.yml
 
-#  - name: "Build and copy secint"
-#    import_tasks: build_and_copy_secinit.yml
-#    run_once: true
-#    when: is_master_host
+  #  - name: "Build and copy secint"
+  #    import_tasks: build_and_copy_secinit.yml
+  #    run_once: true
+  #    when: is_master_host
 
-  # The jwt tokens are generated on the master
-  # This task copies the jwt tokens from master to the consul client hosts
-#  - name: "Copy secint jwt tokens"
-#    import_tasks: copy_jwt.yml
-#    when: is_worker_host
+    # The jwt tokens are generated on the master
+    # This task copies the jwt tokens from master to the consul client hosts
+  #  - name: "Copy secint jwt tokens"
+  #    import_tasks: copy_jwt.yml
+  #    when: is_worker_host
 
-  - name: Consul config files
-    import_tasks: copy_consul_config_files.yml
+    - name: Consul config files
+      import_tasks: copy_consul_config_files.yml
 
 
-  - name: "Install consul-template"
-    import_tasks: consul_template_install.yml
+    - name: "Install consul-template"
+      import_tasks: consul_template_install.yml
 
-  - name: "Systemd service"
-    import_tasks: consul_systemd_install.yml
+    - name: "Systemd service"
+      import_tasks: consul_systemd_install.yml
+
+  - name: consul update
+    when: update_consul|bool == true
+    block:
+      - name: Update consul
+        include_tasks: consul_update.yml
+
+      - name: Consul config
+        include_tasks: copy_consul_config_files.yml
+
+      - name: Consul service
+        include_tasks: consul_systemd_install.yml
 
   vars:
     consul_initial_management_token: "e95b599e-166e-7d80-08ad-aee76e7ddf19"

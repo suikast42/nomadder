@@ -3,12 +3,10 @@ vault_checksum: "sha256:aa2ed532d9a0ecc8635fed63cb3fb6de472b4c01ca622a9a199cd92a
 uninstall_vault: false
 
 
-#consul_version: "1.14.4"
-#consul_checksum: "sha256:eafb7c853ce9cc1536bffa99325f8df365ff70a3b83c037836e63964a8adfd7a"
-consul_version: "1.15.1"
-consul_checksum: "sha256:23f7eb0461dd01a95c5d56472b91c22d5dacec84f31f1846c0c9f9621f98f29f"
+consul_version: "1.15.2"
+consul_checksum: "sha256:21e6c204f8dfdfde63eed5853fbf5a84d414299a111ad6b66da36d00db6414e9"
 uninstall_consul: false
-
+update_consul: false
 
 consul_template_version: "0.30.0"
 consul_template_checksum: "sha256:c78db0f0eecc4d314a5130e3b4c8bd17086c6cd9080c4caf69c606de67cbe212"
