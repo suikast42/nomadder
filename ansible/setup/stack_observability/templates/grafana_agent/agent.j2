@@ -12,7 +12,13 @@ metrics:
   configs:
     - name: integrations
       scrape_configs:
-          # grab all metric endpoints with stadanrd /metrics endpoint
+        - job_name: integrations/traefik
+          scheme: http
+          metrics_path: '/metrics'
+          static_configs:
+          - targets:
+            - ingress.{{tls_san}}:8081
+        # grab all metric endpoints with stadanrd /metrics endpoint
         - job_name: "integrations/consul_sd"
           consul_sd_configs:
             - server: "consul.service.consul:8501"

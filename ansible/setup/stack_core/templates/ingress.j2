@@ -285,15 +285,18 @@ job "ingress" {
     address = ":443"
 
     [entryPoints.traefik]
+    # The default port 8080 is used by cdvisor
     address = ":8081"
 # TCP / UDP over one port
 #  [entryPoints.tcpep]
 #    address = ":3179"
 #  [entryPoints.udpep]
 #    address = ":3179/udp"
+#  [entryPoints.streaming]
+#    address = ":1704/udp"
 [api]
     dashboard = true
-    insecure  = true
+    insecure  = false
     debug = false
 [providers]
   [providers.file]
@@ -334,9 +337,13 @@ job "ingress" {
     addEntryPointsLabels = true
     addRoutersLabels = true
     addServicesLabels = true
+[log]
+  level = "DEBUG"
+#  format = "json"
+
 [accessLog]
   filePath = "/logs/access.log"
-  format = "json"
+  #format = "json"
 
 [experimental.plugins.traefik-add-trace-id]
   moduleName = "github.com/trinnylondon/traefik-add-trace-id"
@@ -351,9 +358,7 @@ job "ingress" {
           headerPrefix = ""
           verbose = "true"
 
-[log]
-  level = "DEBUG"
-#  format = "json"
+
 
 EOF
 
