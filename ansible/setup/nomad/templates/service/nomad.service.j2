@@ -15,6 +15,7 @@ After=network-online.target,containerd.service,docker.service,consul.service
 
 
 [Service]
+ExecStartPre=/bin/bash -c '(while ! nc -z -v -w1 consul.service.consul 8501 2>/dev/null; do echo "Waiting for consul.service.consul 8501 to open..."; sleep 1; done); sleep 1'
 {% if is_worker_host  %}
 #Environment="CONSUL_HTTP_ADDR=127.0.0.1:8501"
 #Environment="CONSUL_HTTP_SSL=true"
