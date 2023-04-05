@@ -186,8 +186,7 @@ job "observability" {
            destination = "/data"
          }
          env {
-           JAEGER_AGENT_HOST= "tempo.service.consul"
-           JAEGER_ENDPOINT = "http://tempo.service.consul:14268/api/traces" # send traces to Tempo
+           JAEGER_ENDPOINT = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift" # send traces to Tempo
            JAEGER_REPORTER_LOG_SPANS=true
           }
          config {
@@ -337,8 +336,7 @@ job "observability" {
 
       driver = "docker"
        env {
-         JAEGER_AGENT_HOST= "tempo.service.consul"
-         JAEGER_ENDPOINT = "http://tempo.service.consul:14268/api/traces" # send traces to Tempo
+         JAEGER_ENDPOINT = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift" # send traces to Tempo
          JAEGER_REPORTER_LOG_SPANS=true
          }
       config {

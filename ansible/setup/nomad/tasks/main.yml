@@ -32,7 +32,7 @@
         include_tasks: nomad_cli_wander_install.yml
 
       - name: Nomad config
-        include_tasks: copy_copy_config_files.yml
+        include_tasks: copy_nomad_config_files.yml
 
       - name: Nomad service
         include_tasks: nomad_systemd_install.yml
@@ -44,7 +44,7 @@
         include_tasks: nomad_update.yml
 
       - name: Nomad config
-        include_tasks: copy_copy_config_files.yml
+        include_tasks: copy_nomad_config_files.yml
 
       - name: Nomad service
         include_tasks: nomad_systemd_install.yml

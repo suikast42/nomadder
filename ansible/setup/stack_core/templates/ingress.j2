@@ -325,11 +325,16 @@ job "ingress" {
   key = "{{base_cert_dir}}/ingress/nomad-ingress-key.pem"
 
 [tracing]
-  [tracing.zipkin]
-    httpEndpoint = "http://tempo-zipkin.service.consul:9411/api/v2/spans"
-    #httpEndpoint = "http://10.21.21.42:9411/api/v2/spans"
-    sameSpan = true
-    id128Bit = true
+#  [tracing.zipkin]
+#    httpEndpoint = "http://tempo-zipkin.service.consul:9411/api/v2/spans"
+#    sameSpan = true
+#    id128Bit = true
+  [tracing.jaeger]
+    samplingServerURL = "http://tempo-jaeger.service.consul:14268/sampling"
+    propagation  = "b3"
+    gen128Bit = true
+  [tracing.jaeger.collector]
+    endpoint = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift"
 
 [metrics]
   [metrics.prometheus]
@@ -344,19 +349,11 @@ job "ingress" {
 [accessLog]
   filePath = "/logs/access.log"
   #format = "json"
+  [accessLog.fields]
+  defaultMode = "keep"
 
-[experimental.plugins.traefik-add-trace-id]
-  moduleName = "github.com/trinnylondon/traefik-add-trace-id"
-  version = "v0.1.5"
-
-[http]
-  [http.middlewares]
-    [http.middlewares.my-traefik-add-trace-id]
-      [http.middlewares.my-traefik-add-trace-id.plugin]
-        [http.middlewares.my-traefik-add-trace-id.plugin.traefik-add-trace-id]
-          headerName = "X-Trace-Id"
-          headerPrefix = ""
-          verbose = "true"
+  [accessLog.fields.headers]
+   defaultMode = "keep"
 
 
 

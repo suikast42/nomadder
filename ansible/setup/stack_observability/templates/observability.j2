@@ -174,9 +174,11 @@ job "observability" {
 
          driver = "docker"
          env {
-           JAEGER_AGENT_HOST= "tempo.service.consul"
-           JAEGER_ENDPOINT = "http://tempo.service.consul:14268/api/traces" # send traces to Tempo
+           JAEGER_ENDPOINT = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift" # send traces to Tempo
            JAEGER_REPORTER_LOG_SPANS=true
+           JAEGER_TRACEID_128BIT=true
+           JAEGER_SAMPLER_TYPE="const"
+           JAEGER_SAMPLER_PARAM="1"
          }
          config {
          image = "{{registry_dns}}/grafana/mimir:{{version_grafana_mimir}}"
@@ -285,10 +287,12 @@ job "observability" {
 
      driver = "docker"
      env {
-       JAEGER_AGENT_HOST= "tempo.service.consul"
-       JAEGER_ENDPOINT = "http://tempo.service.consul:14268/api/traces" # send traces to Tempo
+       JAEGER_ENDPOINT = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift" # send traces to Tempo
        JAEGER_REPORTER_LOG_SPANS=true
-       }
+       JAEGER_TRACEID_128BIT=true
+       JAEGER_SAMPLER_TYPE="const"
+       JAEGER_SAMPLER_PARAM="1"
+     }
     config {
        image = "{{registry_dns}}/grafana/loki:{{version_grafana_loki}}"
        labels = {
@@ -338,6 +342,19 @@ job "observability" {
           static =  14268
           to = 14268
         }
+      # port "jaeger-grpc" {
+      #    static =  14250
+      #     to = 14250
+      # }
+      # port "jaeger-thrift-compact" {
+      #    static =  6831
+      #    to = 6831
+      #  }
+      # port "jaeger-thrift-binary" {
+      #       static =  6832
+      #       to = 6832
+      # }
+
         port "tempo" {
           static =  3200
           to = 3200
@@ -386,12 +403,48 @@ job "observability" {
         name ="tempo-jaeger"
         port= "jaeger"
         check {
-          name     = "tempo_jagger_check"
+          name     = "tempo_jaeger_check"
           type     = "tcp"
           interval = "10s"
           timeout  = "1s"
          }
       }
+    # service{
+    #   name ="tempo-jaeger-grpc"
+    #   port= "jaeger-grpc"
+    #   check {
+    #     name     = "tempo_jaeger_grpc_check"
+    #     type     = "tcp"
+    #     interval = "10s"
+    #     timeout  = "1s"
+    #   }
+    # }
+    #  service{
+    #   name ="tempo-jaeger-thrift-compact"
+    #   port= "jaeger-thrift-compact"
+    #   check {
+    #     task = "tempo"
+    #     name     = "tempo_jaeger_thrift_compact_check"
+    #     type     = "script"
+    #     command  = "nc"
+    #     args     = ["-z", "-v","-u", "${NOMAD_IP_jaeger_thrift_compact}", "${NOMAD_PORT_jaeger_thrift_compact}"]
+    #     interval = "10s"
+    #     timeout  = "1s"
+    #    }
+    # }
+    #service{
+    #  name ="tempo-jaeger-thrift-binary"
+    #  port= "jaeger-thrift-binary"
+    #  check {
+    #        task = "tempo"
+    #        name     = "tempo_jaeger_thrift_binary_check"
+    #        type     = "script"
+    #        command  = "nc"
+    #        args     = ["-z", "-v","-u", "${NOMAD_IP_jaeger_thrift_binary}", "${NOMAD_PORT_jaeger_thrift_binary}"]
+    #        interval = "10s"
+    #        timeout  = "1s"
+    #   }
+    #}
      service{
         name ="tempo-otlp-grpc"
         port= "otlp_grpc"
@@ -419,6 +472,14 @@ job "observability" {
         }
 
          driver = "docker"
+          env {
+          # Not needed for tempo itself
+         #   JAEGER_ENDPOINT = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift" # send traces to Tempo
+            JAEGER_REPORTER_LOG_SPANS=true
+            JAEGER_TRACEID_128BIT=true
+            JAEGER_SAMPLER_TYPE="const"
+            JAEGER_SAMPLER_PARAM="1"
+          }
          config {
          image = "{{registry_dns}}/grafana/tempo:{{version_grafana_tempo}}"
          labels = {

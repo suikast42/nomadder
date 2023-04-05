@@ -478,3 +478,34 @@ resolver = "foobar"
 [tls.stores.Store1.defaultGeneratedCert.domain]
 main = "foobar"
 sans = ["foobar", "foobar"]
+
+
+# Define middleware that adds headers to http requests
+[http.middlewares]
+[http.middlewares.exclude-trace]
+# Define the middleware to exclude tracing headers
+[http.middlewares.exclude-trace.headers]
+# Delete trace headers. See https://github.com/opentracing/specification/blob/master/rfc/trace_identifiers.md
+#  ["X-Request-Id", "X-B3-TraceId", "X-B3-SpanId", "X-B3-ParentSpanId", "X-B3-Sampled", "X-B3-Flags", "traceparent", "tracestate"]
+[http.middlewares.exclude-trace.headers.customRequestHeaders]
+X-Request-Id = "hans"
+X-B3-TraceId = "hans"
+X-B3-SpanId = "hans"
+X-B3-ParentSpanId = "hans"
+X-B3-Sampled = "hans"
+X-B3-Flags = "hans"
+traceparent = "hans"
+tracestate = "hans"
+uber-trace-id = "hans"
+
+# Add this middleware to a route
+[http.routers.nomad]
+entryPoints = ["https"]
+rule = "Host(`nomad.{{tls_san}}`) "
+service = "nomad"
+{% if enable_oauth_middleware %}
+middlewares = ["traefik-forward-auth@consulcatalog","exclude-trace"]
+{% endif %}
+[[http.routers.nomad.tls.domains]]
+#main = "{{tls_san}}"
+sans = ["nomad.{{tls_san}}"]

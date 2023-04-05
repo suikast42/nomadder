@@ -15,8 +15,8 @@ uninstall_consul_template: false
 
 nomad_version: "1.5.1"
 nomad_checksum: "sha256:da4b976dfcab27d16fc03e95719685d4ce603b13a3e5ba692df7c434024dc294"
-#nomad_version: "1.5.2"
-#nomad_checksum: "sha256:51d0ecf23f4740d078287eaef2f4da9f3420b087907d33480ef2ec49628d6461"
+#nomad_version: "1.5.3"
+#nomad_checksum: "sha256:92a1d2d4593d09e0838f7ffc71125494a69951d220ffa1658192c7fbe7034573"
 uninstall_nomad: false
 update_nomad: false
 
