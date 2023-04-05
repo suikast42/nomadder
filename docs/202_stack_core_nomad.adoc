@@ -188,6 +188,57 @@ job "docs" {
 
 For playing with update strategies you can use test_deployments/fail-service_healtlhy_to_unhealtly_.nomad
 
+==== Linux system signals
+. SIGHUP - Hangup signal. Sent to a process when its controlling terminal or session ends. Often used to reload configuration files.
+
+. SIGINT - Interrupt signal. Sent to a process when the user presses the interrupt key combination (usually Ctrl+C) in the terminal. Often used to stop a program that is running in an infinite loop or not responding.
+
+. SIGQUIT - Quit signal. Sent to a process when the user presses the quit key combination (usually Ctrl+) in the terminal. Often used to generate a core dump for debugging purposes.
+
+. SIGILL - Illegal instruction signal. Sent to a process when it attempts to execute an illegal instruction.
+
+. SIGTRAP - Trap signal. Sent to a process when a debugger or other tracing utility sets a breakpoint.
+
+.  - Abort signal. Sent to a process by the abort() library function.
+
+. SIGBUS - Bus error signal. Sent to a process when it attempts to access memory that cannot be accessed.
+
+. SIGFPE - Floating point exception signal. Sent to a process when it attempts to execute an invalid arithmetic operation.
+
+. SIGKILL - Kill signal. Sent to a process to terminate it immediately, regardless of whether it is hung or unresponsive.
+
+. SIGUSR1 - User-defined signal 1. Can be used for any purpose that a program may require.
+
+. SIGSEGV - Segmentation fault signal. Sent to a process when it attempts to access memory that it does not have permission to access.
+
+. SIGUSR2 - User-defined signal 2. Can be used for any purpose that a program may require.
+
+. SIGPIPE - Broken pipe signal. Sent to a process when it attempts to write to a pipe that has been closed.
+
+. SIGALRM - Alarm signal. Sent to a process when the specified time interval has elapsed.
+
+. SIGTERM - Termination signal. Sent to a process to request that it terminate gracefully.
+
+. SIGSTKFLT - Stack fault signal. Sent to a process when it exceeds its stack size.
+
+. SIGCHLD - Child process signal. Sent to a process when a child process terminates.
+
+. SIGCONT - Continue signal. Sent to a process to resume it after it has been stopped.
+
+. SIGSTOP - Stop signal. Sent to a process to stop it immediately, but without terminating it.
+
+. SIGTSTP - Terminal stop signal. Sent to a process when the user presses the suspend key combination (usually Ctrl+Z) in the terminal.
+
+. SIGTTIN - Terminal input signal. Sent to a process that is attempting to read input from the terminal while it is in the background.
+
+. SIGTTOU - Terminal output signal. Sent to a process that is attempting to write output to the terminal while it is in the background.
+
+. SIGURG - Urgent data signal. Sent to a process when urgent data is available on a socket.
+
+. SIGXCPU - CPU time limit exceeded signal. Sent to a process when it exceeds its allotted CPU time.
+
+. SIGXFSZ - File size limit exceeded signal. Sent to a process when it exceeds its allotted file size.
+
 === Links
 [[_200_link_nomad_task_init,nomad task dependencies]]https://developer.hashicorp.com/nomad/tutorials/task-deps/task-dependencies-interjob[Express Inter-job Dependencies with Init Tasks]
 
