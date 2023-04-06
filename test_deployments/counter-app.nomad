@@ -1,7 +1,7 @@
 job "countdash_app" {
   datacenters = ["nomadder1"]
 
-  group "api" {
+  group "counter-api" {
     network {
       mode = "bridge"
       port "http" {
@@ -9,9 +9,9 @@ job "countdash_app" {
         to = 9001
       }
     }
-    task "api" {
+    task "counter-api" {
       service {
-        name = "api"
+        name = "counter-api"
         port = "http"
 #        tags = [
 #          "traefik.enable=true",
@@ -71,7 +71,7 @@ job "countdash_app" {
         }
         driver = "docker"
         env {
-          COUNTING_SERVICE_URL = "http://api.service.nomadder1.consul:9001"
+          COUNTING_SERVICE_URL = "http://counter-api.service.nomadder1.consul:9001"
         }
 
         config {
