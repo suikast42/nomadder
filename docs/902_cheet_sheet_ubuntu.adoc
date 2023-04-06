@@ -27,6 +27,13 @@ a|[source,shell]
 Add DefaultTimeoutStopSec to service systemd condif file.
 ----
 
+|list network config
+a|[source,shell]
+----
+ip -br a
+----
+
+
 
 |===
 
