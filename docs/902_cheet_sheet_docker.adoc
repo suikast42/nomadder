@@ -1,0 +1,12 @@
+.Docker cheat sheet
+|===
+|Description |Command
+
+
+|Kill docker container by image
+a|[source,shell]
+----
+docker kill $( docker ps \| grep "amd64:3.2"  \|  awk '{ print $1 }')
+----
+
+|===
