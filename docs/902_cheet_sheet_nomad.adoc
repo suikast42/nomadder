@@ -1,3 +1,5 @@
+
+
 .Nomad CLI cheatsheet
 |===
 |Description |Command
@@ -50,4 +52,54 @@ a|[source,shell]
 
 
 |===
+
+
+
+=== CSI ( Container Storage Interface )
+
+A Container Storage Interface (CSI) driver is a standardized interface for container orchestrators like Kubernetes to interact with different storage providers. The benefits of using a CSI driver include:
+
+Advantages:
+
+* *Flexibility*: CSI drivers allow container orchestrators to support multiple storage systems, giving users more options for storage solutions.
+
+* *Portability*: CSI drivers provide a standard interface for interacting with storage systems, making it easier to move workloads between different clusters and cloud providers.
+
+* *Automation*: CSI drivers allow for automated storage provisioning and management, reducing the burden on administrators.
+
+* *Security*: CSI drivers can provide security features like encryption, access control, and data protection, improving the security of the storage system.
+
+* *Scalability*: CSI drivers can support large-scale deployments by providing a consistent interface for managing storage across multiple nodes.
+
+Overall, using a CSI driver can simplify storage management and increase flexibility, portability, automation, security, and scalability in containerized environments.
+
+While there are many benefits to using a Container Storage Interface (CSI) driver, there are also some potential disadvantages to consider:
+
+Disadvantages:
+
+* *Complexity*: Setting up and configuring a CSI driver can be more complex than using native storage options. This may require additional expertise and resources to manage.
+
+* *Performance*: Adding a layer of abstraction with a CSI driver can add some overhead, which may impact performance in some cases.
+
+* *Compatibility*: Some storage systems may not yet have a CSI driver available, which could limit the options for using certain storage systems with container orchestrators.
+
+* *Vendor* lock-in: While CSI drivers aim to provide a standardized interface, some vendors may still add proprietary features or functionality that could lead to vendor lock-in.
+
+* *Maintenance*: Like any piece of software, CSI drivers require regular maintenance and updates, which can add additional overhead and potential risks.
+
+Overall, it is important to weigh the benefits and disadvantages of using a CSI driver based on the specific needs and requirements of the containerized environment.
+
+*Conclusion* +
+There is no need for small setups like that platform aims to set up a csi. The stateful workloads must make use of nomad host volume. The disadvantage of that is the maintenance and the static volume configuration. Every configuration change in host volumes needs a host access and nomad service restart. But it is straight forward and easy to understand.
+
+A CSI driver should only be considers if the platform needs a setup with more dynamic VM provisioning. ( A CI pipeline environment for example ).
+
+Portworkx or history are the best evaluated options for CSI drivers.
+
+[[__902_link_storage_comprassion,Storage Compression]]https://vitobotta.com/2019/08/06/kubernetes-storage-openebs-rook-longhorn-storageos-robin-portworx/[Storage Compression]
+
+
+[[__902_link_nomad_csi_plugins,Nomad CSI Plugins]]https://github.com/hashicorp/nomad/tree/main/demo/csi[Nomad CSI Plugins]
+
+[[__902_link_nomad_portworkx_licence,Portworkx license essentials]]https://forums.portworx.com/t/portworx-essentials-on-nomad/567[Portworkx license essentials]
 
