@@ -38,7 +38,7 @@ uninstall_cli_wander: false
 version_cfssl: 1.6.3
 update_cfssl: false
 
-docker_version: "23.0.1"
+docker_version: "23.0.3"
 uninstall_docker: false
 
 update_certificates: false
@@ -47,7 +47,7 @@ version_nexus: "3.50.0"
 version_nexus_initlzr: "1.0.0.Alpha10"
 uninstall_nexus: false
 
-version_docker_compose: "2.16.0"
+version_docker_compose: "2.17.2"
 uninstall_compose: false
 
 version_protoc: "21.12"
@@ -60,6 +60,6 @@ version_busy_box_init_container: "1.28"
 version_multi_stage_apline_container: "3.17.2"
 version_grafana_agent_container: "0.32.1"
 
-version_minio: "RELEASE.2023-03-24T21-41-23Z"
-version_minio_mc_admin: "RELEASE.2023-03-23T20-03-04Z"
+version_minio: "RELEASE.2023-04-07T05-28-58Z"
+version_minio_mc_admin: "RELEASE.2023-04-06T16-51-10Z"
 uninstall_minio_admin: false

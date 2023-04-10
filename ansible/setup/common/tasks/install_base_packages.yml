@@ -26,7 +26,6 @@
       - jq
       - zip
       - unzip
-      - tree
       - dos2unix
       - ruby-dev
       - fortune-mod
@@ -38,7 +37,7 @@
       - open-iscsi
       - nfs-common
       - python3-docker
-      - cadvisor
+#      - cadvisor
 
     state: present
   register: install_apt

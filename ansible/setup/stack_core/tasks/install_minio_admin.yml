@@ -18,7 +18,7 @@
     - name: "Install minio admin client {{cliinstalled.stat.exists}}"
       when: not cliinstalled.stat.exists
       block:
-      - name: "Install minio cli from https://dl.min.io/client/mc/release/linux-amd64/mc.{{version_minio_mc_admin}}"
+      - name: "Install minio cli from https://dl.min.io/client/mc/release/linux-amd64/archive/mc.{{version_minio_mc_admin}}"
         delay: 0
         async: 60
         poll: 1
