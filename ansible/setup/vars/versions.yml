@@ -35,7 +35,7 @@ nomad_cli_wander_checkusum: "sha256:aea08e51b85b68a2a899b689f0e8d70cc8b0b54fe388
 uninstall_cli_wander: false
 
 
-version_cfssl: 1.6.3
+version_cfssl: 1.6.4
 update_cfssl: false
 
 docker_version: "23.0.3"
