@@ -16,10 +16,8 @@ job "whoami" {
 
       tags = [
         "traefik.enable=true",
-#        "traefik.consulcatalog.connect=true",
         "traefik.http.routers.whoami.rule=Host(`whoami.cloud.private`)",
         "traefik.http.routers.whoami.tls=true",
-        "traefik.http.routers.whoami.middlewares=traefik-forward-auth"
       ]
 
       check {
@@ -33,6 +31,7 @@ job "whoami" {
 
     task "whoami" {
       driver = "docker"
+#      driver = "containerd-driver"
       config {
         image = "traefik/whoami"
         ports = ["web"]
