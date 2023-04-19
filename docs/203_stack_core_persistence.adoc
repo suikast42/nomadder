@@ -56,6 +56,8 @@ Disadvantages:
 * If the CSI driver not works then every stateful workload not works in the cluster
 * Consumes additional CPU and RAM resources on the hosts.
 
+IMPORTANT: If you deploy a CSI plugin over a nomad job then you must enable the  `privileged = true` flag on the docker plugin. This is a security risk. because any docker container that someone deploy in your cluster can do operations on the host os as root. See the discussion in https://github.com/hashicorp/nomad/issues/9258[github]
+
 There a lot of CSI implementations:
  * Portworkx: To many important features are enterprise and have to many dependencies to the linux kernel. For example it is not possible to run portworkx on ubuntu 22.04 without downgrading the kernel.
 * Cinder: needs a extra dependency for authentication ( Keystone )
