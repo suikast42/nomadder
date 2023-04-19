@@ -1,0 +1,33 @@
+groups:
+  - name: GenericLogObservation
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          sum(rate({ingress="ingress.logs.journald"} |~ "error|failed|missing"  [5m])) by (job,level)  /
+          sum(rate({ingress="ingress.logs.journald"}[5m])) by (job,level)
+          > 0.5
+        for: 1m
+        labels:
+          severity: warning
+          team: devops
+          category: logs
+        annotations:
+          title: High Error rate
+          message: "High error rate in for job {{ $labels.job }} with log level {{ $labels.level }}"
+          description: High Error rate
+          impact: impact
+          action: action
+          dashboard: https://grafana.com/service-dashboard
+          runbook: https://wiki.com
+          logurl: https://grafana.com/log-explorer
+
+
+#  - name: credentials_leak
+#    rules:
+#      - alert: http-credentials-leaked
+#        annotations:
+#          message: "{{ $labels.job }} is leaking http basic auth credentials."
+#        expr: 'sum by (cluster, job, pod) (count_over_time({namespace="prod"} |~ "http(s?)://(\\w+):(\\w+)@" [5m]) > 0)'
+#        for: 10m
+#        labels:
+#          severity: critical

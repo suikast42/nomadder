@@ -39,6 +39,8 @@ ingester:
   chunk_encoding: snappy
 
 ruler:
+  evaluation_interval : 1m
+  poll_interval: 1m
   storage:
     type: local
     local:
@@ -54,6 +56,7 @@ ruler:
     kvstore:
       store: memberlist
   enable_api: true
+  enable_alertmanager_v2: true
 
 compactor:
   working_directory: /data/retention
@@ -117,6 +120,10 @@ distributor:
   ring:
     kvstore:
       store: memberlist
+
+table_manager:
+  retention_deletes_enabled: true
+  retention_period: 24h
 
 limits_config:
   ingestion_rate_mb: 64
