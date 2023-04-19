@@ -49,6 +49,12 @@ a|[source,shell]
  {{ end }}
 ----
 
+|show files in (failed) allocs
+a|[source,shell]
+----
+nomad fs  d3f38e6b  alloc/logs/mimir.stderr.0
+----
+
 
 
 |===
