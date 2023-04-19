@@ -13,7 +13,7 @@ end
 $vm_base_box="suikast42/ubuntu-22.04_64"
 $vm_base_box_version="1.1.1"
 
-$vm_mem_master_01 = 8096 # 8 GB RAM for docker builds and k3s master
+$vm_mem_master_01 = 8096 # 8 GB RAM for master
 $vm_cpus_master_01 = 4
 $vm_hostname_master_01 = "master-01"
 $vm_master_01_ip = "10.21.21.41"
