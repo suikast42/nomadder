@@ -56,9 +56,9 @@ version_protoc: "21.12"
 version_proto_gen: "1.28.1"
 version_proto_grpc: "1.2.0"
 
-version_busy_box_init_container: "1.28"
+version_busy_box_init_container: "1.36"
 version_multi_stage_apline_container: "3.17.2"
-version_grafana_agent_container: "0.32.1"
+version_grafana_agent_container: "0.33.0"
 
 version_minio: "RELEASE.2023-04-07T05-28-58Z"
 version_minio_mc_admin: "RELEASE.2023-04-06T16-51-10Z"
