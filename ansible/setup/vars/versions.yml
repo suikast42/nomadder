@@ -44,7 +44,7 @@ uninstall_docker: false
 update_certificates: false
 
 version_nexus: "3.52.0"
-version_nexus_initlzr: "1.0.0.Alpha10"
+version_nexus_initlzr: "1.0.0"
 uninstall_nexus: true
 
 version_docker_compose: "2.17.2"
