@@ -27,6 +27,25 @@
 #    debug:
 #      msg: "{{build}}"
 
+  - name: Delete protoc
+    when: uninstall_protoc|bool == true
+    become: true
+    file:
+      path: "/usr/local/bin/protoc"
+      state: absent
+
+  - name: Delete protoc includes
+    when: uninstall_protoc|bool == true
+    become: true
+    file:
+      path: "/usr/local/bin/include"
+      state: absent
+
+  - name: Delete protoc tmp files
+    become: true
+    file:
+      path: "/tmp/protoc"
+      state: absent
 
   - name: "Download protoc v{{version_protoc}}"
     get_url:
@@ -54,8 +73,12 @@
     shell: |
       go install google.golang.org/protobuf/cmd/protoc-gen-go@v{{version_proto_gen}} 
       go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v{{version_proto_grpc}}
+      go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v{{version_proto_grpc_gateway}}
+      go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v{{version_proto_openapi}}
       sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-go  /usr/local/bin
       sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-go-grpc  /usr/local/bin
+      sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-grpc-gateway  /usr/local/bin
+      sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-openapiv2  /usr/local/bin
       sudo mv bin/protoc   /usr/local/bin
       sudo mv include   /usr/local/bin/include
     args:
