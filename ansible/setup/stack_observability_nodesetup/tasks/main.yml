@@ -15,7 +15,7 @@
 
   vars:
     - tmp_install_dir_base: "/tmp/grafana_agent"
-    - version_grafana_agent_nodes: "0.33.0"
+    - version_grafana_agent_nodes: "0.33.1"
     - uninstall_grafana_agent: false
     - version_vector_agent: "0.29.1-1"
     - uninstall_vector_agent: false

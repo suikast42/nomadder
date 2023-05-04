@@ -34,7 +34,7 @@
       rm -fr /usr/local/bin/protoc*
       rm -fr /usr/local/bin/include
       rm -fr /tmp/protoc
-      rm -fr  /usr/local/bin/buf
+      rm -fr /usr/local/bin/buf
 
 
   - name: "Download protoc v{{version_protoc}}"
@@ -57,27 +57,47 @@
       dest: "/tmp/protoc"
       copy: no
 
+#  - name: "Install protoc in /usr/local/bin"
+#    register: installProto
+#    failed_when: installProto.rc != 0
+#    shell: |
+#      go install google.golang.org/protobuf/cmd/protoc-gen-go@v{{version_proto_gen}}
+#      go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v{{version_proto_grpc}}
+#      go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v{{version_proto_grpc_gateway}}
+#      go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v{{version_proto_openapi}}
+#      curl -sSL "https://github.com/bufbuild/buf/releases/download/v{{version_proto_buf_cli}}/buf-$(uname -s)-$(uname -m)" -o buf
+#      sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-go  /usr/local/bin
+#      sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-go-grpc  /usr/local/bin
+#      sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-grpc-gateway  /usr/local/bin
+#      sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-openapiv2  /usr/local/bin
+#      sudo mv bin/protoc /usr/local/bin
+#      sudo mv include   /usr/local/bin/include
+#      sudo mv buf  /usr/local/bin
+#      chmod +x  /usr/local/bin/buf
+#    args:
+#      chdir: "/tmp/protoc"
+#      creates: /usr/local/bin/protoc
+
   - name: "Install protoc in /usr/local/bin"
     register: installProto
     failed_when: installProto.rc != 0
     shell: |
       go install google.golang.org/protobuf/cmd/protoc-gen-go@v{{version_proto_gen}} 
-      go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v{{version_proto_grpc}}
-      go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v{{version_proto_grpc_gateway}}
-      go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v{{version_proto_openapi}}
-      curl -sSL "https://github.com/bufbuild/buf/releases/download/v{{version_proto_buf_cli}}/buf-$(uname -s)-$(uname -m)" -o buf
-      sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-go  /usr/local/bin
-      sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-go-grpc  /usr/local/bin
-      sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-grpc-gateway  /usr/local/bin
-      sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-openapiv2  /usr/local/bin
       sudo mv bin/protoc /usr/local/bin
       sudo mv include   /usr/local/bin/include
+      
+      go install github.com/fullstorydev/grpcurl/cmd/grpcurl@v{{version_proto_grpc_curl}}
+      sudo mv grpcurl   /usr/local/bin
+      
+      go install github.com/bufbuild/connect-go/cmd/protoc-gen-connect-go@v{{version_proto_buf_connect}}
+      sudo mv protoc-gen-connect-go   /usr/local/bin
+      
+      curl -sSL "https://github.com/bufbuild/buf/releases/download/v{{version_proto_buf_cli}}/buf-$(uname -s)-$(uname -m)" -o buf
       sudo mv buf  /usr/local/bin
       chmod +x  /usr/local/bin/buf
     args:
       chdir: "/tmp/protoc"
       creates: /usr/local/bin/protoc
-
 
   tags:
     - localhost

@@ -97,7 +97,7 @@ limits:
   max_total_query_length: 43680h
   max_label_names_per_series: 42
   # Allow ingestion of out-of-order samples up to 2 hours since the latest received sample for the series.
-  out_of_order_time_window: 2h
+  out_of_order_time_window: 1d
   # delete old blocks from long-term storage.
   # Delete from storage metrics data older than 1d.
   compactor_blocks_retention_period: 1d
