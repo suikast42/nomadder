@@ -33,6 +33,13 @@ a|[source,shell]
 ip -br a
 ----
 
+|Check if can connect to port
+a|[source,shell]
+----
+nc -zv 172.26.73.37 9009
+----
+
+
 
 
 |===
