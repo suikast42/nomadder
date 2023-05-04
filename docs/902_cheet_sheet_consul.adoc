@@ -83,7 +83,24 @@ curl   -s  -N \
 --cacert "${CONSUL_CACERT}" \
 --cert "${CONSUL_CLIENT_CERT}" \
 --key "${CONSUL_CLIENT_KEY}" \
-https://"${CONSUL_HTTP_ADDR}"/v1/catalog/services | jq .
+https://"${CONSUL_HTTP_ADDR}"/v1/catalog/services \| jq .
 ----
 
+| Consul catalog services over rest
+a|[source,shell]
+----
+unhealthy_checks=$(curl -s  --cacert "${CONSUL_CACERT}" --cert "${CONSUL_CLIENT_CERT}" --key "${CONSUL_CLIENT_KEY}"  "https://${CONSUL_HTTP_ADDR}/v1/health/state/critical" \| jq -c '.[]')
+
+# Iterate over the unhealthy checks and deregister the associated service instances
+echo "$unhealthy_checks" \| while read -r check; do
+  service_id=$(echo "$check" \| jq -r '.ServiceID')
+  node=$(echo "$check" \| jq -r '.Node')
+ if [ "$service_id" != "null" ] && [ "$node" != "null" ]; then
+    echo "Deregistering unhealthy service instance: ${service_id} on node ${node}"
+    curl  --cacert "${CONSUL_CACERT}" --cert "${CONSUL_CLIENT_CERT}" --key "${CONSUL_CLIENT_KEY}" -X PUT "https://${CONSUL_HTTP_ADDR}/v1/catalog/deregister" -d "{\"Node\": \"${node}\", \"ServiceID\": \"${service_id}\"}"
+  else
+    echo "Skipping check with no associated service instance or node"
+  fi
+done
+----
 |===
