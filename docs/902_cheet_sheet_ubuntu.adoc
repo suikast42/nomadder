@@ -39,6 +39,12 @@ a|[source,shell]
 nc -zv 172.26.73.37 9009
 ----
 
+|Check all opened ports of an ip
+a|[source,shell]
+----
+sudo nmap -sT -p- 172.26.73.37
+----
+
 
 
 
