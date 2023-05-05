@@ -3,6 +3,10 @@ name = "{{host_name}}"
 datacenter = "{{data_center}}"
 data_dir =  "{{nomad_data_dir}}"
 bind_addr = "0.0.0.0" # the default
+
+leave_on_interrupt= true
+leave_on_terminate = true
+
 advertise {
   # Defaults to the first private IP address.
   http = "{{host_ip}}"
@@ -21,6 +25,11 @@ client {
     retry_max = 0
     retry_interval = "15s"
   }
+#  drain_on_shutdown {
+#    deadline           = "30s"
+#    force              = false
+#    ignore_system_jobs = false
+#  }
   host_volume "ca_cert" {
     path      = "/usr/local/share/ca-certificates/cloudlocal"
     read_only = true
@@ -101,6 +110,7 @@ telemetry {
 plugin "docker" {
   config {
     allow_privileged = false
+    disable_log_collection  = false
 #    volumes {
 #      enabled = true
 #      selinuxlabel = "z"

@@ -3,8 +3,18 @@ name = "{{host_name}}"
 datacenter = "{{data_center}}"
 data_dir =  "{{nomad_data_dir}}"
 
+#You should only set this value to true on server agents
+#if the terminated server will never join the cluster again
+#leave_on_interrupt= false
+
+#You should only set this value to true on server agents
+#if the terminated server will never join the cluster again
+#leave_on_terminate = false
+
 server {
   enabled = true
+  job_max_priority = 100 # 100 is the default
+  job_default_priority = 50 # 50 is the default
   bootstrap_expect =  {{masters|length}}
   encrypt = "{{nomad_encrypt_key}}"
   rejoin_after_leave = true

@@ -1,5 +1,6 @@
 job "minio" {
   datacenters = ["{{data_center}}"]
+  priority    = 80
   type = "service"
  {% if is_env_development %}
   meta {

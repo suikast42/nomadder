@@ -1,6 +1,37 @@
 - name: Install nomad systemd service
   become: true
   block:
+
+    - name: Nomad worker auto eligtion hook service
+      when: is_worker_host
+      block:
+        - name: Template nomad.eligtion.service.j2
+          template:
+            force: yes
+            src: service/nomad.eligtion.service.j2
+            dest: /etc/systemd/system/nomad.eligtion.service
+          register: serviceconfig_eligtion
+
+        - name: Template nomad_node_drain.sh.j2
+          template:
+            force: yes
+            src: service/nomad_node_drain.sh.j2
+            dest: "{{nomad_conf_dir}}/nomad_node_drain.sh"
+
+        - name: "Changing perm of {{nomad_conf_dir}}/nomad_node_drain.sh"
+          file: dest="{{nomad_conf_dir}}/nomad_node_drain.sh" mode=+x
+
+        - name: enable nomad eligtion service
+          service:
+            name: nomad.eligtion
+            enabled: yes
+
+        - name: Reload systemd
+          when: serviceconfig_eligtion.changed
+          ansible.builtin.systemd:
+            daemon_reload: yes
+
+
     - name: Template nomad.service.server
       template:
         force: yes

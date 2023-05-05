@@ -16,10 +16,6 @@ After=network-online.target,containerd.service,docker.service,consul.service
 
 [Service]
 ExecStartPre=/bin/bash -c '(while ! nc -z -v -w1 consul.service.consul 8501 2>/dev/null; do echo "Waiting for consul.service.consul 8501 to open..."; sleep 1; done); sleep 1'
-{% if is_worker_host  %}
-#Environment="CONSUL_HTTP_ADDR=127.0.0.1:8501"
-#Environment="CONSUL_HTTP_SSL=true"
-{% endif %}
 
 # Nomad server should be run as the nomad user. Nomad clients
 # should be run as root
@@ -39,6 +35,15 @@ Group=root
 
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStart=/usr/local/bin/nomad agent -config {{nomad_conf_dir}}
+{% if is_worker_host  %}
+# nomad client have a active setting drain_on_shutdown
+# this drains the node and mark it as ineligible.
+# Make the node eligible again
+#ExecStartPost=/bin/bash -c '(while ! nomad  node eligibility  -enable -self -address=https://localhost:4646 -ca-cert=/usr/local/share/ca-certificates/cloudlocal/cluster-ca-bundle.pem -client-cert=/etc/opt/certs/nomad/nomad-cli.pem -client-key=/etc/opt/certs/nomad/nomad-cli-key.pem  >/dev/null; do echo "Waiting for port nomad agent runs..."; sleep 1; done); sleep 1'
+ExecStartPost=systemctl restart nomad.eligtion.service
+ExecStop={{nomad_conf_dir}}/nomad_node_drain.sh
+{% endif %}
+
 KillMode=process
 KillSignal=SIGINT
 LimitNOFILE=65536
@@ -58,6 +63,8 @@ RestartSec=2
 ## StartLimitIntervalSec is used for systemd versions >= 230
 StartLimitIntervalSec = 10s
 
+# drain_on_shutdown *2
+TimeoutStopSec=1m
 ## StartLimitInterval is used for systemd versions < 230
 # StartLimitInterval = 10s
 

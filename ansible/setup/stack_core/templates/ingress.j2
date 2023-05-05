@@ -26,6 +26,7 @@ variable "image" {
 
 job "ingress" {
   datacenters = [var.datacenter]
+  priority    = 100
   type        = "system"
  {% if is_env_development %}
   meta {

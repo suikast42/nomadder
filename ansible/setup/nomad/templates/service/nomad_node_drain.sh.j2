@@ -1,0 +1,3 @@
+#!/bin/bash
+
+if [ ! -f "/home/{{ansible_user}}/notdrain" ] ; then nomad node drain -enable -self -deadline "30s"  -m "Node shutdown" -yes -address=https://localhost:4646 -ca-cert=/usr/local/share/ca-certificates/cloudlocal/cluster-ca-bundle.pem -client-cert=/etc/opt/certs/nomad/nomad.pem -client-key=/etc/opt/certs/nomad/nomad-key.pem;fi

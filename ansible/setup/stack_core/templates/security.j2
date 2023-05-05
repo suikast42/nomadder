@@ -1,5 +1,6 @@
 job "security" {
   type = "service"
+  priority    = 90
  {% if is_env_development %}
   meta {
     run_uuid = "${uuidv4()}"
