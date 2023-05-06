@@ -13,10 +13,10 @@ consul_template_checksum: "sha256:c78db0f0eecc4d314a5130e3b4c8bd17086c6cd9080c4c
 update_consul_template: false
 uninstall_consul_template: false
 
-nomad_version: "1.5.1"
-nomad_checksum: "sha256:da4b976dfcab27d16fc03e95719685d4ce603b13a3e5ba692df7c434024dc294"
-#nomad_version: "1.5.4"
-#nomad_checksum: "sha256:c15ffd6a79925ea363d569028189bec8d8eb81c2a2e0c85afac2405d785ec9ef"
+#nomad_version: "1.5.1"
+#nomad_checksum: "sha256:da4b976dfcab27d16fc03e95719685d4ce603b13a3e5ba692df7c434024dc294"
+nomad_version: "1.5.5"
+nomad_checksum: "sha256:edbebdf105daf556a1f9e9b40d58eaa6a0984de52ec87c8900687f9d98465b84"
 uninstall_nomad: false
 update_nomad: false
 
