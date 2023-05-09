@@ -24,7 +24,7 @@ job "security" {
 
   datacenters = ["{{data_center}}"]
 
-  group "keycloak-db" {
+  group "keycloak-postgres" {
 
     restart {
       attempts = 1
@@ -32,9 +32,9 @@ job "security" {
       delay = "5s"
       mode = "fail"
     }
-    volume "security_postgres_volume" {
+    volume "keycloak_postgres_volume" {
       type      = "host"
-      source    = "security_postgres_volume"
+      source    = "stack_core_keycloak_postgres_volume"
       read_only = false
     }
 
@@ -43,12 +43,14 @@ job "security" {
       mode = "bridge"
       port "db" {
         to = 5432
+        host_network = "local"
       }
     }
 
     service {
-      name = "security-postgres"
+      name = "keycloak-postgres"
       port = "5432"
+      address_mode = "alloc"
       connect {
         sidecar_service {}
         sidecar_task{
@@ -60,12 +62,13 @@ job "security" {
         }
       }
      check {
-        name     = "security_postgres_ping"
+        name     = "keycloak_postgres_ping"
         type     = "script"
         command  = "pg_isready"
-        task     = "security_postgres"
+        task     = "keycloak_postgres"
         interval = "10s"
         timeout  = "2s"
+        address_mode = "alloc"
         check_restart {
           limit = 3
           grace = "30s"
@@ -74,9 +77,9 @@ job "security" {
       }
     }
 
-    task "security_postgres" {
+    task "keycloak_postgres" {
       volume_mount {
-        volume      = "security_postgres_volume"
+        volume      = "keycloak_postgres_volume"
         destination = "/var/lib/postgresql/data/pgdata"
       }
       driver = "docker"
@@ -145,11 +148,13 @@ job "security" {
       mode = "bridge"
       port "auth" {
         to = 4181
+        host_network = "local"
       }
     }
     service {
       name = "forwardauth"
       port = "auth"
+      address_mode = "alloc"
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.forwardauth.entrypoints=https",
@@ -249,23 +254,38 @@ job "security" {
       mode = "bridge"
       port "ui" {
         to = 8080
+        host_network = "local"
       }
+     # port "api_expose_healthcheck"{
+     #   to = -1
+     # }
     }
 
     service {
       name = "keycloak"
 #      port = "ui"
       port = "8080"
+      address_mode = "alloc"
       connect {
         sidecar_service {
           proxy {
+          #  expose {
+          #     path {
+          #        path            = "/health"
+          #        protocol        = "http"
+          #        local_path_port = 8080
+          #        listener_port   = "api_expose_healthcheck"
+          #     }
+          #  }
             upstreams {
-              destination_name = "security-postgres"
+              destination_name = "keycloak-postgres"
               local_bind_port  = 5432
             }
           }
         }
         sidecar_task{
+
+
           config{
             labels = {
               "com.github.logunifier.application.pattern.key" = "envoy"
@@ -287,6 +307,7 @@ job "security" {
         path="/health"
         interval = "10s"
         timeout  = "2s"
+        address_mode = "alloc"
         check_restart {
            limit = 3
            grace = "60s"
@@ -300,6 +321,7 @@ job "security" {
         path="/health/live"
         interval = "10s"
         timeout  = "2s"
+        address_mode = "alloc"
       }
       check {
         name  = "ready"
@@ -308,6 +330,7 @@ job "security" {
         path="/health/ready"
         interval = "10s"
         timeout  = "2s"
+        address_mode = "alloc"
         check_restart {
           limit = 3
           grace = "60s"
@@ -316,13 +339,13 @@ job "security" {
       }
 
     }
-      task "await-for-security-postgres" {
+      task "await-for-keycloak-postgres" {
         driver = "docker"
 
         config {
           image        = "{{registry_dns}}/busybox:{{version_busy_box_init_container}}"
           command      = "sh"
-          args         = ["-c", "echo -n 'Waiting for service security-postgres'; until nslookup security-postgres.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
+          args         = ["-c", "echo -n 'Waiting for service keycloak-postgres'; until nslookup keycloak-postgres.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
           #network_mode = "host"
         }
 
@@ -349,8 +372,8 @@ job "security" {
         KC_DB                     = "postgres"
         KC_DB_SCHEMA              = "keycloak"
         KC_DB_USERNAME            = "keycloak"
-        KC_DB_URL_HOST            = "${NOMAD_UPSTREAM_IP_security_postgres}"
-        KC_DB_URL_PORT            = "${NOMAD_UPSTREAM_PORT_security_postgres}"
+        KC_DB_URL_HOST            = "${NOMAD_UPSTREAM_IP_keycloak_postgres}"
+        KC_DB_URL_PORT            = "${NOMAD_UPSTREAM_PORT_keycloak_postgres}"
       }
       config {
         image = "{{registry_dns}}/{{stack_name}}/keycloak:{{version_keycloak_nomadder}}"

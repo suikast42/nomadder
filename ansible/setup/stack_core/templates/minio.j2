@@ -28,7 +28,7 @@ job "minio" {
     count = 1
     volume "stack_core_minio_volume" {
       type      = "host"
-      source    = "core_minio_volume"
+      source    = "stack_core_minio_volume"
       read_only = false
     }
    volume "ca_cert" {

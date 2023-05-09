@@ -2,6 +2,12 @@
 #(reasonable to just use the private IP of the host you're using)
 #- if you use 127.0.0.1, docker will remove the nameserver when you launch the container as the container won't be able
 # to resolve the host with that as the IP (it will be the containers loopback IP).
-nameserver {{host_ip}}
+nameserver {{ansible_eth1.ipv4.address}}
+{% if is_master_host  %}
+# for resolving the domain {{tls_san}}
+{% for worker in workers -%}
+nameserver {{worker}}
+{% endfor %}
+{% endif %}
 nameserver 8.8.8.8
 nameserver 1.1.1.1
