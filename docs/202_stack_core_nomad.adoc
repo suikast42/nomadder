@@ -8,16 +8,20 @@ https://developer.hashicorp.com/nomad/tutorials/enterprise/production-deployment
 In nomad client config is a `network` stanza.
 You can bin there some interfaces to a named physical or virtual betwork on your host.
 
-.Bind two named networks
+.Bind three named networks
 [source,hcl]
 ----
- host_network "private" {
+ host_network "public" {
    interface = "eth0"
    #cidr = "203.0.113.0/24"
    #reserved_ports = "22,80"
 }
 
-host_network "public" {
+host_network "private" {
+    interface = "eth1"
+}
+
+host_network "default" {
     interface = "eth1"
 }
 ----
@@ -42,6 +46,93 @@ After that you can bind in a job stanza the service to a specific interface
       host_network = "public"
     }
   }
+----
+
+==== Networking with consul connect
+Consul connect proxies a port of a service. The communication to a service from an external system is encrypted and observed and can be restricted by acl policies. If a service should be protected by consul connect ( keycloak and postgres for example) then you must follow the following rules:
+
+. The bound IP must not be accessed from public network.
+. The proxied service must not be accessed from outside the host.
+. If the service exposes metrics to prometheus then use the connect expose mechanism
+
+[source,hcl]
+----
+job "whoami" {
+  datacenters = ["nomadder1"]
+
+  group "whoami" {
+    count = 3
+    network {
+      mode = "bridge"
+      port "web" {
+        to = 8080
+        # The address_mode = "alloc" is used but nomad
+        # exposes the bin address to its api
+        # for this reason we bind the ip to localhost
+        # Then nomad exposes 127.0.0.1 zto its api and the
+        # protected service is not accessible from outside of the host
+        # See https://github.com/hashicorp/nomad/issues/12256
+        host_network = "local"
+      }
+      port "health" {
+        to = -1
+      }
+    }
+
+    service {
+      name = "whoami"
+      port = "8080"
+      # Register the service with the container address
+      # This is only accessible from inside the host
+      address_mode = "alloc"
+      connect {
+        sidecar_service {
+          proxy {
+            # The health is exposed over the host ip
+            expose {
+              path {
+                path            = "/health"
+                protocol        = "http"
+                local_path_port = 8080
+                listener_port   = "health"
+              }
+            }
+          }
+        }
+      }
+      tags = [
+        "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
+        "traefik.http.routers.whoami.tls=true",
+        "traefik.http.routers.whoami.rule=Host(`whoami.cloud.private`)",
+      ]
+
+      check {
+        name     = "whoami_health"
+        type     = "http"
+        path     = "/health"
+        port     = "web"
+        interval = "10s"
+        timeout  = "2s"
+        address_mode = "alloc"
+      }
+    }
+
+    task "whoami" {
+      driver = "docker"
+      config {
+        image = "traefik/whoami"
+        ports = ["web"]
+        args  = ["--port", "${NOMAD_PORT_web}"]
+      }
+
+      resources {
+        cpu    = 100
+        memory = 128
+      }
+    }
+  }
+}
 ----
 
 
@@ -74,6 +165,9 @@ job -> group -> service -> check |
 job -> group -> task -> service -> check
 
 The check block instructs Nomad to register a check associated with a service into the Nomad or Consul service provider.
+
+- if connect enabled and the service needs to expose metrics then use `expose`. This delegated the metrics checks to the proxies service
+- set `address_mode` to `driver` if connect is enabled
 
 ==== check_restart
 job -> group -> task -> service -> check_restart | job -> group -> task -> service -> check -> check_restart

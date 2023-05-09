@@ -5,7 +5,7 @@
   - name: Create stack core postgres volumes
     include_tasks: nomad/tasks/nomad_volumes.yml
     loop:
-      - { name: 'security_postgres_volume' , path: '{{postgres_volume}}'}
+      - { name: 'stack_core_keycloak_postgres_volume' , path: '{{stack_core_keycloak_postgres_volume}}'}
 
   - name: restart nomad if needed
     become: true
@@ -21,16 +21,17 @@
     delay: 5
 
   vars:
-    postgres_volume: "{{nomad_volumes_dir}}/core/postgres"
+    stack_core_keycloak_postgres_volume: "{{nomad_volumes_dir}}/core/postgres"
 
 - name: Create Minio volume
-  when: is_worker_host
+  when: host_name == 'worker-01'
+#  when: is_worker_host
   block:
 
     - name: Create stack core create minio volume
       include_tasks: nomad/tasks/nomad_volumes.yml
       loop:
-        - { name: 'core_minio_volume' , path: '{{core_minio_volume}}'}
+        - { name: 'stack_core_minio_volume' , path: '{{stack_core_minio_volume}}'}
 
     - name: restart nomad if needed
       become: true
@@ -46,4 +47,4 @@
       delay: 5
 
   vars:
-    core_minio_volume: "{{nomad_volumes_dir}}/core/minio"
+    stack_core_minio_volume: "{{nomad_volumes_dir}}/core/minio"

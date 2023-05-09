@@ -50,7 +50,7 @@ client {
     path      = "{{base_cert_dir}}/consul"
     read_only = true
   }
-  host_network "private" {
+  host_network "public" {
     interface = "eth0"
     #cidr = "203.0.113.0/24"
     #reserved_ports = "22,80"
@@ -58,15 +58,13 @@ client {
   host_network "default" {
       interface = "eth1"
   }
-  host_network "public" {
+  host_network "private" {
     interface = "eth1"
   }
   host_network "local" {
     interface = "lo"
   }
-  host_network "nomad" {
-    interface = "nomad"
-  }
+
   reserved {
   # cpu (int: 0) - Specifies the amount of CPU to reserve, in MHz.
   # cores (int: 0) - Specifies the number of CPU cores to reserve.
