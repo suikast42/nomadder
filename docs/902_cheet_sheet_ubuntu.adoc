@@ -45,6 +45,17 @@ a|[source,shell]
 sudo nmap -sT -p- 172.26.73.37
 ----
 
+|Increase the inotify limits
+a|[source,shell]
+----
+#  In case of node logs Error streaming logs: error getting journald fd: Too many open files
+#Find current values
+sysctl fs.inotify
+#Set new value with
+
+sudo sysctl -w fs.inotify.max_user_instances=2048
+----
+[[_205_link_inode,Manage Inode]]https://maestral.app/docs/inotify-limits[Manage Inode]
 
 
 

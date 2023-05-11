@@ -18,8 +18,8 @@
     import_tasks: install_base_packages.yml
 
 
-  - name: "Set Timezone {{host_name}}"
-    import_tasks: set_timezone_utc.yml
+  - name: "Host config {{host_name}}"
+    import_tasks: host_config.yml
 
 
 
@@ -36,5 +36,7 @@
 
   - name: "copy check config sh to the nodes "
     import_tasks: copy_check_config.yml
+
+
   tags:
     - nodes

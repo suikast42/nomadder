@@ -1,0 +1,14 @@
+- name: Set timezone to UTC
+  become: true
+  community.general.timezone:
+    name: UTC
+  register: ts
+
+- name: Set Inode settings
+  become: true
+  changed_when: false
+  shell: |
+    if [ $(sysctl fs.inotify.max_user_instances | awk '{print $3}') -lt 4096 ]; then sysctl -w fs.inotify.max_user_instances=4096 ;fi
+    
+- debug:
+    msg: "{{ ts }}"

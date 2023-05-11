@@ -1,8 +1,0 @@
-- name: Set timezone to UTC
-  become: true
-  community.general.timezone:
-    name: UTC
-  register: ts
-
-- debug:
-    msg: "{{ ts }}"

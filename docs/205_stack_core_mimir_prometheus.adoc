@@ -1,0 +1,4 @@
+=== PromQl Basics
+
+==== staleness
+https://www.youtube.com/watch?v=GcTzd2CLH7I&ab_channel=PrometheusMonitoring
