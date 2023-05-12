@@ -21,4 +21,22 @@ grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install marcusolsson-gantt-
 grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install volkovlabs-echarts-panel &&
 grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install marcusolsson-treemap-panel &&
 grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install netsage-slopegraph-panel &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install cloudspout-button-panel &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install esnet-matrix-panel &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install integrationmatters-comparison-panel &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install orchestracities-iconstat-panel &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install auxmoney-waterfall-panel &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install grafana-xyzchart-panel &&
+
+#grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install grafana-synthetic-monitoring-app &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install grafana-oncall-app &&
+
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install sbueringer-consul-datasource &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install volkovlabs-grapi-datasource &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install hamedkarbasi93-nodegraphapi-datasource &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install grafana-opcua-datasource &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install fzakaria-simple-annotations-datasource &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install innius-grpc-datasource &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install golioth-websocket-datasource &&
+
 echo All plugins are installed
