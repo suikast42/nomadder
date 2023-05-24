@@ -4,7 +4,7 @@ server:
 metrics:
   wal_directory: "/data/wal"
   global:
-    scrape_interval: 5s
+    scrape_interval: 10s
     remote_write:
 ++- range service "mimir" ++
       - url: http://++.Name++.service.consul:++.Port++/api/v1/push
@@ -17,7 +17,10 @@ metrics:
           metrics_path: '/metrics'
           static_configs:
           - targets:
-            - ingress.{{tls_san}}:8081
+++- range service "traefik" ++
+            - ++.Address++:8081
+++- end ++
+
         # grab all metric endpoints with stadanrd /metrics endpoint
         - job_name: "integrations/consul_sd"
           consul_sd_configs:
@@ -106,3 +109,37 @@ metrics:
           metric_relabel_configs:
             - action: labeldrop
               regex: 'exported_.*'
+
+        - job_name: integrations/blackbox # To get metrics about the exporter itself
+          metrics_path: /metrics
+          static_configs:
+            - targets:
+++- range  $index, $service := service "blackbox-exporter" -++
+++- if eq $index 0 ++
+              - ++.Name++.service.consul:++.Port++
+++- end ++
+++- end ++
+
+        - job_name: integrations/blackbox-checks # To get metrics about the exporter’s targets
+          metrics_path: /probe
+          params:
+            module: [http_integrations]
+          static_configs:
+            - targets:
+              - https://master-01.node.consul:12345/agent/api/v1/instances
+              - https://worker-01.node.consul:12345/agent/api/v1/instances
+              - https://worker-02.node.consul:12345/agent/api/v1/instances
+              - https://worker-03.node.consul:12345/agent/api/v1/instances
+          relabel_configs:
+            - source_labels: [__address__]
+              target_label: __param_target
+            - source_labels: [__param_target]
+              target_label: instance
+              regex: 'https://(.+)\.node\.consul.*'
+              replacement: '$1'
+            - target_label: __address__
+++- range  $index, $service := service "blackbox-exporter" -++
+++- if eq $index 0 ++
+              replacement: ++.Name++.service.consul:++.Port++ # The blackbox exporter’s real hostname:port
+++- end ++
+++- end ++
