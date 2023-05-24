@@ -103,8 +103,9 @@ acknowledgements.enabled=true
 [sinks.sink_nats_nomad_events]
 type = "nats"
 inputs = [ "source_nomad_events" ]
-url = "nats://nats.service.consul:4222"
-#url = "nats://10.21.21.42:4222"
+#url = "nats://nats.service.consul:4222"
+#See issue https://github.com/suikast42/nomadder/issues/90
+url = "nats://10.21.21.42:4222"
 # Template syntax is useable here https://vector.dev/docs/reference/configuration/template-syntax/
 subject = "ingress.logs.nomadevents"
 connection_name ="{{host_name}}-ingress-nomadevents"
