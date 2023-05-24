@@ -50,6 +50,15 @@ client {
     path      = "{{base_cert_dir}}/consul"
     read_only = true
   }
+
+  ## Cert consul client
+  ## Needed for jenkins
+  ## Should be deleted after resolve https://github.com/suikast42/nomadder/issues/100
+  host_volume "cert_nomad" {
+    path      = "{{base_cert_dir}}/nomad"
+    read_only = true
+  }
+
   host_network "public" {
     interface = "eth0"
     #cidr = "203.0.113.0/24"
