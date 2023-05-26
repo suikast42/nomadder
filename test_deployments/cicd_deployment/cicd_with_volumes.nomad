@@ -323,6 +323,8 @@ EOF
         data = <<EOF
 #!/bin/bash
 EXIT_STATUS=0
+# ca ca.crt and cluster-ca.crt to java trust store
+# Java trust store does not works with the bundle cluster-ca-bundle.pem
 echo "Starting gen cert"
 cp -r ${JAVA_HOME}/lib/security/cacerts /var/jenkins_home/cacerts || EXIT_STATUS=$?
 ${JAVA_HOME}/bin/keytool -import -trustcacerts -alias rootCa -keystore /var/jenkins_home/cacerts -file /certs/ca.crt -noprompt -storepass changeit || EXIT_STATUS=$?
