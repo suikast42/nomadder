@@ -15,6 +15,13 @@ awk -v cmd='openssl x509 -noout -subject' '
 /BEGIN/{close(cmd)};{print \| cmd}' < /etc/ssl/certs/ca-certificates.crt
 ----
 
+
+|Slurp a root certificate from a host
+a|[source,shell]
+----
+openssl s_client -showcerts -connect gitlab.cloud.private:443 </dev/null 2> /dev/null | openssl x509 -outform PEM > root_ca.pem
+----
+
 |Search for apt packages
 a|[source,shell]
 ----

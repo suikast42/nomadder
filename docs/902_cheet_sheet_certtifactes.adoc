@@ -16,6 +16,24 @@ openssl x509 -in / <path>/my.crt -noout -text
 ----
 
 
+|Slurp certificate from remote server:
+a|[source,shell]
+----
+openssl s_client -showcerts -connect gitlab.cloud.private:443 </dev/null 2> /dev/null | openssl x509 -outform PEM > root_ca.pem
+----
+
+|Import certificate to java trust store:
+a|[source,shell]
+----
+${JAVA_HOME}/bin/keytool -import -trustcacerts -alias cc -keystore /var/jenkins_home/security/cacerts -file  root_ca.pem -noprompt -storepass changeit
+----
+
+|List java trust store:
+a|[source,shell]
+----
+keytool -list -keystore /path/to/cacerts
+----
+
 |extract cert from json
 a|[source,shell]
 ----
