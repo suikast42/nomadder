@@ -30,11 +30,11 @@ client {
   }
   # Either leave_on_interrupt or leave_on_terminate must be set
   # for this to take effect.
-#  drain_on_shutdown {
-#    deadline           = "2m"
-#    force              = false
-#    ignore_system_jobs = false
-#  }
+  drain_on_shutdown {
+    deadline           = "1h"
+    force              = false
+    ignore_system_jobs = false
+  }
   host_volume "ca_cert" {
     path      = "/usr/local/share/ca-certificates/cloudlocal"
     read_only = true

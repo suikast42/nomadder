@@ -21,6 +21,16 @@
         - name: "Changing perm of {{nomad_conf_dir}}/nomad_node_drain.sh"
           file: dest="{{nomad_conf_dir}}/nomad_node_drain.sh" mode=+x
 
+        - name: Template nomad_kill_pause_containers.sh.j2
+          template:
+            force: yes
+            src: service/nomad_kill_pause_containers.sh.j2
+            dest: "{{nomad_conf_dir}}/nomad_kill_pause_containers.sh"
+
+        - name: "Changing perm of {{nomad_conf_dir}}/nomad_kill_pause_containers.sh"
+          file: dest="{{nomad_conf_dir}}/nomad_kill_pause_containers.sh" mode=+x
+
+
         - name: enable nomad eligtion service
           service:
             name: nomad.eligtion

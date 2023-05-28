@@ -9,4 +9,10 @@ a|[source,shell]
 docker kill $( docker ps \| grep "amd64:3.2"  \|  awk '{ print $1 }')
 ----
 
+|List containers
+a|[source,shell]
+----
+ docker ps | grep "amd64:3.2"  |  awk '{print $4,$5,$1,$10 }'
+----
+
 |===

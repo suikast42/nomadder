@@ -1,0 +1,5 @@
+#!/bin/bash
+CONTAINER_IDS=$(docker ps | grep "amd64")
+if [ -n "$CONTAINER_IDS" ]; then
+    docker kill $(docker ps | grep "amd64" | awk '{ print $1 }')
+fi
