@@ -19,7 +19,7 @@ awk -v cmd='openssl x509 -noout -subject' '
 |Slurp a root certificate from a host
 a|[source,shell]
 ----
-openssl s_client -showcerts -connect gitlab.cloud.private:443 </dev/null 2> /dev/null | openssl x509 -outform PEM > root_ca.pem
+openssl s_client -showcerts -connect gitlab.cloud.private:443 </dev/null 2> /dev/null \| openssl x509 -outform PEM > root_ca.pem
 ----
 
 |Search for apt packages
@@ -63,6 +63,17 @@ sysctl fs.inotify
 sudo sysctl -w fs.inotify.max_user_instances=2048
 ----
 [[_205_link_inode,Manage Inode]]https://maestral.app/docs/inotify-limits[Manage Inode]
+
+|Extend systemd unit without touching the deployment
+a|[source,shell]
+----
+#create a file /etc/systemd/system/<your sevice.>d/override.conf
+# And then wirte the extended content here
+# For example extend docker.service
+vim /etc/systemd/system/docker.service.d/override.conf
+[Service]
+ExecStartPost=/etc/nomad.d/nomad_kill_pause_containers.sh
+----
 
 
 
