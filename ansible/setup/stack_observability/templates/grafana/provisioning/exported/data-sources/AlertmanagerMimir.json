@@ -1,0 +1,1 @@
+{"access":"proxy","id":2,"jsonData":{"httpHeaderName1":"X-Scope-OrgID","implementation":"prometheus"},"name":"Alertmanager/Mimir","orgId":1,"type":"alertmanager","typeLogoUrl":"public/app/plugins/datasource/alertmanager/img/logo.svg","uid":"alertmanager","url":"http://mimir.service.consul:9009/alertmanager"}
