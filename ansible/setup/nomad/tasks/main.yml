@@ -134,5 +134,4 @@
       - "server.global.nomad"
       - "localhost"
       - "{{nomad_dns}}"
-      - "server.{{data_center}}.nomad"
-      - "server.{{host_name}}.{{data_center}}.nomad"
+      - "{{host_name}}.node.{{data_center}}.consul"

@@ -47,7 +47,7 @@
       file:
         path: "{{docker_cert_path}}"
         state: directory
-        mode: '0400'
+        mode: '0755'
         group: docker
 
 
@@ -73,7 +73,7 @@
         dest: "{{cfssl_working_dir}}/docker-server.json"
 
     - name: Template docker-client.json
-      when: is_build_host
+#      when: is_build_host
       delegate_to: "{{masters[0]}}"
       template:
         force: yes
@@ -81,7 +81,7 @@
         dest: "{{cfssl_working_dir}}/docker-client.json"
 
 
-    - name: "Generate docker server certificate(s) in  on master 0"
+    - name: "Generate docker server certificate(s)  on master 0"
       register: cfsslgen
       failed_when: cfsslgen.rc != 0
       delegate_to: "{{masters[0]}}"
@@ -94,8 +94,8 @@
       args:
         chdir: "{{cfssl_working_dir}}"
 
-    - name: "Generate docker client certificate(s) in on master 0"
-      when: is_build_host
+    - name: "Generate docker client certificate(s) on master 0"
+#      when: is_build_host
       register: cfsslgen
       failed_when: cfsslgen.rc != 0
       delegate_to: "{{masters[0]}}"
@@ -111,10 +111,12 @@
     - name: "Copy docker server certs"
       include_tasks: cert_install/tasks/copy_from_master_0.yml
       loop:
-        - { src: '{{cfssl_working_dir}}/docker-server.pem', dest: '{{docker_server_cert}}' ,mode: '0400'}
-        - { src: '{{cfssl_working_dir}}/docker-server-key.pem', dest: '{{docker_server_cert_key}}',mode: '0400'}
+        - { src: '{{cfssl_working_dir}}/docker-server.pem', dest: '{{docker_server_cert}}' ,mode: '0644'}
+        - { src: '{{cfssl_working_dir}}/docker-server-key.pem', dest: '{{docker_server_cert_key}}',mode: '0644'}
+        - { src: '{{cfssl_working_dir}}/docker-client.pem', dest: '{{docker_client_cert}}' ,mode: '0644'}
+        - { src: '{{cfssl_working_dir}}/docker-client-key.pem', dest: '{{docker_client_cert_key}}',mode: '0644'}
 
-    - name: "Copy docker client certs"
+    - name: "Copy docker client certs from build host to localhost"
       when: is_build_host
       run_once: true
       include_tasks: cert_install/tasks/copy_from_master_0.yml
@@ -139,3 +141,5 @@
     - docker_cert_path: "{{base_cert_dir}}/docker"
     - docker_server_cert: "{{docker_cert_path}}/docker-server.pem"
     - docker_server_cert_key: "{{docker_cert_path}}/docker-server-key.pem"
+    - docker_client_cert: "{{docker_cert_path}}/docker-client.pem"
+    - docker_client_cert_key: "{{docker_cert_path}}/docker-client-key.pem"

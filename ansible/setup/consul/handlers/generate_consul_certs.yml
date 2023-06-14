@@ -63,7 +63,7 @@
         src: ../templates/cert/consul_client.j2
         dest: "{{cfssl_working_dir}}/consul_client.json"
 
-    - name: "Generate consul server certificate(s) in  on master 0"
+    - name: "Generate consul server certificate(s)  on master 0"
       register: cfsslgen
       when: is_master_host
       failed_when: cfsslgen.rc != 0
@@ -77,7 +77,7 @@
       args:
         chdir: "{{cfssl_working_dir}}"
 
-    - name: "Generate consul client certificate(s) in  on master 0"
+    - name: "Generate consul client certificate(s)  on master 0"
       register: cfsslgen
       when: is_worker_host
       failed_when: cfsslgen.rc != 0

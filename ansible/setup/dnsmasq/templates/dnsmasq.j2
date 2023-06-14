@@ -1,5 +1,4 @@
-listen-address=127.0.0.1
-listen-address={{ ansible_eth1.ipv4.address }}
+listen-address=127.0.0.1, {{ ansible_eth1.ipv4.address }}
 
 # Enable forward lookup of the 'consul' domain:
 server=/consul/127.0.0.1#8600

@@ -18,6 +18,7 @@ advertise {
 }
 client {
   enabled = true
+  network_interface = "eth1"
   meta {
     node_type= "worker"
     connect.log_level = "debug"
@@ -56,6 +57,14 @@ client {
   ## Should be deleted after resolve https://github.com/suikast42/nomadder/issues/100
   host_volume "cert_nomad" {
     path      = "{{base_cert_dir}}/nomad"
+    read_only = true
+  }
+
+  ## Cert docker client
+  ## Needed for jenkins
+  ## Should be deleted after migrating to vault
+  host_volume "cert_docker" {
+    path      = "{{base_cert_dir}}/docker"
     read_only = true
   }
 

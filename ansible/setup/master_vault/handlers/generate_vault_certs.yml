@@ -63,7 +63,7 @@
         dest: "{{cfssl_working_dir}}/vault-server.json"
 
 
-    - name: "Generate vault server certificate(s) in  on master 0"
+    - name: "Generate vault server certificate(s)  on master 0"
       register: cfsslgen
       failed_when: cfsslgen.rc != 0
       delegate_to: "{{masters[0]}}"
