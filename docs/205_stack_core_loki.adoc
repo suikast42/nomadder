@@ -1,6 +1,11 @@
 === Storage retention Configuration
 https://grafana.com/docs/loki/latest/operations/storage/retention/[Storage retention]
 
+=== Provisioned recordings and alarms
+must be places in /opt/nomadvolumes/observability/loki/rules
+
+The fake folder is dependents on the organization id what is set in loki. If no organization is set then fake is used by loki internally.And the rules path on the host depends on the storage location of the ruler in loki config.
+
 === Understand loki queries
 https://taisho6339.gitbook.io/grafana-loki-deep-dive/query-process/split-a-query-into-someones[Queries_1]
 https://taisho6339.gitbook.io/grafana-loki-deep-dive/query-process/schedule-queries-to-queriers[Queries_2]

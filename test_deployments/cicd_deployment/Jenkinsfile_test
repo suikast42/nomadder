@@ -1,0 +1,52 @@
+#!groovy
+pipeline {
+    agent any
+    environment {
+        //This will install nomad on jenkins node and save the path to this env
+        nomad = tool 'Nomad_1_5_6'
+        consul = tool 'Consul_1_15_3'
+    }
+    tools{
+       dockerTool("Docker24_0_2")
+    }
+
+  stages {
+        stage('Info') {
+            steps {
+                sh 'docker --version'
+            }
+        }
+
+        stage('Ps') {
+            steps {
+                sh 'docker ps'
+            }
+        }
+
+        stage('Nomad Version') {
+            steps {
+                //sh 'echo $nomad'
+                sh '$nomad/nomad --version'
+            }
+        }
+
+        stage('Consul Version') {
+            steps {
+                sh '$consul/consul --version'
+            }
+        }
+        stage('Nomad status') {
+            steps {
+                sh '$nomad/nomad node status'
+            }
+        }
+
+          stage('Consul status') {
+            steps {
+                sh '$consul/consul members'
+            }
+        }
+
+    }
+
+}

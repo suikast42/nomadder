@@ -28,11 +28,22 @@ builders: "{{ groups['build'] }}"
 worker_names: "{{groups['workers']|map('extract', hostvars, ['ansible_hostname']) |list}}"
 worker_index: "{{groups['workers'].index(inventory_hostname)}}"
 
+#hostvars is a dictionary which has an entry for each inventory host.
+#If you want to access host information, you need to use the inventory_hostname.
+#If you want to use/print the name of the host as configured on the host, you should use ansible_hostname
+#since most likely the IP will be used in the inventory file.
+#
+#gather_facts: true
+#tasks:
+#  - debug: var=inventory_hostname
+#  - debug: var=ansible_hostname
+#  - debug: var=hostvars
+
 is_local_host: "{{ inventory_hostname in groups['localhost'] }}"
 is_build_host: "{{ inventory_hostname in groups['build'] }}"
 is_master_host: "{{ inventory_hostname in groups['masters'] }}"
 is_worker_host: "{{ inventory_hostname in groups['workers'] }}"
-is_master_0: "{{hostvars[groups['masters'][0]]['ansible_hostname'] == host_name}}"
+is_master_0: "{{is_master_host and hostvars[groups['masters'][0]]['ansible_hostname'] == host_name}}"
 
 
 vault_dns: "vault.{{tls_san}}"
@@ -82,7 +93,7 @@ nomad_conf_dir: "/etc/nomad.d"
 # enables traefik middlware for oauth authentication
 enable_oauth_middleware: true
 
-env: "dev"
+env: "prod"
 is_env_development : "{{ env == 'dev'}}"
 is_devnode : "{{ host_ip in  host_ips }}"
 # Development env set but host ip not registered as local development node

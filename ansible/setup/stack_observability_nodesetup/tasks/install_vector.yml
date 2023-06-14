@@ -1,4 +1,4 @@
-- name: Grafana agent uninstall
+- name: Vector agent uninstall
   become: true
   when: uninstall_vector_agent|bool == true
   block:
@@ -31,7 +31,7 @@
         path:  /etc/vector/vector.toml
         state: absent
 
-- name : Check grafana agent installation present
+- name : Check vector agent installation present
   stat:
     path: /usr/bin/vector
   register: agnetinstalled

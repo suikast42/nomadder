@@ -69,7 +69,9 @@ job "es-cluster" {
           "-Etransport.tcp.port=${NOMAD_PORT_transport}",          # Transport port (originally port 9300) inside the container
           "-Expack.license.self_generated.type=basic",             # use x-packs basic license (free)
         ]
-
+#        sysctl = {
+#          "net.core.somaxconn" = "16384"
+#        }
         ulimit {
           # ensure elastic search can lock all memory for the JVM on start
           memlock = "-1"

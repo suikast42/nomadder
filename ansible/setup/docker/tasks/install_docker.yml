@@ -114,7 +114,7 @@
   become: true
   when: not dockerInstalled.stat.exists or update_certificates|bool == true
   block:
-    - name: install_cert handler nomad
+    - name: install_cert handler docker
       include_tasks: handlers/generate_docker_certs.yml
 
 

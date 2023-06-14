@@ -62,12 +62,12 @@
         path: "{{cfssl_working_dir}}"
 
 
-    - name: Template nomad_server.json
+    - name: Template nomad_agent.json
       delegate_to: "{{masters[0]}}"
       template:
         force: yes
-        src: ../templates/cert/nomad_server.j2
-        dest: "{{cfssl_working_dir}}/nomad_server.json"
+        src: ../templates/cert/nomad_agent.j2
+        dest: "{{cfssl_working_dir}}/nomad_agent.json"
 
     - name: Template nomad_cli.json
       delegate_to: "{{masters[0]}}"
@@ -76,13 +76,6 @@
         src: ../templates/cert/nomad_cli.j2
         dest: "{{cfssl_working_dir}}/nomad_cli.json"
 
-    - name: Template nomad_client.json
-      delegate_to: "{{masters[0]}}"
-      template:
-        force: yes
-        src: ../templates/cert/nomad_client.j2
-        dest: "{{cfssl_working_dir}}/nomad_client.json"
-
     - name: Template nomad_ingress.j2
       delegate_to: "{{masters[0]}}"
       template:
@@ -90,9 +83,8 @@
         src: ../templates/cert/nomad_ingress.j2
         dest: "{{cfssl_working_dir}}/nomad_ingress.json"
 
-    - name: "Generate nomad server certificate(s) in  on master 0"
+    - name: "Generate nomad server certificate(s)"
       register: cfsslgen
-      when: is_master_host
       failed_when: cfsslgen.rc != 0
       delegate_to: "{{masters[0]}}"
       shell: |
@@ -100,28 +92,13 @@
           -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
           -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
           -config {{cert_path_master_0}}/cfssl/config.json \
-          -profile peer nomad_server.json | cfssljson -bare nomad
+          -profile peer nomad_agent.json | cfssljson -bare nomad
 
         cfssl gencert \
           -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
           -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
           -config {{cert_path_master_0}}/cfssl/config.json \
           -profile client nomad_cli.json | cfssljson -bare nomad-cli
-
-      args:
-        chdir: "{{cfssl_working_dir}}"
-
-    - name: "Generate nomad client certificate(s) in  on master 0"
-      register: cfsslgen
-      when: is_worker_host
-      failed_when: cfsslgen.rc != 0
-      delegate_to: "{{masters[0]}}"
-      shell: |
-        cfssl gencert \
-          -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
-          -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
-          -config {{cert_path_master_0}}/cfssl/config.json \
-          -profile peer nomad_client.json | cfssljson -bare nomad
 
       args:
         chdir: "{{cfssl_working_dir}}"
@@ -155,6 +132,8 @@
       loop:
         - { src: '{{cfssl_working_dir}}/nomad.pem', dest: '{{nomad_cert}}' ,mode: '0644' }
         - { src: '{{cfssl_working_dir}}/nomad-key.pem', dest: '{{nomad_cert_key}}',mode: '0644' }
+        - { src: '{{cfssl_working_dir}}/nomad-cli.pem', dest: '{{nomad_cert_cli}}' ,mode: '0644'}
+        - { src: '{{cfssl_working_dir}}/nomad-cli-key.pem', dest: '{{nomad_cert_cli_key}}',mode: '0644'}
         - { src: '{{cfssl_working_dir}}/nomad_ingress.pem', dest: '{{nomad_cert_ingress}}' ,mode: '0644' }
         - { src: '{{cfssl_working_dir}}/nomad_ingress-key.pem', dest: '{{nomad_cert_ingress_key}}',mode: '0644' }
 
@@ -183,8 +162,9 @@
     - data_center: "nomadder1"
     - nomad_servers:
       - "127.0.0.1"
+      - "{{host_ip}}"
       - "server.global.nomad"
       - "localhost"
-      - "{{nomad_dns}}"
-      - "server.{{data_center}}.nomad"
-      - "server.{{host_name}}.{{data_center}}.nomad"
+      - "{{host_name}}.node.{{data_center}}"
+      - "{{host_name}}.node.{{data_center}}.consul"
+

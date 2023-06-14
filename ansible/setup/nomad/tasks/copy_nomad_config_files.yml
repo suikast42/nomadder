@@ -23,11 +23,3 @@
         dest: "{{nomad_conf_dir}}/client.hcl"
         owner: "{{ nomad_user }}"
       register: cfgClient
-
-
-    - name: "restart nomad service"
-      become: true
-      when: nomad_service.stat.exists and ( (cfgClient is defined and  cfgClient.changed) or (cfgServer is defined and cfgServer.changed))
-      service:
-        name: nomad
-        state: restarted

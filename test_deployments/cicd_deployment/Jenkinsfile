@@ -1,0 +1,105 @@
+pipeline {
+  agent any
+  tools {
+     maven ("Maven392")
+     jdk("JDK_16")
+     dockerTool("Docker24_0_2")
+  }
+  environment {
+    //This will install nomad on jenkins node and save the path to this env
+    nomad = tool 'Nomad_1_5_6'
+    consul = tool 'Consul_1_15_3'
+  }
+  options {
+    buildDiscarder(
+      logRotator(
+        artifactDaysToKeepStr: "30",
+        artifactNumToKeepStr: "100",
+        daysToKeepStr: "60",
+        numToKeepStr: "10",
+      )
+    )
+    disableConcurrentBuilds(abortPrevious: true)
+    timeout(time: 1, unit: 'HOURS')
+  }
+  triggers {
+    // Accepts a cron-style string to define a regular interval
+    // at which Jenkins should check for new source changes.
+    // If new changes exist, the Pipeline will be re-triggered
+    //  Cron order
+    // MINUTE HOUR DOM MONTH DOW
+    // pollSCM('H */4 * * 1-5')
+    // Nightly build
+    pollSCM('0 0 * * *')
+    // Every minute
+    //pollSCM('*/1 * * * *')
+    gitlab(
+        triggerOnPush: true,
+        triggerOnMergeRequest: true,
+        triggerOpenMergeRequestOnPush: "never",
+        triggerOnNoteRequest: true,
+        noteRegex: "Regex Trigger",
+        skipWorkInProgressMergeRequest: true,
+        ciSkip: false,
+        setBuildDescription: true,
+        addNoteOnMergeRequest: true,
+        addCiMessage: true,
+        addVoteOnMergeRequest: false,
+        acceptMergeRequestOnSuccess: false,
+        branchFilterType: "All",
+        // includeBranchesSpec: "release/qat",
+        excludeBranchesSpec: "",
+        pendingBuildName: "Builging dpw...",
+        cancelPendingBuildsOnUpdate: true,
+        //secretToken: "dasd"
+      )
+    }
+    stages {
+          stage('Clean'){
+            steps {
+              updateGitlabCommitStatus name: 'build', state: 'pending'
+              sh 'mvn clean'
+            }
+          }
+
+         stage('Build'){
+           steps {
+             sh 'mvn -DskipTests=true install'
+           }
+         }
+         stage('Test') {
+             steps {
+                sh 'docker ps'
+                sh '$consul/consul --version'
+                sh '$nomad/nomad --version'
+                sh '$consul/consul members'
+                sh '$nomad/nomad node status'
+                echo 'Testing..'
+             }
+         }
+         stage('Deploy') {
+             steps {
+                 echo 'Deploying....'
+             }
+         }
+         stage('Finish') {
+           steps {
+              echo 'Notify GitLab'
+              updateGitlabCommitStatus name: 'build', state: 'success'
+           }
+         }
+
+    }
+          post {
+        failure {
+          updateGitlabCommitStatus name: 'build', state: 'failed'
+        }
+        success {
+          updateGitlabCommitStatus name: 'build', state: 'success'
+        }
+        aborted {
+          updateGitlabCommitStatus name: 'build', state: 'canceled'
+        }
+      }
+    //sdfd
+}

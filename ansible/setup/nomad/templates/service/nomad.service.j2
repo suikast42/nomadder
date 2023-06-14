@@ -5,8 +5,8 @@
 Description=Nomad
 Documentation=https://www.nomadproject.io/docs/
 {% if is_master_host  %}
-Wants=network-online.target,consul.service
-After=network-online.target,consul.service
+Wants=network-online.target,containerd.service,docker.service, consul.service
+After=network-online.target,containerd.service,docker.service,consul.service
 {% else %}
 Wants=network-online.target,containerd.service,docker.service,consul.service
 After=network-online.target,containerd.service,docker.service,consul.service
@@ -36,12 +36,16 @@ Group=root
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStart=/usr/local/bin/nomad agent -config {{nomad_conf_dir}}
 {% if is_worker_host  %}
+# See issue https://github.com/hashicorp/nomad/issues/17299
+# See issue https://github.com/suikast42/nomadder/issues/138
+ExecStartPre={{nomad_conf_dir}}/nomad_kill_pause_containers.sh
 # nomad client have a active setting drain_on_shutdown
 # this drains the node and mark it as ineligible.
 # Make the node eligible again
-#ExecStartPost=/bin/bash -c '(while ! nomad  node eligibility  -enable -self -address=https://localhost:4646 -ca-cert=/usr/local/share/ca-certificates/cloudlocal/cluster-ca-bundle.pem -client-cert=/etc/opt/certs/nomad/nomad-cli.pem -client-key=/etc/opt/certs/nomad/nomad-cli-key.pem  >/dev/null; do echo "Waiting for port nomad agent runs..."; sleep 1; done); sleep 1'
 ExecStartPost=systemctl restart nomad.eligtion.service
-ExecStop={{nomad_conf_dir}}/nomad_node_drain.sh
+# Use node drain over client config drain_on_shutdown
+# Enable this section if you disable the option drain_on_shutdown
+#ExecStop={{nomad_conf_dir}}/nomad_node_drain.sh
 {% endif %}
 
 KillMode=process
