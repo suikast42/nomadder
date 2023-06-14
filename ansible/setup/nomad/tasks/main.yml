@@ -37,6 +37,52 @@
       - name: Nomad service
         include_tasks: nomad_systemd_install.yml
 
+      - name: Reload systemd
+        become: true
+        ansible.builtin.systemd:
+          daemon_reload: yes
+
+      - name: stop nomad service
+        become: true
+        failed_when: false
+        service:
+          name: nomad
+          state: stopped
+
+      - name: start nomad service
+        become: true
+        service:
+          name: nomad
+          state: started
+          enabled: yes
+        register: nomadservice
+        until: nomadservice.status.ActiveState == "active"
+        retries: 10
+        delay: 5
+
+      - name: Enable Memory Oversubscription
+        become: false
+        when: is_master_host
+        run_once: true
+        shell: |
+          curl  -s  -N \
+          --cacert "${NOMAD_CACERT}" \
+          --cert "${NOMAD_CLIENT_CERT}" \
+          --key "${NOMAD_CLIENT_KEY}" \
+          "${NOMAD_ADDR}/v1/operator/scheduler/configuration" |\
+          jq '.SchedulerConfig | .SchedulerAlgorithm= "spread" |  .MemoryOversubscriptionEnabled=true | .PreemptionConfig.SysBatchSchedulerEnabled=true | .PreemptionConfig.BatchSchedulerEnabled=true  | .PreemptionConfig.ServiceSchedulerEnabled=true'   |\
+          curl \
+          --cacert "${NOMAD_CACERT}" \
+          --cert "${NOMAD_CLIENT_CERT}" \
+          --key "${NOMAD_CLIENT_KEY}" \
+          -X PUT $NOMAD_ADDR/v1/operator/scheduler/configuration -d @-
+        changed_when: false
+        environment:
+          - NOMAD_ADDR: "https://localhost:4646"
+          - NOMAD_CACERT: "{{cluster_intermediate_ca_bundle}}"
+          - NOMAD_CLIENT_CERT: "{{nomad_cert}}"
+          - NOMAD_CLIENT_KEY: "{{nomad_cert_key}}"
+
   - name: nomad update
     when: update_nomad|bool == true
     block:
@@ -49,6 +95,25 @@
       - name: Nomad service
         include_tasks: nomad_systemd_install.yml
 
+      - name: Reload systemd
+        ansible.builtin.systemd:
+          daemon_reload: yes
+
+      - name: stop nomad service
+        failed_when: false
+        service:
+          name: nomad
+          state: stopped
+
+      - name: start nomad service
+        service:
+          name: nomad
+          state: started
+          enabled: yes
+        register: nomadservice
+        until: nomadservice.status.ActiveState == "active"
+        retries: 10
+        delay: 5
   vars:
     consul_cert_path: "{{base_cert_dir}}/consul"
     consul_cert: "{{consul_cert_path}}/consul.pem"
@@ -69,5 +134,4 @@
       - "server.global.nomad"
       - "localhost"
       - "{{nomad_dns}}"
-      - "server.{{data_center}}.nomad"
-      - "server.{{host_name}}.{{data_center}}.nomad"
+      - "{{host_name}}.node.{{data_center}}.consul"

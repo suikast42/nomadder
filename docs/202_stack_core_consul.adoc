@@ -64,7 +64,7 @@ whoami.service.consul.  0       IN      SRV     1 1 29864 0a15152a.addr.nomadder
 
 Consul is able to register one service multiple times. The dns server changes on every dns request the order of the healthy services. So that the client took everytime the first entry. That mean that is not a service load balancing like traefik does.
 
-=== Consul Teplate
+=== Consul Template
 .Consul Template
 [source,hcl]
 ----

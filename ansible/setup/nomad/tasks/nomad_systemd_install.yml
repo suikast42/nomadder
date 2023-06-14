@@ -12,27 +12,32 @@
             dest: /etc/systemd/system/nomad.eligtion.service
           register: serviceconfig_eligtion
 
+        - name: Template nomad_kill_pause_containers.sh.j2
+          template:
+            force: yes
+            src: service/nomad_kill_pause_containers.sh.j2
+            dest: "{{nomad_conf_dir}}/nomad_kill_pause_containers.sh"
+          register: template_kill_pause
+
         - name: Template nomad_node_drain.sh.j2
           template:
             force: yes
             src: service/nomad_node_drain.sh.j2
             dest: "{{nomad_conf_dir}}/nomad_node_drain.sh"
+          register: template_node_drain
 
         - name: "Changing perm of {{nomad_conf_dir}}/nomad_node_drain.sh"
           file: dest="{{nomad_conf_dir}}/nomad_node_drain.sh" mode=+x
+
+        - name: "Changing perm of {{nomad_conf_dir}}/nomad_kill_pause_containers.sh"
+          file: dest="{{nomad_conf_dir}}/nomad_kill_pause_containers.sh" mode=+x
 
         - name: enable nomad eligtion service
           service:
             name: nomad.eligtion
             enabled: yes
 
-        - name: Reload systemd
-          when: serviceconfig_eligtion.changed
-          ansible.builtin.systemd:
-            daemon_reload: yes
-
-
-    - name: Template nomad.service.server
+    - name: Template nomad.service
       template:
         force: yes
         src: service/nomad.service.j2
@@ -40,50 +45,6 @@
       register: serviceconfig
 
 
-    - name: stop nomad service
-      when: serviceconfig.changed
-      failed_when: false
-      service:
-        name: nomad
-        state: stopped
-
-    - name: Reload systemd
-      when: serviceconfig.changed
-      ansible.builtin.systemd:
-        daemon_reload: yes
-
-    - name: start nomad service
-      service:
-        name: nomad
-        state: started
-        enabled: yes
-      register: nomadservice
-      until: nomadservice.status.ActiveState == "active"
-      retries: 10
-      delay: 5
-
-    - name: Enable Memory Oversubscription
-      become: false
-      when: is_master_host
-      run_once: true
-      shell: |
-        curl  -s  -N \
-        --cacert "${NOMAD_CACERT}" \
-        --cert "${NOMAD_CLIENT_CERT}" \
-        --key "${NOMAD_CLIENT_KEY}" \
-        "${NOMAD_ADDR}/v1/operator/scheduler/configuration" |\
-        jq '.SchedulerConfig | .SchedulerAlgorithm= "spread" |  .MemoryOversubscriptionEnabled=true | .PreemptionConfig.SysBatchSchedulerEnabled=true | .PreemptionConfig.BatchSchedulerEnabled=true  | .PreemptionConfig.ServiceSchedulerEnabled=true'   |\
-        curl \
-        --cacert "${NOMAD_CACERT}" \
-        --cert "${NOMAD_CLIENT_CERT}" \
-        --key "${NOMAD_CLIENT_KEY}" \
-        -X PUT $NOMAD_ADDR/v1/operator/scheduler/configuration -d @-
-      changed_when: false
-      environment:
-        - NOMAD_ADDR: "https://localhost:4646"
-        - NOMAD_CACERT: "{{cluster_intermediate_ca_bundle}}"
-        - NOMAD_CLIENT_CERT: "{{nomad_cert}}"
-        - NOMAD_CLIENT_KEY: "{{nomad_cert_key}}"
 
 #     failed_when: install.rc > 2
 

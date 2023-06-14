@@ -18,10 +18,11 @@ advertise {
 }
 client {
   enabled = true
+  network_interface = "eth1"
   meta {
     node_type= "worker"
     connect.log_level = "debug"
- #   connect.sidecar_image: "{{registry_dns}}/envoyproxy/envoy:v{{envoy_version}}"
+    connect.sidecar_image= "{{registry_dns}}/envoyproxy/envoy:v{{envoy_version}}"
   }
   server_join {
     retry_join =  {{masters | to_json }}
@@ -30,11 +31,11 @@ client {
   }
   # Either leave_on_interrupt or leave_on_terminate must be set
   # for this to take effect.
-#  drain_on_shutdown {
-#    deadline           = "2m"
-#    force              = false
-#    ignore_system_jobs = false
-#  }
+  drain_on_shutdown {
+    deadline           = "2m"
+    force              = false
+    ignore_system_jobs = false
+  }
   host_volume "ca_cert" {
     path      = "/usr/local/share/ca-certificates/cloudlocal"
     read_only = true
@@ -50,6 +51,23 @@ client {
     path      = "{{base_cert_dir}}/consul"
     read_only = true
   }
+
+  ## Cert consul client
+  ## Needed for jenkins
+  ## Should be deleted after resolve https://github.com/suikast42/nomadder/issues/100
+  host_volume "cert_nomad" {
+    path      = "{{base_cert_dir}}/nomad"
+    read_only = true
+  }
+
+  ## Cert docker client
+  ## Needed for jenkins
+  ## Should be deleted after migrating to vault
+  host_volume "cert_docker" {
+    path      = "{{base_cert_dir}}/docker"
+    read_only = true
+  }
+
   host_network "public" {
     interface = "eth0"
     #cidr = "203.0.113.0/24"

@@ -8,3 +8,6 @@ include::203_stack_core_persistence.adoc[]
 
 <<<
 include::204_stack_core_ingress.adoc[]
+
+<<<
+include::205_stack_core_loki.adoc[]

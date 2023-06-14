@@ -1,4 +1,63 @@
 === PromQl Basics
 
+=== Concepts
+In Prometheus terms, an endpoint you can scrape is called an instance, usually corresponding to a single process. A collection of instances with the same purpose, a process replicated for scalability or reliability for example, is called a job.
+
+For example, an API server job with four replicated instances:
+
+job: api-server:
+
+- instance 1: 1.2.3.4:5670
+- instance 2: 1.2.3.4:5671
+- instance 3: 5.6.7.8:5670
+- instance 4: 5.6.7.8:5671
+
+For each instance scrape, Prometheus stores a sample in the following time series:
+
+- `up{job="<job-name>"`, instance="<instance-id>"}: 1 if the instance is healthy, i.e. reachable, or 0 if the scrape failed.
+- `scrape_duration_seconds{job="<job-name>", instance="<instance-id>"}`: duration of the scrape.
+- `scrape_samples_post_metric_relabeling{job="<job-name>", instance="<instance-id>"}`: the number of samples remaining after metric relabeling was applied.
+- `scrape_samples_scraped{job="<job-name>", instance="<instance-id>"}`: the number of samples the target exposed.
+- `scrape_series_added{job="<job-name>", instance="<instance-id>"}`: the approximate number of new series in this scrape.
+
+The up time series is useful for instance availability monitoring.
+
+=== Nomadder Setups
+In nomadder is no prometheus setup but mimir. Mimir is a scalable implementation based on prometheus code and with full compatible prometheus api. Mimir implements a write  api so that the scarpers can push their metrics to mimit without the need of prometheus push gateway. the grafana agent scrapes the metrics in prometheus format and pushes it zo the wire api of mimir.
+
+In nomadder the grafana agent is installed as systemd services on every node and is deployed as service job type. This deployment scrapes metrics from cluster services and the systemd installations node metrics and metrics from consul and nomad installations
+
+==== Nomadder job types
+
+- integration/agent: agent metrics
+- integrations/consul_exporter: consul cluster metrics
+- integrations/nomad: nomad cluster metrics
+- integrations/node_exporter: nomad metrics
+
+==== Alarms and Conditions
+This section describes the build in alarms and conditions when the alarms trigger.
+
+===== NodeDown
+Every node has grafana agent installed. We observe `integrations/agent` instance and observe it's up metric. If there is no scrape of this metric from a host then an alarm is triggered.
+
+- *Method 1:* Use PromQL to create an alert:
++
+[source,shell]
+----
+max_over_time(up{job="integrations/agent"}[t1]) unless max_over_time(up{job="integrations/agent"}[t2])
+----
++
+This method allows to detect host absent within t1 that is not visible since t2 for a configured time t3 in alarming. This is very flexible and easy and dynamic to adapt. But the disadvantage is that alarm fires only in the range of t1.
+
+
+- *Method 2:* Method 2: Use the absent() function. Needs to configure
+
+
+
 ==== staleness
 https://www.youtube.com/watch?v=GcTzd2CLH7I&ab_channel=PrometheusMonitoring
+
+which job="integrations/agent" was last 24h visible and is since 1m absent
+max_over_time(up{job="integrations/agent"}[24h]) unless max_over_time(up{job="integrations/agent"}[1m])
+
+PromQL Data selection  https://www.youtube.com/watch?v=xIAEEQwUBXQ&ab_channel=PrometheusMonitoringwithJulius%7CPromLabs

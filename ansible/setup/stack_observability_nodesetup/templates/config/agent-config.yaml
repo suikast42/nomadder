@@ -1,5 +1,10 @@
 server:
-  log_level: error
+  log_level: info
+  http_tls_config:
+    cert_file: "{{nomad_cert}}"
+    key_file: "{{nomad_cert_key}}"
+    client_auth_type: "RequireAndVerifyClientCert"
+    client_ca_file: "{{cluster_intermediate_ca_bundle}}"
 
 metrics:
   wal_directory: "{{grafana_agent_working_dir}}/wal"
@@ -7,10 +12,11 @@ metrics:
     scrape_interval: 10s
     remote_write:
       - url: http://mimir.service.consul:9009/api/v1/push
-#        headers:
-#          X-Scope-OrgID: 1
+  #        headers:
+  #          X-Scope-OrgID: 1
   configs:
-    - name: integrations
+    # This name is printed in the agent/api/v1/instances
+    - name: integration/nomad
       scrape_configs:
         # Scrape metrics from nomad
         - job_name: integrations/nomad
@@ -25,10 +31,10 @@ metrics:
             format:
               - prometheus
           static_configs:
-            - targets: ['localhost:4646']
+            - targets: [ 'localhost:4646' ]
               # Add label for imported dashboard
               labels:
-                host: "{{host_name}}"
+                agent_hostname: "{{host_name}}"
           relabel_configs:
             # Replace the instance label with the hostname.
             # Otherwise, localhost:4646 will be tracked in this label
@@ -37,7 +43,32 @@ metrics:
               target_label: instance
               action: replace
 
-
+#    - name: integration/consul
+#      scrape_configs:
+#        # Scrape metrics from nomad
+#        - job_name: integrations/consul
+#          metrics_path: /v1/agent/metrics
+#          tls_config:
+#            insecure_skip_verify: false
+#            ca_file: "{{cluster_intermediate_ca_bundle}}"
+#            cert_file: "{{consul_cert}}"
+#            key_file: "{{consul_cert_key}}"
+#          scheme: https
+#          params:
+#            format:
+#              - prometheus
+#          static_configs:
+#            - targets: [ 'localhost:8501' ]
+#              # Add label for imported dashboard
+#              labels:
+#                agent_hostname: "{{host_name}}"
+#          relabel_configs:
+#            # Replace the instance label with the hostname.
+#            # Otherwise, localhost:4646 will be tracked in this label
+#            - source_labels: [ instance ]
+#              replacement: "{{host_name}}"
+#              target_label: instance
+#              action: replace
 #logs:
 #  configs:
 #    - name: default
@@ -74,8 +105,8 @@ traces:
         enabled: true
       remote_write:
         - endpoint: http://tempo-otlp-grpc.service.consul:4317
-#          headers:
-#            X-Scope-OrgID: 1
+          #          headers:
+          #            X-Scope-OrgID: 1
           insecure: true
       receivers:
         jaeger:
@@ -84,6 +115,12 @@ traces:
 
 
 integrations:
+  http_tls_config:
+    insecure_skip_verify: true
+    ca_file: "{{cluster_intermediate_ca_bundle}}"
+    cert_file: "{{nomad_cert}}"
+    key_file: "{{nomad_cert_key}}"
+
   agent:
     # Enables the Agent integration, allowing the Agent to automatically
     enabled: true
@@ -92,7 +129,6 @@ integrations:
         source_labels:
           - agent_hostname
         target_label: instance
-
   # Scrape metrics from linux host
   node_exporter:
     enabled: true
@@ -101,11 +137,12 @@ integrations:
         source_labels:
           - agent_hostname
         target_label: instance
-
-  # Scrape metrics from consul
+  #   Scrape metrics from consul
+  #  This scrapper sends up = 1 when then consul service is down
+  # Check consul with consul_up
+  #  See https://github.com/grafana/agent/issues/3959
   consul_exporter:
     enabled: true
-    scrape_interval: 5s
     server: https://localhost:8501
     ca_file: "{{cluster_intermediate_ca_bundle}}"
     cert_file: "{{consul_cert}}"

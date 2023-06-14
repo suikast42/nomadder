@@ -9,6 +9,14 @@ a|[source,shell]
 nats consumer next  --ack --count=100 EgressStream egress
 ----
 
+| Create nats cli context
+a|[source,shell]
+----
+# The stream and consumer 'egress' must exists
+nats context save local --server nats://nats.service.consul:4222
+nats context select local
+----
+
 
 |===
 

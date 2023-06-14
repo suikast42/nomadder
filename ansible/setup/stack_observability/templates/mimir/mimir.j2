@@ -33,6 +33,7 @@ blocks_storage:
 querier:
   # query_ingesters_within: 13h # default 13h
   #query_store_after: 12h #default 12h
+
 ruler_storage:
   backend: filesystem
   filesystem:
@@ -68,6 +69,8 @@ alertmanager:
     grpc_compression: snappy
 
 ruler:
+  # Somehow the consul address does not works here
+  alertmanager_url: http://localhost:9009/alertmanager
   query_frontend:
     grpc_client_config:
       grpc_compression: snappy

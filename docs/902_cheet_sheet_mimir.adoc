@@ -10,8 +10,37 @@ curl -H "X-Scope-OrgID:1" http://mimir.service.consul:9009/prometheus/api/v1/lab
 ----
 
 
+|Read all metric metadata
+a|[source,shell]
+----
+curl -H "X-Scope-OrgID:1" http://mimir.service.consul:9009/prometheus/api/v1/metadata | jq .
+----
+|===
 
 
+.Mimir PromQL
+|===
+|Description |Command
 
 
+|Getting all values for a specific label
+a|[source,shell]
+----
+# All job names from scrape_duration_seconds
+group by(job) (scrape_duration_seconds)
+----
 
+|Getting all metrics that scrapped by job
+a|[source,shell]
+----
+({job="integrations/agent"})
+----
+
+|Getting all metric names
+a|[source,shell]
+----
+group by(__name__) ({__name__!=""})
+----
+
+
+|===

@@ -7,7 +7,7 @@ Description=Grafana Agent
 #Group={{grafana_agent_group}}
 User= root
 Group= root
-ExecStart=/usr/local/bin/grafana-agent -config.file={{grafana_agent_config_dir}}/agent-config.yaml
+ExecStart=/usr/local/bin/grafana-agent -config.file={{grafana_agent_config_dir}}/agent-config.yaml -server.http.address={{host_ip}}:12345 -server.http.enable-tls=true
 ExecReload=/bin/kill --signal HUP $MAINPID
 KillMode=process
 KillSignal=SIGTERM
