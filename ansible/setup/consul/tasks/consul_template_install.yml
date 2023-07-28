@@ -23,7 +23,7 @@
     - name: Download Consul Template
       get_url:
         url:  https://releases.hashicorp.com/consul-template/{{consul_template_version}}/consul-template_{{consul_template_version}}_linux_amd64.zip
-        dest: /consul-template{{consul_template_version}}.tgz
+        dest: "/{{download_dir}}/consul-template{{consul_template_version}}.tgz"
         owner: "{{ consul_user }}"
         group: "{{ consul_group }}"
         mode: 0755

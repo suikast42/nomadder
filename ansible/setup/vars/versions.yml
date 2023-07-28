@@ -3,27 +3,27 @@ vault_checksum: "sha256:aa2ed532d9a0ecc8635fed63cb3fb6de472b4c01ca622a9a199cd92a
 uninstall_vault: false
 
 
-consul_version: "1.15.3"
-consul_checksum: "sha256:86c6fe308d2e4eea106d21e20c307726eb87be87eab1f6dfb0d53db81b31d334"
-uninstall_consul: false
+consul_version: "1.16.0"
+consul_checksum: "sha256:c112d1b2ffcfa7d98cde5508bec3bce383ed3650290cc8be3cfe682b79bb13f1"
+uninstall_consul: true
 update_consul: false
 
-consul_template_version: "0.30.0"
-consul_template_checksum: "sha256:c78db0f0eecc4d314a5130e3b4c8bd17086c6cd9080c4caf69c606de67cbe212"
+consul_template_version: "0.32.0"
+consul_template_checksum: "sha256:eda83e12a4618929a3ec0a49b11a2823b6201c9ae64e5a15161fd63313caf88b"
 update_consul_template: false
 uninstall_consul_template: false
 
-#nomad_version: "1.5.1"
-#nomad_checksum: "sha256:da4b976dfcab27d16fc03e95719685d4ce603b13a3e5ba692df7c434024dc294"
-nomad_version: "1.5.6"
-nomad_checksum: "sha256:65a7d5a4c6ade01a44292901b05a7c985b4459e0a079b5eb55f5d61474ee98e5"
-uninstall_nomad: false
+#nomad_version: "1.5.6"
+#nomad_checksum: "sha256:65a7d5a4c6ade01a44292901b05a7c985b4459e0a079b5eb55f5d61474ee98e5"
+nomad_version: "1.6.0-beta.1"
+nomad_checksum: "sha256:90b276ca06c6e03c1e4ee32ef47945b52d7a0d574e0227e6ab5f25648c106586"
+uninstall_nomad: true
 update_nomad: false
 
 envoy_version: 1.26.2
 
-nomad_plugin_cni_version: "1.2.0"
-nomad_plugin_cni_checksum: "sha256:f3a841324845ca6bf0d4091b4fc7f97e18a623172158b72fc3fdcdb9d42d2d37"
+nomad_plugin_cni_version: "1.3.0"
+nomad_plugin_cni_checksum: "sha256:754a71ed60a4bd08726c3af705a7d55ee3df03122b12e389fdba4bea35d7dd7e"
 uninstall_nomad_plugin_cni: false
 
 nomad_cli_levant_version: "0.3.2"
@@ -41,7 +41,7 @@ update_cfssl: false
 docker_version: "24.0.2"
 uninstall_docker: false
 
-version_docker_compose: "2.18.1"
+version_docker_compose: "2.19.0"
 uninstall_compose: false
 
 update_certificates: false
@@ -51,7 +51,7 @@ version_nexus_initlzr: "1.0.0"
 uninstall_nexus: false
 
 
-version_protoc: "23.2"
+version_protoc: "23.3"
 version_proto_gen: "1.30.0"
 version_proto_grpc: "1.3.0"
 version_proto_grpc_gateway: "2.15.2"
@@ -63,7 +63,7 @@ uninstall_protoc: false
 
 version_busy_box_init_container: "1.36"
 version_multi_stage_apline_container: "3.17.2"
-version_grafana_agent_container: "0.34.1"
-version_minio: "RELEASE.2023-04-28T18-11-17Z"
-version_minio_mc_admin: "RELEASE.2023-04-12T02-21-51Z"
+version_grafana_agent_container: "0.34.3"
+version_minio: "RELEASE.2023-06-23T20-26-00Z"
+version_minio_mc_admin: "RELEASE.2023-06-23T18-12-07Z"
 uninstall_minio_admin: false

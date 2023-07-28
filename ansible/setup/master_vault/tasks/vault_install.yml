@@ -65,7 +65,7 @@
   - name: Download vault binary
     get_url:
       url: https://releases.hashicorp.com/vault/{{vault_version}}/vault_{{vault_version}}_linux_amd64.zip
-      dest: /tmp/vault_{{vault_version}}_linux_amd64.zip
+      dest: "/{{download_dir}}/vault_{{vault_version}}_linux_amd64.zip"
       owner: "{{ vault_user }}"
       group: "{{ vault_group }}"
       mode: 0755

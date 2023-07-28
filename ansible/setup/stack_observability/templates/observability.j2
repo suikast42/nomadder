@@ -173,13 +173,13 @@ job "observability" {
         }
 
          driver = "docker"
-         env {
-           JAEGER_ENDPOINT = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift" # send traces to Tempo
-           JAEGER_REPORTER_LOG_SPANS=true
-           JAEGER_TRACEID_128BIT=true
-           JAEGER_SAMPLER_TYPE="const"
-           JAEGER_SAMPLER_PARAM="1"
-         }
+   #      env {
+   #        JAEGER_ENDPOINT = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift" # send traces to Tempo
+   #        JAEGER_REPORTER_LOG_SPANS=true
+   #        JAEGER_TRACEID_128BIT=true
+   #        JAEGER_SAMPLER_TYPE="const"
+   #        JAEGER_SAMPLER_PARAM="1"
+   #      }
          config {
          image = "{{registry_dns}}/grafana/mimir:{{version_grafana_mimir}}"
          labels = {
@@ -286,13 +286,13 @@ job "observability" {
        }
 
      driver = "docker"
-     env {
-       JAEGER_ENDPOINT = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift" # send traces to Tempo
-       JAEGER_REPORTER_LOG_SPANS=true
-       JAEGER_TRACEID_128BIT=true
-       JAEGER_SAMPLER_TYPE="const"
-       JAEGER_SAMPLER_PARAM="1"
-     }
+   #  env {
+   #    JAEGER_ENDPOINT = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift" # send traces to Tempo
+   #    JAEGER_REPORTER_LOG_SPANS=true
+   #    JAEGER_TRACEID_128BIT=true
+   #    JAEGER_SAMPLER_TYPE="const"
+   #    JAEGER_SAMPLER_PARAM="1"
+   #  }
     config {
        image = "{{registry_dns}}/grafana/loki:{{version_grafana_loki}}"
        labels = {
@@ -472,14 +472,14 @@ job "observability" {
         }
 
          driver = "docker"
-          env {
-          # Not needed for tempo itself
-         #   JAEGER_ENDPOINT = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift" # send traces to Tempo
-            JAEGER_REPORTER_LOG_SPANS=true
-            JAEGER_TRACEID_128BIT=true
-            JAEGER_SAMPLER_TYPE="const"
-            JAEGER_SAMPLER_PARAM="1"
-          }
+       #   env {
+       #   # Not needed for tempo itself
+       #  #   JAEGER_ENDPOINT = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift" # send traces to Tempo
+       #     JAEGER_REPORTER_LOG_SPANS=true
+       #     JAEGER_TRACEID_128BIT=true
+       #     JAEGER_SAMPLER_TYPE="const"
+       #     JAEGER_SAMPLER_PARAM="1"
+       #   }
          config {
          image = "{{registry_dns}}/grafana/tempo:{{version_grafana_tempo}}"
          labels = {
@@ -916,27 +916,6 @@ jetstream {
      }
      task "logunifier" {
      driver = "docker"
- {% if is_env_development %}
-        config {
-          image = "{{registry_dns}}/suikast42/logunifier:latest"
-          labels = {
-            "com.github.logunifier.application.name" = "logunifier"
-            "com.github.logunifier.application.version" = "latest"
-            "com.github.logunifier.application.pattern.key" = "tslevelmsg"
-            "com.github.logunifier.application.strip.ansi" = "true"
-          }
-          force_pull = true
-          ports = ["health"]
-          args = [
-              "-loglevel",
-              "debug",
-              "-natsServers",
-              "nats.service.consul:4222",
-              "-lokiServers",
-              "loki.service.consul:9005",
-           ]
-         }
- {% else %}
             config {
               image = "{{registry_dns}}/suikast42/logunifier:{{version_logunifer}}"
               labels = {
@@ -955,7 +934,6 @@ jetstream {
                   "loki.service.consul:9005",
                ]
              }
- {% endif %}
 
            resources {
              cpu    = 100

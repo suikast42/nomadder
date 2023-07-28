@@ -91,11 +91,14 @@ nomad_user: nomad
 nomad_conf_dir: "/etc/nomad.d"
 
 # enables traefik middlware for oauth authentication
-enable_oauth_middleware: true
+enable_oauth_middleware: false
 
-env: "prod"
+env: "dev"
 is_env_development : "{{ env == 'dev'}}"
 is_devnode : "{{ host_ip in  host_ips }}"
 # Development env set but host ip not registered as local development node
 # Avoid dev deployments to prod
 fail_when_not_development_env : "{{is_env_development|bool == true and is_devnode|bool == false}}"
+
+download_dir: "/home/{{ansible_ssh_user}}/downloads"
+delete_downloads: false

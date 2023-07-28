@@ -1,0 +1,15 @@
+- name: "Delete download dir"
+  become: true
+  when: delete_downloads |bool == true
+  ansible.builtin.file:
+    path: "{{download_dir}}"
+    state: absent
+
+- name: "Create download dir"
+  become: true
+  ansible.builtin.file:
+    path: "{{download_dir}}"
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+    state: directory
+    mode: '0755'
