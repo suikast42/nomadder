@@ -4,5 +4,5 @@
       include_tasks: install_docker.yml
 
   vars:
-    docker_download_dir: "/tmp/docker"
+    docker_download_dir: "/{{download_dir}}/docker"
     docker_cert_path: "{{base_cert_dir}}/docker"

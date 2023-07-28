@@ -325,17 +325,17 @@ job "ingress" {
   cert = "{{base_cert_dir}}/ingress/nomad-ingress.pem"
   key = "{{base_cert_dir}}/ingress/nomad-ingress-key.pem"
 
-[tracing]
-#  [tracing.zipkin]
-#    httpEndpoint = "http://tempo-zipkin.service.consul:9411/api/v2/spans"
-#    sameSpan = true
-#    id128Bit = true
-  [tracing.jaeger]
-    samplingServerURL = "http://tempo-jaeger.service.consul:14268/sampling"
-    propagation  = "b3"
-    gen128Bit = true
-  [tracing.jaeger.collector]
-    endpoint = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift"
+#[tracing]
+##  [tracing.zipkin]
+##    httpEndpoint = "http://tempo-zipkin.service.consul:9411/api/v2/spans"
+##    sameSpan = true
+##    id128Bit = true
+#  [tracing.jaeger]
+#    samplingServerURL = "http://tempo-jaeger.service.consul:14268/sampling"
+#    propagation  = "b3"
+#    gen128Bit = true
+#  [tracing.jaeger.collector]
+#    endpoint = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift"
 
 [metrics]
   [metrics.prometheus]

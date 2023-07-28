@@ -14,7 +14,7 @@ variable "image_jenkins" {
 variable "image_gitlab" {
   type = string
   description = "The used jenkins image"
-  default = "gitlab/gitlab-ce:16.0.3-ce.0"
+  default = "gitlab/gitlab-ce:16.1.1-ce.0"
 }
 
 # See https://github.com/hashicorp/nomad-pack-community-registry/blob/main/packs/jenkins/templates/jenkins.nomad.tpl

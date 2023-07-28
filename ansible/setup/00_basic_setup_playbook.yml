@@ -3,6 +3,7 @@
 - hosts: localhost
   vars_files:
     - vars/versions.yml
+    - vars/common_vars.yml
   name: "Setup local environment"
   gather_facts: no
   roles:

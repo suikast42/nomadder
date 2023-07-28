@@ -20,7 +20,7 @@
       - name: Download cli tool wander
         get_url:
           url: https://github.com/robinovitch61/wander/releases/download/v{{nomad_cli_wander_version}}/wander_{{nomad_cli_wander_version}}_Linux_x86_64.tar.gz
-          dest: /tmp/wander_{{nomad_cli_wander_version}}_Linux_x86_64.tar.gz
+          dest: "/{{download_dir}}/wander_{{nomad_cli_wander_version}}_Linux_x86_64.tar.gz"
           owner: "{{ nomad_user }}"
           group: "{{ nomad_group }}"
           mode: 0755

@@ -20,7 +20,7 @@
       - name: Download cli tool levant
         get_url:
           url: https://releases.hashicorp.com/levant/{{nomad_cli_levant_version}}/levant_{{nomad_cli_levant_version}}_linux_amd64.zip
-          dest: /tmp/levant_{{nomad_cli_levant_version}}_linux_amd64.zip
+          dest: "/{{download_dir}}/levant_{{nomad_cli_levant_version}}_linux_amd64.zip"
           owner: "{{ nomad_user }}"
           group: "{{ nomad_group }}"
           mode: 0755

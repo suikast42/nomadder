@@ -12,13 +12,21 @@
       - { name: 'stack_observability_nats_volume' , path: '{{stack_observability_nats_volume}}'}
       - { name: 'stack_observability_grafana_agent_volume' , path: '{{stack_observability_grafana_agent_volume}}'}
 
-  - name: restart nomad if needed
+  - name: Stop nomad service if needed
     become: true
     # fact comes from task nomad/tasks/nomad_volumes.yml
     when: volume_changed | bool == true
     service:
       name: nomad
-      state: restarted
+      state: stopped
+
+  - name: Start nomad if needed
+    become: true
+    # fact comes from task nomad/tasks/nomad_volumes.yml
+    when: volume_changed | bool == true
+    service:
+      name: nomad
+      state: started
     register: nomadService
     until: nomadService.status.ActiveState == "active"
     async: 300

@@ -166,7 +166,7 @@
   when: is_build_host
   block:
   - name: "Uninstall docker compose  v {{version_docker_compose}} "
-    when: uninstall_docker|bool == true
+    when: uninstall_compose|bool == true
     become: true
     ansible.builtin.file:
       path: /usr/bin/docker-compose

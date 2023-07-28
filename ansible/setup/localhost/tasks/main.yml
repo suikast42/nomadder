@@ -1,6 +1,22 @@
 - name: Localhost setup
   block:
 
+  - name: "Delete download dir"
+    become: true
+    when: delete_downloads |bool == true
+    ansible.builtin.file:
+      path: "{{download_dir}}"
+      state: absent
+
+  - name: "Create download dir"
+    become: true
+    ansible.builtin.file:
+      path: "{{download_dir}}"
+      owner: "{{ansible_user}}"
+      group: "{{ansible_user}}"
+      state: directory
+      mode: '0755'
+
   - name: Install pip modules
     pip:
       name:
@@ -40,7 +56,7 @@
   - name: "Download protoc v{{version_protoc}}"
     get_url:
       url: https://github.com/protocolbuffers/protobuf/releases/download/v{{version_protoc}}/protoc-{{version_protoc}}-linux-x86_64.zip
-      dest: /tmp/protoc.tgz
+      dest: "/{{download_dir}}/protoc_{{version_protoc}}.tgz"
       mode: 0755
     register: protoc_download
 
@@ -98,6 +114,8 @@
     args:
       chdir: "/tmp/protoc"
       creates: /usr/local/bin/protoc
-
+  vars:
+    # Override the download_dir for localhost
+    download_dir: "/home/{{ansible_user}}/downloads"
   tags:
     - localhost

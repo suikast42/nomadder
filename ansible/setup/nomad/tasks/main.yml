@@ -96,6 +96,7 @@
         include_tasks: nomad_systemd_install.yml
 
       - name: Reload systemd
+        become: true
         ansible.builtin.systemd:
           daemon_reload: yes
 
