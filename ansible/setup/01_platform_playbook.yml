@@ -14,7 +14,7 @@
     - import_tasks: nomad/handlers/main.yml
   roles:
     - {role: dnsmasq, tags: ['dnsmasq']}
-    - {role: cert_install, tags: ['cert']}
+    - {role: cert_install, tags: ['cert_install']}
 
 
 # Single master setup
