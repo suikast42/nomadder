@@ -15,12 +15,12 @@ uninstall_consul_template: false
 
 #nomad_version: "1.5.6"
 #nomad_checksum: "sha256:65a7d5a4c6ade01a44292901b05a7c985b4459e0a079b5eb55f5d61474ee98e5"
-nomad_version: "1.6.0-beta.1"
-nomad_checksum: "sha256:90b276ca06c6e03c1e4ee32ef47945b52d7a0d574e0227e6ab5f25648c106586"
-uninstall_nomad: true
+nomad_version: "1.6.1"
+nomad_checksum: "sha256:e4c01c51c393b266aee4ff184dd97704ae3d838c233a6189425a9f1c31a55f4f"
+uninstall_nomad: false
 update_nomad: false
 
-envoy_version: 1.26.2
+envoy_version: 1.27.0
 
 nomad_plugin_cni_version: "1.3.0"
 nomad_plugin_cni_checksum: "sha256:754a71ed60a4bd08726c3af705a7d55ee3df03122b12e389fdba4bea35d7dd7e"
@@ -30,28 +30,28 @@ nomad_cli_levant_version: "0.3.2"
 nomad_cli_levant_checkusum: "sha256:1e06180f8d8327e721e2ad4c9637d1f391034a22709473b8ed8ee19f1cad1570"
 uninstall_cli_levant: false
 
-nomad_cli_wander_version: "0.9.0"
-nomad_cli_wander_checkusum: "sha256:aea08e51b85b68a2a899b689f0e8d70cc8b0b54fe3883bd99c768894a7359dc8"
-uninstall_cli_wander: false
+nomad_cli_wander_version: "0.11.1"
+nomad_cli_wander_checkusum: "sha256:b05e0243f054aacc9addd2c83af380a5269f74134c490bfaf950e4bed8021ef3    "
+uninstall_cli_wander: true
 
 
 version_cfssl: 1.6.4
 update_cfssl: false
 
-docker_version: "24.0.2"
+docker_version: "24.0.5"
 uninstall_docker: false
 
-version_docker_compose: "2.19.0"
+version_docker_compose: "2.20.1"
 uninstall_compose: false
 
 update_certificates: false
 
-version_nexus: "3.52.0"
+version_nexus: "3.58.1"
 version_nexus_initlzr: "1.0.0"
-uninstall_nexus: false
+uninstall_nexus: true
 
 
-version_protoc: "23.3"
+version_protoc: "23.4"
 version_proto_gen: "1.30.0"
 version_proto_grpc: "1.3.0"
 version_proto_grpc_gateway: "2.15.2"
@@ -63,7 +63,7 @@ uninstall_protoc: false
 
 version_busy_box_init_container: "1.36"
 version_multi_stage_apline_container: "3.17.2"
-version_grafana_agent_container: "0.34.3"
+version_grafana_agent_container: "0.35.2"
 version_minio: "RELEASE.2023-06-23T20-26-00Z"
 version_minio_mc_admin: "RELEASE.2023-06-23T18-12-07Z"
 uninstall_minio_admin: false

@@ -12,8 +12,8 @@ client {
     path      = "/opt/nomadvolumes/cicd/gitlab/opt"
     read_only = false
   }
-    host_volume "nomad_volume_stack_cicd_jenkins" {
-      path      = "/opt/nomadvolumes/cicd/jenkins"
-      read_only = false
-    }
+  host_volume "nomad_volume_stack_cicd_jenkins" {
+    path      = "/opt/nomadvolumes/cicd/jenkins"
+    read_only = false
+  }
 }

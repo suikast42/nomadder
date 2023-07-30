@@ -135,7 +135,7 @@
         systemctl enable docker
       args:
         creates: /usr/bin/docker # docker is already installed
-        chdir: /tmp/docker
+        chdir: "{{docker_download_dir}}"
       register: dockerInstall
 
     - name: "Docker Hosts Workaround"
