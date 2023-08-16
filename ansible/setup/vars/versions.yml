@@ -3,8 +3,8 @@ vault_checksum: "sha256:aa2ed532d9a0ecc8635fed63cb3fb6de472b4c01ca622a9a199cd92a
 uninstall_vault: false
 
 
-consul_version: "1.16.0"
-consul_checksum: "sha256:c112d1b2ffcfa7d98cde5508bec3bce383ed3650290cc8be3cfe682b79bb13f1"
+consul_version: "1.16.1"
+consul_checksum: "sha256:1d48942fa9f1d0df3f56a1622c7a46e9b85924ed9976338912101bb5519aadf1"
 uninstall_consul: true
 update_consul: false
 
@@ -63,7 +63,7 @@ uninstall_protoc: false
 
 version_busy_box_init_container: "1.36"
 version_multi_stage_apline_container: "3.17.2"
-version_grafana_agent_container: "0.35.2"
+version_grafana_agent_container: "0.35.4"
 version_minio: "RELEASE.2023-06-23T20-26-00Z"
 version_minio_mc_admin: "RELEASE.2023-06-23T18-12-07Z"
 uninstall_minio_admin: false
