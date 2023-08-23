@@ -98,6 +98,9 @@
     register: installProto
     failed_when: installProto.rc != 0
     shell: |
+      go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v{{version_proto_grpc}}
+      sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-go-grpc  /usr/local/bin
+      
       go install google.golang.org/protobuf/cmd/protoc-gen-go@v{{version_proto_gen}} 
       sudo mv bin/protoc /usr/local/bin
       sudo mv include   /usr/local/bin/include
