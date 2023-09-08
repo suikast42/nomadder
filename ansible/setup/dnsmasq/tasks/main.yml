@@ -31,6 +31,13 @@
       dest: "/etc/dnsmasq.d/10-consul"
     register: dnsmasq_conf
 
+  - name: "Create /etc/NetworkManager/ if not exists"
+    changed_when: false
+    ansible.builtin.file:
+      path: "/etc/NetworkManager"
+      state: directory
+      mode: '0755'
+
   - name: Template NetworkManager.conf
     template:
       force: yes

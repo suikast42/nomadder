@@ -1,9 +1,14 @@
 - name: volumes
   become: true
   block:
-  - name: "Create volumes"
+  - name: "Check if volume exists"
     register: volume
+    stat:
+      path: "{{item.path}}"
+
+  - name: "Create volumes"
     become: true
+    changed_when: false
     file:
       state: directory
       owner: "{{item.user | default('root')}}"

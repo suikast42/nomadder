@@ -8,7 +8,7 @@ variable "registry" {
 variable "image_jenkins" {
   type = string
   description = "The used jenkins image"
-  default = "jenkins/jenkins:2.401.1-lts-jdk17_1"
+  default = "jenkins/jenkins:2.401.1-lts-jdk17"
 }
 
 variable "image_gitlab" {
@@ -26,7 +26,7 @@ job "cicd-job" {
 # This can be moved to group level as well
   constraint {
     attribute    = "${attr.unique.hostname}"
-    set_contains = "worker-02"
+    value = "worker-02"
   }
 
   reschedule {
@@ -142,7 +142,8 @@ job "cicd-job" {
       }
       resources {
         cpu    = 2000
-        memory = 8092
+        memory = 4096
+        memory_max= 32192
       }
       env {
         GITLAB_ROOT_EMAIL="root@local"
