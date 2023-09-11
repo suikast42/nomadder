@@ -8,13 +8,13 @@ variable "registry" {
 variable "image_jenkins" {
   type = string
   description = "The used jenkins image"
-  default = "jenkins/jenkins:2.401.1-lts-jdk17"
+  default = "jenkins/jenkins:2.414.1-lts-jdk17_1"
 }
 
 variable "image_gitlab" {
   type = string
   description = "The used jenkins image"
-  default = "gitlab/gitlab-ce:16.1.1-ce.0"
+  default = "gitlab/gitlab-ce:16.3.2-ce.0"
 }
 
 # See https://github.com/hashicorp/nomad-pack-community-registry/blob/main/packs/jenkins/templates/jenkins.nomad.tpl
@@ -292,6 +292,7 @@ job "cicd-job" {
 # OIDC Login with keycloak and jenkins https://github.com/jenkinsci/keycloak-plugin
       template {
         data = <<EOF
+keycloak:latest
 git:latest
 github:latest
 job-dsl:latest
@@ -569,19 +570,19 @@ unclassified:
 tool:
   customTool:
     installations:
-    - name: "Nomad_1_5_6"
+    - name: "Nomad_1_6_1"
       properties:
       - installSource:
           installers:
           - zip:
-              url: "https://releases.hashicorp.com/nomad/1.5.6/nomad_1.5.6_linux_amd64.zip"
+              url: "https://releases.hashicorp.com/nomad/1.6.1/nomad_1.6.1_linux_amd64.zip"
 
-    - name: "Consul_1_15_3"
+    - name: "Consul_1_16_1"
       properties:
       - installSource:
           installers:
           - zip:
-              url: "https://releases.hashicorp.com/consul/1.15.3/consul_1.15.3_linux_amd64.zip"
+              url: "https://releases.hashicorp.com/consul/1.16.1/consul_1.16.1_linux_amd64.zip"
 
 
   dockerTool:
