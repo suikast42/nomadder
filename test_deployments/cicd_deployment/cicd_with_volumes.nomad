@@ -60,6 +60,12 @@ job "cicd-job" {
       read_only = false
     }
 
+    volume "ca_cert" {
+      type      = "host"
+      source    = "ca_cert"
+      read_only = true
+    }
+
     network {
       mode = "bridge"
       port "http" {
@@ -121,6 +127,48 @@ job "cicd-job" {
         timeout  = "2s"
       }
     }
+
+    task "01-gitlab-cert-import" {
+
+      volume_mount {
+        volume      = "ca_cert"
+        destination = "/certs"
+      }
+
+
+
+      driver = "docker"
+
+      config {
+        image   = "${var.registry}/${var.image_jenkins}"
+        command = "/bin/sh"
+        args    = ["-c", "/tmp/copy.sh"]
+        #        args    = ["-c", "sleep 300"]
+        volumes = ["local/gen.sh:/tmp/copy.sh"]
+      }
+      lifecycle {
+        hook    = "prestart"
+        sidecar = false
+      }
+      template {
+        perms = "777"
+        data = <<EOF
+#!/bin/bash
+EXIT_STATUS=0
+echo "Starting cert copy"
+mkdir -p ${NOMAD_ALLOC_DIR}/data/security
+cp -r /certs/*  ${NOMAD_ALLOC_DIR}/data/security || EXIT_STATUS=$?
+exit $EXIT_STATUS
+EOF
+        destination   = "local/gen.sh"
+        change_mode   = "noop"
+      }
+      resources {
+        cpu    = 200
+        memory = 128
+      }
+    }
+
     task "gitlab-task" {
       volume_mount {
         volume      = "nomad_volume_stack_cicd_gitlab_etc"
@@ -131,14 +179,13 @@ job "cicd-job" {
         destination = "/var/opt/gitlab"
       }
 
-
       driver = "docker"
 
       config {
         image = "registry.cloud.private/${var.image_gitlab}"
         ports = ["http","ssl"]
         image_pull_timeout = "10m"
-#        volumes = []
+        volumes = ["../${NOMAD_ALLOC_DIR}/data/security/:/etc/gitlab/trusted-certs",]
       }
       resources {
         cpu    = 2000
@@ -292,7 +339,11 @@ job "cicd-job" {
 # OIDC Login with keycloak and jenkins https://github.com/jenkinsci/keycloak-plugin
       template {
         data = <<EOF
+role-strategy:latest
 keycloak:latest
+oic-auth:latest
+matrix-auth:latest
+strict-crumb-issuer:latest
 git:latest
 github:latest
 job-dsl:latest
@@ -548,25 +599,182 @@ EOF
         right_delimiter = "++"
         left_delimiter = "++"
         data = <<EOF
-security:
-  gitHostKeyVerificationConfiguration:
-    sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+      - usernamePassword:
+          description: "jenkinsbotUsernamePassword"
+          id: "jenkinsbotUsernamePassword"
+          password: "{AQAAABAAAAAQtMqrlnrxtnXTNIhmVXghExbPek1/Cy7scwMaGbMPsmI=}"
+          scope: GLOBAL
+          username: "jenkinsbot"
+      - string:
+          description: "jenkinsbotWebhookToken"
+          id: "jenkinsbotWebhookToken"
+          scope: GLOBAL
+          secret: "{AQAAABAAAACQlC+P8WxAFvGrbgeGmtqjwlt36YheTXF2Gwr9U15a1Ogi7HrIX5fsVWjzrP8V6h4pWwN+T2rjaY8Nwe1Lg+yBUgZGsAtGmZ0voapz2+X6jTXcoJhNDUR7baIjKadpct8aYtywEaIGRNdq37XR5EvSqSkDzd/ISpJnC+jXd6yJj98rfSbNKIjS+yaFqcS2lbWTmsdkp+0m7kFk0MFsOpqHLQ==}"
+      - gitlabPersonalAccessToken:
+          description: "jenkinsbotAccessToken"
+          id: "jenkinsbotAccessToken"
+          scope: GLOBAL
+          token: "{AQAAABAAAAAgy+8y8iZBmKgrezQCUiXHisQQ3hVgEE95AtAwtPcc7Q9FBhdsQgbVbvaWn0X9zipD}"
 
 jenkins:
-  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
-  globalNodeProperties:
-
-  slaveAgentPort: 50000
   agentProtocols:
-    - "jnlp2"
+  - "Ping"
+  authorizationStrategy: "loggedInUsersCanDoAnything"
+  clouds:
+  - nomad:
+      clientCertificate: "/etc/opt/certs/nomad/nomad-cli.pem"
+      clientPassword: "{AQAAABAAAABASGkL/clsld93X8aFGmd+FCPNfOxOQbhMlogKh3gtVC53zWhMNwTMkcZgZtouUxPHoNBGwKAJjnzk26Mikn+y745OyduJ2Lt5FhysHoEAvl4=}"
+      name: "CloudPrivate"
+      nomadUrl: "https://10.21.21.41:4646"
+      prune: true
+      serverCertificate: "/etc/ssl/certs/cluster-ca-bundle.pem"
+      serverPassword: "{AQAAABAAAABAkCIjLrqEMOJyI+nQpeUdQgAk8AAsBSZ032QUFlBwchnu01lsqzseXI8GBL1TDAoyioWQ+sCGtCpbifZ/sYpAaiQykB3BrewGAb63BMnhHXw=}"
+      tlsEnabled: true
+      workerTimeout: 1
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true
+  disableRememberMe: false
+  labelAtoms:
+  - name: "built-in"
+  markupFormatter: "plainText"
+  mode: NORMAL
+  myViewsTabBar: "standard"
+  numExecutors: 2
+  primaryView:
+    all:
+      name: "all"
+  projectNamingStrategy: "standard"
+  quietPeriod: 5
+  scmCheckoutRetryCount: 0
+  securityRealm:
+    oic:
+      authorizationServerUrl: "https://security.cloud.private/realms/nomadder/protocol/openid-connect/auth"
+      automanualconfigure: "manual"
+      clientId: "jenkins"
+      clientSecret: "k8qJeXHDEkRu3x0XBNn0VVXNMX3sRx79"
+      disableSslVerification: true
+      endSessionEndpoint: "https://security.cloud.private/realms/nomadder/protocol/openid-connect/logout?client_id=jenkins&post_logout_redirect_uri=https://jenkins.cloud.private"
+      fullNameFieldName: "preferred_username"
+      groupsFieldName: "group-membership"
+      overrideScopes: "web-origins address phone openid profile offle_access roles\
+        \ microprofile-jwt email"
+      overrideScopesDefined: true
+      rootURLFromRequest: true
+      scopes: "openid email profile"
+      sendScopesInTokenRequest: true
+      tokenAuthMethod: "client_secret_post"
+      tokenServerUrl: "https://security.cloud.private/realms/nomadder/protocol/openid-connect/token"
+      userInfoServerUrl: "https://security.cloud.private/realms/nomadder/protocol/openid-connect/userinfo"
+      userNameField: "preferred_username"
+  slaveAgentPort: 50000
+  systemMessage: |+
+    Jenkins configured automatically by Jenkins Configuration as Code plugin
 
+  updateCenter:
+    sites:
+    - id: "default"
+      url: "https://updates.jenkins.io/update-center.json"
+  views:
+  - all:
+      name: "all"
+  viewsTabBar: "standard"
+globalCredentialsConfiguration:
+  configuration:
+    providerFilter: "none"
+    typeFilter: "none"
+security:
+  apiToken:
+    creationOfLegacyTokenEnabled: false
+    tokenGenerationOnCreationEnabled: false
+    usageStatisticsEnabled: true
+  gitHooks:
+    allowedOnAgents: false
+    allowedOnController: false
+  gitHostKeyVerificationConfiguration:
+    sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
+  globalJobDslSecurityConfiguration:
+    useScriptSecurity: true
+  sSHD:
+    port: -1
 unclassified:
+  buildDiscarders:
+    configuredBuildDiscarders:
+    - "jobBuildDiscarder"
+  buildStepOperation:
+    enabled: false
+  enrichedSummaryConfig:
+    enrichedSummaryEnabled: false
+    httpClientDelayBetweenRetriesInSeconds: 1
+    httpClientMaxRetries: 3
+    httpClientTimeoutInSeconds: 1
+  fingerprints:
+    fingerprintCleanupDisabled: false
+    storage: "file"
+  gitHubConfiguration:
+    apiRateLimitChecker: ThrottleForNormalize
+  gitHubPluginConfig:
+    hookUrl: "https://jenkins.cloud.private/github-webhook/"
+  gitLabConnectionConfig:
+    connections:
+    - apiTokenId: "jenkinsbotApiToken"
+      clientBuilderId: "autodetect"
+      connectionTimeout: 10
+      ignoreCertificateErrors: true
+      name: "GitlabLocalconnection"
+      readTimeout: 10
+      url: "https://gitlab.cloud.private"
+    useAuthenticatedEndpoint: true
+  gitLabServers:
+    servers:
+    - credentialsId: "jenkinsbotAccessToken"
+      manageSystemHooks: true
+      manageWebHooks: true
+      name: "GitlabLocalServer"
+      serverUrl: "https://gitlab.cloud.private"
+      webhookSecretCredentialsId: "jenkinsbotWebhookToken"
+  globalTimeOutConfiguration:
+    operations:
+    - "abortOperation"
+    overwriteable: false
+  hashicorpVault:
+    configuration:
+      engineVersion: 2
+      timeout: 60
+  injectionConfig:
+    allowUntrusted: false
+    checkForBuildAgentErrors: false
+    enabled: false
+    enforceUrl: false
+    injectCcudExtension: false
+    injectMavenExtension: false
+  junitTestResultStorage:
+    storage: "file"
   location:
     adminAddress: "wmsadmin@amova.eu"
     url: "https://jenkins.cloud.private/"
+  mailer:
+    charset: "UTF-8"
+    useSsl: false
+    useTls: false
+  mavenModuleSet:
+    localRepository: "default"
+  pollSCM:
+    pollingThreadCount: 10
   resourceRoot:
-    url: "https://jenkins-resources.cloud.private"
-
+    url: "https://jenkins-resources.cloud.private/"
+  scmGit:
+    addGitTagAction: false
+    allowSecondFetch: false
+    createAccountBasedOnEmail: false
+    disableGitToolChooser: false
+    hideCredentials: false
+    showEntireCommitSummaryInChanges: false
+    useExistingAccountWithSameEmail: false
 tool:
   customTool:
     installations:
@@ -576,15 +784,12 @@ tool:
           installers:
           - zip:
               url: "https://releases.hashicorp.com/nomad/1.6.1/nomad_1.6.1_linux_amd64.zip"
-
     - name: "Consul_1_16_1"
       properties:
       - installSource:
           installers:
           - zip:
               url: "https://releases.hashicorp.com/consul/1.16.1/consul_1.16.1_linux_amd64.zip"
-
-
   dockerTool:
     installations:
     - name: "Docker24_0_2"
@@ -593,21 +798,10 @@ tool:
           installers:
           - fromDocker:
               version: "24.0.2"
-  maven:
+  git:
     installations:
-    - name: "Maven392"
-      properties:
-      - installSource:
-          installers:
-          - maven:
-              id: "3.9.2"
-
-    - name: "Maven363"
-      properties:
-      - installSource:
-          installers:
-          - maven:
-              id: "3.6.3"
+    - home: "git"
+      name: "Default"
   jdk:
     installations:
     - name: "JDK_16"
@@ -617,7 +811,6 @@ tool:
           - zip:
               subdir: "jdk-16.0.2"
               url: "https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_linux-x64_bin.tar.gz"
-
     - name: "JDK_17"
       properties:
       - installSource:
@@ -625,7 +818,6 @@ tool:
           - zip:
               subdir: "jdk-17.0.2"
               url: "https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz"
-
     - name: "JDK_18"
       properties:
       - installSource:
@@ -633,7 +825,6 @@ tool:
           - zip:
               subdir: "jdk-18.0.2"
               url: "https://download.java.net/java/GA/jdk18.0.2/f6ad4b4450fd4d298113270ec84f30ee/9/GPL/openjdk-18.0.2_linux-x64_bin.tar.gz"
-
     - name: "JDK_19"
       properties:
       - installSource:
@@ -642,7 +833,6 @@ tool:
               label: "jdk16"
               subdir: "jdk-18.0.1"
               url: "https://download.java.net/java/GA/jdk19.0.1/afdd2e245b014143b62ccb916125e3ce/10/GPL/openjdk-19.0.1_linux-x64_bin.tar.gz"
-
     - name: "JDK_20"
       properties:
       - installSource:
@@ -651,6 +841,31 @@ tool:
               label: "jdk16"
               subdir: "jdk-20"
               url: "https://download.java.net/java/GA/jdk20/bdc68b4b9cbc4ebcb30745c85038d91d/36/GPL/openjdk-20_linux-x64_bin.tar.gz"
+  maven:
+    installations:
+    - name: "Maven392"
+      properties:
+      - installSource:
+          installers:
+          - maven:
+              id: "3.9.2"
+    - name: "Maven363"
+      properties:
+      - installSource:
+          installers:
+          - maven:
+              id: "3.6.3"
+  mavenGlobalConfig:
+    globalSettingsProvider: "standard"
+    settingsProvider: "standard"
+  pipelineMaven:
+    globalTraceability: false
+    triggerDownstreamUponResultAborted: false
+    triggerDownstreamUponResultFailure: false
+    triggerDownstreamUponResultNotBuilt: false
+    triggerDownstreamUponResultSuccess: true
+    triggerDownstreamUponResultUnstable: false
+
 
               EOF
         change_mode   = "noop"

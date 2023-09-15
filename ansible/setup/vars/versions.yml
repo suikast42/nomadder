@@ -13,12 +13,10 @@ consul_template_checksum: "sha256:eda83e12a4618929a3ec0a49b11a2823b6201c9ae64e5a
 update_consul_template: false
 uninstall_consul_template: false
 
-#nomad_version: "1.5.6"
-#nomad_checksum: "sha256:65a7d5a4c6ade01a44292901b05a7c985b4459e0a079b5eb55f5d61474ee98e5"
-nomad_version: "1.6.1"
-nomad_checksum: "sha256:e4c01c51c393b266aee4ff184dd97704ae3d838c233a6189425a9f1c31a55f4f"
+nomad_version: "1.6.2"
+nomad_checksum: "sha256:f6f879a359a667a6b1ca4366abd8383d89118dabd0d28af5bbc4721685ff17b8"
 uninstall_nomad: false
-update_nomad: false
+update_nomad: true
 
 envoy_version: 1.27.0
 
@@ -64,6 +62,6 @@ uninstall_protoc: false
 version_busy_box_init_container: "1.36"
 version_multi_stage_apline_container: "3.17.2"
 version_grafana_agent_container: "0.36.1"
-version_minio: "RELEASE.2023-06-23T20-26-00Z"
-version_minio_mc_admin: "RELEASE.2023-06-23T18-12-07Z"
+version_minio: "RELEASE.2023-09-07T02-05-02Z"
+version_minio_mc_admin: "RELEASE.2023-09-07T22-48-55Z"
 uninstall_minio_admin: false
