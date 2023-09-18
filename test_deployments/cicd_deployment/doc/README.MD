@@ -7,6 +7,16 @@ This guide intruduces a CI/CD setuo with gitlab and Jenkins on nomad. Ig you hav
 4. Replace the clientSecret of configuration as code section from the job file with the jenkins secret from keycloak
 4. Deploy the nomad job
 
+## Configure Local git cli 
+1. If you aim to work with a gitlab instance that works over https then you have to import the root ca certificate from the gitlab instance or you can ignore the ssl verification with:\
+
+```shell
+#Local
+git config http.sslVerify false
+# for all repos 
+git config --global http.sslVerify false
+```
+
 ## Configure Gitlab
 1. Sign in to gitlab as a local user (root@local;lcl@admin is the default )
 2. Sign in as regular gitlab user and got to https://gitlab.cloud.private/admin/application_settings/general \
@@ -31,8 +41,12 @@ This guide intruduces a CI/CD setuo with gitlab and Jenkins on nomad. Ig you hav
 
 ## Jenkins
 1. Login to jenkins with the keycloak account 
-2. Goto [Jenkins credentials](https://jenkins.cloud.private/manage/credentials/store/system/domain/_/) and set `jenkinsbotUsernamePassword` (jenkinsbot) and `jenkinsbotAccessToken` ( with jenkinsbot gitlab access token ) `jenkinsbotWebhookToken` ( with jenkinsbot gitlab access token )
-3. Create a multibranch pipeline
+2. Goto [jenkins credentials](https://jenkins.cloud.private/manage/credentials/store/system/domain/_/) and set `jenkinsbotUsernamePassword` (jenkinsbot) and `jenkinsbotAccessToken` ( with jenkinsbot gitlab access token ) `
+3. Goto [jenkins security configuration](https://jenkins.cloud.private/manage/configureSecurity/) and allow all git hooks
+4. Goto [jenkins system configuration](https://jenkins.cloud.private/manage/configure) and set the correct credentials and git server ( you can manage all gitlab connections here) 
+   1. You must add a connection for gitlab  in section `Enable authentication for '/project' end-point`
+   2. Add a gitlab server in section `GitLab Servers`
+5. Create a multibranch pipeline
    1. Owner is the group name 
    2. Projects means the git project itself
    3. Strategy all branches

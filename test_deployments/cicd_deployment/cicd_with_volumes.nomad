@@ -604,21 +604,17 @@ credentials:
     domainCredentials:
     - credentials:
       - usernamePassword:
-          description: "jenkinsbotUsernamePassword"
+          # TODO Somehow it is not possible todo that authentication over jenkinsbotAccessToken
+          description: "gitlab.cloud.private username and password for jenkins.cloud.private"
           id: "jenkinsbotUsernamePassword"
-          password: "{AQAAABAAAAAQtMqrlnrxtnXTNIhmVXghExbPek1/Cy7scwMaGbMPsmI=}"
+          password: "jenkins@bot"
           scope: GLOBAL
           username: "jenkinsbot"
       - string:
-          description: "jenkinsbotWebhookToken"
-          id: "jenkinsbotWebhookToken"
+          description: "gitlab.cloud.private API Access Token for jenkins.cloud.private"
+          id: "jenkinsbotGitlabApiToken"
           scope: GLOBAL
-          secret: "{AQAAABAAAACQlC+P8WxAFvGrbgeGmtqjwlt36YheTXF2Gwr9U15a1Ogi7HrIX5fsVWjzrP8V6h4pWwN+T2rjaY8Nwe1Lg+yBUgZGsAtGmZ0voapz2+X6jTXcoJhNDUR7baIjKadpct8aYtywEaIGRNdq37XR5EvSqSkDzd/ISpJnC+jXd6yJj98rfSbNKIjS+yaFqcS2lbWTmsdkp+0m7kFk0MFsOpqHLQ==}"
-      - gitlabPersonalAccessToken:
-          description: "jenkinsbotAccessToken"
-          id: "jenkinsbotAccessToken"
-          scope: GLOBAL
-          token: "{AQAAABAAAAAgy+8y8iZBmKgrezQCUiXHisQQ3hVgEE95AtAwtPcc7Q9FBhdsQgbVbvaWn0X9zipD}"
+          secret: "glpat-Jf7QXtC5zzeNbKvsPiCD"
 
 jenkins:
   agentProtocols:
@@ -627,18 +623,20 @@ jenkins:
   clouds:
   - nomad:
       clientCertificate: "/etc/opt/certs/nomad/nomad-cli.pem"
-      clientPassword: "{AQAAABAAAABASGkL/clsld93X8aFGmd+FCPNfOxOQbhMlogKh3gtVC53zWhMNwTMkcZgZtouUxPHoNBGwKAJjnzk26Mikn+y745OyduJ2Lt5FhysHoEAvl4=}"
+      clientPassword: "{AQAAABAAAACA9cx9FvrBYJn/d/4QHWGLepjaF4n1u+0oSHwPzFZuyiZPxojlbzgwl9wi+6xadJBG/E4FfKADGYJhXIwY6DeMWirGT5A6/OdB8Uuj6BC+7KeLiNkhJu9I1QZinoeYPPxEeQ3yKJtrlOn4jD0MoiDeD0JbNcGzWz2kfUZJp+Bcnk2R3xQ88vZ1Vn0geouQZgS2}"
       name: "CloudPrivate"
       nomadUrl: "https://10.21.21.41:4646"
       prune: true
       serverCertificate: "/etc/ssl/certs/cluster-ca-bundle.pem"
-      serverPassword: "{AQAAABAAAABAkCIjLrqEMOJyI+nQpeUdQgAk8AAsBSZ032QUFlBwchnu01lsqzseXI8GBL1TDAoyioWQ+sCGtCpbifZ/sYpAaiQykB3BrewGAb63BMnhHXw=}"
+      serverPassword: "{AQAAABAAAACArpOj0DdpAvshbcuFb5AHuqEydtWdYITTa4BL4VvK+3fUSUM8dQK892AXc3fRtNR0sg04YZ/huMhmA+Dvozhw6Xn56sRp2Fulx3eH4UN5m0rSZ2c5ZwS9LkRlkfk+dT2bcdf4MKlXTxBii6ujdR41qAYuURhNcvjeisFHD642/5y4LV93ImmL/6BKAhCWZlUZ}"
       tlsEnabled: true
       workerTimeout: 1
   crumbIssuer:
     standard:
       excludeClientIPFromCrumb: true
   disableRememberMe: false
+  disabledAdministrativeMonitors:
+  - "hudson.util.DoubleLaunchChecker"
   labelAtoms:
   - name: "built-in"
   markupFormatter: "plainText"
@@ -650,13 +648,15 @@ jenkins:
       name: "all"
   projectNamingStrategy: "standard"
   quietPeriod: 5
+  remotingSecurity:
+    enabled: true
   scmCheckoutRetryCount: 0
   securityRealm:
     oic:
       authorizationServerUrl: "https://security.cloud.private/realms/nomadder/protocol/openid-connect/auth"
       automanualconfigure: "manual"
       clientId: "jenkins"
-      clientSecret: "k8qJeXHDEkRu3x0XBNn0VVXNMX3sRx79"
+      clientSecret: "{AQAAABAAAAAwyeM7YRF4+6WnC+JqrPRnieuiYXvJr8WQAckRPj9UM9MTCss6UXPJpjFIotxRCuiXndahYwxBc1SfWRHnhBpjPA==}"
       disableSslVerification: true
       endSessionEndpoint: "https://security.cloud.private/realms/nomadder/protocol/openid-connect/logout?client_id=jenkins&post_logout_redirect_uri=https://jenkins.cloud.private"
       fullNameFieldName: "preferred_username"
@@ -672,9 +672,8 @@ jenkins:
       userInfoServerUrl: "https://security.cloud.private/realms/nomadder/protocol/openid-connect/userinfo"
       userNameField: "preferred_username"
   slaveAgentPort: 50000
-  systemMessage: |+
-    Jenkins configured automatically by Jenkins Configuration as Code plugin
-
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code\
+    \ plugin\r\n\r\n"
   updateCenter:
     sites:
     - id: "default"
@@ -721,7 +720,7 @@ unclassified:
     hookUrl: "https://jenkins.cloud.private/github-webhook/"
   gitLabConnectionConfig:
     connections:
-    - apiTokenId: "jenkinsbotApiToken"
+    - apiTokenId: "jenkinsbotGitlabApiToken"
       clientBuilderId: "autodetect"
       connectionTimeout: 10
       ignoreCertificateErrors: true
@@ -731,12 +730,12 @@ unclassified:
     useAuthenticatedEndpoint: true
   gitLabServers:
     servers:
-    - credentialsId: "jenkinsbotAccessToken"
+    - credentialsId: "jenkinsbotGitlabApiToken"
       manageSystemHooks: true
       manageWebHooks: true
       name: "GitlabLocalServer"
       serverUrl: "https://gitlab.cloud.private"
-      webhookSecretCredentialsId: "jenkinsbotWebhookToken"
+      webhookSecretCredentialsId: "jenkinsbotGitlabApiToken"
   globalTimeOutConfiguration:
     operations:
     - "abortOperation"
@@ -778,12 +777,12 @@ unclassified:
 tool:
   customTool:
     installations:
-    - name: "Nomad_1_6_1"
+    - name: "Nomad_1_6_2"
       properties:
       - installSource:
           installers:
           - zip:
-              url: "https://releases.hashicorp.com/nomad/1.6.1/nomad_1.6.1_linux_amd64.zip"
+              url: "https://releases.hashicorp.com/nomad/1.6.2/nomad_1.6.2_linux_amd64.zip"
     - name: "Consul_1_16_1"
       properties:
       - installSource:
@@ -823,22 +822,20 @@ tool:
       - installSource:
           installers:
           - zip:
-              subdir: "jdk-18.0.2"
+              subdir: "jdk18.0.2"
               url: "https://download.java.net/java/GA/jdk18.0.2/f6ad4b4450fd4d298113270ec84f30ee/9/GPL/openjdk-18.0.2_linux-x64_bin.tar.gz"
     - name: "JDK_19"
       properties:
       - installSource:
           installers:
           - zip:
-              label: "jdk16"
-              subdir: "jdk-18.0.1"
+              subdir: "jdk-19.0.1"
               url: "https://download.java.net/java/GA/jdk19.0.1/afdd2e245b014143b62ccb916125e3ce/10/GPL/openjdk-19.0.1_linux-x64_bin.tar.gz"
     - name: "JDK_20"
       properties:
       - installSource:
           installers:
           - zip:
-              label: "jdk16"
               subdir: "jdk-20"
               url: "https://download.java.net/java/GA/jdk20/bdc68b4b9cbc4ebcb30745c85038d91d/36/GPL/openjdk-20_linux-x64_bin.tar.gz"
   maven:
@@ -865,8 +862,6 @@ tool:
     triggerDownstreamUponResultNotBuilt: false
     triggerDownstreamUponResultSuccess: true
     triggerDownstreamUponResultUnstable: false
-
-
               EOF
         change_mode   = "noop"
         destination   = "local/jasc.yaml"
