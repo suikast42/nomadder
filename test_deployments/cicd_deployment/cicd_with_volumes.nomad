@@ -14,7 +14,7 @@ variable "image_jenkins" {
 variable "image_gitlab" {
   type = string
   description = "The used jenkins image"
-  default = "gitlab/gitlab-ce:16.3.2-ce.0"
+  default = "gitlab/gitlab-ce:16.3.4-ce.0"
 }
 
 # See https://github.com/hashicorp/nomad-pack-community-registry/blob/main/packs/jenkins/templates/jenkins.nomad.tpl
@@ -656,7 +656,7 @@ jenkins:
       authorizationServerUrl: "https://security.cloud.private/realms/nomadder/protocol/openid-connect/auth"
       automanualconfigure: "manual"
       clientId: "jenkins"
-      clientSecret: "{AQAAABAAAAAwyeM7YRF4+6WnC+JqrPRnieuiYXvJr8WQAckRPj9UM9MTCss6UXPJpjFIotxRCuiXndahYwxBc1SfWRHnhBpjPA==}"
+      clientSecret: "k8qJeXHDEkRu3x0XBNn0VVXNMX3sRx79"
       disableSslVerification: true
       endSessionEndpoint: "https://security.cloud.private/realms/nomadder/protocol/openid-connect/logout?client_id=jenkins&post_logout_redirect_uri=https://jenkins.cloud.private"
       fullNameFieldName: "preferred_username"

@@ -1,37 +1,26 @@
-# gitlab_rails['omniauth_providers'] = [
-#   {
-#     name: "oauth2_generic",
-#     label: "Keycloak Nomadder 1", # optional label for login button, defaults to "Oauth2 Generic"
-#     app_id: "gitlab",
-#     app_secret: "YLHtzHOjVwFyVxIiSaF1L8udGjVtl2Y7",
-#     args: {
-#       client_options: {
-#         site: "https://security.cloud.private",
-#         user_info_url: "/realms/nomadder/protocol/openid-connect/userinfo",
-#         authorize_url: "/realms/nomadder/protocol/openid-connect/auth",
-#         token_url: "/realms/nomadder/protocol/openid-connect/token"
-#       },
-#       user_response_structure: {
-#         root_path: [],
-#         id_path: ["sub"],
-#         attributes: {
-#           email: "email",
-#           name: "name"
-#         }
-#       },
-#       authorize_params: {
-#         scope: "openid profile email"
-#       },
-#       strategy_class: "OmniAuth::Strategies::OAuth2Generic"
-#     }
-#   }
-# ]
+# alertmanager['enable'] = false
+# gitlab_exporter['enable'] = false
+# gitlab_pages['enable'] = false
+# gitlab_workhorse['enable'] = false
+# grafana['enable'] = false
+# logrotate['enable'] = false
+# gitlab_rails['incoming_email_enabled'] = false
+# nginx['enable'] = false
+# node_exporter['enable'] = false
+# postgres_exporter['enable'] = false
+# postgresql['enable'] = false
+# prometheus['enable'] = false
+# puma['enable'] = false
+# redis['enable'] = false
+# redis_exporter['enable'] = false
+# registry['enable'] = false
+# sidekiq['enable'] = false
 
 
 
 gitlab_rails['omniauth_auto_link_user'] = ['openid_connect']
 gitlab_rails['gitlab_default_projects_features_wiki'] = false
-gitlab_rails['gitlab_default_projects_features_container_registry'] = false
+#gitlab_rails['gitlab_default_projects_features_container_registry'] = false
 prometheus['enable'] = false
 grafana['enable'] = false
 # https://docs.gitlab.com/ee/administration/auth/oidc.html

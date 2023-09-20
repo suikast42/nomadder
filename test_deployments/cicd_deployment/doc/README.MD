@@ -38,6 +38,10 @@ git config --global http.sslVerify false
 12. Create an access token for the jenkinsbot user. Delete the Expiration date and set all scopes. Copy this access token. This will not show again.   
 13. Logut from gitlab with jenkinsbot and login again with admin account ( keycloak account in this example)
 14. Add the jenkinsbot user to the groups you want to build with jenkins with Maintainer access
+15. Merge requests settings:
+    1. Squash commits when merging -> Encourage
+    2. Merge checks -> Pipelines must succeed
+    3. Merge checks -> Skipped pipelines are considered successful
 
 ## Jenkins
 1. Login to jenkins with the keycloak account 
@@ -50,16 +54,14 @@ git config --global http.sslVerify false
    1. Owner is the group name 
    2. Projects means the git project itself
    3. Strategy all branches
-   4. Check Scan by webhook and define a custom token there. You can trigger a build with that url for example https://jenkins.cloud.private/multibranch-webhook-trigger/invoke?token=11659c4ca9e551b27f86c46e750c5e7440 \
-   Jenkins will add a automated webhook in gitlab for the project. If not you can add the link above with your token. Do not forget Mask portions of URL for the token field
-
-
+6. Jenkins will add automatically a webhook trigger. This works slowly but if you add a custom hook like https://jenkins.cloud.private/multibranch-webhook-trigger/invoke?token=<your own project key> \
+then this will trigger your pipeline onb jenkins faster. Do not forget Mask portions of URL for the token field
 
 ### Gitlab help links and pitfalls
 1. If gitlab is not connected to internet then gitlab can't save settings
 2. [Gitlab offline mode](https://docs.gitlab.com/ee/topics/offline/quick_start_guide.html)
 3. [Specified URL cannot be used: "Requests to the local network are not allowed](https://computingforgeeks.com/resolve-url-is-blocked-requests-to-the-local-network-are-not-allowed-gitlab-error/)
-
+4. [Gitlab Merge Methods](https://www.youtube.com/watch?v=x6vD9RHEB1M&ab_channel=DanGitschooldude)
 
 ### Jenkins Links 
 * [Current jenkins settings](https://jenkins.cloud.private/configuration-as-code/)
