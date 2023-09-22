@@ -1,0 +1,40 @@
+- name: nats cli nsc uninstall
+  become: true
+  when: update_nats_cli_nsc|bool == true or uninstall_nats_cli_nsc == true
+  block:
+    - name: "Delete nats cli nsc installation"
+      ansible.builtin.file:
+        path: /usr/local/bin/nsc
+        state: absent
+
+- name : Check nats cli installation present
+  stat:
+    path: /usr/local/bin/nsc
+  register: nscInstalled
+
+- name: nats cli install
+  become: true
+  when: not nscInstalled.stat.exists
+  block:
+    - name: Download nats cli binary
+      get_url:
+        url: https://github.com/nats-io/nsc/releases/download/v{{version_nats_cli_nsc}}/nsc-linux-amd64.zip
+        dest: "/{{download_dir}}/nsc-v{{version_nats_cli_nsc}}-linux-amd64.zip"
+#        owner: "{{ ansible_ssh_user }}"
+#        group: "{{ ansible_ssh_user }}"
+#        mode: 0755
+        checksum: "{{nats_cli_nsc_checksum}}"
+      register: nats_cli_nsc_download
+
+    - name: "Unzip nats cli archive"
+      unarchive:
+        src: "{{ nats_cli_nsc_download.dest }}"
+        dest: /usr/local/bin
+        copy: no
+        owner: "{{ ansible_ssh_user }}"
+        group: "{{ ansible_ssh_user }}"
+        mode: 0755
+
+  vars:
+    # Override the download_dir for localhost
+    download_dir: "/tmp/downloads"
