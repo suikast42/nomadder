@@ -12,6 +12,9 @@ export CONSUL_HTTP_TOKEN=e95b599e-166e-7d80-08ad-aee76e7ddf19
 export CONSUL_CACERT=/usr/local/share/ca-certificates/cloudlocal/cluster-ca-bundle.pem
 export CONSUL_CLIENT_KEY=/etc/opt/certs/consul/consul-key.pem
 export CONSUL_CLIENT_CERT=/etc/opt/certs/consul/consul.pem
+
+#needs for nats cli
+export EDITOR=vim
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 # Set name of the theme to load --- if set to "random", it will

@@ -12,8 +12,10 @@ nats consumer next  --ack --count=100 EgressStream egress
 | Create nats cli context
 a|[source,shell]
 ----
-# The stream and consumer 'egress' must exists
-nats context save local --server nats://nats.service.consul:4222
+#create context with system account
+# The sys user account is configured in nats server settings
+# TODO configure JWT or APi key instead of username password
+nats context save local --server nats://nats.service.consul:4222 --user sys --password sys
 nats context select local
 ----
 

@@ -635,7 +635,8 @@ job "observability" {
                "-js"
              ]
             volumes = [
-              "local/nats.conf:/config/nats.conf"
+              "local/nats.conf:/config/nats.conf",
+              "local/mappings.conf:/config/mappings.conf",
             ]
              }
           resources {
@@ -664,6 +665,7 @@ debug: false
 http_port: ++ env "NOMAD_PORT_http" ++
 #http: nats.service.consul:++ env "NOMAD_PORT_http" ++
 
+jetstream: enabled
 jetstream {
   store_dir: /data/jetstream
 
@@ -672,6 +674,56 @@ jetstream {
 
   # 10GB
   max_file_store: 10G
+}
+
+include mappings.conf
+
+              EOF
+          }
+
+          template {
+             destination = "local/mappings.conf"
+             change_mode = "restart"
+             right_delimiter = "++"
+             left_delimiter = "++"
+             data        = <<EOF
+mappings = {
+
+  # Simple direct mapping.  Messages published to foo are mapped to bar.
+  #foo: bar
+
+  # remapping tokens can be done with $<N> representing token position.
+  # In this example bar.a.b would be mapped to baz.b.a.
+  # bar.*.*: baz.$2.$1
+
+  # You can scope mappings to a particular cluster
+  # foo.cluster.scoped : [
+  #   { destination: bar.cluster.scoped, weight:100%, cluster: us-west-1 }
+  # ]
+
+  # Use weighted mapping for canary testing or A/B testing.  Change dynamically
+  # at any time with a server reload.
+  # myservice.request: [
+  #   { destination: myservice.request.v1, weight: 90% },
+  #   { destination: myservice.request.v2, weight: 10% }
+  # ]
+
+  # A testing example of wildcard mapping balanced across two subjects.
+  # 20% of the traffic is mapped to a service in QA coded to fail.
+ # myservice.test.*: [
+ #   { destination: myservice.test.$1, weight: 80% },
+ #   { destination: myservice.test.fail.$1, weight: 20% }
+ # ]
+
+  # A chaos testing trick that introduces 50% artificial message loss of
+  # messages published to foo.loss
+  #foo.loss.>: [ { destination: foo.loss.>, weight: 50% } ]
+
+  #escaping jinja curly braces
+  #devices.*: devices.{{ '{{' }}wildcard(1){{ '}}' }}.{{ '{{' }}partition(10,1){{ '}}' }}
+  {% raw %}
+   ingress.devices.*: "ingress.devices.{{wildcard(1)}}.{{partition(10,1)}}"
+  {% endraw %}
 }
               EOF
           }
