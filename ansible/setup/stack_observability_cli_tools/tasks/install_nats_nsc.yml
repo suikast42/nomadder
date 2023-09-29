@@ -19,7 +19,7 @@
     - name: Download nats cli binary
       get_url:
         url: https://github.com/nats-io/nsc/releases/download/v{{version_nats_cli_nsc}}/nsc-linux-amd64.zip
-        dest: "/{{download_dir}}/nsc-v{{version_nats_cli_nsc}}-linux-amd64.zip"
+        dest: "{{download_dir}}/nsc-v{{version_nats_cli_nsc}}-linux-amd64.zip"
 #        owner: "{{ ansible_ssh_user }}"
 #        group: "{{ ansible_ssh_user }}"
 #        mode: 0755
@@ -37,4 +37,4 @@
 
   vars:
     # Override the download_dir for localhost
-    download_dir: "/tmp/downloads"
+    download_dir: "/tmp"

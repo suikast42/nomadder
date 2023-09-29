@@ -40,6 +40,28 @@ a|[source,shell]
 ip -br a
 ----
 
+
+|trace network
+a|[source,shell]
+----
+sudo tcpdump -i eth0 -n
+----
+
+
+|interface settings
+a|[source,shell]
+----
+sudo ethtool eth0
+----
+
+
+|flush ip cache
+a|[source,shell]
+----
+sudo ip addr flush eth0
+----
+
+
 |Check if can connect to port
 a|[source,shell]
 ----

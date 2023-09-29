@@ -1,5 +1,5 @@
 ---
-tls_san: cloud.private
+tls_san: "{{ lookup('ansible.builtin.env', 'TLS_SAN') }}"
 tls_san_wc:
   -  "*.{{tls_san}}"
 host_name: "{{ ansible_hostname  }}"
@@ -8,9 +8,6 @@ host_ips:
   - "{{ ansible_eth0.ipv4.address }}"
   - "{{ ansible_eth1.ipv4.address }}"
 
-dev_nodes:
-  - "10.21.21.41"
-  - "10.21.21.42"
 
 master_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
 worker_01_ip: "{{ hostvars[groups['workers'][0]]['ansible_host'] | default(groups['workers'][0]) }}"

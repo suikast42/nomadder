@@ -138,6 +138,16 @@ Services
 {{- end }}
 ----
 
+.Iterate over all nodes in cluster
+[source,hcl]
+----
+{{ range nodes }}
+{{ . }}
+{{ end }}
+----
+
+
+
 
 .Render template to a file
 [source,shell]
@@ -178,5 +188,8 @@ consul-template  -config test.cfg -dry
 
 [[_200_link_consul_tpl_lang,consul_tpl_lang]]https://github.com/hashicorp/consul-template/blob/main/docs/templating-language.md[Templating Language]
 
+[[_200_link_consul_tpl_conf,consul_tpl_conf]]https://github.com/hashicorp/consul-template/blob/main/docs/configuration.md[Templating Config]
+
+[[_200_link_consul_tpl_examples,consul_tpl_examples]]https://review.gerrithub.io/plugins/gitiles/GovardhanKanala/consul-template/[Templating Examples]
 
 

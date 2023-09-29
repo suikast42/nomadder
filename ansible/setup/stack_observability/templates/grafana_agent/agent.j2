@@ -119,17 +119,18 @@ metrics:
               - ++.Name++.service.consul:++.Port++
 ++- end ++
 ++- end ++
-
+++- if keyExists "blackbox_hosts" ++
         - job_name: integrations/blackbox-checks # To get metrics about the exporter’s targets
           metrics_path: /probe
           params:
             module: [http_integrations]
           static_configs:
             - targets:
-              - https://master-01.node.consul:12345/agent/api/v1/instances
-              - https://worker-01.node.consul:12345/agent/api/v1/instances
-              - https://worker-02.node.consul:12345/agent/api/v1/instances
-              - https://worker-03.node.consul:12345/agent/api/v1/instances
+++- $hosts := key "blackbox_hosts" -++
+++- $hostList := $hosts | split ","  -++
+++- range $hostList ++
+              - https://++ .| trimSpace ++.node.consul:12345/agent/api/v1/instances
+++- end ++
           relabel_configs:
             - source_labels: [__address__]
               target_label: __param_target
@@ -143,3 +144,4 @@ metrics:
               replacement: ++.Name++.service.consul:++.Port++ # The blackbox exporter’s real hostname:port
 ++- end ++
 ++- end ++
+++- end -++

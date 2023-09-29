@@ -1,9 +1,16 @@
 
-variable "registry" {
+variable "tls_san" {
   type = string
-  description = "The private docker registry"
-  default = "registry.cloud.private"
+  description = "The cluster domain"
+  default = "cloud.private"
 }
+
+variable "hostname" {
+  type = string
+  description = "Deploy this job on this host"
+  default = "worker-02"
+}
+
 
 variable "image_jenkins" {
   type = string
@@ -26,7 +33,7 @@ job "cicd-job" {
 # This can be moved to group level as well
   constraint {
     attribute    = "${attr.unique.hostname}"
-    value = "worker-02"
+    value = "${var.hostname}"
   }
 
   reschedule {
@@ -89,7 +96,7 @@ job "cicd-job" {
         "traefik.enable=true",
         "traefik.consulcatalog.connect=false",
         "traefik.http.routers.gitlab-service.tls=true",
-        "traefik.http.routers.gitlab-service.rule=Host(`gitlab.cloud.private`)",
+        "traefik.http.routers.gitlab-service.rule=Host(`gitlab.${var.tls_san}`)",
       ]
       check {
         name     = "readiness"
@@ -140,7 +147,7 @@ job "cicd-job" {
       driver = "docker"
 
       config {
-        image   = "${var.registry}/${var.image_jenkins}"
+        image   = "registry.${var.tls_san}/${var.image_jenkins}"
         command = "/bin/sh"
         args    = ["-c", "/tmp/copy.sh"]
         #        args    = ["-c", "sleep 300"]
@@ -182,7 +189,7 @@ EOF
       driver = "docker"
 
       config {
-        image = "registry.cloud.private/${var.image_gitlab}"
+        image = "registry.${var.tls_san}/${var.image_gitlab}"
         ports = ["http","ssl"]
         image_pull_timeout = "10m"
         volumes = ["../${NOMAD_ALLOC_DIR}/data/security/:/etc/gitlab/trusted-certs",]
@@ -195,8 +202,8 @@ EOF
       env {
         GITLAB_ROOT_EMAIL="root@local"
         GITLAB_ROOT_PASSWORD="lcl@admin"
-        #GITLAB_OMNIBUS_CONFIG = "external_url 'https://gitlab.cloud.private'; gitlab_rails['monitoring_whitelist'] = ['0.0.0.0/0']"
-        GITLAB_OMNIBUS_CONFIG = "external_url 'https://gitlab.cloud.private'; nginx['listen_https'] = false; nginx['listen_port'] = 80; gitlab_rails['monitoring_whitelist'] = ['0.0.0.0/0']"
+        #GITLAB_OMNIBUS_CONFIG = "external_url 'https://gitlab.${var.tls_san}'; gitlab_rails['monitoring_whitelist'] = ['0.0.0.0/0']"
+        GITLAB_OMNIBUS_CONFIG = "external_url 'https://gitlab.${var.tls_san}'; nginx['listen_https'] = false; nginx['listen_port'] = 80; gitlab_rails['monitoring_whitelist'] = ['0.0.0.0/0']"
       }
     }
   }
@@ -252,7 +259,7 @@ EOF
         "traefik.enable=true",
         "traefik.consulcatalog.connect=false",
         "traefik.http.routers.jenkins-service.tls=true",
-        "traefik.http.routers.jenkins-service.rule=Host(`jenkins.cloud.private`)",
+        "traefik.http.routers.jenkins-service.rule=Host(`jenkins.${var.tls_san}`)",
       ]
       check {
         name     = "alive"
@@ -275,7 +282,7 @@ EOF
         "traefik.enable=true",
         "traefik.consulcatalog.connect=false",
         "traefik.http.routers.jenkins-resources-service.tls=true",
-        "traefik.http.routers.jenkins-resources-service.rule=Host(`jenkins-resources.cloud.private`)",
+        "traefik.http.routers.jenkins-resources-service.rule=Host(`jenkins-resources.${var.tls_san}`)",
       ]
       check {
         name     = "alive"
@@ -305,7 +312,7 @@ EOF
       driver = "docker"
 
       config {
-        image   = "registry.cloud.private/busybox:stable"
+        image   = "registry.${var.tls_san}/busybox:stable"
         command = "sh"
         args    = ["-c", "chown -R 1000:1000 /var/jenkins_home"]
       }
@@ -323,7 +330,7 @@ EOF
         destination = "/var/jenkins_home"
       }
       config {
-        image   = "${var.registry}/${var.image_jenkins}"
+        image   = "registry.${var.tls_san}/${var.image_jenkins}"
         command = "jenkins-plugin-cli"
         args    = ["--verbose","-f", "/var/jenkins_home/plugins.txt", "--plugin-download-directory", "/var/jenkins_home/plugins/"]
         volumes = ["local/plugins.txt:/var/jenkins_home/plugins.txt"]
@@ -407,7 +414,7 @@ EOF
       driver = "docker"
 
       config {
-        image   = "${var.registry}/${var.image_jenkins}"
+        image   = "registry.${var.tls_san}/${var.image_jenkins}"
         command = "/bin/sh"
         args    = ["-c", "/var/jenkins_home/gen.sh"]
         #        args    = ["-c", "sleep 300"]
@@ -429,7 +436,7 @@ cp -r ${JAVA_HOME}/lib/security/cacerts /var/jenkins_home/cacerts || EXIT_STATUS
 ${JAVA_HOME}/bin/keytool -import -trustcacerts -alias rootCa -keystore /var/jenkins_home/cacerts -file /certs/ca.crt -noprompt -storepass changeit || EXIT_STATUS=$?
 ${JAVA_HOME}/bin/keytool -import -trustcacerts -alias rootCaCrt -keystore /var/jenkins_home/cacerts -file /certs/cluster-ca.crt -noprompt -storepass changeit || EXIT_STATUS=$?
 #${JAVA_HOME}/bin/keytool -import -trustcacerts -alias clusterca -keystore /var/jenkins_home/cacerts -file /certs/cluster-ca-bundle.pem -noprompt -storepass changeit || EXIT_STATUS=$?
-#openssl s_client -showcerts -connect gitlab.cloud.private:443 </dev/null 2> /dev/null | openssl x509 -outform PEM >  /var/jenkins_home/root_ca.pem  || EXIT_STATUS=$?
+#openssl s_client -showcerts -connect gitlab.${var.tls_san}:443 </dev/null 2> /dev/null | openssl x509 -outform PEM >  /var/jenkins_home/root_ca.pem  || EXIT_STATUS=$?
 #${JAVA_HOME}/bin/keytool -import -trustcacerts -alias gitlabca -keystore /var/jenkins_home/cacerts -file /var/jenkins_home/root_ca.pem -noprompt -storepass changeit  || EXIT_STATUS=$?
 mkdir -p ${NOMAD_ALLOC_DIR}/data/security
 cp  /var/jenkins_home/cacerts ${NOMAD_ALLOC_DIR}/data/security || EXIT_STATUS=$?
@@ -480,7 +487,7 @@ EOF
       }
 
       config {
-        image = "${var.registry}/${var.image_jenkins}"
+        image = "registry.${var.tls_san}/${var.image_jenkins}"
         ports = ["http","jnlp"]
         volumes = [
           "local/jasc.yaml:/var/jenkins_home/jenkins.yaml",
@@ -551,7 +558,7 @@ EOF
                 <repository>
                     <id>nexusLocal</id>
 			 <!--		<url>http://10.83.201.64:8081/repository/maven-public/</url>-->
-                        <url>https://nexus.cloud.private/repository/maven-public/</url>
+                        <url>https://nexus.${var.tls_san}/repository/maven-public/</url>
                     <releases>
                         <enabled>true</enabled>
                         <updatePolicy>never</updatePolicy>
@@ -566,7 +573,7 @@ EOF
                 <pluginRepository>
                     <id>nexusLocalPlugins</id>
                	 <!--     <url>http://10.83.201.64:8081/repository/maven-public/</url>-->
-				      <url>https://nexus.cloud.private/repository/maven-public/</url>
+				      <url>https://nexus.${var.tls_san}/repository/maven-public/</url>
                     <releases>
                         <enabled>true</enabled>
                     </releases>
@@ -593,7 +600,7 @@ EOF
       }
 # configuration-as-code plugin is required for that
 # https://plugins.jenkins.io/configuration-as-code/
-# Export current settings with https://jenkins.cloud.private/configuration-as-code/
+# Export current settings with https://jenkins.${var.tls_san}/configuration-as-code/
 
       template {
         right_delimiter = "++"
@@ -605,13 +612,13 @@ credentials:
     - credentials:
       - usernamePassword:
           # TODO Somehow it is not possible todo that authentication over jenkinsbotAccessToken
-          description: "gitlab.cloud.private username and password for jenkins.cloud.private"
+          description: "gitlab.${var.tls_san} username and password for jenkins.${var.tls_san}"
           id: "jenkinsbotUsernamePassword"
           password: "jenkins@bot"
           scope: GLOBAL
           username: "jenkinsbot"
       - string:
-          description: "gitlab.cloud.private API Access Token for jenkins.cloud.private"
+          description: "gitlab.${var.tls_san} API Access Token for jenkins.${var.tls_san}"
           id: "jenkinsbotGitlabApiToken"
           scope: GLOBAL
           secret: "glpat-Jf7QXtC5zzeNbKvsPiCD"
@@ -653,12 +660,12 @@ jenkins:
   scmCheckoutRetryCount: 0
   securityRealm:
     oic:
-      authorizationServerUrl: "https://security.cloud.private/realms/nomadder/protocol/openid-connect/auth"
+      authorizationServerUrl: "https://security.${var.tls_san}/realms/nomadder/protocol/openid-connect/auth"
       automanualconfigure: "manual"
       clientId: "jenkins"
       clientSecret: "k8qJeXHDEkRu3x0XBNn0VVXNMX3sRx79"
       disableSslVerification: true
-      endSessionEndpoint: "https://security.cloud.private/realms/nomadder/protocol/openid-connect/logout?client_id=jenkins&post_logout_redirect_uri=https://jenkins.cloud.private"
+      endSessionEndpoint: "https://security.${var.tls_san}/realms/nomadder/protocol/openid-connect/logout?client_id=jenkins&post_logout_redirect_uri=https://jenkins.${var.tls_san}"
       fullNameFieldName: "preferred_username"
       groupsFieldName: "group-membership"
       overrideScopes: "web-origins address phone openid profile offle_access roles\
@@ -668,8 +675,8 @@ jenkins:
       scopes: "openid email profile"
       sendScopesInTokenRequest: true
       tokenAuthMethod: "client_secret_post"
-      tokenServerUrl: "https://security.cloud.private/realms/nomadder/protocol/openid-connect/token"
-      userInfoServerUrl: "https://security.cloud.private/realms/nomadder/protocol/openid-connect/userinfo"
+      tokenServerUrl: "https://security.${var.tls_san}/realms/nomadder/protocol/openid-connect/token"
+      userInfoServerUrl: "https://security.${var.tls_san}/realms/nomadder/protocol/openid-connect/userinfo"
       userNameField: "preferred_username"
   slaveAgentPort: 50000
   systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code\
@@ -717,7 +724,7 @@ unclassified:
   gitHubConfiguration:
     apiRateLimitChecker: ThrottleForNormalize
   gitHubPluginConfig:
-    hookUrl: "https://jenkins.cloud.private/github-webhook/"
+    hookUrl: "https://jenkins.${var.tls_san}/github-webhook/"
   gitLabConnectionConfig:
     connections:
     - apiTokenId: "jenkinsbotGitlabApiToken"
@@ -726,7 +733,7 @@ unclassified:
       ignoreCertificateErrors: true
       name: "GitlabLocalconnection"
       readTimeout: 10
-      url: "https://gitlab.cloud.private"
+      url: "https://gitlab.${var.tls_san}"
     useAuthenticatedEndpoint: true
   gitLabServers:
     servers:
@@ -734,7 +741,7 @@ unclassified:
       manageSystemHooks: true
       manageWebHooks: true
       name: "GitlabLocalServer"
-      serverUrl: "https://gitlab.cloud.private"
+      serverUrl: "https://gitlab.${var.tls_san}"
       webhookSecretCredentialsId: "jenkinsbotGitlabApiToken"
   globalTimeOutConfiguration:
     operations:
@@ -755,7 +762,7 @@ unclassified:
     storage: "file"
   location:
     adminAddress: "wmsadmin@amova.eu"
-    url: "https://jenkins.cloud.private/"
+    url: "https://jenkins.${var.tls_san}/"
   mailer:
     charset: "UTF-8"
     useSsl: false
@@ -765,7 +772,7 @@ unclassified:
   pollSCM:
     pollingThreadCount: 10
   resourceRoot:
-    url: "https://jenkins-resources.cloud.private/"
+    url: "https://jenkins-resources.${var.tls_san}/"
   scmGit:
     addGitTagAction: false
     allowSecondFetch: false

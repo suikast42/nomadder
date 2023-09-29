@@ -203,7 +203,7 @@ job "security" {
         PROVIDER_URI  = "https://security.{{tls_san}}/realms/nomadder"
         #        OIDC_ISSUER   = "https://security.{{tls_san}}/realms/nomadder"
         CLIENT_ID     = "ingress"
-        LOG_LEVEL     = "warn"
+        LOG_LEVEL     = "debug"
         # Lifetime of cookie 60s
         LIFETIME = "60"
 
@@ -367,7 +367,7 @@ job "security" {
         KC_HTTP_ENABLED= "true"
         KC_HOSTNAME_STRICT_HTTPS="false"
         KC_HEALTH_ENABLED= "true"
-        KC_HOSTNAME="security.cloud.private"
+        KC_HOSTNAME="security.{{tls_san}}"
         KC_PROXY="edge"
         KC_DB                     = "postgres"
         KC_DB_SCHEMA              = "keycloak"
