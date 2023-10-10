@@ -1,0 +1,21 @@
+[Unit]
+Description=Watch and renders consul templates on host
+Documentation=https://github.com/hashicorp/consul-template
+Wants=network-online.target,consul.service
+After=network-online.target,consul.service
+
+[Service]
+User=root
+Group=root
+KillMode=process
+KillSignal=SIGINT
+LimitNOFILE=65536
+LimitNPROC=infinity
+Restart=on-failure
+RestartSec=2
+StartLimitIntervalSec = 10s
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart= consul-template   -syslog -config {{consul_template_file_dnsmasq}}
+
+[Install]
+WantedBy=multi-user.target

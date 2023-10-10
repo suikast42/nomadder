@@ -119,9 +119,6 @@
     consul_cert_path: "{{base_cert_dir}}/consul"
     consul_cert: "{{consul_cert_path}}/consul.pem"
     consul_cert_key: "{{consul_cert_path}}/consul-key.pem"
-    # todo define this in common
-    nomad_consul_initial_agent_token: "e95b599e-166e-7d80-08ad-aee76e7ddf19"
-
     nomad_cert_path: "{{base_cert_dir}}/nomad"
     nomad_cert: "{{nomad_cert_path}}/nomad.pem"
     nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"

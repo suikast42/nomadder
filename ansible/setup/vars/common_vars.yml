@@ -98,4 +98,5 @@ is_devnode : "{{ host_ip in  host_ips }}"
 fail_when_not_development_env : "{{is_env_development|bool == true and is_devnode|bool == false}}"
 
 download_dir: "/home/{{ansible_ssh_user}}/downloads"
+consul_template_base_dir: "/etc/consul_template"
 delete_downloads: false

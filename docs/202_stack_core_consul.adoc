@@ -127,6 +127,17 @@ First capture .Tags. Tags is an array value. Convert the array to a string field
 
 [source,hcl]
 ----
+Read worker nodes
+{{- range nodes }}
+{{- $nodeType := index .Meta "node_type" }}
+{{- if eq $nodeType "worker" }}
+address=/{{tls_san}}/++ .Address }}
+{{- end }}
+{{- end }}
+----
+
+[source,hcl]
+----
 Services
 {{- $services := service "minio" -}}
   {{- if $services -}}

@@ -1,0 +1,52 @@
+consul{
+  address= "127.0.0.1:8501"
+  token= "{{consul_initial_agent_token}}"
+  ssl {
+   enabled = true
+   verify = true
+   ca_cert= "{{cluster_intermediate_ca_bundle}}"
+   cert= "{{consul_cert}}"
+   key= "{{consul_cert_key}}"
+  }
+}
+
+syslog {
+  enabled = true
+  facility = "LOCAL5"
+}
+
+deduplicate {
+  enabled = true
+  prefix = "consul-template/dedup/"
+}
+
+template {
+  contents = <<EOF
+{% if is_master_host  %}
+++- $services := service "nomad-client" -++
+  ++- if $services -++
+  ++- range $services ++
+address=/{{tls_san}}/++ .Address ++
+  ++- end ++
+++- end ++
+{% endif %}
+
+{% if is_worker_host  %}
+++ range services ++
+++- range service .Name ++
+++- $labels := .Tags | join ","| splitToMap "," "=" -++
+++- if index $labels "external_dns" -++
+address=/++index $labels "external_dns"++/++ .Address++
+++end ++
+++- end ++
+++- end ++
+
+address=/{{tls_san}}/{{ansible_eth1.ipv4.address}}
+{% endif %}
+EOF
+  perms = 0640
+  command = "/usr/bin/systemctl restart dnsmasq"
+  destination = "/etc/dnsmasq.d/00-externaldns"
+  right_delimiter = "++"
+  left_delimiter = "++"
+}

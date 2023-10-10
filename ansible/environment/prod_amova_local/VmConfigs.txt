@@ -1,0 +1,17 @@
+ESX-3 Lotte ( 16 Cores )
+
+Master-01
+CPU: 2
+RAM: 16
+DISK: 250
+
+Worker-01
+CPU: 8
+RAM: 42
+DISK: 125
+
+
+Worker-02
+CPU: 6
+RAM: 42
+DISK: 125

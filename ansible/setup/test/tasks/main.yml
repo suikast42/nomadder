@@ -29,7 +29,6 @@
       name: nomad
       state: restarted
   vars:
-    nomad_consul_initial_agent_token: "e95b599e-166e-7d80-08ad-aee76e7ddf19"
     cert_path_master_0: /etc/ssl/private/cloudlocal
     ca_cert_path: /usr/local/share/ca-certificates/cloudlocal
     cluster_intermediate_ca_bundle: "{{ca_cert_path}}/cluster-ca-bundle.pem"

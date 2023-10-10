@@ -4,12 +4,17 @@ listen-address=127.0.0.1, {{ ansible_eth1.ipv4.address }}
 server=/consul/127.0.0.1#8600
 
 # For external domain name resolution
-{% if is_worker_host  %}
-address=/{{tls_san}}/{{ansible_eth1.ipv4.address}}
-{% endif %}
-{% if is_master_host  %}
-address=/{{tls_san}}/{{worker_01_ip}}
-{% endif %}
+# TODO delete this section
+# This part is generated with consul template in consul_template_external_dns.j2
+# 1. On master hosts all nomad nodes added and removed dynamically
+# 2. On worker hosts all services with tag external_dns=<dns value> will add as an address field
+#{% if is_worker_host  %}
+#address=/{{tls_san}}/{{ansible_eth1.ipv4.address}}
+#{% endif %}
+#{% if is_master_host  %}
+#address=/{{tls_san}}/{{worker_01_ip}}
+#{% endif %}
+
 # Uncomment and modify as appropriate to enable reverse DNS lookups for
 # common netblocks found in RFC 1918, 5735, and 6598:
 #rev-server=0.0.0.0/8,127.0.0.1#8600
@@ -21,4 +26,4 @@ address=/{{tls_san}}/{{worker_01_ip}}
 #rev-server=192.168.0.0/16,127.0.0.1#8600
 #rev-server=224.0.0.0/4,127.0.0.1#8600
 #rev-server=240.0.0.0/4,127.0.0.1#8600
-rev-server=10.21.21.0/16,127.0.0.1#8600
+#rev-server=10.21.21.0/16,127.0.0.1#8600
