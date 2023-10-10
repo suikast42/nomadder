@@ -192,4 +192,13 @@ consul-template  -config test.cfg -dry
 
 [[_200_link_consul_tpl_examples,consul_tpl_examples]]https://review.gerrithub.io/plugins/gitiles/GovardhanKanala/consul-template/[Templating Examples]
 
+[[_200_link_consul_tpl_examples2,consul_tpl_examples2]]https://gitee.com/kingzuos/consul-template[Templating Examples2]
+
+[[_200_link_consul_tpl_data_structure,consul_tpl_data_structure]]https://github.com/hashicorp/consul-template/blob/c8ac674856d0671645685cc2f50c78ddec5dff4f/dependency/health_service.go#L27[Templating Data Structure]
+
+
+
+
+
+
 

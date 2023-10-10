@@ -20,6 +20,13 @@ a|[source,shell]
 dig @127.0.0.1 -p 8600 consul.service.consul SRV
 ----
 
+
+|Test consul DNS
+a|[source,shell]
+----
+nslookup -debug consul.service.consul <DNS_SERVER_IP>
+----
+
 |Metrics API
 a|[source,shell]
 ----
