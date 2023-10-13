@@ -1,5 +1,5 @@
-## Line filter
-[{{.job}} 💻 {{.host_name}}] [{{.log_levelEmoji}}] {{.message}}  {{if .error_message}}  error={{.error_message}} {{end}}    {{if .trace_trace_id}}  traceID={{.trace_trace_id}} {{end}}
+##Default Loki Query
+{ingress="ingress.logs.journald"} |= `` | json | line_format `[{{.job}} 💻 {{.host_name}}] [{{.log_levelEmoji}}] {{.message}}  {{if .error_message}}  error={{.error_message}} {{end}}    {{if .trace_trace_id}}  traceID={{.trace_trace_id}} {{end}}`
 
 ## Loki rule parse errors
 {ingress="ingress.logs.journald", job="loki"} |= `` | json | line_format `[{{.job}} 💻 {{.host_name}}] [{{.log_levelEmoji}}] {{.message}}  {{if .error_message}}  error={{.error_message}} {{end}}    {{if .trace_trace_id}}  traceID={{.trace_trace_id}} {{end}}`

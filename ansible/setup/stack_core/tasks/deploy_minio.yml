@@ -38,7 +38,7 @@
       force_start: true
       #        content: "{{ job.content | b64decode }}"
       content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/minio.nomad') }}"
-      timeout: 120
+      timeout: 360
 
   - name: Install minio admin cli
     import_tasks: install_minio_admin.yml

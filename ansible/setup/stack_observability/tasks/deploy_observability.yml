@@ -171,7 +171,7 @@
   # The ansible nomad module can't handle jobs with files in template stanza
   # See https://github.com/ansible-collections/community.general/issues/5902
   - name: "Create job"
-    async: 120
+    async: 360
     poll: 5
     shell: nomad job run observability.nomad
     environment:
@@ -189,7 +189,7 @@
       host: localhost
       state: present
       name: observability
-      timeout: 120
+      timeout: 360
       force_start: true
 
   vars:

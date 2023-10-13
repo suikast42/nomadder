@@ -100,3 +100,7 @@ fail_when_not_development_env : "{{is_env_development|bool == true and is_devnod
 download_dir: "/home/{{ansible_ssh_user}}/downloads"
 consul_template_base_dir: "/etc/consul_template"
 delete_downloads: false
+
+nomad_label_text: "💙💛 Fenerbaçhe 1907 💛💙"
+nomad_label_color:  "#163962"
+nomad_label_background:  "#ffed00"

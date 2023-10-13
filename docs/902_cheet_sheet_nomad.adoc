@@ -56,6 +56,11 @@ nomad fs  d3f38e6b  alloc/logs/mimir.stderr.0
 ----
 
 
+|Exec command io container
+a|[source,shell]
+----
+nomad exec  -task nats  8a5d098e /bin/sh
+----
 
 |===
 
