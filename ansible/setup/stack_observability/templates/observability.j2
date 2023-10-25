@@ -722,7 +722,8 @@ mappings = {
   #escaping jinja curly braces
   #devices.*: devices.{{ '{{' }}wildcard(1){{ '}}' }}.{{ '{{' }}partition(10,1){{ '}}' }}
   {% raw %}
-   ingress.devices.*: "ingress.devices.{{wildcard(1)}}.{{partition(10,1)}}"
+   ingress.eventlog.device.*: "ingress.eventlog.device.{{wildcard(1)}}.{{partition(10,1)}}"
+   egress.eventlog.device.*: "egress.eventlog.device.{{wildcard(1)}}.{{partition(10,1)}}"
   {% endraw %}
 }
               EOF
