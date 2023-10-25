@@ -37,6 +37,7 @@
       - open-iscsi
       - nfs-common
       - python3-docker
+      - traceroute
 #      - cadvisor
 
     state: present
