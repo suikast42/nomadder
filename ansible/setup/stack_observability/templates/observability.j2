@@ -724,6 +724,8 @@ mappings = {
   {% raw %}
    ingress.eventlog.device.*: "ingress.eventlog.device.{{wildcard(1)}}.{{partition(10,1)}}"
    egress.eventlog.device.*: "egress.eventlog.device.{{wildcard(1)}}.{{partition(10,1)}}"
+   ingress.devicetracking.*: "ingress.devicetracking.{{wildcard(1)}}.{{partition(10,1)}}"
+   egress.devicetracking.*: "egress.devicetracking.{{wildcard(1)}}.{{partition(10,1)}}"
   {% endraw %}
 }
               EOF
