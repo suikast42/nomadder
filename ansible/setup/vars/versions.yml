@@ -13,8 +13,8 @@ consul_template_checksum: "sha256:eda83e12a4618929a3ec0a49b11a2823b6201c9ae64e5a
 update_consul_template: false
 uninstall_consul_template: false
 
-nomad_version: "1.6.2"
-nomad_checksum: "sha256:f6f879a359a667a6b1ca4366abd8383d89118dabd0d28af5bbc4721685ff17b8"
+nomad_version: "1.6.3"
+nomad_checksum: "sha256:1771f83030d9c0e25b4b97b73e824f4b566721e3b9898ae9940eceb95bb7f4d0"
 uninstall_nomad: false
 update_nomad: false
 
@@ -28,8 +28,8 @@ nomad_cli_levant_version: "0.3.2"
 nomad_cli_levant_checkusum: "sha256:1e06180f8d8327e721e2ad4c9637d1f391034a22709473b8ed8ee19f1cad1570"
 uninstall_cli_levant: false
 
-nomad_cli_wander_version: "0.11.1"
-nomad_cli_wander_checkusum: "sha256:b05e0243f054aacc9addd2c83af380a5269f74134c490bfaf950e4bed8021ef3    "
+nomad_cli_wander_version: "0.11.2"
+nomad_cli_wander_checkusum: "sha256:c4829bb8dbcfea8f0d672935c265951090405eb7e488faeed4a59b0978339adf      "
 uninstall_cli_wander: false
 
 

@@ -98,6 +98,12 @@ ExecStartPost=/etc/nomad.d/nomad_kill_pause_containers.sh
 ----
 
 
+|autmated file system check on boot
+a|[source,shell]
+----
+tune2fs -c <BOOT_ANZAHL> /dev/<PARTITION>
+tune2fs -i <MIN_ZEITABSTAND> /dev/<PARTITION>
+----
 
 |===
 
