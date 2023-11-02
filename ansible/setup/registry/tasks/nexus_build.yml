@@ -1,4 +1,23 @@
+- name: Check if nexus is running
+  uri:
+    url: "http://localhost:5002"
+    return_content: yes
+    validate_certs: no
+    status_code:
+      - 200
+  register: nexus_push_check
+  until: nexus_push_check.status == 200
+  retries: 20
+  delay: 10
+
+
+
+#- name: "DBG nexus_push_check"
+#  debug:
+#    msg: "{{ nexus_push_check }}"
+
 - name: Build nexus
+  when: nexus_push_check.failed or update_nexus|bool == true
   become: true
   block:
     - name: "Create image backup dir {{image_backup_dir}} if needed "
@@ -80,7 +99,7 @@
 
     - name: Wait for port 5002 to become open on the host
       delay: 0
-      async: 60
+      async: 300
       poll: 1
       wait_for:
         port: 5002
