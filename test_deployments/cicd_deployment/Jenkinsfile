@@ -11,6 +11,7 @@ pipeline {
     consul = tool 'Consul_1_15_3'
   }
   options {
+//      For options see https://www.jenkins.io/doc/book/pipeline/syntax/#available-options
     buildDiscarder(
       logRotator(
         artifactDaysToKeepStr: "30",

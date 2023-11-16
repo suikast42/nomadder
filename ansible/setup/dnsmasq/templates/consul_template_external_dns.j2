@@ -41,7 +41,7 @@ address=/++index $labels "external_dns"++/++ .Address++
 ++- end ++
 ++- end ++
 
-address=/{{tls_san}}/{{ansible_eth1.ipv4.address}}
+address=/{{tls_san}}/{{host_ip}}
 {% endif %}
 EOF
   perms = 0640

@@ -367,7 +367,7 @@ job "security" {
         KC_HTTP_ENABLED= "true"
         KC_HOSTNAME_STRICT_HTTPS="false"
         KC_HEALTH_ENABLED= "true"
-        KC_HOSTNAME="security.{{tls_san}}"
+        KC_HOSTNAME="{{security_dns}}"
         KC_PROXY="edge"
         KC_DB                     = "postgres"
         KC_DB_SCHEMA              = "keycloak"

@@ -3,10 +3,13 @@ tls_san: "{{ lookup('ansible.builtin.env', 'TLS_SAN') }}"
 tls_san_wc:
   -  "*.{{tls_san}}"
 host_name: "{{ ansible_hostname  }}"
-host_ip: "{{ ansible_eth1.ipv4.address }}"
+
+host_default_if : "eth2"
+host_private_if : "eth0"
+host_ip: "{{ ansible_eth2.ipv4.address }}"
 host_ips:
   - "{{ ansible_eth0.ipv4.address }}"
-  - "{{ ansible_eth1.ipv4.address }}"
+  - "{{ ansible_eth2.ipv4.address }}"
 
 
 master_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"

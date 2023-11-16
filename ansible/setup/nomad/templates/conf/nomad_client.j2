@@ -18,7 +18,7 @@ advertise {
 }
 client {
   enabled = true
-  network_interface = "eth1"
+  network_interface = "{{host_default_if}}"
   meta {
     node_type= "worker"
     connect.log_level = "debug"
@@ -69,15 +69,15 @@ client {
   }
 
   host_network "public" {
-    interface = "eth0"
+    interface = "{{host_private_if}}"
     #cidr = "203.0.113.0/24"
     #reserved_ports = "22,80"
   }
   host_network "default" {
-      interface = "eth1"
+      interface = "{{host_default_if}}"
   }
   host_network "private" {
-    interface = "eth1"
+    interface = "{{host_default_if}}"
   }
   host_network "local" {
     interface = "lo"

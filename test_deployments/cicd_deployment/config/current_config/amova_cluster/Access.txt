@@ -1,0 +1,2 @@
+Jenkinsbot gitlab token jenkinsbotCiToken
+glpat-1gnds1wJ-_rKFYtE1J6A

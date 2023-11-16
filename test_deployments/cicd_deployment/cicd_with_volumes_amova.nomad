@@ -2,13 +2,26 @@
 variable "tls_san" {
   type = string
   description = "The cluster domain"
-  default = "cloud.private"
+  default = "amovacloud.private"
+}
+
+
+variable "docker_host" {
+  type = string
+  description = "The docker build host"
+  default = "10.128.82.220"
+}
+
+variable "master_01" {
+  type = string
+  description = "The master 01 ip"
+  default = "10.128.82.220"
 }
 
 variable "hostname" {
   type = string
   description = "Deploy this job on this host"
-  default = "worker-02"
+  default = "worker-01"
 }
 
 
@@ -21,7 +34,7 @@ variable "image_jenkins" {
 variable "image_gitlab" {
   type = string
   description = "The used jenkins image"
-  default = "gitlab/gitlab-ce:16.3.4-ce.0"
+  default = "gitlab/gitlab-ce:16.3.6-ce.0"
 }
 
 # See https://github.com/hashicorp/nomad-pack-community-registry/blob/main/packs/jenkins/templates/jenkins.nomad.tpl
@@ -358,49 +371,47 @@ EOF
 # OIDC Login with keycloak and jenkins https://github.com/jenkinsci/keycloak-plugin
       template {
         data = <<EOF
-role-strategy:latest
-keycloak:latest
-oic-auth:latest
-matrix-auth:latest
-strict-crumb-issuer:latest
-git:latest
-github:latest
-job-dsl:latest
-nomad:latest
-hashicorp-vault-plugin:latest
-configuration-as-code:latest
-github-api:latest
-git:latest
-github:latest
-github-branch-source:latest
-gitlab-api:latest
-gitlab-branch-source:latest
-gitlab-logo:latest
-gitlab-oauth:latest
-gitlab-plugin:latest
-multibranch-scan-webhook-trigger:latest
-keycloak:latest
-pipeline-stage-tags-metadata:latest
-pipeline-github-lib:latest
-pipeline-model-extensions:latest
-pipeline-build-step:latest
-pipeline-rest-api:latest
-plain-credentials:latest
-pipeline-model-definition:latest
-pipeline-stage-step:latest
-pipeline-stage-view:latest
-pipeline-milestone-step:latest
-pipeline-maven:latest
-pipeline-model-api:latest
-build-timeout:latest
-gradle:latest
-ant:latest
-authentication-tokens:latest
-docker-workflow:latest
-maven-plugin:latest
-custom-tools-plugin:latest
-pipeline-utility-steps:latest
-email-ext:latest
+role-strategy:689.v731678c3e0eb_
+keycloak:2.3.2
+oic-auth:2.6
+matrix-auth:3.2.1
+strict-crumb-issuer:2.1.1
+git:5.2.1
+github:1.37.3.1
+job-dsl:1.87
+nomad:0.10.0
+consul:2.1
+hashicorp-vault-plugin:362.v8dfe4061f29e
+configuration-as-code:1737.v652ee9b_a_e0d9
+github-api:1.316-451.v15738eef3414
+github-branch-source:1750.v6b_fb_8df8f985
+gitlab-api:5.3.0-91.v1f9a_fda_d654f
+gitlab-branch-source:684.vea_fa_7c1e2fe3
+gitlab-logo:1.1.2
+gitlab-oauth:1.18
+gitlab-plugin:1.7.16
+multibranch-scan-webhook-trigger:1.0.9
+pipeline-stage-tags-metadata:2.2151.ve32c9d209a_3f
+pipeline-github-lib:42.v0739460cda_c4
+pipeline-model-extensions:2.2151.ve32c9d209a_3f
+pipeline-build-step:516.v8ee60a_81c5b_9
+pipeline-rest-api:2.34
+plain-credentials:143.v1b_df8b_d3b_e48
+pipeline-model-definition:2.2151.ve32c9d209a_3f
+pipeline-stage-step:305.ve96d0205c1c6
+pipeline-stage-view:2.34
+pipeline-milestone-step:111.v449306f708b_7
+pipeline-maven:1362.vee39a_d4b_02b_1
+pipeline-model-api:2.2151.ve32c9d209a_3f
+build-timeout:1.31
+gradle:2.9
+ant:497.v94e7d9fffa_b_9
+authentication-tokens:1.53.v1c90fd9191a_b_
+docker-workflow:572.v950f58993843
+maven-plugin:3.23
+custom-tools-plugin:0.8
+pipeline-utility-steps:2.16.0
+email-ext:2.102
 EOF
         destination   = "local/plugins.txt"
         change_mode   = "noop"
@@ -512,7 +523,7 @@ EOF
       }
       env{
         JAVA_OPTS ="-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -Dhudson.model.DownloadService.noSignatureCheck=true"
-        DOCKER_HOST = "10.21.21.41"
+        DOCKER_HOST = "${var.docker_host}"
         DOCKER_TLS_VERIFY = 1
         DOCKER_BUILDKIT = 1
         //Nomad address with port
@@ -543,7 +554,7 @@ EOF
 	 <mirror>
       <mirrorOf>external:http:*</mirrorOf>
       <name>Pseudo repository to mirror external repositories initially using HTTP.</name>
-	  <url>http://10.21.21.41:5002/repository/maven-public/</url>
+	  <url>http://${var.docker_host}:5002/repository/maven-public/</url>
       <blocked>false</blocked>
       <id>maven-default-http-blocker</id>
     </mirror>
@@ -624,18 +635,29 @@ credentials:
     domainCredentials:
     - credentials:
       - usernamePassword:
-          # TODO Somehow it is not possible todo that authentication over jenkinsbotAccessToken
-          description: "gitlab.${var.tls_san} username and password for jenkins.${var.tls_san}"
+          description: "username and password for gitlab at 10.83.201.64"
           id: "jenkinsbotUsernamePassword"
-          password: "jenkins@bot"
+          password: "{AQAAABAAAAAQ7GAmNJuXo7we3kTWn7XyDcskY2Q1Lt0bk1PHx16kLB0=}"
           scope: GLOBAL
           username: "jenkinsbot"
       - string:
-          description: "gitlab.${var.tls_san} API Access Token for jenkins.${var.tls_san}"
+          description: "API Access Token for gitlab at 10.83.201.64"
           id: "jenkinsbotGitlabApiToken"
           scope: GLOBAL
-          secret: "glpat-Jf7QXtC5zzeNbKvsPiCD"
-
+          secret: "{AQAAABAAAAAgeUcaRybDSebDtxE1yamCbwxR2zJxEFpBCBVR0M05MXKrkvDgzW1/Sb0O/ScUKBaB}"
+      - usernamePassword:
+          description: "Jenkins bot username with api token as passowrd for gitlab\
+            \ at 10.83.201.64 ( Http Access )"
+          id: "jenkinsbotUsernameAndApiToken"
+          password: "{AQAAABAAAAAg6Um/GZmkIWIeukkuMegfAFPcSKBW340qKU4qvRx+rIlBOfxbWrvhH9gUbl1NbS11}"
+          scope: GLOBAL
+          username: "jenkinsbot"
+      - usernamePassword:
+          description: "Service Account for sending emails over sms email server"
+          id: "emailsender"
+          password: "{AQAAABAAAAAgVl7v/catYqlJrNRm1IfdiZOujPbdq3SWpOHrop1AC7OnsMAXSmsvLv9OTzMBRmkW}"
+          scope: GLOBAL
+          username: "WMS-SLN"
 jenkins:
   agentProtocols:
   - "Ping"
@@ -643,12 +665,12 @@ jenkins:
   clouds:
   - nomad:
       clientCertificate: "/etc/opt/certs/nomad/nomad-cli.pem"
-      clientPassword: "{AQAAABAAAACA9cx9FvrBYJn/d/4QHWGLepjaF4n1u+0oSHwPzFZuyiZPxojlbzgwl9wi+6xadJBG/E4FfKADGYJhXIwY6DeMWirGT5A6/OdB8Uuj6BC+7KeLiNkhJu9I1QZinoeYPPxEeQ3yKJtrlOn4jD0MoiDeD0JbNcGzWz2kfUZJp+Bcnk2R3xQ88vZ1Vn0geouQZgS2}"
+      clientPassword: "{AQAAABAAAADQQGh3P2JEQruNTBR/WMWcBWckccOgFQWOIgfRKlmLUZjkwp7kAfVJQ50cHNWAokIsVxS+TGbdxHOoQd3k9ebEGd1c51fNU76DY64KAd7dsDDMVKgeOOEBBy5w7isVbGyniR1PY11lm5fZPZ1sodaCJzUUFfYVHSWezax6pDUPe+3ZPGNGeV1syqlFxWRbqd4h/wYyXFOQXfHVaKyoP7V/QoXDCBf0R4Gg5naGoZfaNxMkwUvFXq3vuGU7bUerXA1C41tOEqIX3z44Gifqm4GLZGDK9/3xPUdB+WBrwyBpeSA=}"
       name: "CloudPrivate"
-      nomadUrl: "https://10.21.21.41:4646"
+      nomadUrl: "https://10.128.82.220:4646"
       prune: true
       serverCertificate: "/etc/ssl/certs/cluster-ca-bundle.pem"
-      serverPassword: "{AQAAABAAAACArpOj0DdpAvshbcuFb5AHuqEydtWdYITTa4BL4VvK+3fUSUM8dQK892AXc3fRtNR0sg04YZ/huMhmA+Dvozhw6Xn56sRp2Fulx3eH4UN5m0rSZ2c5ZwS9LkRlkfk+dT2bcdf4MKlXTxBii6ujdR41qAYuURhNcvjeisFHD642/5y4LV93ImmL/6BKAhCWZlUZ}"
+      serverPassword: "{AQAAABAAAADQXDZ10z3vmre8MTq031u1YumnDbm/XVGuc+0l2lGT0vxWdha7milwBQfSudvTywYQzRTBFhYDlfBpJNyhqgbVzLiaYGCWswytexqsB+FXlboOh50pS60l9eTLSTqk5+s5bXoXelwhFvwqDkQBbQBqJsz0JmIGPSesg04cGqgghzjB4CYhjEJjRrhpWLOfUIDMnH1GIdWUjJp8IxfjTub0KLeHBFeaaa+7GmiNI8RxWaMrYVtxB8KiROHt5pJWS49KFmkmvxrfIXqbIa89GDUTTx+MsRuP0J31JkOjwuttIbY=}"
       tlsEnabled: true
       workerTimeout: 1
   crumbIssuer:
@@ -673,12 +695,12 @@ jenkins:
   scmCheckoutRetryCount: 0
   securityRealm:
     oic:
-      authorizationServerUrl: "https://security.${var.tls_san}/realms/nomadder/protocol/openid-connect/auth"
+      authorizationServerUrl: "https://security.amovacloud.private/realms/nomadder/protocol/openid-connect/auth"
       automanualconfigure: "manual"
       clientId: "jenkins"
-      clientSecret: "k8qJeXHDEkRu3x0XBNn0VVXNMX3sRx79"
+      clientSecret: "{AQAAABAAAAAwFrTH70y05tveWFY8mF11KJEEtqkDWGXcXx68QGh/91KGhDdvSmgNHzZQH31mFC3O5ufX+GeI3ExrDT1EvusZmA==}"
       disableSslVerification: true
-      endSessionEndpoint: "https://security.${var.tls_san}/realms/nomadder/protocol/openid-connect/logout?client_id=jenkins&post_logout_redirect_uri=https://jenkins.${var.tls_san}"
+      endSessionEndpoint: "https://security.amovacloud.private/realms/nomadder/protocol/openid-connect/logout?client_id=jenkins&post_logout_redirect_uri=https://jenkins.amovacloud.private"
       fullNameFieldName: "preferred_username"
       groupsFieldName: "group-membership"
       overrideScopes: "web-origins address phone openid profile offle_access roles\
@@ -688,8 +710,8 @@ jenkins:
       scopes: "openid email profile"
       sendScopesInTokenRequest: true
       tokenAuthMethod: "client_secret_post"
-      tokenServerUrl: "https://security.${var.tls_san}/realms/nomadder/protocol/openid-connect/token"
-      userInfoServerUrl: "https://security.${var.tls_san}/realms/nomadder/protocol/openid-connect/userinfo"
+      tokenServerUrl: "https://security.amovacloud.private/realms/nomadder/protocol/openid-connect/token"
+      userInfoServerUrl: "https://security.amovacloud.private/realms/nomadder/protocol/openid-connect/userinfo"
       userNameField: "preferred_username"
   slaveAgentPort: 50000
   systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code\
@@ -726,6 +748,28 @@ unclassified:
     - "jobBuildDiscarder"
   buildStepOperation:
     enabled: false
+  defaultDisplayUrlProvider:
+    providerId: "org.jenkinsci.plugins.displayurlapi.ClassicDisplayURLProvider"
+  email-ext:
+    adminRequiredForTemplateTesting: false
+    allowUnregisteredEnabled: false
+    charset: "UTF-8"
+    debugMode: true
+    defaultBody: |-
+      $PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
+
+      Check console output at $BUILD_URL to view the results.
+    defaultContentType: "text/html"
+    defaultSubject: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!"
+    defaultTriggerIds:
+    - "hudson.plugins.emailext.plugins.trigger.FailureTrigger"
+    mailAccount:
+      credentialsId: "emailsender"
+      smtpHost: "smssysmail.sms-group.com"
+    maxAttachmentSize: -1
+    maxAttachmentSizeMb: -1
+    precedenceBulk: false
+    watchingEnabled: false
   enrichedSummaryConfig:
     enrichedSummaryEnabled: false
     httpClientDelayBetweenRetriesInSeconds: 1
@@ -737,7 +781,7 @@ unclassified:
   gitHubConfiguration:
     apiRateLimitChecker: ThrottleForNormalize
   gitHubPluginConfig:
-    hookUrl: "https://jenkins.${var.tls_san}/github-webhook/"
+    hookUrl: "https://jenkins.amovacloud.private/github-webhook/"
   gitLabConnectionConfig:
     connections:
     - apiTokenId: "jenkinsbotGitlabApiToken"
@@ -746,7 +790,7 @@ unclassified:
       ignoreCertificateErrors: true
       name: "GitlabLocalconnection"
       readTimeout: 10
-      url: "https://gitlab.${var.tls_san}"
+      url: "http://10.83.201.64"
     useAuthenticatedEndpoint: true
   gitLabServers:
     servers:
@@ -754,7 +798,7 @@ unclassified:
       manageSystemHooks: true
       manageWebHooks: true
       name: "GitlabLocalServer"
-      serverUrl: "https://gitlab.${var.tls_san}"
+      serverUrl: "http://10.83.201.64"
       webhookSecretCredentialsId: "jenkinsbotGitlabApiToken"
   globalTimeOutConfiguration:
     operations:
@@ -774,8 +818,8 @@ unclassified:
   junitTestResultStorage:
     storage: "file"
   location:
-    adminAddress: "wmsadmin@amova.eu"
-    url: "https://jenkins.${var.tls_san}/"
+    adminAddress: "jenkins@amovacloud.private"
+    url: "https://jenkins.amovacloud.private/"
   mailer:
     charset: "UTF-8"
     useSsl: false
@@ -784,8 +828,10 @@ unclassified:
     localRepository: "default"
   pollSCM:
     pollingThreadCount: 10
+  prismConfiguration:
+    theme: PRISM
   resourceRoot:
-    url: "https://jenkins-resources.${var.tls_san}/"
+    url: "https://jenkins-resources.amovacloud.private/"
   scmGit:
     addGitTagAction: false
     allowSecondFetch: false
@@ -797,18 +843,18 @@ unclassified:
 tool:
   customTool:
     installations:
-    - name: "Nomad_1_6_2"
+    - name: "Nomad"
       properties:
       - installSource:
           installers:
           - zip:
-              url: "https://releases.hashicorp.com/nomad/1.6.2/nomad_1.6.2_linux_amd64.zip"
-    - name: "Consul_1_16_1"
+              url: "https://releases.hashicorp.com/nomad/1.6.3/nomad_1.6.3_linux_amd64.zip"
+    - name: "Consul"
       properties:
       - installSource:
           installers:
           - zip:
-              url: "https://releases.hashicorp.com/consul/1.16.1/consul_1.16.1_linux_amd64.zip"
+              url: "https://releases.hashicorp.com/consul/1.17.0/consul_1.17.0_linux_amd64.zip"
   dockerTool:
     installations:
     - name: "Docker"
@@ -864,6 +910,13 @@ tool:
           installers:
           - zip:
               subdir: "jdk-20"
+              url: "https://download.java.net/java/GA/jdk20/bdc68b4b9cbc4ebcb30745c85038d91d/36/GPL/openjdk-20_linux-x64_bin.tar.gz"
+    - name: "JDK_21"
+      properties:
+      - installSource:
+          installers:
+          - zip:
+              subdir: "jdk-21"
               url: "https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_linux-x64_bin.tar.gz"
   maven:
     installations:

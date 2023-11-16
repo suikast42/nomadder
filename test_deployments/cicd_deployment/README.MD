@@ -1,12 +1,12 @@
 ### Prepare Gitlab
 
 1. Login to gitlab
-2. Create an account jenkinsbot
+2. Create an account jenkinsbot with password jenkins@bot
 3. Add this user to the groups you want to build with jenkins with Maintainer access
 4. Logout with admin and login with jenkinsbot
 5. Create a api access token for jenkinsbot
-6. Create a ssh key with ssh-keygen -t rsa -b 4096 -f id_rsa_gitlab -C "jenkinsbot@jenkins.cloud.private"
-7. Import this ssh pub key for jenkinsbot user
+6. Allow fetch local resources ( For import projects from local git instances ).Admin -> Settings -> Network ->
+   Outbound Requests -> Allow requests to the local network from hooks and services
 
 You can define group project or personal access token for acessing gitlab from jenkins
 <br>It is more suitable to define a user named `jenkinsbot` and create a presonal access token for that user.
@@ -15,17 +15,8 @@ You can define group project or personal access token for acessing gitlab from j
 ## Prepare jenkins
 
 1. Login to jenkins
-2. Create credentials got gitlab server:
-    1. Gitlab Personal Access Token named `jenkinsbotAccessToken` Token ( with jenkinsbot gitlab access token )
-    2. Gitlab Api Token named `jenkinsbotApiToken` Token ( with jenkinsbot gitlab access token )
-    3. Secret text named `jenkinsbotWebhookToken` ( with jenkinsbot gitlab access token )
-    4. Secret ssh key named `jenkinsbotSshKey` ( with jenkinsbots' private key )
-    4. Or Secret username password named `jenkinsbotUserNamePassword` ( with jenkinsbots' private key )
-
-3. Configure gitlab server with the
-   credentials `jenkinsbotAccessToken` , `jenkinsbotWebhookToken , jenkinsbotSshKey | jenkinsbotUserNamePassword`
-
-4. allow fetch local resources ( For import projects from local git instances ). I found Admin -> Settings -> Network -> Outbound Requests -> Allow requests to the local network from hooks and services
+2. Set the values for `jenkinsbotUsernamePassword` ,`jenkinsbotGitlabApiToken`   and `jenkinsbotUsernameAndApiToken` with the values from gitlab. The casc plugin does not export the security information like pwd an token.
+   </br>jenkinsbotUsernameAndApiToken is needed for gitlab http access. The Jenkins projects should refer to this token if the gitlab server uses http access instead of https
 ## Add git as remote in intelij
 
 1. git config http.sslVerify false
@@ -33,7 +24,7 @@ You can define group project or personal access token for acessing gitlab from j
 
 ## Post configuration Gitlab Webhooks
 
-The Webhook plugin nedded for trieggering multibranc job types in jenkins
+The Webhook plugin needed for triggering multibranch job types in jenkins
 The jenkins integration in gitlab works only with normal pipeline jobs
 
 1. In projects settings goto webhook and type the uri for webhook.

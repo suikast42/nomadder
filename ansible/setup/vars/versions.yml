@@ -3,12 +3,12 @@ vault_checksum: "sha256:aa2ed532d9a0ecc8635fed63cb3fb6de472b4c01ca622a9a199cd92a
 uninstall_vault: false
 
 
-consul_version: "1.16.3"
-consul_checksum: "sha256:9d0d7ad123844d43543d285cc0b3e15393d75ffa384bf84e5d64226a7f3d3132  "
+consul_version: "1.17.0"
+consul_checksum: "sha256:4fbb6c3a05ddfc72d314149fe9765a1be89c33857b003a1d861469f2fe97e23e"
 uninstall_consul: false
 update_consul: false
 
-consul_template_version: "0.34.0"
+consul_template_version: "0.35.0"
 consul_template_checksum: "sha256:c7a5817547d6545f8c5ce2dfea62c821ddd324dd9a3414519ebaba2aeeff59a0"
 update_consul_template: false
 uninstall_consul_template: false
@@ -28,18 +28,18 @@ nomad_cli_levant_version: "0.3.2"
 nomad_cli_levant_checkusum: "sha256:1e06180f8d8327e721e2ad4c9637d1f391034a22709473b8ed8ee19f1cad1570"
 uninstall_cli_levant: false
 
-nomad_cli_wander_version: "0.11.2"
-nomad_cli_wander_checkusum: "sha256:c4829bb8dbcfea8f0d672935c265951090405eb7e488faeed4a59b0978339adf      "
+nomad_cli_wander_version: "0.12.0"
+nomad_cli_wander_checkusum: "sha256:5d56719f613cd4c779a739cdf0e54bdc52b90e756a83fd5dad14f51db8c51cca"
 uninstall_cli_wander: false
 
 
 version_cfssl: 1.6.4
 update_cfssl: false
 
-docker_version: "24.0.6"
+docker_version: "24.0.7"
 uninstall_docker: false
 
-version_docker_compose: "2.23.0"
+version_docker_compose: "2.23.1"
 uninstall_compose: false
 
 update_certificates: false
@@ -49,7 +49,7 @@ version_nexus_initlzr: "1.0.0"
 update_nexus: false
 
 
-version_protoc: "25.0"
+version_protoc: "25.1"
 version_proto_gen: "1.31.0"
 version_proto_grpc: "1.3.0"
 version_proto_grpc_gateway: "2.15.2"
@@ -57,7 +57,7 @@ version_proto_openapi: "{{version_proto_grpc_gateway}}"
 version_proto_buf_cli: "1.26.1"
 version_proto_buf_connect: "1.10.0"
 version_proto_grpc_curl: "1.8.7"
-uninstall_protoc: true
+uninstall_protoc: false
 
 version_busy_box_init_container: "1.36"
 version_multi_stage_apline_container: "3.17.2"

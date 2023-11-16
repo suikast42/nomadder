@@ -191,7 +191,19 @@ consul-template -template test.tpl -dry
    {{ end }}
  {{ end }}
 ----
-
+.Find all services with traefik host entry
+[source,shell]
+----
+{{ range services }}
+  {{ range .Tags }}
+    {{ $pattern := `traefik\.http\.routers\..+\.rule.*=Host\((.*)\)` }}
+     {{ $matches := regexMatch  $pattern . }}
+	 {{ if $matches }}
+        // Logic here
+    {{ end }}
+  {{ end }}
+{{ end }}
+----
 ==== Consul Template rendering with config
 
 . Crate a cfg file

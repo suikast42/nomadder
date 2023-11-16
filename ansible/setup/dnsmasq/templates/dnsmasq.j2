@@ -1,4 +1,4 @@
-listen-address=127.0.0.1, {{ ansible_eth1.ipv4.address }}
+listen-address=127.0.0.1, {{ host_ip }}
 
 # Enable forward lookup of the 'consul' domain:
 server=/consul/127.0.0.1#8600
@@ -9,7 +9,7 @@ server=/consul/127.0.0.1#8600
 # 1. On master hosts all nomad nodes added and removed dynamically
 # 2. On worker hosts all services with tag external_dns=<dns value> will add as an address field
 #{% if is_worker_host  %}
-#address=/{{tls_san}}/{{ansible_eth1.ipv4.address}}
+#address=/{{tls_san}}/{{host_ip}}
 #{% endif %}
 #{% if is_master_host  %}
 #address=/{{tls_san}}/{{worker_01_ip}}
