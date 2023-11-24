@@ -845,8 +845,6 @@ unclassified:
     localRepository: "default"
   pollSCM:
     pollingThreadCount: 10
-  prismConfiguration:
-    theme: PRISM
   resourceRoot:
     url: "https://jenkins-resources.amovacloud.private/"
   scmGit:

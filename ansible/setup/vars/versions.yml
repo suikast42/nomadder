@@ -28,8 +28,8 @@ nomad_cli_levant_version: "0.3.2"
 nomad_cli_levant_checkusum: "sha256:1e06180f8d8327e721e2ad4c9637d1f391034a22709473b8ed8ee19f1cad1570"
 uninstall_cli_levant: false
 
-nomad_cli_wander_version: "0.12.0"
-nomad_cli_wander_checkusum: "sha256:5d56719f613cd4c779a739cdf0e54bdc52b90e756a83fd5dad14f51db8c51cca"
+nomad_cli_wander_version: "0.12.6"
+nomad_cli_wander_checkusum: "sha256:6b34dcfa818f24eeea1fdd7fcac1dbb2b0b983a998aa4a6c56cce1d3057954f5"
 uninstall_cli_wander: false
 
 
@@ -39,7 +39,7 @@ update_cfssl: false
 docker_version: "24.0.7"
 uninstall_docker: false
 
-version_docker_compose: "2.23.1"
+version_docker_compose: "2.23.3"
 uninstall_compose: false
 
 update_certificates: false
@@ -61,7 +61,7 @@ uninstall_protoc: false
 
 version_busy_box_init_container: "1.36"
 version_multi_stage_apline_container: "3.17.2"
-version_grafana_agent_container: "0.37.4"
+version_grafana_agent_container: "0.38.0"
 version_minio: "RELEASE.2023-09-07T02-05-02Z"
 version_minio_mc_admin: "RELEASE.2023-09-07T22-48-55Z"
 uninstall_minio_admin: false
