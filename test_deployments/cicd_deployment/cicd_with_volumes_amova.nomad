@@ -637,7 +637,7 @@ credentials:
       - usernamePassword:
           description: "username and password for gitlab at 10.83.201.64"
           id: "jenkinsbotUsernamePassword"
-          password: "{AQAAABAAAAAQ7GAmNJuXo7we3kTWn7XyDcskY2Q1Lt0bk1PHx16kLB0=}"
+          password: "{AQAAABAAAAAQyhOLbLiZRMfjr03vbNKwpd7lgfRrvnZZPx1xp11W0Ys=}"
           scope: GLOBAL
           username: "jenkinsbot"
       - string:
@@ -649,13 +649,13 @@ credentials:
           description: "Jenkins bot username with api token as passowrd for gitlab\
             \ at 10.83.201.64 ( Http Access )"
           id: "jenkinsbotUsernameAndApiToken"
-          password: "{AQAAABAAAAAg6Um/GZmkIWIeukkuMegfAFPcSKBW340qKU4qvRx+rIlBOfxbWrvhH9gUbl1NbS11}"
+          password: "{AQAAABAAAAAg8I+Myq8CejFef2cBwramMMibBOPc25iRk9d2KhMUu9iGSf1rgV8muvLQpMPhcmCI}"
           scope: GLOBAL
           username: "jenkinsbot"
       - usernamePassword:
           description: "Service Account for sending emails over sms email server"
           id: "emailsender"
-          password: "{AQAAABAAAAAgVl7v/catYqlJrNRm1IfdiZOujPbdq3SWpOHrop1AC7OnsMAXSmsvLv9OTzMBRmkW}"
+          password: "{AQAAABAAAAAg+2KJZla4tJGM8+g+33C59nBjrA77PwyduXrQVj4NDn6v5qkTme2J9PgPOiLG6t4a}"
           scope: GLOBAL
           username: "WMS-SLN"
 jenkins:
@@ -698,7 +698,7 @@ jenkins:
       authorizationServerUrl: "https://security.amovacloud.private/realms/nomadder/protocol/openid-connect/auth"
       automanualconfigure: "manual"
       clientId: "jenkins"
-      clientSecret: "{AQAAABAAAAAwFrTH70y05tveWFY8mF11KJEEtqkDWGXcXx68QGh/91KGhDdvSmgNHzZQH31mFC3O5ufX+GeI3ExrDT1EvusZmA==}"
+      clientSecret: "{AQAAABAAAAAwD4+TD/nb+1lczDLZKqmLnJ/V8bUNUROnyg381zsjSuE65skA5KEyYlKXYGt/N/uwzRm+M4X2AyCMw31lkxh4EQ==}"
       disableSslVerification: true
       endSessionEndpoint: "https://security.amovacloud.private/realms/nomadder/protocol/openid-connect/logout?client_id=jenkins&post_logout_redirect_uri=https://jenkins.amovacloud.private"
       fullNameFieldName: "preferred_username"
@@ -742,6 +742,9 @@ security:
     useScriptSecurity: true
   sSHD:
     port: -1
+  scriptApproval:
+    approvedSignatures:
+    - "method groovy.lang.GroovyObject invokeMethod java.lang.String java.lang.Object"
 unclassified:
   buildDiscarders:
     configuredBuildDiscarders:
@@ -800,6 +803,20 @@ unclassified:
       name: "GitlabLocalServer"
       serverUrl: "http://10.83.201.64"
       webhookSecretCredentialsId: "jenkinsbotGitlabApiToken"
+  globalLibraries:
+    libraries:
+    - defaultVersion: "main"
+      name: "jenkins-amova-lib"
+      retriever:
+        modernSCM:
+          libraryPath: "."
+          scm:
+            git:
+              credentialsId: "jenkinsbotUsernameAndApiToken"
+              id: "9859cc51-efb4-4f99-82bc-691109eed7ee"
+              remote: "http://10.83.201.64/jenkins/jenkins-amova-lib.git"
+              traits:
+              - "gitBranchDiscovery"
   globalTimeOutConfiguration:
     operations:
     - "abortOperation"
