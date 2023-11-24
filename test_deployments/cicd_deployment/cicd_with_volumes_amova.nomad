@@ -745,6 +745,10 @@ security:
   scriptApproval:
     approvedSignatures:
     - "method groovy.lang.GroovyObject invokeMethod java.lang.String java.lang.Object"
+    - "method hudson.model.Executor interrupt hudson.model.Result"
+    - "method hudson.model.Run getExecutor"
+    - "method hudson.model.Run isBuilding"
+    - "method org.jenkinsci.plugins.workflow.support.steps.build.RunWrapper getRawBuild"
 unclassified:
   buildDiscarders:
     configuredBuildDiscarders:
