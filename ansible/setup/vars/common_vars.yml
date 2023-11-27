@@ -107,3 +107,8 @@ delete_downloads: false
 nomad_label_text: "💙💛 Fenerbaçhe 1907 💛💙"
 nomad_label_color:  "#163962"
 nomad_label_background:  "#ffed00"
+
+uninstall_all: false
+update_all: false
+
+fail_when_update_and_uninstall : "{{uninstall_all|bool == true and update_all|bool == true}}"

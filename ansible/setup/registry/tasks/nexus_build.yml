@@ -1,14 +1,14 @@
-- name: Check if nexus is running
-  uri:
-    url: "http://localhost:5002"
-    return_content: yes
-    validate_certs: no
-    status_code:
-      - 200
-  register: nexus_push_check
-  until: nexus_push_check.status == 200
-  retries: 20
-  delay: 10
+- name: Nexus state check
+  block:
+    - name: Get infos on container
+      docker_container_info:
+        name: nexus
+      register: nexus_docker
+
+    - name: Show the status of the nexus container
+      debug:
+        msg: "The container status is {{ nexus_docker.container['State']['Status'] }}"
+      when: nexus_docker.exists
 
 
 
@@ -17,7 +17,7 @@
 #    msg: "{{ nexus_push_check }}"
 
 - name: Build nexus
-  when: nexus_push_check.failed or update_nexus|bool == true
+  when: not nexus_docker.exists or update_nexus|bool == true
   become: true
   block:
     - name: "Create image backup dir {{image_backup_dir}} if needed "

@@ -15,12 +15,12 @@
       register: nomadInstalled
 
 
-    - name: nomad install
+    - name: nomad update
       become: true
       when: nomadInstalled.stat.exists
       block:
 
-        - name: Download nomad binary
+        - name: Download nomad binary for update
           get_url:
             url: https://releases.hashicorp.com/nomad/{{nomad_version}}/nomad_{{nomad_version}}_linux_amd64.zip
             dest: "/{{download_dir}}/nomad{{nomad_version}}_linux_amd64.zip"

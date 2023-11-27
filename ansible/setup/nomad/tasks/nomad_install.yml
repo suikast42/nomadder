@@ -25,6 +25,11 @@
         path: "{{nomad_cert_path}}"
         state: absent
 
+    - name: "Delete nomad download dir  {{download_dir}} if present"
+      ansible.builtin.file:
+        path: "{{download_dir}}/nomad"
+        state: absent
+
 
     - name: "Delete nomad installation"
       ansible.builtin.file:
@@ -92,7 +97,7 @@
         mode: '0700'
 
 
-    - name: Download nomad binary
+    - name: Download nomad binary for install
       get_url:
         url: https://releases.hashicorp.com/nomad/{{nomad_version}}/nomad_{{nomad_version}}_linux_amd64.zip
         dest: "/{{download_dir}}/nomad{{nomad_version}}_linux_amd64.zip"

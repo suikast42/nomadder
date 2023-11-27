@@ -39,9 +39,9 @@
       creates: /usr/local/bin/secint # oh-my-posh is already installed
 #    register: build
 #
-#  - name: "Debug install secint"
-#    debug:
-#      msg: "{{build}}"
+  - name: "Debug Delete protoc"
+    debug:
+      msg: "update_all: {{update_all}}, uninstall_protoc:{{uninstall_protoc}}"
 
   - name: "Delete protoc"
     become: true

@@ -1,5 +1,19 @@
 ---
 - hosts: all,!localhost
+  gather_facts: true
+  vars_files:
+    - vars/common_vars.yml
+  tasks:
+    - name: "Check update flags will fail {{fail_when_not_development_env|bool == true }}"
+      changed_when: false
+      failed_when: fail_when_update_and_uninstall|bool == true
+      shell: |
+        echo can not uninstall and update on same time. Use these one by one. Set either uninstall_all or update_all to false
+      tags:
+        - always
+
+
+- hosts: all,!localhost
   name: "Master and worker base installations"
   vars_files:
     - vars/versions.yml

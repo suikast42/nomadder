@@ -8,7 +8,7 @@ $ traceroute www.google.com
 -- DNS config
 dnsmasq config(/etc/dnsmasq.d/10-consul) add:
 (for all worker nodes)
-address=/cloud.private/10.21.21.42
+address=/cloud.private/172.42.1.20
 Windows client
 Add at least one of dnsmasq servers to vmnet2
 WSL client

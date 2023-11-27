@@ -90,7 +90,7 @@ job "portworx" {
           "-c", "px-cluster-nomadv1",
           "-a",
           "-b",
-          "-k", "consul:https://10.21.21.42:8501",
+          "-k", "consul:https://172.42.21.20:8501",
           "-ca","/certs/ca/cluster-ca-bundle.pem",
           "-cert", "/certs/consul/consul.pem",
           "-key", "/certs/consul/consul-key.pem",
