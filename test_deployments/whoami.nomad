@@ -1,6 +1,10 @@
+#NOMAD_NAMESPACE
+#NOMAD_JOB_NAME
+#NOMAD_TASK_NAME
+#NOMAD_GROUP_NAME
 job "whoami" {
-  datacenters = ["nomadder1"]
 
+  namespace = "test1"
   group "whoami" {
     count = 1
 
@@ -11,13 +15,13 @@ job "whoami" {
     }
 
     service {
-      name = "whoami"
+      name = "${NOMAD_NAMESPACE}-${NOMAD_GROUP_NAME}"
       port = "web"
 
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.whoami.rule=Host(`whoami.cloud.private`)",
-        "traefik.http.routers.whoami.tls=true",
+        "traefik.http.routers.${NOMAD_GROUP_NAME}-${NOMAD_ALLOC_ID}.rule=Host(`${NOMAD_NAMESPACE}.${NOMAD_GROUP_NAME}.cloud.private`)",
+        "traefik.http.routers.${NOMAD_GROUP_NAME}-${NOMAD_ALLOC_ID}.tls=true",
       ]
 
       check {
