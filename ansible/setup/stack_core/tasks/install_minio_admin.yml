@@ -20,7 +20,7 @@
       block:
       - name: "Install minio cli from https://dl.min.io/client/mc/release/linux-amd64/archive/mc.{{version_minio_mc_admin}}"
         delay: 0
-        async: 60
+        async: 360
         poll: 1
         shell: |
           curl https://dl.min.io/client/mc/release/linux-amd64/archive/mc.{{version_minio_mc_admin}} \

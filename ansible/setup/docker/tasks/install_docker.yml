@@ -157,6 +157,12 @@
       retries: 10
       delay: 5
 
+- name: "Restart build host"
+  become: true
+  when: not dockerInstalled.stat.exists and is_build_host
+  ansible.builtin.reboot:
+    msg: "Rebooting machine in 5 seconds"
+
 #    - name: Debug docker install
 #      debug:
 #        msg: "{{dockerInstall}}"

@@ -28,7 +28,7 @@
     - version_grafana_nomadder: "{{version_grafana}}.1"
     - version_grafana_mimir: "2.10.4"
     - version_grafana_loki: "2.9.2"
-    - version_grafana_tempo: "2.3.0"
+    - version_grafana_tempo: "2.3.1"
     - version_nats_server: "2.10.4"
     - version_logunifer: "0.2.5"
     - version_blackbox_exporter: "0.24.0"
