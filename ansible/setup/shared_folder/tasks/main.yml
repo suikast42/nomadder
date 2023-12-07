@@ -1,0 +1,34 @@
+# https://kb.vmware.com/s/article/74650
+# Enable shared volume with the windows host
+- name: open-vm-tools.conf
+  when : enable_shared_folders
+  become:  true
+  block:
+    - name: "open-vm-tools.conf if not exists"
+      ansible.builtin.file:
+        path: "/etc/modules-load.d/open-vm-tools.conf"
+        state: touch
+        mode: '0755'
+
+    - name: Ensure 'fuse' is in the file
+      lineinfile:
+        path: /etc/modules-load.d/open-vm-tools.conf
+        line: 'fuse'
+
+
+- name: Enable mount service
+  when : enable_shared_folders
+  become:  true
+  block:
+    - name: Template mnt-cluster.mount.j2
+      template:
+        force: yes
+        src: mnt-cluster.mount.j2
+        dest: /etc/systemd/system/mnt-cluster.mount
+      register: serviceconfig
+
+    - name:  enable and start mnt-cluster.mount service
+      service:
+        name: mnt-cluster.mount
+        state: started
+        enabled: true

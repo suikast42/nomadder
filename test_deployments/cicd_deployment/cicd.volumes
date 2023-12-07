@@ -1,19 +1,19 @@
-sudo mkdir -p /opt/nomadvolumes/cicd/gitlab/etc
-sudo mkdir -p /opt/nomadvolumes/cicd/gitlab/opt
-sudo mkdir -p /opt/nomadvolumes/cicd/jenkins
+sudo mkdir -p /mnt/cluster/nomadvolumes/cicd/gitlab/etc
+sudo mkdir -p /mnt/cluster/nomadvolumes/cicd/gitlab/opt
+sudo mkdir -p /mnt/cluster/nomadvolumes/cicd/jenkins
 
 
 client {
   host_volume "nomad_volume_stack_cicd_gitlab_etc" {
-    path      = "/opt/nomadvolumes/cicd/gitlab/etc"
+    path      = "/mnt/cluster/nomadvolumes/cicd/gitlab/etc"
     read_only = false
   }
   host_volume "nomad_volume_stack_cicd_gitlab_opt" {
-    path      = "/opt/nomadvolumes/cicd/gitlab/opt"
+    path      = "/mnt/cluster/nomadvolumes/cicd/gitlab/opt"
     read_only = false
   }
   host_volume "nomad_volume_stack_cicd_jenkins" {
-    path      = "/opt/nomadvolumes/cicd/jenkins"
+    path      = "/mnt/cluster/nomadvolumes/cicd/jenkins"
     read_only = false
   }
 }

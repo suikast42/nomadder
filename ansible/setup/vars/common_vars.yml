@@ -73,7 +73,7 @@ local_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/ca"
 local_cluster_ca_cert_path: "{{role_path}}/../certificates_generate/files/certs/cluster-ca"
 service_working_dir_base:  /opt/services
 master_0_job_dir:  /opt/nomadjobs
-nomad_volumes_dir:  /opt/nomadvolumes
+nomad_volumes_dir:  /mnt/cluster/nomadvolumes
 base_cert_dir: /etc/opt/certs
 notify_cert_change: false
 
@@ -112,3 +112,5 @@ uninstall_all: false
 update_all: false
 
 fail_when_update_and_uninstall : "{{uninstall_all|bool == true and update_all|bool == true}}"
+
+enable_shared_folders: false

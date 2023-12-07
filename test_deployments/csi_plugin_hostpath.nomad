@@ -25,7 +25,7 @@ job "csi-plugin" {
         id        = "hostpath-plugin"
         type      = "monolith" #node" # doesn't support Controller RPCs
         mount_dir = "/csi"
-        stage_publish_base_dir = "/opt/nomadvolumes/csi"
+        stage_publish_base_dir = "/mnt/cluster/nomadvolumes/csi"
       }
 
       resources {

@@ -1,0 +1,15 @@
+[Unit]
+Description=VMware mount for /mnt/cluster
+DefaultDependencies=no
+Before=umount.target
+ConditionVirtualization=vmware
+After=sys-fs-fuse-connections.mount
+
+[Mount]
+What=vmhgfs-fuse
+Where=/mnt/cluster
+Type=fuse
+Options=default_permissions,allow_other,umask=000
+
+[Install]
+WantedBy=multi-user.target

@@ -72,9 +72,9 @@ job "portworx" {
       csi_plugin {
         id                     = "portworx"
         type                   = "monolith"
-        mount_dir              = "/opt/nomadvolumes/csi"
+        mount_dir              = "/mnt/cluster/nomadvolumes/csi"
         health_timeout         = "30m"                  # Nomad 1.3.2 and later only
-        stage_publish_base_dir = "/opt/nomadvolumes/csi/publish" # Nomad 1.3.4 and later only
+        stage_publish_base_dir = "/mnt/cluster/nomadvolumes/csi/publish" # Nomad 1.3.4 and later only
       }
 
       # container config
