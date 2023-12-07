@@ -1,11 +1,11 @@
 collections:
   - name: community.docker
-    version: "3.1.0"
+    version: "3.4.11"
     # Needs for rsync
   - name: ansible.posix
-    version: "1.4.0"
+    version: "1.5.4"
   - name: kubernetes.core
-    version: "2.3.2"
+    version: "2.4.0"
     # nomad_job
   - name: community.general
-    version: "6.2.0"
+    version: "8.1.0"

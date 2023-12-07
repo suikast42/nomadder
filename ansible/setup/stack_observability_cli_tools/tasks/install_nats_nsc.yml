@@ -27,12 +27,21 @@
       register: nats_cli_nsc_download
 
     - name: "Unzip nats cli archive"
+      when: not is_local_host
       unarchive:
         src: "{{ nats_cli_nsc_download.dest }}"
         dest: /usr/local/bin
         copy: no
         owner: "{{ ansible_ssh_user }}"
         group: "{{ ansible_ssh_user }}"
+        mode: 0755
+
+    - name: "Unzip nats cli archive on localhost"
+      when: is_local_host
+      unarchive:
+        src: "{{ nats_cli_nsc_download.dest }}"
+        dest: /usr/local/bin
+        copy: no
         mode: 0755
 
   vars:

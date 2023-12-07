@@ -32,6 +32,7 @@ services:
     environment:
       # Let the default admin password as admin123
       NEXUS_SECURITY_RANDOMPASSWORD : false
+      INSTALL4J_ADD_VM_PARAMS: "-Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2073M -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
 #    logging:
 #      options:
 #        max-size: '100m'

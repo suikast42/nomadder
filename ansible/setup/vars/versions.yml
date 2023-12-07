@@ -13,23 +13,23 @@ consul_template_checksum: "sha256:1b1c9127e8da25b2d7322e6f2aa8e6d946336083999e0f
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "1.6.3"
-nomad_checksum: "sha256:1771f83030d9c0e25b4b97b73e824f4b566721e3b9898ae9940eceb95bb7f4d0"
+nomad_version: "1.7.0"
+nomad_checksum: "sha256:b0881b2e60f8acb97751bc1aac470d4f60ceab430ef572e12c7dadf1037532bf"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
 version_envoy: 1.28.0
 
-nomad_plugin_cni_version: "1.3.0"
-nomad_plugin_cni_checksum: "sha256:754a71ed60a4bd08726c3af705a7d55ee3df03122b12e389fdba4bea35d7dd7e"
+nomad_plugin_cni_version: "1.4.0"
+nomad_plugin_cni_checksum: "sha256:c2485ddb3ffc176578ae30ae58137f0b88e50f7c7f2af7d53a569276b2949a33"
 uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 
 nomad_cli_levant_version: "0.3.2"
 nomad_cli_levant_checkusum: "sha256:1e06180f8d8327e721e2ad4c9637d1f391034a22709473b8ed8ee19f1cad1570"
 uninstall_cli_levant: "{{uninstall_all or false }}"
 
-version_wander: "0.13.0"
-nomad_cli_wander_checkusum: "sha256:bd112362c3fc4815ead27fe2af6e5e8b6dc0e052875d5cab7f0dac32c51e292e"
+version_wander: "0.14.1"
+nomad_cli_wander_checkusum: "sha256:1bbcd84c4d791660a5a13bd69c35e231e0de5ed31392a41e05c21f3e5eea70e9"
 uninstall_cli_wander: "{{uninstall_all or false }}"
 
 
@@ -44,7 +44,7 @@ uninstall_compose: false
 
 update_certificates: false
 
-version_nexus: "3.61.0"
+version_nexus: "3.63.0"
 version_nexus_initlzr: "1.0.1"
 update_nexus: false
 
@@ -61,7 +61,7 @@ uninstall_protoc: "{{uninstall_all or false }}"
 
 version_busy_box_init_container: "1.36"
 version_multi_stage_apline_container: "3.17.2"
-version_grafana_agent_container: "0.38.0"
-version_minio: "RELEASE.2023-09-07T02-05-02Z"
-version_minio_mc_admin: "RELEASE.2023-09-07T22-48-55Z"
+version_grafana_agent_container: "0.38.1"
+version_minio: "RELEASE.2023-12-06T09-09-22Z"
+version_minio_mc_admin: "RELEASE.2023-12-02T11-24-10Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
