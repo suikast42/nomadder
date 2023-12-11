@@ -9,3 +9,11 @@ X-Scope-OrgID $ensured_x_scope_orgid;
 
 After setup observability stack add a kv in consul  e.g. consul kv put blackbox_hosts "master-01,worker-01,worker-02"
 This will trigger the blackbox exporter for having static lookups for must to have hosts
+
+
+
+## Video links
+
+## Nats
+
+Jetstream https://www.youtube.com/watch?v=ChSVWDW-874
