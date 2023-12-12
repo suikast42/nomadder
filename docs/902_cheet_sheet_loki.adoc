@@ -1,0 +1,15 @@
+.Mimir Rest
+|===
+|Description |Command
+
+
+|Delete logs from stream
+a|[source,shell]
+----
+curl -g -X POST \
+  'http://172.42.1.20:3100/loki/api/v1/delete?query={ingress="ingress.logs.ecs"}&start=1672531200&end=1702252800'
+----
+
+
+
+|===

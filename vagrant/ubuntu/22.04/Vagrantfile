@@ -90,30 +90,30 @@ Vagrant.configure("2") do |config|
       worker_01.vmx['displayname'] =$vm_hostname_worker_01
     end
   end
-  config.vm.define "worker_02" do |workercfg|
-    workercfg.vm.provider :vmware_desktop do |worker_02|
-      workercfg.vm.hostname = $vm_hostname_worker_02
-      workercfg.vm.network :private_network, ip: $vm_worker_02_ip, :netmask => "255.255.0.0"
-      workercfg.vm.box_version = $vm_base_box_version
-      worker_02.gui=true
-      worker_02.linked_clone = false
-      worker_02.vmx["memsize"] = $vm_mem_worker_02
-      worker_02.vmx["numvcpus"] = $vm_cpus_worker_02
-      worker_02.vmx['displayname'] =$vm_hostname_worker_02
-    end
-  end
-  config.vm.define "worker_03" do |workercfg|
-    workercfg.vm.provider :vmware_desktop do |worker_03|
-      workercfg.vm.hostname = $vm_hostname_worker_03
-      workercfg.vm.network :private_network, ip: $vm_worker_03_ip, :netmask => "255.255.0.0"
-      workercfg.vm.box_version = $vm_base_box_version
-      worker_03.gui=true
-      worker_03.linked_clone = false
-      worker_03.vmx["memsize"] = $vm_mem_worker_03
-      worker_03.vmx["numvcpus"] = $vm_cpus_worker_03
-      worker_03.vmx['displayname'] =$vm_hostname_worker_03
-    end
-  end
+  # config.vm.define "worker_02" do |workercfg|
+  #   workercfg.vm.provider :vmware_desktop do |worker_02|
+  #     workercfg.vm.hostname = $vm_hostname_worker_02
+  #     workercfg.vm.network :private_network, ip: $vm_worker_02_ip, :netmask => "255.255.0.0"
+  #     workercfg.vm.box_version = $vm_base_box_version
+  #     worker_02.gui=true
+  #     worker_02.linked_clone = false
+  #     worker_02.vmx["memsize"] = $vm_mem_worker_02
+  #     worker_02.vmx["numvcpus"] = $vm_cpus_worker_02
+  #     worker_02.vmx['displayname'] =$vm_hostname_worker_02
+  #   end
+  # end
+  # config.vm.define "worker_03" do |workercfg|
+  #   workercfg.vm.provider :vmware_desktop do |worker_03|
+  #     workercfg.vm.hostname = $vm_hostname_worker_03
+  #     workercfg.vm.network :private_network, ip: $vm_worker_03_ip, :netmask => "255.255.0.0"
+  #     workercfg.vm.box_version = $vm_base_box_version
+  #     worker_03.gui=true
+  #     worker_03.linked_clone = false
+  #     worker_03.vmx["memsize"] = $vm_mem_worker_03
+  #     worker_03.vmx["numvcpus"] = $vm_cpus_worker_03
+  #     worker_03.vmx['displayname'] =$vm_hostname_worker_03
+  #   end
+  # end
   # Somehow this part is not working with bento image provisioning
   # Let's do it self
   $disk_resize = <<-SHELL
