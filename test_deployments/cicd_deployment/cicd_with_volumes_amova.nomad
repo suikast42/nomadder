@@ -28,13 +28,13 @@ variable "hostname" {
 variable "image_jenkins" {
   type = string
   description = "The used jenkins image"
-  default = "jenkins/jenkins:2.432-jdk17_1"
+  default = "jenkins/jenkins:2.436-jdk17_1"
 }
 
 variable "image_gitlab" {
   type = string
   description = "The used jenkins image"
-  default = "gitlab/gitlab-ce:16.3.6-ce.0"
+  default = "gitlab/gitlab-ce:16.6.2-ce.0"
 }
 
 # See https://github.com/hashicorp/nomad-pack-community-registry/blob/main/packs/jenkins/templates/jenkins.nomad.tpl

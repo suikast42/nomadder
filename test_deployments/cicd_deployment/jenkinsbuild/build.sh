@@ -1,6 +1,6 @@
 #!/bin/bash
 export APP_NAME=jenkins
-export APP_VERSION_ORIG=2.432-jdk17
+export APP_VERSION_ORIG=2.436-jdk17
 export APP_VERSION_BUILD=${APP_VERSION_ORIG}_1
 export PULL_IMAGE=jenkins/jenkins:${APP_VERSION_ORIG}
 export PUSH_IMAGE=jenkins/jenkins:${APP_VERSION_BUILD}
