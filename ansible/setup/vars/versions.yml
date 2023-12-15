@@ -3,8 +3,8 @@ vault_checksum: "sha256:aa2ed532d9a0ecc8635fed63cb3fb6de472b4c01ca622a9a199cd92a
 uninstall_vault: "{{uninstall_all or false }}"
 
 
-consul_version: "1.17.0"
-consul_checksum: "sha256:4fbb6c3a05ddfc72d314149fe9765a1be89c33857b003a1d861469f2fe97e23e"
+consul_version: "1.17.1"
+consul_checksum: "sha256:388889321d6aaf389ee87acc247ea9885e684a1581c8ebfbeab7348abd7c0214"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
