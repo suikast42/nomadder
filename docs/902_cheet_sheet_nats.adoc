@@ -31,3 +31,6 @@ Links for nats topics:
 
 * [[_902_link_nats_java]]https://github.com/nats-io/nats.java/tree/main/src/examples/java/io/nats/examples/jetstream[Nats Java Examples]
 * [[_902_link_nats_exaclty_once_send]]https://nats.io/blog/new-per-subject-discard-policy//[Nats exactly once]
+
+* [[_902_link_nats_jetstream_video]]https://www.youtube.com/watch?v=ChSVWDW-874&t=10s[Nats Jetstream video]
+

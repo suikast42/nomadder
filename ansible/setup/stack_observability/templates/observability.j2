@@ -263,7 +263,7 @@ job "observability" {
        tags = [
              "prometheus",
              "prometheus:server_id=${NOMAD_ALLOC_NAME}",
-             "prometheus:version={{version_nats_server}}",
+             "prometheus:version={{version_grafana_loki}}",
           ]
        check {
          name  = "health"
@@ -565,7 +565,7 @@ job "observability" {
         service {
            port = "prometheus-exporter"
            # Change the service selector in grafana agent config as well if you cange this name
-           name = "nats-prometheus-exporter"
+           name = "${NOMAD_ALLOC_NAME}"
            tags = [
                 "prometheus",
                 "prometheus:server_id=${NOMAD_ALLOC_NAME}",
@@ -596,7 +596,7 @@ job "observability" {
           #  image = "{{registry_dns}}/{{stack_name}}/prometheus-nats-exporter:{{version_nats_prometheus_exporter_nomadder}}"
             image = "{{registry_dns}}/natsio/prometheus-nats-exporter:{{version_nats_prometheus_exporter}}"
             labels = {
-                "com.github.logunifier.application.name" = "prometheus-nats-exporter"
+                "com.github.logunifier.application.name" = "${NOMAD_ALLOC_NAME}"
                 "com.github.logunifier.application.version" = "{{version_nats_prometheus_exporter_nomadder}}"
                 "com.github.logunifier.application.pattern.key" = "tslevelmsg"
              }
@@ -610,7 +610,7 @@ job "observability" {
               "-serverz",
               "-subz",
               "-jsz=all",
-              "-use_internal_server_id",
+              "-use_internal_server_name",
               "http://localhost:${NOMAD_PORT_http}"
             ]
         }
@@ -721,12 +721,13 @@ mappings = {
 
   #escaping jinja curly braces
   #devices.*: devices.{{ '{{' }}wildcard(1){{ '}}' }}.{{ '{{' }}partition(10,1){{ '}}' }}
-  {% raw %}
-   ingress.eventlog.device.*: "ingress.eventlog.device.{{wildcard(1)}}.{{partition(10,1)}}"
-   egress.eventlog.device.*: "egress.eventlog.device.{{wildcard(1)}}.{{partition(10,1)}}"
-   ingress.devicetracking.*: "ingress.devicetracking.{{wildcard(1)}}.{{partition(10,1)}}"
-   egress.devicetracking.*: "egress.devicetracking.{{wildcard(1)}}.{{partition(10,1)}}"
-  {% endraw %}
+  # {% raw %}
+  #  ingress.eventlog.device.*: "ingress.eventlog.device.{{wildcard(1)}}.{{partition(10,1)}}"
+  #  egress.eventlog.device.*: "egress.eventlog.device.{{wildcard(1)}}.{{partition(10,1)}}"
+  #  ingress.devicetracking.*: "ingress.devicetracking.{{wildcard(1)}}.{{partition(10,1)}}"
+  #  egress.devicetracking.*: "egress.devicetracking.{{wildcard(1)}}.{{partition(10,1)}}"
+  # {% endraw %}
+
 }
               EOF
           }

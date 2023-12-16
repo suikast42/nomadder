@@ -38,21 +38,6 @@ metrics:
               target_label: instance
             - source_labels: [__meta_consul_service]
               target_label: service
-#            - source_labels: [__meta_consul_tags]
-#              separator:     ','
-#              regex:         'prometheus:([^=]+)=([^,]+)'
-#              target_label:  '$${1}'
-#              replacement:   '$${2}'
-            - source_labels: [__meta_consul_tags]
-              separator:     ','
-              regex:         '.*,prometheus:server_id=([^,]+),.*'
-              target_label:  'server_id'
-              replacement:   '$${1}'
-            - source_labels: [__meta_consul_tags]
-              separator:     ','
-              regex:         '.*,prometheus:version=([^,]+),.*'
-              target_label:  'version'
-              replacement:   '$${1}'
             - source_labels: ['__meta_consul_tags']
               target_label: 'labels'
               regex: '(.+)'
@@ -83,33 +68,14 @@ metrics:
               target_label: instance
             - source_labels: [__meta_consul_service]
               target_label: service
-#            - source_labels: [__meta_consul_tags]
-#              separator:     ','
-#              regex:         'prometheus:([^=]+)=([^,]+)'
-#              target_label:  '$${1}'
-#              replacement:   '$${2}'
-            - source_labels: [__meta_consul_tags]
-              separator:     ','
-              regex:         '.*,prometheus:server=([^,]+),.*'
-              target_label:  'server'
-              replacement:   '$${1}'
-            - source_labels: [__meta_consul_tags]
-              separator:     ','
-              regex:         '.*,prometheus:version=([^,]+),.*'
-              target_label:  'version'
-              replacement:   '$${1}'
             - source_labels: ['__meta_consul_tags']
               target_label: 'labels'
               regex: '(.+)'
               replacement: '$${1}'
               action: 'keep'
-#            - action: replace
-#              replacement: '38'
-#              target_label: 'test'
           metric_relabel_configs:
             - action: labeldrop
               regex: 'exported_.*'
-
         - job_name: integrations/blackbox # To get metrics about the exporter itself
           metrics_path: /metrics
           static_configs:

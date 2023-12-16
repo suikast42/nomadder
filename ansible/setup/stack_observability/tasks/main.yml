@@ -5,8 +5,9 @@
     - name: "Build grafana v {{version_grafana}}"
       import_tasks: build_grafana.yml
 
-    - name: "Build nats_prometheus_exporter v {{version_nats_prometheus_exporter_nomadder}}"
-      import_tasks: build_nats_exporter.yml
+# No ned of build a custom image here
+#    - name: "Build nats_prometheus_exporter v {{version_nats_prometheus_exporter_nomadder}}"
+#      import_tasks: build_nats_exporter.yml
 
 
     - name: "Create {{stack_deployment_dir}} if needed"
