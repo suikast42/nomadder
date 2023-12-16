@@ -86,7 +86,7 @@ if .SYSLOG_FACILITY == "3"{
 [sinks.sink_nats_journald]
 type = "nats"
 inputs = [ "source_journald","transform_logfmt_logunifier","transform_tsLevelMsg_logunifier" ]
-#url = "nats://nats.service.consul:4222"
+#url = "nats://nats-observability.service.consul:4222"
 #See issue https://github.com/suikast42/nomadder/issues/90
 url = "nats://{{worker_01_ip}}:4222"
 # Template syntax is useable here https://vector.dev/docs/reference/configuration/template-syntax/
@@ -104,7 +104,7 @@ acknowledgements.enabled=true
 [sinks.sink_nats_nomad_events]
 type = "nats"
 inputs = [ "source_nomad_events" ]
-#url = "nats://nats.service.consul:4222"
+#url = "nats://nats-observability.service.consul:4222"
 #See issue https://github.com/suikast42/nomadder/issues/90
 url = "nats://{{worker_01_ip}}:4222"
 # Template syntax is useable here https://vector.dev/docs/reference/configuration/template-syntax/

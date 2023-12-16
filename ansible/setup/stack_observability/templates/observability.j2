@@ -547,7 +547,12 @@ job "observability" {
       }
       service {
         port = "client"
-        name = "nats"
+        name = "nats-observability"
+        tags = [
+            "prometheus",
+            "prometheus:server_id=nats-observability",
+            "prometheus:version={{version_nats_server}}",
+        ]
         check {
           type     = "http"
           port     = "http"
@@ -569,7 +574,7 @@ job "observability" {
            tags = [
                 "prometheus",
                 "prometheus:server_id=${NOMAD_ALLOC_NAME}",
-                "prometheus:version={{version_nats_server}}",
+                "prometheus:version={{version_nats_prometheus_exporter}}",
            ]
            check {
               type     = "http"
@@ -986,7 +991,7 @@ mappings = {
                   "-loglevel",
                   "debug",
                   "-natsServers",
-                  "nats.service.consul:4222",
+                  "nats-observability.service.consul:4222",
                   "-lokiServers",
                   "loki.service.consul:9005",
                ]
