@@ -1,0 +1,9 @@
+sudo mkdir -p /opt/nomadvolumes/tools/excalidraw
+
+client {
+  host_volume "nomad_volume_stack_tools_excalidraw" {
+    path      = "/opt/nomadvolumes/tools/excalidraw"
+    read_only = false
+  }
+
+}

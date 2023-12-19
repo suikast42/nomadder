@@ -22,7 +22,7 @@ nats context select local
 | Create nats cli test Deterministic Subject token Partitioning
 a|[source,shell]
 ----
-nats server mapping "ingress.eventlog.device.*" "ingress.eventlog.device.{{wildcard(1)}}.{{partition(10,1)}}"
+nats server mapping "ingress.eventlog.*" "ingress.eventlog.{{wildcard(1)}}.{{partition(10,1)}}"
 ----
 
 |===
