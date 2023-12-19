@@ -978,6 +978,9 @@ mappings = {
      }
      task "logunifier" {
      driver = "docker"
+            env {
+                GOMAXPROCS = "1"
+            }
             config {
               image = "{{registry_dns}}/suikast42/logunifier:{{version_logunifer}}"
               labels = {
@@ -998,7 +1001,7 @@ mappings = {
              }
 
            resources {
-             cpu    = 100
+             cpu    = 500
              memory = 64
              memory_max = 2048
            }
