@@ -7,10 +7,32 @@ variable "tls_san" {
 
 job "tools" {
 
+  reschedule {
+    delay          = "10s"
+    delay_function = "constant"
+    unlimited      = true
+  }
+  update {
+    health_check      = "checks"
+    max_parallel      = 1
+    # Alloc is marked as unhealthy after this time
+    healthy_deadline  = "5m"
+    auto_revert  = true
+    # Mark the task as healthy after 10s positive check
+    min_healthy_time  = "10s"
+    # Task is dead after failed checks in 1h
+    progress_deadline = "1h"
+  }
 
   group "excalidraw" {
     count = 1
 
+    restart {
+      attempts = 1
+      interval = "1h"
+      delay = "5s"
+      mode = "fail"
+    }
     network {
       mode = "bridge"
       port "web" {
