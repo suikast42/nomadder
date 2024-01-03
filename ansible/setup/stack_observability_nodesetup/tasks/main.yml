@@ -17,7 +17,7 @@
     - tmp_install_dir_base: "/{{download_dir}}/grafana_agent"
     - version_grafana_agent_nodes: "0.38.1"
     - uninstall_grafana_agent: false
-    - version_vector_agent: "0.34.1-1"
+    - version_vector_agent: "0.34.2-1"
     - uninstall_vector_agent: false
     - version_nomad_event_sink: "0.2.0"
     - uninstall_version_nomad_event_sink: false
