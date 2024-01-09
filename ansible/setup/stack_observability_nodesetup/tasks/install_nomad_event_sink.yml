@@ -1,6 +1,6 @@
 - name: Nomad event sink agent uninstall
   become: true
-  when: uninstall_version_nomad_event_sink|bool == true
+  when: uninstall_nomad_event_sink|bool == true or update_nomad_event_sink|bool == true
   block:
     - name: Nomad event sink agent service
       failed_when: false

@@ -3,7 +3,7 @@
   block:
 
     - name: "Delete cli tool levant {{install_file}} if present"
-      when: uninstall_cli_levant|bool == true
+      when: uninstall_cli_levant|bool == true or update_cli_levant|bool == true
       ansible.builtin.file:
         path: "{{install_file}}"
         state: absent

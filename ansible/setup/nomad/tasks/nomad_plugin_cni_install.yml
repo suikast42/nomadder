@@ -3,7 +3,7 @@
   block:
 
     - name: "Delete nomad plugin cni dir {{plugin_dir}} if present"
-      when: uninstall_nomad|bool == true or uninstall_nomad_plugin_cni|bool == true
+      when: uninstall_nomad|bool == true
       ansible.builtin.file:
         path: "{{plugin_dir}}"
         state: absent

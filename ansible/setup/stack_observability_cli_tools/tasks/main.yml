@@ -10,5 +10,5 @@
     - update_nats_cli: false
     - version_nats_cli_nsc: "2.8.5"
     - nats_cli_nsc_checksum: "sha256:c5af53624f52cfbd2732bfdd40c3a0371a921ff11d5d097ede8946c4d83c4207  "
-    - update_nats_cli_nsc: false
-    - uninstall_nats_cli_nsc: false
+    - update_nats_cli_nsc: "{{update_all or false }}"
+    - uninstall_nats_cli_nsc: "{{uninstall_all or false }}"

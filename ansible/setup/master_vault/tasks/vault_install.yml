@@ -1,6 +1,6 @@
 - name: Vault uninstall
   become: true
-  when: uninstall_vault|bool == true
+  when: uninstall_vault|bool == true or update_vault|bool == true
   block:
     - name: stop vault service
       service:

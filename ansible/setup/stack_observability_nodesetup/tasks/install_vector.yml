@@ -1,6 +1,6 @@
 - name: Vector agent uninstall
   become: true
-  when: uninstall_vector_agent|bool == true
+  when: uninstall_vector_agent|bool == true or update_vector_agent|bool == true
   block:
     - name: stop vector agent service
       failed_when: false

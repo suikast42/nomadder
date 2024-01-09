@@ -45,7 +45,7 @@
 
   - name: "Delete protoc"
     become: true
-    when: uninstall_protoc|bool == true
+    when: uninstall_protoc|bool == true or update_protoc|bool == true
     shell: |
       rm -fr /usr/local/bin/protoc*
       rm -fr /usr/local/bin/include

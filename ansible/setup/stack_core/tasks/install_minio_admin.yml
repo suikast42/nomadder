@@ -4,7 +4,7 @@
   block:
 
     - name: minio cli uninstall
-      when: uninstall_minio_admin|bool == true
+      when: uninstall_minio_admin|bool == true or update_minio_admin|bool == true
       file:
         path: "{{install_file}}"
         state: absent

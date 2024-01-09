@@ -1,6 +1,7 @@
 vault_version: "1.11.1"
 vault_checksum: "sha256:aa2ed532d9a0ecc8635fed63cb3fb6de472b4c01ca622a9a199cd92a046bc73a"
 uninstall_vault: "{{uninstall_all or false }}"
+update_vault: "{{update_all or false }}"
 
 
 consul_version: "1.17.1"
@@ -27,10 +28,12 @@ uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 nomad_cli_levant_version: "0.3.2"
 nomad_cli_levant_checkusum: "sha256:1e06180f8d8327e721e2ad4c9637d1f391034a22709473b8ed8ee19f1cad1570"
 uninstall_cli_levant: "{{uninstall_all or false }}"
+update_cli_levant: "{{update_all or false }}"
 
 version_wander: "1.0.0"
 nomad_cli_wander_checkusum: "sha256:1409b34585856cd03d03ca303b38b999d2fb18ed7a73af9ef7805623ed418e13"
 uninstall_cli_wander: "{{uninstall_all or false }}"
+update_cli_wander: "{{update_all or false }}"
 
 
 version_cfssl: 1.6.4
@@ -58,6 +61,7 @@ version_proto_buf_cli: "1.26.1"
 version_proto_buf_connect: "1.10.0"
 version_proto_grpc_curl: "1.8.7"
 uninstall_protoc: "{{uninstall_all or false }}"
+update_protoc: "{{update_all or false }}"
 
 version_busy_box_init_container: "1.36"
 version_multi_stage_apline_container: "3.17.2"
@@ -65,3 +69,4 @@ version_grafana_agent_container: "0.38.1"
 version_minio: "RELEASE.2023-12-06T09-09-22Z"
 version_minio_mc_admin: "RELEASE.2023-12-02T11-24-10Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
+update_minio_admin: "{{update_all or false }}"

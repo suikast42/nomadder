@@ -8,7 +8,7 @@
 
 - name: Grafana agent uninstall
   become: true
-  when: uninstall_grafana_agent|bool == true
+  when: uninstall_grafana_agent|bool == true or update_grafana_agent|bool == true
   block:
     - name: stop grafana agent service
       failed_when: false

@@ -74,3 +74,15 @@
   gather_facts: yes
   roles:
     - {role: test, tags: ['never','test']}
+
+- hosts: all,!localhost
+  gather_facts: true
+  vars_files:
+    - vars/common_vars.yml
+  tasks:
+    - name: "Restart host"
+      become: true
+      when: update_all|bool == true
+      ansible.builtin.reboot:
+        msg: "Rebooting machine in 5 seconds"
+

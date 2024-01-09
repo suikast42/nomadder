@@ -3,7 +3,7 @@
   block:
 
     - name: "Delete cli tool wander {{install_file}} if present"
-      when: uninstall_cli_wander|bool == true
+      when: uninstall_cli_wander|bool == true or update_cli_wander|bool == true
       ansible.builtin.file:
         path: "{{install_file}}"
         state: absent

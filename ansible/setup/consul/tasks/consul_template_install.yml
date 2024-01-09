@@ -1,6 +1,6 @@
 - name: Consul template uninstall
   become: true
-  when: uninstall_consul_template|bool == true
+  when: uninstall_consul_template|bool == true or update_consul_template|bool
   block:
 
     - name: "Delete consul-template installation"
