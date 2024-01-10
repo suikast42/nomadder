@@ -27,14 +27,14 @@
         state: absent
         mode: '0755'
 
-- name: Check grafana agent installation present
+- name: Check nomad event sink installation present
   stat:
     path: "{{nomad_event_sink_working_dir}}/nomad-events-sink"
-  register: agnetinstalled
+  register: sinkInstalled
 
-- name: "Install grafana agent"
+- name: "Install nomad event sink"
   become: true
-  when: not agnetinstalled.stat.exists
+  when: not sinkInstalled.stat.exists
   block:
 
     - name: "Nomad event sink agent data dir {{nomad_event_sink_working_dir}} if needed"
