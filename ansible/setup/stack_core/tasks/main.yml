@@ -2,6 +2,14 @@
   when: is_master_0
   run_once: true
   block:
+    - name: "Create {{core_deployment_dir}} if needed"
+      become: true
+      file:
+        state: directory
+        mode: '0755'
+        path: "{{core_deployment_dir}}"
+
+
     - name: "Deploy traefik v {{version_traefik}}"
       import_tasks: deploy_ingress.yml
 
@@ -19,13 +27,6 @@
 
     - name: "Build keycloak v {{version_keycloak}}"
       import_tasks: build_keycloak.yml
-
-    - name: "Create {{core_deployment_dir}} if needed"
-      become: true
-      file:
-        state: directory
-        mode: '0755'
-        path: "{{core_deployment_dir}}"
 
 
     - name: "Deploy keycloak v {{version_keycloak}}"
