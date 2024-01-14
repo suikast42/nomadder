@@ -28,7 +28,7 @@ addServer(){
 
 pullFromBucket(){
     mkdir -p  $backup_local_folder
-    mc  cp $backup_full_path $minio_alias/$minio_bucket/$minio_path
+    mc cp $minio_alias/$minio_bucket/$minio_path $backup_full_path
     result=$?
     if [ $result -gt 0 ]; then
       echo "Can't copy $backup_full_path to $minio_alias/$minio_bucket/$minio_path. Return code is: $result"

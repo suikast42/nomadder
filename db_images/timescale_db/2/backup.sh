@@ -37,10 +37,10 @@ backupDb(){
 }
 
 pushToBucket(){
-    mc  cp $backup_full_path $minio_alias/$minio_bucket/$minio_path
+    mc  cp $backup_full_path $minio_alias/$minio_bucket/$minio_folder
     result=$?
     if [ $result -gt 0 ]; then
-      echo "Can't copy $backup_full_path to $minio_alias/$minio_bucket/$minio_path. Return code is: $result"
+      echo "Can't copy $backup_full_path to $minio_alias/$minio_bucket/$minio_folder. Return code is: $result"
       return $result
     fi
 }
