@@ -8,12 +8,13 @@ minio_folder=$MINIO_FOLDER
 minio_alias="minio_local"
 
 backup_file=$1
-backup_full_path="/var/opt/mssql/backup/$backup_file"
+backup_local_folder="/home/postgres/backup/"
+backup_full_path=$backup_local_folder/$backup_file
 minio_path=$minio_folder"/"$backup_file
 
-mssql_user=$MSSQL_BACKUP_USER
-mssql_pwd=$MSSQL_BACKUP_PWD
-mssql_db=$MSSQL_BACKUP_DB
+pg_user=$PG_BACKUP_USER
+pg_pwd=$PG_BACKUP_PWD
+pg_db=$PG_BACKUP_DB
 now=$(date)
 
 addServer(){
@@ -26,10 +27,11 @@ addServer(){
 }
 
 backupDb(){
-    /opt/mssql-tools/bin/sqlcmd  -U $mssql_user -P $mssql_pwd -Q "BACKUP DATABASE [$mssql_db] TO  DISK = N'$backup_full_path' WITH NOFORMAT, NOINIT,  NAME = N'$backup_file-Full backup: $now', SKIP, NOREWIND, NOUNLOAD,  STATS = 5"
+    mkdir -p  $backup_local_folder
+    pg_dump -Fc --dbname=postgresql://"$pg_user":"$pg_pwd"@localhost:5432/"$pg_db" -f  $backup_full_path
     result=$?
     if [ $result -gt 0 ]; then
-      echo "Can't backup $mssql_db to $backup_full_path. Return code is: $result"
+      echo "Can't backup $pg_db to $minio_alias/$minio_bucket/$backup_file. Return code is: $result"
       return $result
     fi
 }
