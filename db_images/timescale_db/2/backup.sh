@@ -1,5 +1,6 @@
 #!/bin/sh
-
+#exit on error
+set -e
 minio_bucket=$MINIO_BUCKET
 minio_access_key=$MINIO_ACCESS_KEY
 minio_secret_key=$MINIO_SECRET_KEY
@@ -28,7 +29,7 @@ addServer(){
 
 backupDb(){
     mkdir -p  $backup_local_folder
-    pg_dump -Fc --dbname=postgresql://"$pg_user":"$pg_pwd"@localhost:5432/"$pg_db" -f  $backup_full_path
+    pg_dump -Fc --disable-triggers --dbname=postgresql://"$pg_user":"$pg_pwd"@localhost:5432/"$pg_db" -f  $backup_full_path
     result=$?
     if [ $result -gt 0 ]; then
       echo "Can't backup $pg_db to $minio_alias/$minio_bucket/$backup_file. Return code is: $result"

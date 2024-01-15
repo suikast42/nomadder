@@ -1,5 +1,6 @@
 #!/bin/sh
-
+#exit on error
+set -e
 minio_bucket=$MINIO_BUCKET
 minio_access_key=$MINIO_ACCESS_KEY
 minio_secret_key=$MINIO_SECRET_KEY
