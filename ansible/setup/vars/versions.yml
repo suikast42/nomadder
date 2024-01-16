@@ -14,8 +14,8 @@ consul_template_checksum: "sha256:9844aebb997b81dd5b58a6ddadbf650eca4b200ccbc2ad
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "1.7.2"
-nomad_checksum: "sha256:5264b4f4b9a0bf8f086544f15e6a6377c856e5556bf44337c958f5356d251331"
+nomad_version: "1.7.3"
+nomad_checksum: "sha256:ee0d93fe1b2d5aead6bc5c0508c8ac99822e11157c0e1172f5da0d7d139c26c8"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
@@ -30,7 +30,7 @@ nomad_cli_levant_checkusum: "sha256:1e06180f8d8327e721e2ad4c9637d1f391034a227094
 uninstall_cli_levant: "{{uninstall_all or false }}"
 update_cli_levant: "{{update_all or false }}"
 
-version_wander: "1.0.0"
+version_wander: "1.0.1"
 nomad_cli_wander_checkusum: "sha256:1409b34585856cd03d03ca303b38b999d2fb18ed7a73af9ef7805623ed418e13"
 uninstall_cli_wander: "{{uninstall_all or false }}"
 update_cli_wander: "{{update_all or false }}"
@@ -52,7 +52,7 @@ version_nexus_initlzr: "1.0.1"
 update_nexus: false
 
 
-version_protoc: "25.1"
+version_protoc: "25.2"
 version_proto_gen: "1.31.0"
 version_proto_grpc: "1.3.0"
 version_proto_grpc_gateway: "2.15.2"
@@ -65,7 +65,7 @@ update_protoc: "{{update_all or false }}"
 
 version_busy_box_init_container: "1.36"
 version_multi_stage_apline_container: "3.17.2"
-version_grafana_agent_container: "0.38.1"
+version_grafana_agent_container: "0.39.0"
 version_minio: "RELEASE.2024-01-13T07-53-03Z"
 version_minio_mc_admin: "RELEASE.2024-01-13T08-44-48Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"

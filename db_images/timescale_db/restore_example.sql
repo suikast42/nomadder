@@ -21,10 +21,13 @@ CREATE DATABASE BI OWNER BIMASTER;
 
 
 -- Default restore workflow
--- Logon to the postgres database
+-- Logon to the bi database
 SELECT timescaledb_pre_restore();
 
 -- execute the pg_restore
 
 SELECT timescaledb_post_restore();
 ANALYSE;
+
+Alternatvive migration
+https://docs.timescale.com/migrate/latest/pg-dump-and-restore/pg-dump-restore-from-timescaledb/
