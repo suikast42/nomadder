@@ -64,7 +64,24 @@ nomad exec  -task nats  8a5d098e /bin/sh
 
 |===
 
+=== CPU limit with docker
 
+Nomad jobs can limit the number of reserved cpu by set resources in job -> group -> task stanza
+
+
+[source,hcl]
+----
+     resources {
+        #        cores  = 1 # Limit the job to use 1 core and reserve it
+        cpu    = 100 # Intent to use 100MHZ
+        memory = 128
+      }
+----
+
+The cores setting reserves the full core for that job. That means you can run max jobs limited to your cpus on the node.
+
+The cpu reserves mhz on the node but not limit it by default. The job can overconsume the cpu.
+To limit the job on that mhz you can set cpu_hard_limit for docker driver.
 
 === CSI ( Container Storage Interface )
 

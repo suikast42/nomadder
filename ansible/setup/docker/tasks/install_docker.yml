@@ -122,12 +122,12 @@
   become: true
   when: not dockerInstalled.stat.exists
   block:
-    - name: "Install docker V {{ docker_version }}"
+    - name: "Install docker V {{ version_docker }}"
       delay: 0
       async: 300
       poll: 1
       shell: |
-        export VERSION={{docker_version}}
+        export VERSION={{version_docker}}
         curl -fsSL https://get.docker.com -o install-docker.sh
         chmod +x install-docker.sh
         ./install-docker.sh
