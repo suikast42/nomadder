@@ -58,6 +58,9 @@ job "observability" {
           }
             sidecar_task{
               config{
+               {% if set_cpu_hard_limit %}
+                cpu_hard_limit = "true"
+               {% endif %}
                 labels = {
                   "com.github.logunifier.application.pattern.key" = "envoy"
                 }
@@ -103,6 +106,9 @@ job "observability" {
       }
       config {
         image = "{{registry_dns}}/{{stack_name}}/grafana:{{version_grafana_nomadder}}"
+ {% if set_cpu_hard_limit %}
+        cpu_hard_limit = "true"
+ {% endif %}
         labels = {
           "com.github.logunifier.application.name" = "grafana"
           "com.github.logunifier.application.version" = "{{version_grafana_nomadder}}"
@@ -183,6 +189,9 @@ job "observability" {
    #      }
          config {
          image = "{{registry_dns}}/grafana/mimir:{{version_grafana_mimir}}"
+ {% if set_cpu_hard_limit %}
+         cpu_hard_limit = "true"
+ {% endif %}
          labels = {
            "com.github.logunifier.application.name" = "mimir"
            "com.github.logunifier.application.version" = "{{version_grafana_mimir}}"
@@ -296,6 +305,9 @@ job "observability" {
    #  }
     config {
        image = "{{registry_dns}}/grafana/loki:{{version_grafana_loki}}"
+  {% if set_cpu_hard_limit %}
+       cpu_hard_limit = "true"
+  {% endif %}
        labels = {
          "com.github.logunifier.application.name" = "loki"
          "com.github.logunifier.application.version" = "{{version_grafana_loki}}"
@@ -483,6 +495,9 @@ job "observability" {
        #   }
          config {
          image = "{{registry_dns}}/grafana/tempo:{{version_grafana_tempo}}"
+ {% if set_cpu_hard_limit %}
+         cpu_hard_limit = "true"
+ {% endif %}
          labels = {
            "com.github.logunifier.application.name" = "tempo"
            "com.github.logunifier.application.version" = "{{version_grafana_tempo}}"
@@ -600,6 +615,9 @@ job "observability" {
            # for debugging
           #  image = "{{registry_dns}}/{{stack_name}}/prometheus-nats-exporter:{{version_nats_prometheus_exporter_nomadder}}"
             image = "{{registry_dns}}/natsio/prometheus-nats-exporter:{{version_nats_prometheus_exporter}}"
+ {% if set_cpu_hard_limit %}
+            cpu_hard_limit = "true"
+ {% endif %}
             labels = {
                 "com.github.logunifier.application.name" = "${NOMAD_ALLOC_NAME}"
                 "com.github.logunifier.application.version" = "{{version_nats_prometheus_exporter_nomadder}}"
@@ -629,6 +647,9 @@ job "observability" {
              driver = "docker"
              config {
              image = "{{registry_dns}}/nats:{{version_nats_server}}-alpine"
+ {% if set_cpu_hard_limit %}
+             cpu_hard_limit = "true"
+ {% endif %}
              labels = {
                 "com.github.logunifier.application.name" = "nats"
                 "com.github.logunifier.application.version" = "{{version_nats_server}}"
@@ -769,6 +790,9 @@ mappings = {
         }
         config {
           image = "prom/blackbox-exporter:v{{version_blackbox_exporter}}"
+ {% if set_cpu_hard_limit %}
+          cpu_hard_limit = "true"
+ {% endif %}
           ports = ["http"]
           args = ["--config.file","/config/blackbox.yaml"]
           volumes = [
@@ -913,6 +937,9 @@ mappings = {
        config {
 
          image = "{{registry_dns}}/grafana/agent:v{{version_grafana_agent_container}}"
+ {% if set_cpu_hard_limit %}
+         cpu_hard_limit = "true"
+ {% endif %}
          labels = {
            "com.github.logunifier.application.name" = "grafana_agent"
            "com.github.logunifier.application.version" = "{{version_grafana_agent_container}}"
@@ -983,6 +1010,9 @@ mappings = {
             }
             config {
               image = "{{registry_dns}}/suikast42/logunifier:{{version_logunifer}}"
+ {% if set_cpu_hard_limit %}
+              cpu_hard_limit = "true"
+ {% endif %}
               labels = {
                 "com.github.logunifier.application.name" = "logunifier"
                 "com.github.logunifier.application.version" = "{{version_logunifer}}"

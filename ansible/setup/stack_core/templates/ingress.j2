@@ -132,6 +132,9 @@ job "ingress" {
 
       config {
         image        = var.image
+ {% if set_cpu_hard_limit %}
+       cpu_hard_limit = "true"
+ {% endif %}
         labels = {
           "com.github.logunifier.application.name" = "traefik"
           "com.github.logunifier.application.version" = "{{version_traefik}}"

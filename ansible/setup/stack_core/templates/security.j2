@@ -55,6 +55,9 @@ job "security" {
         sidecar_service {}
         sidecar_task{
           config{
+ {% if set_cpu_hard_limit %}
+            cpu_hard_limit = "true"
+ {% endif %}
             labels = {
               "com.github.logunifier.application.pattern.key" = "envoy"
             }
@@ -95,6 +98,9 @@ job "security" {
       }
       config {
         image = "{{registry_dns}}/postgres:{{version_postgres_keycloak}}"
+ {% if set_cpu_hard_limit %}
+        cpu_hard_limit = "true"
+ {% endif %}
         volumes = [
           "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
         ]
@@ -175,6 +181,9 @@ job "security" {
 
         config {
           image        = "{{registry_dns}}/busybox:{{version_busy_box_init_container}}"
+ {% if set_cpu_hard_limit %}
+          cpu_hard_limit = "true"
+ {% endif %}
           command      = "sh"
           args         = ["-c", "echo -n 'Waiting for service keycloak'; until nslookup keycloak.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
           #network_mode = "host"
@@ -214,6 +223,9 @@ job "security" {
       }
       config {
         image = "{{registry_dns}}/mesosphere/traefik-forward-auth:{{version_mesosphere}}"
+ {% if set_cpu_hard_limit %}
+        cpu_hard_limit = "true"
+ {% endif %}
         labels = {
           "com.github.logunifier.application.name" = "mesosphere"
           "com.github.logunifier.application.version" = "{{version_mesosphere}}"
@@ -287,6 +299,9 @@ job "security" {
 
 
           config{
+ {% if set_cpu_hard_limit %}
+            cpu_hard_limit = "true"
+ {% endif %}
             labels = {
               "com.github.logunifier.application.pattern.key" = "envoy"
             }
@@ -344,6 +359,9 @@ job "security" {
 
         config {
           image        = "{{registry_dns}}/busybox:{{version_busy_box_init_container}}"
+ {% if set_cpu_hard_limit %}
+          cpu_hard_limit = "true"
+ {% endif %}
           command      = "sh"
           args         = ["-c", "echo -n 'Waiting for service keycloak-postgres'; until nslookup keycloak-postgres.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
           #network_mode = "host"
@@ -377,6 +395,9 @@ job "security" {
       }
       config {
         image = "{{registry_dns}}/{{stack_name}}/keycloak:{{version_keycloak_nomadder}}"
+ {% if set_cpu_hard_limit %}
+        cpu_hard_limit = "true"
+ {% endif %}
         labels = {
           "com.github.logunifier.application.name" = "keycloak"
           "com.github.logunifier.application.version" = "{{version_keycloak_nomadder}}"

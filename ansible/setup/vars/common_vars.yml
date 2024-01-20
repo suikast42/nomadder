@@ -92,7 +92,9 @@ nomad_conf_dir: "/etc/nomad.d"
 
 # enables traefik middlware for oauth authentication
 enable_oauth_middleware: false
-
+# !! Experimental. Set  cpu_hard_limit for all stacks
+## Set only to true for testing purposes
+set_cpu_hard_limit: false
 env: "dev"
 is_env_development : "{{ env == 'dev'}}"
 is_devnode : "{{ host_ip in  host_ips }}"

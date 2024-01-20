@@ -67,6 +67,9 @@ job "minio" {
 
       config {
         image = "{{registry_dns}}/minio/minio:{{version_minio}}"
+ {% if set_cpu_hard_limit %}
+       cpu_hard_limit = "true"
+ {% endif %}
         command = "server"
         args = [
           "/data",
