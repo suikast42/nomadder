@@ -1,0 +1,20 @@
+ifndef::imagesdir[]
+:imagesdir: ./images
+endif::imagesdir[]
+
+=== Settings
+Clarify VMWare workstation settings
+
+==== Virtual Machine Settings -> Processors -> Virtualization engine
+
+- Intel VT-x/EPT and AMD-V/RVI +
+you only enable that if you want to run a VM in your VM. (nested virtualisation)
+
+- CPU performance counters +
+A special use case where you need to measure performance
+
+- Virtual IOMMU +
+Needed if you want to enable VBS
+IOW, leaving these options unchecked unless you have one of those specific needs is highly recommended.
+It will not make your VM faster.
+If it does then an application installed in your guest OS is doing something behind your back.
