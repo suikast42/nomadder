@@ -10,7 +10,7 @@ ENV GRAFANA_PATH=/data/grafana/plugins
 #RUN mkdir -p /data/grafana/plugins && chown -R grafana:grafana /data/grafana/plugins
 #RUN mkdir -p /var/lib/grafana/dashboards && chown -R grafana:grafana /var/lib/grafana/dashboards
 
-COPY ../ansible/setup/stack_observability/templates/grafana/installPlugins.sh /home/grafana/installPlugins.sh
+COPY ../../ansible/setup/stack_observability/templates/grafana/installPlugins.sh /home/grafana/installPlugins.sh
 
 USER root
 RUN apk add --no-cache git make musl-dev go yarn
@@ -28,7 +28,7 @@ ENV GF_PATHS_PLUGINS=/data/grafana/plugins
 COPY --from=builder /data/grafana/plugins /data/grafana/plugins
 COPY --from=builder /bin/curl /bin/curl
 COPY provisioning/datasources/* /etc/grafana/provisioning/datasources/
-COPY ../ansible/setup/stack_observability/templates/grafana/grafana2.ini /etc/grafana/grafana2.ini
+COPY ../../ansible/setup/stack_observability/templates/grafana/grafana2.ini /etc/grafana/grafana2.ini
 #COPY /src/main/resources/docker/provisioning/dashboards/ /etc/grafana/provisioning/dashboards/
 #COPY /src/main/resources/docker/dashboards/provisioning/*  /etc/grafana/provisioning/dashboards/
 #COPY /src/main/resources/docker/dashboards/logs/* /var/lib/grafana/dashboards/logs/

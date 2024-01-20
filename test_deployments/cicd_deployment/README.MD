@@ -14,6 +14,7 @@ You can define group project or personal access token for acessing gitlab from j
 
 ## Prepare jenkins
 
+1. Build the jenkins docker image ../[test_docker_images](..%2F..%2Ftest_docker_images)/[jenkinsbuild](..%2F..%2Ftest_docker_images%2Fjenkinsbuild)
 1. Login to jenkins
 2. Set the values for `jenkinsbotUsernamePassword` ,`jenkinsbotGitlabApiToken`   and `jenkinsbotUsernameAndApiToken` with the values from gitlab. The casc plugin does not export the security information like pwd an token.
    </br>jenkinsbotUsernameAndApiToken is needed for gitlab http access. The Jenkins projects should refer to this token if the gitlab server uses http access instead of https
