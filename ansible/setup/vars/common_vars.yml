@@ -114,3 +114,5 @@ uninstall_all: false
 update_all: false
 
 fail_when_update_and_uninstall : "{{uninstall_all|bool == true and update_all|bool == true}}"
+
+update_vim_hcl: "{{uninstall_all|bool == true or update_all|bool == true}}"

@@ -117,6 +117,24 @@
     args:
       chdir: "/tmp/protoc"
       creates: /usr/local/bin/protoc
+
+  - name: "Delete vim hcl dir  ~/.vim/pack/jvirtanen/start if present"
+    when: update_vim_hcl|bool == true
+    ansible.builtin.file:
+      path: "~/.vim/pack/jvirtanen/start"
+      state: absent
+
+  - name: "vim hcl"
+    delay: 0
+    async: 300
+    poll: 1
+    shell: |
+      mkdir -p ~/.vim/pack/jvirtanen/start
+      cd ~/.vim/pack/jvirtanen/start
+      git clone https://github.com/jvirtanen/vim-hcl.git
+    args:
+      creates: ~/.vim/pack/jvirtanen/start
+
   vars:
     # Override the download_dir for localhost
     download_dir: "/home/{{ansible_user}}/downloads"

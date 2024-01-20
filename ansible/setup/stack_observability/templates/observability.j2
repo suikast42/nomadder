@@ -210,14 +210,129 @@ job "observability" {
         memory = 512
         memory_max = 32768
       }
-
     template {
       change_mode   = "restart"
       right_delimiter = "++"
       left_delimiter = "++"
-      data = file(abspath("./configs/mimir/mimir.tpl"))
+      data = <<EOF
+
+# Test ++ env "NOMAD_ALLOC_NAME"  ++
+# Do not use this configuration in production.
+# It is for demonstration purposes only.
+
+# Run Mimir in single process mode, with all components running in 1 process.
+target: all,alertmanager,overrides-exporter
+# Disable tendency support.
+multitenancy_enabled: false
+
+server:
+  http_listen_port: 9009
+  log_level: debug
+  # Configure the server to allow messages up to 100MB.
+  grpc_server_max_recv_msg_size: 104857600
+  grpc_server_max_send_msg_size: 104857600
+  grpc_server_max_concurrent_streams: 1000
+
+blocks_storage:
+  backend: filesystem
+  bucket_store:
+    sync_dir: /data/tsdb-sync
+   #ignore_blocks_within: 10h # default 10h
+  filesystem:
+    dir: /data/blocks
+  tsdb:
+    dir: /data/tsdb
+    # Note that changing this requires changes to some other parameters like
+    # -querier.query-store-after,
+    # -querier.query-ingesters-within and
+    # -blocks-storage.bucket-store.ignore-blocks-within.
+    # retention_period: 24h # default 24h
+querier:
+  # query_ingesters_within: 13h # default 13h
+  #query_store_after: 12h #default 12h
+
+ruler_storage:
+  backend: filesystem
+  filesystem:
+    dir: /data/rules
+
+alertmanager_storage:
+  backend: filesystem
+  filesystem:
+    dir: /data/alarms
+
+frontend:
+  grpc_client_config:
+    grpc_compression: snappy
+
+frontend_worker:
+  grpc_client_config:
+    grpc_compression: snappy
+
+ingester_client:
+  grpc_client_config:
+    grpc_compression: snappy
+
+query_scheduler:
+  grpc_client_config:
+    grpc_compression: snappy
+
+alertmanager:
+  data_dir: /data/alertmanager
+#  retention: 120h
+  sharding_ring:
+    replication_factor: 1
+  alertmanager_client:
+    grpc_compression: snappy
+
+ruler:
+  # Somehow the consul address does not works here
+  alertmanager_url: http://localhost:9009/alertmanager
+  query_frontend:
+    grpc_client_config:
+      grpc_compression: snappy
+
+compactor:
+#  compaction_interval: 1h # default 1h
+#  deletion_delay: 12h # default 12h
+  max_closing_blocks_concurrency: 2
+  max_opening_blocks_concurrency: 4
+  symbols_flushers_concurrency: 4
+  data_dir: /data/compactor
+  sharding_ring:
+    kvstore:
+      store: memberlist
+
+
+ingester:
+  ring:
+    replication_factor: 1
+
+store_gateway:
+  sharding_ring:
+    replication_factor: 1
+
+limits:
+  # Limit queries to 5 years. You can override this on a per-tenant basis.
+  max_total_query_length: 43680h
+  max_label_names_per_series: 42
+  # Allow ingestion of out-of-order samples up to 2 hours since the latest received sample for the series.
+  out_of_order_time_window: 1d
+  # delete old blocks from long-term storage.
+  # Delete from storage metrics data older than 1d.
+  compactor_blocks_retention_period: 1d
+  ingestion_rate: 100000
+      EOF
       destination = "local/mimir.yml"
     }
+
+#    template {
+#      change_mode   = "restart"
+#      right_delimiter = "++"
+#      left_delimiter = "++"
+#      data = file(abspath("./configs/mimir/mimir.tpl"))
+#      destination = "local/mimir.yml"
+#    }
 
 
  #     template {
@@ -326,14 +441,188 @@ job "observability" {
        memory = 512
        memory_max = 32768
     }
-
       template {
         change_mode   = "restart"
         right_delimiter = "++"
         left_delimiter = "++"
-        data = file(abspath("./configs/loki/loki.tpl"))
+        data = <<EOF
+auth_enabled: false
+
+server:
+  #default 3100
+  http_listen_port: 3100
+  #default 9005
+  #grpc_listen_port: 9005
+  # Max gRPC message size that can be received
+  # CLI flag: -server.grpc-max-recv-msg-size-bytes
+  #default 4194304 -> 4MB
+  grpc_server_max_recv_msg_size: 419430400
+
+  # Max gRPC message size that can be sent
+  # CLI flag: -server.grpc-max-send-msg-size-bytes
+  #default 4194304 -> 4MB
+  grpc_server_max_send_msg_size:  419430400
+
+  # Limit on the number of concurrent streams for gRPC calls (0 = unlimited)
+  # CLI flag: -server.grpc-max-concurrent-streams
+  grpc_server_max_concurrent_streams:  100
+
+  # Log only messages with the given severity or above. Supported values [debug,
+  # info, warn, error]
+  # CLI flag: -log.level
+  log_level: "warn"
+ingester:
+  wal:
+    enabled: true
+    dir: /data/wal
+  lifecycler:
+    address: 127.0.0.1
+    ring:
+      kvstore:
+        store: memberlist
+      replication_factor: 1
+    final_sleep: 0s
+  chunk_idle_period: 5m
+  chunk_retain_period: 30s
+  chunk_encoding: snappy
+
+ruler:
+  evaluation_interval : 1m
+  poll_interval: 1m
+  storage:
+    type: local
+    local:
+      directory: /data/rules
+  rule_path: /data/scratch
+++- range  $index, $service := service "mimir" -++
+++- if eq $index 0 ++
+  alertmanager_url: http://++$service.Name++.service.consul:++ $service.Port ++/alertmanager
+++- end ++
+++- end ++
+
+  ring:
+    kvstore:
+      store: memberlist
+  enable_api: true
+  enable_alertmanager_v2: true
+
+compactor:
+  working_directory: /data/retention
+  shared_store: filesystem
+  compaction_interval: 10m
+  retention_enabled: true
+  retention_delete_delay: 2h
+  retention_delete_worker_count: 150
+
+schema_config:
+  configs:
+    - from: 2023-03-01
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v12
+      index:
+        prefix: index_
+        period: 24h
+
+storage_config:
+  boltdb_shipper:
+    active_index_directory: /data/index
+    cache_location: /data/index-cache
+    shared_store: filesystem
+  filesystem:
+    directory: /data/chunks
+  index_queries_cache_config:
+    enable_fifocache: false
+    embedded_cache:
+      max_size_mb: 4096
+      enabled: true
+querier:
+  multi_tenant_queries_enabled: false
+  max_concurrent: 4096
+  query_store_only: false
+
+query_scheduler:
+  max_outstanding_requests_per_tenant: 10000
+
+query_range:
+  cache_results: true
+  results_cache:
+    cache:
+      enable_fifocache: false
+      embedded_cache:
+        enabled: true
+
+chunk_store_config:
+  chunk_cache_config:
+    enable_fifocache: false
+    embedded_cache:
+      max_size_mb: 4096
+      enabled: true
+  write_dedupe_cache_config:
+    enable_fifocache: false
+    embedded_cache:
+      max_size_mb: 4096
+      enabled: true
+
+distributor:
+  ring:
+    kvstore:
+      store: memberlist
+
+table_manager:
+  retention_deletes_enabled: true
+  retention_period: 24h
+
+limits_config:
+  ingestion_rate_mb: 64
+  ingestion_burst_size_mb: 8
+  max_label_name_length: 4096
+  max_label_value_length: 8092
+  enforce_metric_name: false
+  # Loki will reject any log lines that have already been processed and will not index them again
+  reject_old_samples: false
+  # 5y
+  reject_old_samples_max_age: 43800h
+  # The limit to length of chunk store queries. 0 to disable.
+  # 5y
+  max_query_length: 43800h
+  # Maximum number of log entries that will be returned for a query.
+  max_entries_limit_per_query: 20000
+  # Limit the maximum of unique series that is returned by a metric query.
+  max_query_series: 100000
+  # Maximum number of queries that will be scheduled in parallel by the frontend.
+  max_query_parallelism: 64
+  split_queries_by_interval: 24h
+  # Alter the log line timestamp during ingestion when the timestamp is the same as the
+  # previous entry for the same stream. When enabled, if a log line in a push request has
+  # the same timestamp as the previous line for the same stream, one nanosecond is added
+  # to the log line. This will preserve the received order of log lines with the exact
+  # same timestamp when they are queried, by slightly altering their stored timestamp.
+  # NOTE: This is imperfect, because Loki accepts out of order writes, and another push
+  # request for the same stream could contain duplicate timestamps to existing
+  # entries and they will not be incremented.
+  # CLI flag: -validation.increment-duplicate-timestamps
+  increment_duplicate_timestamp: true
+  #Log data retention for all
+  retention_period: 24h
+  # Comment this out for fine grained retention
+#  retention_stream:
+#  - selector: '{namespace="dev"}'
+#    priority: 1
+#    period: 24h
+  # Comment this out for having overrides
+#  per_tenant_override_config: /etc/overrides.yaml
+         EOF
         destination = "local/loki.yaml"
       }
+
+#      template {
+#        change_mode   = "restart"
+#        right_delimiter = "++"
+#        left_delimiter = "++"
+#        data = file(abspath("./configs/loki/loki.tpl"))
+#        destination = "local/loki.yaml"
+#      }
       }
     }
   group "tempo"{
@@ -521,7 +810,74 @@ job "observability" {
        change_mode   = "restart"
        right_delimiter = "++"
        left_delimiter = "++"
-       data = file(abspath("./configs/tempo/tempo.tpl"))
+       data = <<EOF
+multitenancy_enabled: false
+
+server:
+  http_listen_port: 3200
+
+distributor:
+  receivers:                           # this configuration will listen on all ports and protocols that tempo is capable of.
+    jaeger:                            # the receives all come from the OpenTelemetry collector.  more configuration information can
+      protocols:                       # be found there: https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver
+        thrift_http:                   #
+        grpc:                          # for a production deployment you should only enable the receivers you need!
+        thrift_binary:
+        thrift_compact:
+    zipkin:
+    otlp:
+      protocols:
+        http:
+        grpc:
+    opencensus:
+
+ingester:
+  trace_idle_period: 10s               # the length of time after a trace has not received spans to consider it complete and flush it
+  max_block_bytes: 1_000_000           # cut the head block when it hits this size or ...
+  max_block_duration: 5m               #   this much time passes
+
+compactor:
+  compaction:
+    compaction_window: 1h              # blocks in this time window will be compacted together
+    max_block_bytes: 100_000_000       # maximum size of compacted blocks
+    block_retention: 24h               # Duration to keep blocks 1d
+
+metrics_generator:
+  registry:
+    external_labels:
+      source: tempo
+      cluster: {{data_center}}
+  storage:
+    path: /data/generator/wal
+    remote_write:
+++- range service "mimir" ++
+      - url: http://++.Name++.service.consul:++.Port++/api/v1/push
+        send_exemplars: true
+        headers:
+          x-scope-orgid: 1
+++- end ++
+
+storage:
+  trace:
+    backend: local                     # backend configuration to use
+    block:
+      bloom_filter_false_positive: .05 # bloom filter false positive rate.  lower values create larger filters but fewer false positives
+    wal:
+      path: /data/wal             # where to store the the wal locally
+    local:
+      path: /data/blocks
+    pool:
+      max_workers: 100                 # worker pool determines the number of parallel requests to the object store backend
+      queue_depth: 10000
+
+query_frontend:
+  search:
+    # how to define year here ? define 5 years
+    max_duration: 43800h
+
+overrides:
+  metrics_generator_processors: [service-graphs, span-metrics]
+       EOF
        destination = "local/tempo.yaml"
      }
     }
@@ -961,10 +1317,131 @@ mappings = {
 	   template {
          right_delimiter = "++"
          left_delimiter = "++"
-         data = file(abspath("./configs/grafana_agent/agent.tpl"))
+         data = <<EOF
+server:
+  log_level: info
+
+metrics:
+  wal_directory: "/data/wal"
+  global:
+    scrape_interval: 10s
+    remote_write:
+++- range service "mimir" ++
+      - url: http://++.Name++.service.consul:++.Port++/api/v1/push
+++- end ++
+  configs:
+    - name: integrations
+      scrape_configs:
+        - job_name: integrations/traefik
+          scheme: http
+          metrics_path: '/metrics'
+          static_configs:
+          - targets:
+++- range service "traefik" ++
+            - ++.Address++:8081
+++- end ++
+
+        # grab all metric endpoints with stadanrd /metrics endpoint
+        - job_name: "integrations/consul_sd"
+          consul_sd_configs:
+            - server: "consul.service.consul:8501"
+              tags: ["prometheus"]
+              tls_config:
+                insecure_skip_verify: true
+                ca_file: "/certs/ca/ca.crt"
+                cert_file: "/certs/consul/consul.pem"
+                key_file: "/certs/consul/consul-key.pem"
+              datacenter: "{{data_center}}"
+              scheme: https
+          relabel_configs:
+            - source_labels: [__meta_consul_node]
+              target_label: instance
+            - source_labels: [__meta_consul_service]
+              target_label: service
+            - source_labels: ['__meta_consul_tags']
+              target_label: 'labels'
+              regex: '(.+)'
+              replacement: '$${1}'
+              action: 'keep'
+ #           - action: replace
+ #             replacement: '1'
+ #             target_label: 'test'
+          metric_relabel_configs:
+            - action: labeldrop
+              regex: 'exported_.*'
+
+
+        - job_name: "integrations/consul_sd_minio"
+          metrics_path: "/minio/v2/metrics/cluster"
+          consul_sd_configs:
+            - server: "consul.service.consul:8501"
+              tags: ["prometheus_minio"]
+              tls_config:
+                insecure_skip_verify: true
+                ca_file: "/certs/ca/ca.crt"
+                cert_file: "/certs/consul/consul.pem"
+                key_file: "/certs/consul/consul-key.pem"
+              datacenter: "{{data_center}}"
+              scheme: https
+          relabel_configs:
+            - source_labels: [__meta_consul_node]
+              target_label: instance
+            - source_labels: [__meta_consul_service]
+              target_label: service
+            - source_labels: ['__meta_consul_tags']
+              target_label: 'labels'
+              regex: '(.+)'
+              replacement: '$${1}'
+              action: 'keep'
+          metric_relabel_configs:
+            - action: labeldrop
+              regex: 'exported_.*'
+        - job_name: integrations/blackbox # To get metrics about the exporter itself
+          metrics_path: /metrics
+          static_configs:
+            - targets:
+++- range  $index, $service := service "blackbox-exporter" -++
+++- if eq $index 0 ++
+              - ++.Name++.service.consul:++.Port++
+++- end ++
+++- end ++
+++- if keyExists "blackbox_hosts" ++
+        - job_name: integrations/blackbox-checks # To get metrics about the exporter’s targets
+          metrics_path: /probe
+          params:
+            module: [http_integrations]
+          static_configs:
+            - targets:
+++- $hosts := key "blackbox_hosts" -++
+++- $hostList := $hosts | split ","  -++
+++- range $hostList ++
+              - https://++ .| trimSpace ++.node.consul:12345/agent/api/v1/instances
+++- end ++
+          relabel_configs:
+            - source_labels: [__address__]
+              target_label: __param_target
+            - source_labels: [__param_target]
+              target_label: instance
+              regex: 'https://(.+)\.node\.consul.*'
+              replacement: '$1'
+            - target_label: __address__
+++- range  $index, $service := service "blackbox-exporter" -++
+++- if eq $index 0 ++
+              replacement: ++.Name++.service.consul:++.Port++ # The blackbox exporter’s real hostname:port
+++- end ++
+++- end ++
+++- end -++
+         EOF
          destination = "local/agent.yaml"
          change_mode = "restart"
        }
+#	   template {
+#         right_delimiter = "++"
+#         left_delimiter = "++"
+#         data = file(abspath("./configs/grafana_agent/agent.tpl"))
+#         destination = "local/agent.yaml"
+#         change_mode = "restart"
+#       }
     }
   }
    group "logunifier"{

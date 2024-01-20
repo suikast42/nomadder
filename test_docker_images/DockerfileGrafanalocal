@@ -1,0 +1,37 @@
+# TODO http://docs.grafana.org/administration/provisioning/ import datasource and dashboard
+FROM  registry.cloud.private/grafana/grafana:9.5.3 as builder
+
+MAINTAINER Süleyman Vurucu <sueleyman.vurucu@amova.eu>
+
+ENV GF_PATHS_PLUGINS=/data/grafana/plugins
+ENV GRAFANA_PATH=/data/grafana/plugins
+#
+#USER root
+#RUN mkdir -p /data/grafana/plugins && chown -R grafana:grafana /data/grafana/plugins
+#RUN mkdir -p /var/lib/grafana/dashboards && chown -R grafana:grafana /var/lib/grafana/dashboards
+
+COPY ../ansible/setup/stack_observability/templates/grafana/installPlugins.sh /home/grafana/installPlugins.sh
+
+USER root
+RUN apk add --no-cache git make musl-dev go yarn
+RUN chmod +x /home/grafana/installPlugins.sh
+RUN sh /home/grafana/installPlugins.sh
+RUN git clone https://github.com/grafana/scenes.git
+WORKDIR scenes
+RUN yarn install
+RUN ./scripts/dev.sh
+COPY --from=tarampampam/curl:7.78.0 /bin/curl /bin/curl
+
+
+FROM registry.cloud.private/grafana/grafana:9.5.3
+ENV GF_PATHS_PLUGINS=/data/grafana/plugins
+COPY --from=builder /data/grafana/plugins /data/grafana/plugins
+COPY --from=builder /bin/curl /bin/curl
+COPY provisioning/datasources/* /etc/grafana/provisioning/datasources/
+COPY ../ansible/setup/stack_observability/templates/grafana/grafana2.ini /etc/grafana/grafana2.ini
+#COPY /src/main/resources/docker/provisioning/dashboards/ /etc/grafana/provisioning/dashboards/
+#COPY /src/main/resources/docker/dashboards/provisioning/*  /etc/grafana/provisioning/dashboards/
+#COPY /src/main/resources/docker/dashboards/logs/* /var/lib/grafana/dashboards/logs/
+#COPY /src/main/resources/docker/dashboards/nodes/* /var/lib/grafana/dashboards/nodes/
+#COPY /src/main/resources/docker/dashboards/docker/* /var/lib/grafana/dashboards/docker/
+EXPOSE 3000

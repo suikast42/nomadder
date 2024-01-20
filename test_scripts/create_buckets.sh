@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -e
 addserver(){
     ++- range  $index, $service := service "minio" -++
     ++- if eq $index 0 ++

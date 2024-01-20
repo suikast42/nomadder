@@ -1,0 +1,59 @@
+---
+# Install tools and update the nodes ( not related to nomad hashi stack )
+- hosts: all, !localhost
+  name: "Nodes base installations"
+  vars_files:
+    - ../ansible/setup/vars/versions.yml
+    - ../ansible/setup/vars/common_vars.yml
+  gather_facts: yes
+  tasks:
+    - name: "Update installed packages"
+      become: true
+      apt:
+        only_upgrade: true
+        update_cache: true
+        force_apt_get: true
+        upgrade: true
+        state: latest
+        clean: true
+        autoclean: true
+        autoremove: true
+      register: update
+
+
+    - debug:
+        msg: "{{ update }}"
+
+
+#    - name: "Install base packages"
+#      become: true
+#      apt:
+#        name:
+#          - snapd
+#          - thin-provisioning-tools
+#          - lvm2
+#          - tree
+#          - htop
+#          - zsh
+#          - jq
+#          - zip
+#          - unzip
+#          - dos2unix
+#          - ruby-dev
+#          - fortune-mod
+#          - ctop
+#          - python3-pip
+#          - fzf
+#          - net-tools
+#          - ncdu
+#          - open-iscsi
+#          - nfs-common
+#          - python3-docker
+
+#        state: present
+#        clean: true
+#        allow_unauthenticated: true
+#      register: install_apt
+
+    - debug:
+        msg: "{{ install_apt }}"
