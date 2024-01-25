@@ -39,10 +39,10 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.4
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "25.0.0"
+version_docker: "25.0.1"
 uninstall_docker: false
 
-version_docker_compose: "2.24.1"
+version_docker_compose: "2.24.2"
 uninstall_compose: false
 
 update_certificates: false
