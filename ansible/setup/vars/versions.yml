@@ -42,7 +42,7 @@ update_cfssl: "{{update_all or false }}"
 version_docker: "25.0.1"
 uninstall_docker: false
 
-version_docker_compose: "2.24.2"
+version_docker_compose: "2.24.3"
 uninstall_compose: false
 
 update_certificates: false
