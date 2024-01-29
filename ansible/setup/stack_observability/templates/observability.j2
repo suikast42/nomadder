@@ -1,3 +1,15 @@
+variable "org" {
+  type = string
+  description = "Default organisation"
+  default = "{{tls_san}}"
+}
+
+variable "env" {
+  type = string
+  description = "environment like prod dev testing"
+  default = "{{env}}"
+}
+
 job "observability" {
  {% if is_env_development %}
   meta {
@@ -63,6 +75,10 @@ job "observability" {
                {% endif %}
                 labels = {
                   "com.github.logunifier.application.pattern.key" = "envoy"
+                  "com.github.logunifier.application.name" = "grafana_agent"
+                  "com.github.logunifier.application.version" = "{{version_grafana_agent_container}}"
+                  "com.github.logunifier.application.org" = "${var.org}"
+                  "com.github.logunifier.application.env" = "${var.env}"
                 }
               }
             }
@@ -112,6 +128,8 @@ job "observability" {
         labels = {
           "com.github.logunifier.application.name" = "grafana"
           "com.github.logunifier.application.version" = "{{version_grafana_nomadder}}"
+          "com.github.logunifier.application.org" = "${var.org}"
+          "com.github.logunifier.application.env" = "${var.env}"
           "com.github.logunifier.application.pattern.key" = "logfmt"
         }
         ports = ["ui"]
@@ -195,6 +213,8 @@ job "observability" {
          labels = {
            "com.github.logunifier.application.name" = "mimir"
            "com.github.logunifier.application.version" = "{{version_grafana_mimir}}"
+           "com.github.logunifier.application.org" = "${var.org}"
+           "com.github.logunifier.application.env" = "${var.env}"
            "com.github.logunifier.application.pattern.key" = "logfmt"
          }
          ports = ["api"]
@@ -426,6 +446,8 @@ limits:
        labels = {
          "com.github.logunifier.application.name" = "loki"
          "com.github.logunifier.application.version" = "{{version_grafana_loki}}"
+         "com.github.logunifier.application.org" = "${var.org}"
+         "com.github.logunifier.application.env" = "${var.env}"
          "com.github.logunifier.application.pattern.key" = "logfmt"
        }
        ports = ["http","cli","grpc"]
@@ -790,6 +812,8 @@ limits_config:
          labels = {
            "com.github.logunifier.application.name" = "tempo"
            "com.github.logunifier.application.version" = "{{version_grafana_tempo}}"
+           "com.github.logunifier.application.org" = "${var.org}"
+           "com.github.logunifier.application.env" = "${var.env}"
            "com.github.logunifier.application.pattern.key" = "logfmt"
          }
          ports = ["jaeger","tempo","otlp_grpc","otlp_http","zipkin"]
@@ -978,6 +1002,8 @@ overrides:
                 "com.github.logunifier.application.name" = "${NOMAD_ALLOC_NAME}"
                 "com.github.logunifier.application.version" = "{{version_nats_prometheus_exporter_nomadder}}"
                 "com.github.logunifier.application.pattern.key" = "tslevelmsg"
+                "com.github.logunifier.application.org" = "${var.org}"
+                "com.github.logunifier.application.env" = "${var.env}"
              }
             ports = ["prometheus_exporter"]
             args = [
@@ -1010,6 +1036,8 @@ overrides:
                 "com.github.logunifier.application.name" = "nats"
                 "com.github.logunifier.application.version" = "{{version_nats_server}}"
                 "com.github.logunifier.application.pattern.key" = "tslevelmsg"
+                "com.github.logunifier.application.org" = "${var.org}"
+                "com.github.logunifier.application.env" = "${var.env}"
              }
              ports = ["client","http","cluster"]
              args = [
@@ -1146,6 +1174,12 @@ mappings = {
         }
         config {
           image = "prom/blackbox-exporter:v{{version_blackbox_exporter}}"
+          labels = {
+            "com.github.logunifier.application.name" = "blackbox-exporter"
+            "com.github.logunifier.application.version" = "{{version_blackbox_exporter}}"
+            "com.github.logunifier.application.org" = "${var.org}"
+            "com.github.logunifier.application.env" = "${var.env}"
+          }
  {% if set_cpu_hard_limit %}
           cpu_hard_limit = "true"
  {% endif %}
@@ -1291,8 +1325,7 @@ mappings = {
           }
        driver = "docker"
        config {
-
-         image = "{{registry_dns}}/grafana/agent:v{{version_grafana_agent_container}}"
+       image = "{{registry_dns}}/grafana/agent:v{{version_grafana_agent_container}}"
  {% if set_cpu_hard_limit %}
          cpu_hard_limit = "true"
  {% endif %}
@@ -1300,6 +1333,8 @@ mappings = {
            "com.github.logunifier.application.name" = "grafana_agent"
            "com.github.logunifier.application.version" = "{{version_grafana_agent_container}}"
            "com.github.logunifier.application.pattern.key" = "logfmt"
+           "com.github.logunifier.application.org" = "${var.org}"
+           "com.github.logunifier.application.env" = "${var.env}"
          }
          #:${NOMAD_HOST_PORT_server} bind on all available interfaces in the container
          args = [
@@ -1495,6 +1530,8 @@ metrics:
                 "com.github.logunifier.application.version" = "{{version_logunifer}}"
                 "com.github.logunifier.application.pattern.key" = "tslevelmsg"
                 "com.github.logunifier.application.strip.ansi" = "true"
+                "com.github.logunifier.application.org" = "${var.org}"
+                "com.github.logunifier.application.env" = "${var.env}"
               }
               ports = ["health"]
               args = [

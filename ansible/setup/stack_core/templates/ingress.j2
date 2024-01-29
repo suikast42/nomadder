@@ -22,6 +22,19 @@ variable "image" {
   description = "Default image"
   default = "{{registry_ip}}:{{registry_port}}/traefik:v{{version_traefik}}"
 }
+
+variable "org" {
+  type = string
+  description = "Default organisation"
+  default = "{{tls_san}}"
+}
+
+variable "env" {
+  type = string
+  description = "environment like prod dev testing"
+  default = "{{env}}"
+}
+
 # endregion
 
 job "ingress" {
@@ -138,6 +151,8 @@ job "ingress" {
         labels = {
           "com.github.logunifier.application.name" = "traefik"
           "com.github.logunifier.application.version" = "{{version_traefik}}"
+          "com.github.logunifier.application.org" = "${var.org}"
+          "com.github.logunifier.application.env" = "${var.env}"
           "com.github.logunifier.application.pattern.key" = "logfmt"
         }
         network_mode = "host"

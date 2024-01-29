@@ -9,6 +9,9 @@ services:
       - "com.hashicorp.nomad.namespace=default"
       - "com.hashicorp.nomad.task_group_name=nexus"
       - "com.hashicorp.nomad.task_name=nexus-initlz"
+      - "com.github.logunifier.application.org={{tls_san}}"
+      - "com.github.logunifier.application.env={{env}}"
+      - "com.github.logunifier.application.stack=core"
     environment:
       NEXUS_ADDRESS: {{host_ip}}
       NEXUS_PORT: 5002
@@ -29,6 +32,9 @@ services:
       - "com.hashicorp.nomad.task_group_name=nexus"
       - "com.hashicorp.nomad.task_name=nexus"
       - "com.github.logunifier.application.pattern.key=tslevelmsg"
+      - "com.github.logunifier.application.org={{tls_san}}"
+      - "com.github.logunifier.application.env={{env}}"
+      - "com.github.logunifier.application.stack=core"
     environment:
       # Let the default admin password as admin123
       NEXUS_SECURITY_RANDOMPASSWORD : false

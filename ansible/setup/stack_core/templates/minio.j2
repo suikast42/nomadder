@@ -1,3 +1,16 @@
+
+variable "org" {
+  type = string
+  description = "Default organisation"
+  default = "{{tls_san}}"
+}
+
+variable "env" {
+  type = string
+  description = "environment like prod dev testing"
+  default = "{{env}}"
+}
+
 job "minio" {
   datacenters = ["{{data_center}}"]
   priority    = 80
@@ -79,6 +92,12 @@ job "minio" {
           "/certs"
           ]
          ports = ["http","console"]
+         labels = {
+            "com.github.logunifier.application.name" = "minio"
+            "com.github.logunifier.application.version" = "{{version_minio}}"
+            "com.github.logunifier.application.org" = "${var.org}"
+            "com.github.logunifier.application.env" = "${var.env}"
+         }
       }
 
      env {
@@ -130,6 +149,8 @@ job "minio" {
          "traefik.consulcatalog.connect=false",
          "traefik.http.routers.minio.tls=true",
          "traefik.http.routers.minio.rule=Host(`minio.{{tls_san}}`)",
+
+
         ]
 
       check {

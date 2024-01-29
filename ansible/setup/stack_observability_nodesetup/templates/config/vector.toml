@@ -60,6 +60,19 @@ decoding.codec = "json"
 ## Log sources END
 
 ## Logunifer add pattern key transform
+[transforms.transform_journald]
+type = "remap"
+inputs = ["source_journald"]
+# Add COM_GITHUB_LOGUNIFIER_APPLICATION_PATTERN_KEY only for daemon processes
+source = '''
+if .SYSLOG_FACILITY == "3"{
+ .COM_GITHUB_LOGUNIFIER_APPLICATION_ORG = "{{tls_san}}"
+ .COM_GITHUB_LOGUNIFIER_APPLICATION_ENV = "{{env}}"
+ .COM_GITHUB_LOGUNIFIER_APPLICATION_STACK = "core"
+ .COM_GITHUB_LOGUNIFIER_APPLICATION_NAMESPACE = "default"
+}
+'''
+
 [transforms.transform_logfmt_logunifier]
 type = "remap"
 inputs = ["source_journald_logfmt"]
@@ -67,6 +80,10 @@ inputs = ["source_journald_logfmt"]
 source = '''
 if .SYSLOG_FACILITY == "3"{
  .COM_GITHUB_LOGUNIFIER_APPLICATION_PATTERN_KEY = "logfmt"
+ .COM_GITHUB_LOGUNIFIER_APPLICATION_ORG = "{{tls_san}}"
+ .COM_GITHUB_LOGUNIFIER_APPLICATION_ENV = "{{env}}"
+ .COM_GITHUB_LOGUNIFIER_APPLICATION_STACK = "core"
+ .COM_GITHUB_LOGUNIFIER_APPLICATION_NAMESPACE = "default"
 }
 '''
 
@@ -77,6 +94,10 @@ inputs = ["source_journald_tsLevelMsg"]
 source = '''
 if .SYSLOG_FACILITY == "3"{
  .COM_GITHUB_LOGUNIFIER_APPLICATION_PATTERN_KEY = "tslevelmsg"
+ .COM_GITHUB_LOGUNIFIER_APPLICATION_ORG = "{{tls_san}}"
+ .COM_GITHUB_LOGUNIFIER_APPLICATION_ENV = "{{env}}"
+ .COM_GITHUB_LOGUNIFIER_APPLICATION_STACK = "core"
+ .COM_GITHUB_LOGUNIFIER_APPLICATION_NAMESPACE = "default"
 }
 '''
 
@@ -85,7 +106,8 @@ if .SYSLOG_FACILITY == "3"{
 ## Log sources to standdardsaztion channels Begin
 [sinks.sink_nats_journald]
 type = "nats"
-inputs = [ "source_journald","transform_logfmt_logunifier","transform_tsLevelMsg_logunifier" ]
+inputs = [ "transform_journald","transform_logfmt_logunifier","transform_tsLevelMsg_logunifier" ]
+
 #url = "nats://nats-observability.service.consul:4222"
 #See issue https://github.com/suikast42/nomadder/issues/90
 url = "nats://{{worker_01_ip}}:4222"

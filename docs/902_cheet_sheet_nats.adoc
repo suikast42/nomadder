@@ -15,7 +15,7 @@ a|[source,shell]
 #create context with system account
 # The sys user account is configured in nats server settings
 # TODO configure JWT or APi key instead of username password
-nats context save local --server nats://nats.service.consul:4222 --user sys --password sys
+nats context save local --server nats://nats-observability.service.consul:4222 --user sys --password sys
 nats context select local
 ----
 
