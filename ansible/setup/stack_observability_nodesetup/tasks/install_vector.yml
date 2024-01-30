@@ -1,3 +1,13 @@
+##!/bin/bash
+#
+#  version=$(vector --version | awk '{match($0, /[0-9]+\.[0-9]+(\.[0-9]+)?/, arr); print arr[0]}')
+#
+#if (( $(awk -v ver="$version" 'BEGIN {print (ver + 0 < 0.35) ? 1 : 0}') )); then
+#  echo "The version $version is less than 0.35."
+#  else
+#  echo "The version $version is greater than or equal to 0.35."
+#  fi
+
 - name: Vector agent uninstall
   become: true
   when: uninstall_vector_agent|bool == true or update_vector_agent|bool == true
@@ -42,9 +52,7 @@
   block:
     - name: Add datadog vector apt repo
       shell: |
-        curl -1sLf \
-        'https://repositories.timber.io/public/vector/cfg/setup/bash.deb.sh' \
-        | sudo -E bash
+        CSM_MIGRATE=true bash -c "$(curl -L https://setup.vector.dev)"
 
 
     - name: "Update installed packages"
