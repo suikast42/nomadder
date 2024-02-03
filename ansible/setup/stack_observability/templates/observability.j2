@@ -247,7 +247,7 @@ multitenancy_enabled: false
 
 server:
   http_listen_port: 9009
-  log_level: debug
+  log_level: info
   # Configure the server to allow messages up to 100MB.
   grpc_server_max_recv_msg_size: 104857600
   grpc_server_max_send_msg_size: 104857600
@@ -662,39 +662,38 @@ limits_config:
       count = 1
       network {
         mode = "bridge"
-        port "jaeger" {
-          static =  14268
-          to = 14268
-        }
-      # port "jaeger-grpc" {
-      #    static =  14250
-      #     to = 14250
-      # }
-      # port "jaeger-thrift-compact" {
-      #    static =  6831
-      #    to = 6831
-      #  }
-      # port "jaeger-thrift-binary" {
-      #       static =  6832
-      #       to = 6832
-      # }
-
+        # Query api for tempo itself
         port "tempo" {
           static =  3200
           to = 3200
         }
-        port "otlp_grpc" {
-          static =  4317
-          to = 4317
-        }
-        port "otlp_http" {
-          static =  4318
-          to = 4318
-        }
+        # server grpc port
+        # 9095
         port "zipkin" {
           static =  9411
           to = 9411
         }
+#        port "jaeger_http" {
+#          static =  14268
+#          to = 14268
+#        }
+#        port "jaeger_grpc" {
+#          static =  14250
+#          to = 14250
+#        }
+#        port "otlp_grpc" {
+#          static =  4317
+#          to = 4317
+#        }
+#        port "otlp_http" {
+#          static =  4318
+#          to = 4318
+#        }
+#        port "opensus" {
+#          static =  55678
+#          to = 55678
+#        }
+
       }
     service{
       name ="tempo"
@@ -722,73 +721,8 @@ limits_config:
          interval = "10s"
          timeout  = "1s"
         }
-       }
-     service{
-        name ="tempo-jaeger"
-        port= "jaeger"
-        check {
-          name     = "tempo_jaeger_check"
-          type     = "tcp"
-          interval = "10s"
-          timeout  = "1s"
-         }
-      }
-    # service{
-    #   name ="tempo-jaeger-grpc"
-    #   port= "jaeger-grpc"
-    #   check {
-    #     name     = "tempo_jaeger_grpc_check"
-    #     type     = "tcp"
-    #     interval = "10s"
-    #     timeout  = "1s"
-    #   }
-    # }
-    #  service{
-    #   name ="tempo-jaeger-thrift-compact"
-    #   port= "jaeger-thrift-compact"
-    #   check {
-    #     task = "tempo"
-    #     name     = "tempo_jaeger_thrift_compact_check"
-    #     type     = "script"
-    #     command  = "nc"
-    #     args     = ["-z", "-v","-u", "${NOMAD_IP_jaeger_thrift_compact}", "${NOMAD_PORT_jaeger_thrift_compact}"]
-    #     interval = "10s"
-    #     timeout  = "1s"
-    #    }
-    # }
-    #service{
-    #  name ="tempo-jaeger-thrift-binary"
-    #  port= "jaeger-thrift-binary"
-    #  check {
-    #        task = "tempo"
-    #        name     = "tempo_jaeger_thrift_binary_check"
-    #        type     = "script"
-    #        command  = "nc"
-    #        args     = ["-z", "-v","-u", "${NOMAD_IP_jaeger_thrift_binary}", "${NOMAD_PORT_jaeger_thrift_binary}"]
-    #        interval = "10s"
-    #        timeout  = "1s"
-    #   }
-    #}
-     service{
-        name ="tempo-otlp-grpc"
-        port= "otlp_grpc"
-        check {
-          name     = "tempo_otlp_grpc_check"
-          type     = "tcp"
-          interval = "10s"
-          timeout  = "1s"
-         }
-      }
-     service{
-        name ="tempo-otlp-http"
-        port= "otlp_http"
-        check {
-          name     = "tempo_otlp_http_check"
-          type     = "tcp"
-          interval = "10s"
-          timeout  = "1s"
-         }
-      }
+    }
+
       task "tempo"{
         volume_mount {
           volume      = "stack_observability_tempo_volume"
@@ -816,7 +750,7 @@ limits_config:
            "com.github.logunifier.application.env" = "${var.env}"
            "com.github.logunifier.application.pattern.key" = "logfmt"
          }
-         ports = ["jaeger","tempo","otlp_grpc","otlp_http","zipkin"]
+         ports = ["zipkin"]
          args = [
            "-config.file","/config/tempo.yaml","-config.expand-env","true"
          ]
@@ -839,21 +773,23 @@ multitenancy_enabled: false
 
 server:
   http_listen_port: 3200
+  #default
+  #grpc_listen_port: 9095
 
 distributor:
   receivers:                           # this configuration will listen on all ports and protocols that tempo is capable of.
-    jaeger:                            # the receives all come from the OpenTelemetry collector.  more configuration information can
-      protocols:                       # be found there: https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver
-        thrift_http:                   #
-        grpc:                          # for a production deployment you should only enable the receivers you need!
-        thrift_binary:
-        thrift_compact:
+#    jaeger:                            # the receives all come from the OpenTelemetry collector.  more configuration information can
+#      protocols:                       # be found there: https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver
+#        thrift_http:                   #
+#        grpc:                          # for a production deployment you should only enable the receivers you need!
+#        thrift_binary:
+#        thrift_compact:
     zipkin:
-    otlp:
-      protocols:
-        http:
-        grpc:
-    opencensus:
+#    otlp:
+#      protocols:
+#        http:
+#        grpc:
+#    opencensus:
 
 ingester:
   trace_idle_period: 10s               # the length of time after a trace has not received spans to consider it complete and flush it

@@ -61,6 +61,11 @@ a|[source,shell]
 sudo ip addr flush eth0
 ----
 
+|List open ports
+a|[source,shell]
+----
+sudo netstat -tulpn \| grep LISTEN
+----
 
 |Check if can connect to port
 a|[source,shell]
