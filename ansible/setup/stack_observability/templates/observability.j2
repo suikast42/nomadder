@@ -673,14 +673,14 @@ limits_config:
           static =  9411
           to = 9411
         }
-#        port "jaeger_http" {
-#          static =  14268
-#          to = 14268
-#        }
-#        port "jaeger_grpc" {
-#          static =  14250
-#          to = 14250
-#        }
+        port "jaeger_http" {
+          static =  14268
+          to = 14268
+        }
+        port "jaeger_grpc" {
+          static =  14250
+          to = 14250
+        }
 #        port "otlp_grpc" {
 #          static =  4317
 #          to = 4317
@@ -722,7 +722,26 @@ limits_config:
          timeout  = "1s"
         }
     }
-
+    service{
+       name ="jaeger-http"
+       port= "jaeger_http"
+       check {
+         name     = "jaeger_http_check"
+         type     = "tcp"
+         interval = "10s"
+         timeout  = "1s"
+        }
+    }
+    service{
+       name ="jaeger-grpc"
+       port= "jaeger_grpc"
+       check {
+         name     = "jaeger_grpc_check"
+         type     = "tcp"
+         interval = "10s"
+         timeout  = "1s"
+        }
+    }
       task "tempo"{
         volume_mount {
           volume      = "stack_observability_tempo_volume"
@@ -778,12 +797,12 @@ server:
 
 distributor:
   receivers:                           # this configuration will listen on all ports and protocols that tempo is capable of.
-#    jaeger:                            # the receives all come from the OpenTelemetry collector.  more configuration information can
-#      protocols:                       # be found there: https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver
-#        thrift_http:                   #
-#        grpc:                          # for a production deployment you should only enable the receivers you need!
-#        thrift_binary:
-#        thrift_compact:
+    jaeger:                            # the receives all come from the OpenTelemetry collector.  more configuration information can
+      protocols:                       # be found there: https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver
+        thrift_http:                   #
+        grpc:                          # for a production deployment you should only enable the receivers you need!
+        thrift_binary:
+        thrift_compact:
     zipkin:
 #    otlp:
 #      protocols:
