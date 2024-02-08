@@ -1,1 +1,53 @@
-{"access":"proxy","id":4,"jsonData":{"httpMethod":"GET","lokiSearch":{"datasourceUid":"loki"},"nodeGraph":{"enabled":true},"search":{"hide":false},"serviceMap":{"datasourceUid":"mimir"},"tracesToLogs":{"datasourceUid":"loki","filterBySpanID":false,"filterByTraceID":false,"mapTagNamesEnabled":false,"mappedTags":[{"key":"service.name","value":"service"}],"spanEndTimeShift":"1h","spanStartTimeShift":"1h","tags":["group","job","task","container","namespace"]},"tracesToMetrics":{"datasourceUid":"mimir","queries":[{"name":"Sample query","query":"sum(rate(tempo_spanmetrics_latency_bucket{}[5m]))"}],"tags":[{"key":"service.name","value":"service"},{"key":"job"}]}},"name":"Tempo","orgId":1,"readOnly":true,"type":"tempo","typeLogoUrl":"public/app/plugins/datasource/tempo/img/tempo_logo.svg","uid":"tempo","url":"http://tempo.service.consul:3200"}
+{
+  "access": "proxy",
+  "id": 4,
+  "jsonData": {
+    "httpMethod": "GET",
+    "lokiSearch": {
+      "datasourceUid": "loki"
+    },
+    "nodeGraph": {
+      "enabled": true
+    },
+    "search": {
+      "hide": false
+    },
+    "serviceMap": {
+      "datasourceUid": "mimir"
+    },
+    "tracesToLogsV2": {
+      "customQuery": true,
+      "datasourceUid": "loki",
+      "filterBySpanID": false,
+      "filterByTraceID": false,
+      "query": "{pattern_key=\"Ecs\", process_error=\"false\"} | json | trace_trace_id= \"${__span.traceId}\" | line_format `[{{.service_name}} 💻 {{.host_name}}] [{{.log_levelEmoji}}] [{{.log_logger}}]  {{.message}}  {{if .error_message}}  error={{.error_message}} {{end}}   {{if .trace_trace_id}}  traceID={{.trace_trace_id}} {{end}}`",
+      "spanEndTimeShift": "2h",
+      "spanStartTimeShift": "-2h"
+    },
+    "tracesToMetrics": {
+      "datasourceUid": "mimir",
+      "queries": [
+        {
+          "name": "Sample query",
+          "query": "sum(rate(tempo_spanmetrics_latency_bucket{}[5m]))"
+        }
+      ],
+      "tags": [
+        {
+          "key": "service.name",
+          "value": "service"
+        },
+        {
+          "key": "job"
+        }
+      ]
+    }
+  },
+  "name": "Tempo",
+  "orgId": 1,
+  "readOnly": true,
+  "type": "tempo",
+  "typeLogoUrl": "/public/app/plugins/datasource/tempo/img/tempo_logo.svg",
+  "uid": "tempo",
+  "url": "http://tempo.service.consul:3200"
+}
