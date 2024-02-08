@@ -73,13 +73,18 @@ datasources:
       httpMethod: GET
       tracesToLogs:
         datasourceUid: 'loki'
-        tags: ['group' ,'job', 'task', 'container', 'namespace']
-        mappedTags: [{ key: 'service.name', value: 'service' }]
+#        tags: ['group' ,'job', 'task', 'container', 'namespace']
+#        mappedTags: [{ key: 'service.name', value: 'service' }]
         mapTagNamesEnabled: false
-        spanStartTimeShift: '1h'
-        spanEndTimeShift: '1h'
+        spanStartTimeShift: '-2h'
+        spanEndTimeShift: '2h'
         filterByTraceID: false
         filterBySpanID: false
+        customQuery: true
+{% raw %}
+        #query: '{{process_error="false"} | json | line_format "{{.body}}" | json | trace_id="$${__span.traceId}" | span_id="$${__span.spanId}"}'
+        query: '{pattern_key="Ecs", process_error="false"} | json | trace_trace_id= "$${__span.traceId}" | line_format `[{{.service_name}} 💻 {{.host_name}}] [{{.log_levelEmoji}}] [{{.log_logger}}]  {{.message}}  {{if .error_message}}  error={{.error_message}} {{end}}   {{if .trace_trace_id}}  traceID={{.trace_trace_id}} {{end}}`'
+{% endraw  %}
       tracesToMetrics:
         datasourceUid: 'mimir'
         tags: [{ key: 'service.name', value: 'service' }, { key: 'job' }]

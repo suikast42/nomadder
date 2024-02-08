@@ -1,4 +1,4 @@
-- name: Keycloak docker build
+- name: Grafana docker build
   run_once: true
   block:
   - name: "Search for {{registry_ip}}/{{stack_name}}/grafana:{{version_grafana_nomadder}} in nexus"
@@ -51,13 +51,19 @@
         src: grafana/grafana2.ini
         dest: "{{docker_build_dir_grafana}}/grafana2.ini"
 
+#    - name: Template grafana provisioning datasources
+#      template:
+#        src: "{{ item.src }}"
+#        dest: "{{docker_build_dir_grafana}}/provisioning/datasources" # The ending slash is very important here. Indicates a folder
+#        force: yes
+#      with_filetree: templates/grafana/provisioning/datasources
+#      when: item.state == 'file'
+
     - name: Template grafana provisioning datasources
       template:
-        src: "{{ item.src }}"
-        dest: "{{docker_build_dir_grafana}}/provisioning/datasources" # The ending slash is very important here. Indicates a folder
+        src: grafana/provisioning/datasources/datasources.j2
+        dest: "{{docker_build_dir_grafana}}/provisioning/datasources/datasources.yaml" # The ending slash is very important here. Indicates a folder
         force: yes
-      with_filetree: templates/grafana/provisioning/datasources
-      when: item.state == 'file'
 
 #
 #    - name: Copy content of directory 'files'

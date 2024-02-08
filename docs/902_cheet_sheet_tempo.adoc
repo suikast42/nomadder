@@ -1,0 +1,14 @@
+
+https://grafana.com/docs/tempo/latest/metrics-generator/service_graphs/[Service Graphs]
+
+https://grafana.com/docs/grafana/latest/datasources/tempo/configure-tempo-data-source/[Tempo query parameters]
+
+__tags	This variable uses the tag mapping from the UI to create a label matcher string in the specific data source syntax. The variable only uses tags that are present in the span. The link is still created even if only one of those tags is present in the span. You can use this if all tags are not required for the query to be useful.
+__span.spanId	The ID of the span.
+__span.traceId	The ID of the trace.
+__span.duration	The duration of the span.
+__span.name	Name of the span.
+__span.tags	Namespace for the tags in the span. To access a specific tag named version, you would use ${__span.tags.version}. In case the tag contains dot, you have to access it as ${__span.tags["http.status"]}.
+__trace.traceId	The ID of the trace.
+__trace.duration	The duration of the trace.
+__trace.name	The name of the trace.
