@@ -4,13 +4,14 @@
 #NOMAD_GROUP_NAME
 job "whoami" {
 
-  namespace = "test1"
   group "whoami" {
     count = 1
 
     network {
-      mode = "bridge"
+      mode = "host"
       port "web" {
+        to     = 42000
+        static = 42000
       }
     }
 
@@ -35,7 +36,7 @@ job "whoami" {
 
     task "whoami" {
       driver = "docker"
-#      driver = "containerd-driver"
+      #      driver = "containerd-driver"
       config {
         image = "traefik/whoami"
         ports = ["web"]
