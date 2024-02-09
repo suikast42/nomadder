@@ -14,15 +14,15 @@ client {
     read_only = true
   }
 
-  host_network "private" {
-    interface = "{{host_private_if}}"
+  host_network "public" {
+    interface = "{{host_public_if}}"
     #cidr = "203.0.113.0/24"
     #reserved_ports = "22,80"
   }
   host_network "default" {
       interface = "{{host_default_if}}"
   }
-  host_network "public" {
+  host_network "private" {
     interface = "{{host_default_if}}"
   }
   host_network "local" {

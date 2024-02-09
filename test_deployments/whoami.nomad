@@ -8,7 +8,8 @@ job "whoami" {
     count = 1
 
     network {
-      mode = "host"
+      mode = "bridge"
+    #  host_network="public"
       port "web" {
         to     = 42000
         static = 42000
