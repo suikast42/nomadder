@@ -12,9 +12,11 @@ variable "env" {
 
 job "observability" {
  {% if is_env_development %}
-  meta {
-    run_uuid = "${uuidv4()}"
-  }
+# Enable this for redeploy all the job file even if nothing changed
+#  meta {
+#    run_uuid = "${uuidv4()}"
+#  }
+#
   {% endif %}
 
   type = "service"
@@ -822,6 +824,9 @@ compactor:
     block_retention: 24h               # Duration to keep blocks 1d
 
 metrics_generator:
+  processor:
+    span_metrics:
+      dimensions: [org.name, deployment.environment, otel.scope.name,db.name, db.operation]
   registry:
     external_labels:
       source: tempo
@@ -835,6 +840,7 @@ metrics_generator:
         headers:
           x-scope-orgid: 1
 ++- end ++
+
 
 storage:
   trace:

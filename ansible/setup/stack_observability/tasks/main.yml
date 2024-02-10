@@ -31,7 +31,7 @@
     - version_grafana_loki: "2.9.4"
     - version_grafana_tempo: "2.3.1"
     - version_nats_server: "2.10.10"
-    - version_logunifer: "0.5.6"
+    - version_logunifer: "0.5.7"
     - version_blackbox_exporter: "0.24.0"
     - version_nats_prometheus_exporter: "0.14.0"
     - version_nats_prometheus_exporter_nomadder: "{{version_nats_prometheus_exporter}}.0"
