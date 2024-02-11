@@ -512,7 +512,7 @@ EOF
       }
       env{
         JAVA_OPTS ="-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -Dhudson.model.DownloadService.noSignatureCheck=true"
-        DOCKER_HOST = "172.42.21.10"
+        DOCKER_HOST = "172.21.1.10"
         DOCKER_TLS_VERIFY = 1
         DOCKER_BUILDKIT = 1
         //Nomad address with port
@@ -645,7 +645,7 @@ jenkins:
       clientCertificate: "/etc/opt/certs/nomad/nomad-cli.pem"
       clientPassword: "{AQAAABAAAACA9cx9FvrBYJn/d/4QHWGLepjaF4n1u+0oSHwPzFZuyiZPxojlbzgwl9wi+6xadJBG/E4FfKADGYJhXIwY6DeMWirGT5A6/OdB8Uuj6BC+7KeLiNkhJu9I1QZinoeYPPxEeQ3yKJtrlOn4jD0MoiDeD0JbNcGzWz2kfUZJp+Bcnk2R3xQ88vZ1Vn0geouQZgS2}"
       name: "CloudPrivate"
-      nomadUrl: "https://172.42.21.10:4646"
+      nomadUrl: "https://172.21.21.10:4646"
       prune: true
       serverCertificate: "/etc/ssl/certs/cluster-ca-bundle.pem"
       serverPassword: "{AQAAABAAAACArpOj0DdpAvshbcuFb5AHuqEydtWdYITTa4BL4VvK+3fUSUM8dQK892AXc3fRtNR0sg04YZ/huMhmA+Dvozhw6Xn56sRp2Fulx3eH4UN5m0rSZ2c5ZwS9LkRlkfk+dT2bcdf4MKlXTxBii6ujdR41qAYuURhNcvjeisFHD642/5y4LV93ImmL/6BKAhCWZlUZ}"

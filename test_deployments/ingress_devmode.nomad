@@ -154,7 +154,7 @@ job "ingress" {
     connectByDefault = false
 
   [providers.consulCatalog.endpoint]
-      address = "172.42.21.10:8500"
+      address = "172.21.21.10:8500"
       scheme  = "http"
 #      address = "127.0.0.1:8501"
 #      scheme  = "https"

@@ -52,7 +52,7 @@ include_matches = { }
 type = "nats"
 inputs = [ "source_journald" ]
 url = "nats://nats.service.consul:4222"
-#url = "nats://172.42.21.20:4222"
+#url = "nats://172.21.21.20:4222"
 # Template syntax is useable here https://vector.dev/docs/reference/configuration/template-syntax/
 subject = "ingress.logs.journald"
 connection_name ="{{host_name}}-ingress-journald"
@@ -64,7 +64,7 @@ healthcheck = true
 #type = "nats"
 #inputs = [ "source_docker_logs" ]
 #url = "nats://nats.service.consul:4222"
-##url = "nats://172.42.21.20:4222"
+##url = "nats://172.21.21.20:4222"
 ## Template syntax is useable here https://vector.dev/docs/reference/configuration/template-syntax/
 #subject = "ingress.logs.docker"
 #connection_name ="{{host_name}}-ingress-journald"

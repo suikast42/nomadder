@@ -16,24 +16,24 @@ $vm_base_box_version="1.3.0"
 $vm_mem_master_01 = 8096 # 8 GB RAM for master
 $vm_cpus_master_01 = 4
 $vm_hostname_master_01 = "master-01"
-$vm_master_01_ip = "172.42.1.10"
+$vm_master_01_ip = "172.21.1.10"
 
 
 $vm_mem_worker_01 = 43008  # 42 GB RAM for the workloads
 $vm_cpus_worker_01 = 12
 $vm_hostname_worker_01 = "worker-01"
-$vm_worker_01_ip = "172.42.1.20"
+$vm_worker_01_ip = "172.21.1.20"
 
 $vm_mem_worker_02 = 14000  # 42 GB RAM for the workloads
 $vm_cpus_worker_02 = 4
 $vm_hostname_worker_02 = "worker-02"
-$vm_worker_02_ip = "172.42.1.21"
+$vm_worker_02_ip = "172.21.1.21"
 
 
 $vm_mem_worker_03 = 14000  # 42 GB RAM for the workloads
 $vm_cpus_worker_03 = 4
 $vm_hostname_worker_03 = "worker-03"
-$vm_worker_03_ip = "172.42.1.22"
+$vm_worker_03_ip = "172.21.1.22"
 
 
 Vagrant.configure("2") do |config|
