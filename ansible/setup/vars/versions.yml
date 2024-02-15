@@ -4,8 +4,8 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.17.2"
-consul_checksum: "sha256:e16489849b3b203251d93fef94d60600b59cb776c11b66959786e3484d336381"
+consul_version: "1.17.3"
+consul_checksum: "sha256:bb71f4b9b465e314af0d98f5a6884794be9a44e930180537f0825ae9939461a4"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
@@ -14,8 +14,8 @@ consul_template_checksum: "sha256:9844aebb997b81dd5b58a6ddadbf650eca4b200ccbc2ad
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "1.7.4"
-nomad_checksum: "sha256:de8acde5a7564cb8fa3c50c6ef94876b07426c1996898eb1ae8e9566ff9143aa"
+nomad_version: "1.7.5"
+nomad_checksum: "sha256:da04e002e5b12fba3713de89f5d89d1374184009d32a68b16c8791c3bed6ceb0"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
@@ -42,7 +42,7 @@ update_cfssl: "{{update_all or false }}"
 version_docker: "25.0.3"
 uninstall_docker: false
 
-version_docker_compose: "2.24.5"
+version_docker_compose: "2.24.6"
 uninstall_compose: false
 
 update_certificates: false
