@@ -683,14 +683,14 @@ limits_config:
           static =  14250
           to = 14250
         }
-#        port "otlp_grpc" {
-#          static =  4317
-#          to = 4317
-#        }
-#        port "otlp_http" {
-#          static =  4318
-#          to = 4318
-#        }
+        port "otlp_grpc" {
+          static =  4317
+          to = 4317
+        }
+        port "otlp_http" {
+          static =  4318
+          to = 4318
+        }
 #        port "opensus" {
 #          static =  55678
 #          to = 55678
@@ -744,6 +744,26 @@ limits_config:
          timeout  = "1s"
         }
     }
+    service{
+       name ="otlp-http"
+       port= "otlp_http"
+       check {
+         name     = "otlp_http_check"
+         type     = "tcp"
+         interval = "10s"
+         timeout  = "1s"
+        }
+    }
+    service{
+       name ="otlp-grpc"
+       port= "otlp_grpc"
+       check {
+         name     = "otlp_grpc_check"
+         type     = "tcp"
+         interval = "10s"
+         timeout  = "1s"
+        }
+    }
       task "tempo"{
         volume_mount {
           volume      = "stack_observability_tempo_volume"
@@ -771,7 +791,7 @@ limits_config:
            "com.github.logunifier.application.env" = "${var.env}"
            "com.github.logunifier.application.pattern.key" = "logfmt"
          }
-         ports = ["zipkin"]
+         ports = ["zipkin","jaeger_http","jaeger_grpc","otlp_http","otlp_grpc"]
          args = [
            "-config.file","/config/tempo.yaml","-config.expand-env","true"
          ]
@@ -806,10 +826,10 @@ distributor:
         thrift_binary:
         thrift_compact:
     zipkin:
-#    otlp:
-#      protocols:
-#        http:
-#        grpc:
+    otlp:
+      protocols:
+        http:
+        grpc:
 #    opencensus:
 
 ingester:
