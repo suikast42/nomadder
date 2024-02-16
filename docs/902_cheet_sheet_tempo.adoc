@@ -1,3 +1,57 @@
+.NATS cheatsheet
+|===
+|Description |Command
+
+| Push spans with OTLP
+a|[source,shell]
+----
+curl -X POST -H 'Content-Type: application/json' http://localhost:4318/v1/traces -d '
+{
+	"resourceSpans": [{
+    	"resource": {
+        	"attributes": [{
+            	"key": "service.name",
+            	"value": {
+                	"stringValue": "my.service"
+            	}
+        	}]
+    	},
+    	"scopeSpans": [{
+        	"scope": {
+            	"name": "my.library",
+            	"version": "1.0.0",
+            	"attributes": [{
+                	"key": "my.scope.attribute",
+                	"value": {
+                    	"stringValue": "some scope attribute"
+                	}
+            	}]
+        	},
+        	"spans": [
+        	{
+            	"traceId": "5B8EFFF798038103D269B633813FC700",
+            	"spanId": "EEE19B7EC3C1B100",
+            	"name": "I am a span!",
+            	"startTimeUnixNano": 1689969302000000000,
+            	"endTimeUnixNano": 1689970000000000000,
+            	"kind": 2,
+            	"attributes": [
+            	{
+                	"key": "my.span.attr",
+                	"value": {
+                    	"stringValue": "some value"
+                	}
+            	}]
+        	}]
+    	}]
+	}]
+}'
+----
+
+
+|===
+
+
 
 https://grafana.com/docs/tempo/latest/metrics-generator/service_graphs/[Service Graphs]
 
