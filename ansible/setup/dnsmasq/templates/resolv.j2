@@ -6,9 +6,10 @@ cache-size=0
 # to resolve the host with that as the IP (it will be the containers loopback IP).
 nameserver {{host_ip}}
 {% if is_master_host  %}
-# for resolving the domain {{tls_san}}
+## for resolving the domain {{tls_san}}
+# This should resolved over dnsmasq 00-externaldns
 {% for worker in workers -%}
-nameserver {{worker}}
+#nameserver {{worker}}
 {% endfor %}
 {% endif %}
 nameserver 8.8.8.8
