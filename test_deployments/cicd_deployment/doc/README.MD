@@ -1,7 +1,7 @@
 # Setup CI/CD Pipeline with nomad
 This guide intruduces a CI/CD setuo with gitlab and Jenkins on nomad. Ig you have already a gitlab setup.
 
-1. Execute the jenkins build at first if not already done. !!! If you change the version then change it in the nomad job as well !!!
+1. Execute the jenkins build in test_docker_images at first if not already done. !!! If you change the version then change it in the nomad job as well !!!
 2. Login to keycloak an import the users in realm nomadder
 3. Create the volumes and copy the nomad volume file to worker-02
 4. Replace the clientSecret of configuration as code section from the job file with the jenkins secret from keycloak
