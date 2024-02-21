@@ -62,6 +62,13 @@ a|[source,shell]
 nomad exec  -task nats  8a5d098e /bin/sh
 ----
 
+|If container fails to start. Debug i by keep it running without start the app
+a|[source,shell]
+----
+# in config section of the image
+entrypoint         = ["tail", "-f", "/dev/null"]
+----
+
 |===
 
 === CPU limit with docker

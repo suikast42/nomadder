@@ -1,40 +1,39 @@
-
 variable "tls_san" {
-  type = string
+  type        = string
   description = "The cluster domain"
-  default = "amovacloud.private"
+  default     = "amovacloud.private"
 }
 
 
 variable "docker_host" {
-  type = string
+  type        = string
   description = "The docker build host"
-  default = "10.128.82.220"
+  default     = "10.128.82.220"
 }
 
 variable "master_01" {
-  type = string
+  type        = string
   description = "The master 01 ip"
-  default = "10.128.82.220"
+  default     = "10.128.82.220"
 }
 
 variable "hostname" {
-  type = string
+  type        = string
   description = "Deploy this job on this host"
-  default = "worker-01"
+  default     = "worker-01"
 }
 
 
 variable "image_jenkins" {
-  type = string
+  type        = string
   description = "The used jenkins image"
-  default = "jenkins/jenkins:2.445-jdk17_1"
+  default     = "jenkins/jenkins:2.445-jdk17_1"
 }
 
 variable "image_gitlab" {
-  type = string
+  type        = string
   description = "The used jenkins image"
-  default = "gitlab/gitlab-ce:16.9.0-ce.0"
+  default     = "gitlab/gitlab-ce:16.9.0-ce.0"
 }
 
 # See https://github.com/hashicorp/nomad-pack-community-registry/blob/main/packs/jenkins/templates/jenkins.nomad.tpl
@@ -42,11 +41,11 @@ job "cicd-job" {
   datacenters = ["nomadder1"]
   type        = "service"
 
-#  Place the whole job on the same node
-# This can be moved to group level as well
+  #  Place the whole job on the same node
+  # This can be moved to group level as well
   constraint {
-    attribute    = "${attr.unique.hostname}"
-    value = "${var.hostname}"
+    attribute = "${attr.unique.hostname}"
+    value     = "${var.hostname}"
   }
 
   reschedule {
@@ -60,20 +59,20 @@ job "cicd-job" {
     max_parallel      = 1
     # Alloc is marked as unhealthy after this time
     healthy_deadline  = "5m"
-    auto_revert  = true
+    auto_revert       = true
     # Mark the task as healthy after 10s positive check
     min_healthy_time  = "10s"
     # Task is dead after failed checks in 1h
     progress_deadline = "1h"
   }
 
-  group gitlab-group{
-    count =1
+  group gitlab-group {
+    count = 1
     restart {
       attempts = 1
       interval = "1h"
-      delay = "5s"
-      mode = "fail"
+      delay    = "5s"
+      mode     = "fail"
     }
     volume "nomad_volume_stack_cicd_gitlab_etc" {
       type      = "host"
@@ -124,8 +123,8 @@ job "cicd-job" {
         interval = "10s"
         timeout  = "2s"
         check_restart {
-          limit = 3
-          grace = "300s"
+          limit           = 3
+          grace           = "300s"
           ignore_warnings = false
         }
       }
@@ -162,7 +161,6 @@ job "cicd-job" {
       }
 
 
-
       driver = "docker"
 
       config {
@@ -177,8 +175,8 @@ job "cicd-job" {
         sidecar = false
       }
       template {
-        perms = "777"
-        data = <<EOF
+        perms       = "777"
+        data        = <<EOF
 #!/bin/bash
 EXIT_STATUS=0
 echo "Starting cert copy"
@@ -186,8 +184,8 @@ mkdir -p ${NOMAD_ALLOC_DIR}/data/security
 cp -r /certs/*  ${NOMAD_ALLOC_DIR}/data/security || EXIT_STATUS=$?
 exit $EXIT_STATUS
 EOF
-        destination   = "local/gen.sh"
-        change_mode   = "noop"
+        destination = "local/gen.sh"
+        change_mode = "noop"
       }
       resources {
         cpu    = 200
@@ -208,19 +206,20 @@ EOF
       driver = "docker"
 
       config {
-        image = "registry.${var.tls_san}/${var.image_gitlab}"
-        ports = ["http","ssl"]
+        image              = "registry.${var.tls_san}/${var.image_gitlab}"
+        ports              = ["http", "ssl"]
         image_pull_timeout = "10m"
-        volumes = ["../${NOMAD_ALLOC_DIR}/data/security/:/etc/gitlab/trusted-certs",]
+#        entrypoint         = ["tail", "-f", "/dev/null"]
+        volumes            = ["../${NOMAD_ALLOC_DIR}/data/security/:/etc/gitlab/trusted-certs",]
       }
       resources {
-        cpu    = 2000
-        memory = 4096
-        memory_max= 32192
+        cpu        = 2000
+        memory     = 4096
+        memory_max = 32192
       }
       env {
-        GITLAB_ROOT_EMAIL="root@local"
-        GITLAB_ROOT_PASSWORD="lcl@admin"
+        GITLAB_ROOT_EMAIL     = "root@local"
+        GITLAB_ROOT_PASSWORD  = "lcl@admin"
         #GITLAB_OMNIBUS_CONFIG = "external_url 'https://gitlab.${var.tls_san}'; gitlab_rails['monitoring_whitelist'] = ['0.0.0.0/0']"
         GITLAB_OMNIBUS_CONFIG = "external_url 'https://gitlab.${var.tls_san}'; nginx['listen_https'] = false; nginx['listen_port'] = 80; gitlab_rails['monitoring_whitelist'] = ['0.0.0.0/0']"
       }
@@ -231,8 +230,8 @@ EOF
     restart {
       attempts = 1
       interval = "1h"
-      delay = "5s"
-      mode = "fail"
+      delay    = "5s"
+      mode     = "fail"
     }
     volume "nomad_volume_stack_cicd_jenkins" {
       type      = "host"
@@ -293,8 +292,8 @@ EOF
         interval = "10s"
         timeout  = "2s"
         check_restart {
-          limit = 3
-          grace = "300s"
+          limit           = 3
+          grace           = "300s"
           ignore_warnings = false
         }
       }
@@ -316,13 +315,13 @@ EOF
         interval = "10s"
         timeout  = "2s"
         check_restart {
-          limit = 3
-          grace = "300s"
+          limit           = 3
+          grace           = "300s"
           ignore_warnings = false
         }
       }
     }
-# Enable this if volume is enabled
+    # Enable this if volume is enabled
     task "01-jenknins-chown" {
       lifecycle {
         hook    = "prestart"
@@ -357,7 +356,10 @@ EOF
       config {
         image   = "registry.${var.tls_san}/${var.image_jenkins}"
         command = "jenkins-plugin-cli"
-        args    = ["--verbose","-f", "/var/jenkins_home/plugins.txt", "--plugin-download-directory", "/var/jenkins_home/plugins/"]
+        args    = [
+          "--verbose", "-f", "/var/jenkins_home/plugins.txt", "--plugin-download-directory",
+          "/var/jenkins_home/plugins/"
+        ]
         volumes = ["local/plugins.txt:/var/jenkins_home/plugins.txt"]
       }
 
@@ -365,12 +367,12 @@ EOF
         hook    = "prestart"
         sidecar = false
       }
-# List of Plugins https://updates.jenkins.io/download/plugins/
-# For config the plugin cli see https://github.com/jenkinsci/plugin-installation-manager-tool
+      # List of Plugins https://updates.jenkins.io/download/plugins/
+      # For config the plugin cli see https://github.com/jenkinsci/plugin-installation-manager-tool
 
-# OIDC Login with keycloak and jenkins https://github.com/jenkinsci/keycloak-plugin
+      # OIDC Login with keycloak and jenkins https://github.com/jenkinsci/keycloak-plugin
       template {
-        data = <<EOF
+        data        = <<EOF
 role-strategy:689.v731678c3e0eb_
 keycloak:2.3.2
 oic-auth:2.6
@@ -413,8 +415,8 @@ custom-tools-plugin:0.8
 pipeline-utility-steps:2.16.0
 email-ext:2.102
 EOF
-        destination   = "local/plugins.txt"
-        change_mode   = "noop"
+        destination = "local/plugins.txt"
+        change_mode = "noop"
       }
       resources {
         cpu    = 500
@@ -449,8 +451,8 @@ EOF
         sidecar = false
       }
       template {
-        perms = "777"
-        data = <<EOF
+        perms       = "777"
+        data        = <<EOF
 #!/bin/bash
 EXIT_STATUS=0
 # ca ca.crt and cluster-ca.crt to java trust store
@@ -471,8 +473,8 @@ cp /certsdocker/docker-client.pem ${NOMAD_ALLOC_DIR}/data/docker_certs/cert.pem 
 cp /certsdocker/docker-client-key.pem ${NOMAD_ALLOC_DIR}/data/docker_certs/key.pem || EXIT_STATUS=$?
 exit $EXIT_STATUS
 EOF
-        destination   = "local/gen.sh"
-        change_mode   = "noop"
+        destination = "local/gen.sh"
+        change_mode = "noop"
       }
       resources {
         cpu    = 200
@@ -511,38 +513,38 @@ EOF
       }
 
       config {
-        image = "registry.${var.tls_san}/${var.image_jenkins}"
-        ports = ["http","jnlp"]
+        image   = "registry.${var.tls_san}/${var.image_jenkins}"
+        ports   = ["http", "jnlp"]
         volumes = [
           "local/jasc.yaml:/var/jenkins_home/jenkins.yaml",
-#        "../${NOMAD_ALLOC_DIR}/data/security:/etc/ssl/certs/java/cacerts",
-        "../${NOMAD_ALLOC_DIR}/data/security/cacerts:/opt/java/openjdk/lib/security/cacerts",
-        "../${NOMAD_ALLOC_DIR}/data/docker_certs/:/var/jenkins_home/.docker",
-        "local/settings.xml:/var/jenkins_home/.m2/settings.xml",
+          #        "../${NOMAD_ALLOC_DIR}/data/security:/etc/ssl/certs/java/cacerts",
+          "../${NOMAD_ALLOC_DIR}/data/security/cacerts:/opt/java/openjdk/lib/security/cacerts",
+          "../${NOMAD_ALLOC_DIR}/data/docker_certs/:/var/jenkins_home/.docker",
+          "local/settings.xml:/var/jenkins_home/.m2/settings.xml",
         ]
       }
-      env{
-        JAVA_OPTS ="-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -Dhudson.model.DownloadService.noSignatureCheck=true"
-        DOCKER_HOST = "${var.docker_host}"
-        DOCKER_TLS_VERIFY = 1
-        DOCKER_BUILDKIT = 1
+      env {
+        JAVA_OPTS              = "-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -Dhudson.model.DownloadService.noSignatureCheck=true"
+        DOCKER_HOST            = "${var.docker_host}"
+        DOCKER_TLS_VERIFY      = 1
+        DOCKER_BUILDKIT        = 1
         //Nomad address with port
-        NOMAD_ADDR="https://${attr.nomad.advertise.address}"
-        NOMAD_CACERT="/etc/ssl/certs/cluster-ca-bundle.pem"
-        NOMAD_CLIENT_CERT="/etc/opt/certs/nomad/nomad-cli.pem"
-        NOMAD_CLIENT_KEY="/etc/opt/certs/nomad/nomad-cli-key.pem"
-        CONSUL_CACERT="/etc/ssl/certs/cluster-ca-bundle.pem"
-        CONSUL_HTTP_SSL=true
-        CONSUL_HTTP_SSL_VERIFY=true
-        CONSUL_HTTP_ADDR="${attr.unique.network.ip-address}:8501"
-        CONSUL_CLIENT_KEY="/etc/opt/certs/consul/consul-key.pem"
-        CONSUL_CLIENT_CERT="/etc/opt/certs/consul/consul.pem"
+        NOMAD_ADDR             = "https://${attr.nomad.advertise.address}"
+        NOMAD_CACERT           = "/etc/ssl/certs/cluster-ca-bundle.pem"
+        NOMAD_CLIENT_CERT      = "/etc/opt/certs/nomad/nomad-cli.pem"
+        NOMAD_CLIENT_KEY       = "/etc/opt/certs/nomad/nomad-cli-key.pem"
+        CONSUL_CACERT          = "/etc/ssl/certs/cluster-ca-bundle.pem"
+        CONSUL_HTTP_SSL        = true
+        CONSUL_HTTP_SSL_VERIFY = true
+        CONSUL_HTTP_ADDR       = "${attr.unique.network.ip-address}:8501"
+        CONSUL_CLIENT_KEY      = "/etc/opt/certs/consul/consul-key.pem"
+        CONSUL_CLIENT_CERT     = "/etc/opt/certs/consul/consul.pem"
       }
       template {
         right_delimiter = "++"
         left_delimiter  = "++"
-        change_mode   = "noop"
-        destination   = "local/settings.xml"
+        change_mode     = "noop"
+        destination     = "local/settings.xml"
         data            = <<EOF
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -622,14 +624,14 @@ EOF
 
 EOF
       }
-# configuration-as-code plugin is required for that
-# https://plugins.jenkins.io/configuration-as-code/
-# Export current settings with https://jenkins.${var.tls_san}/configuration-as-code/
+      # configuration-as-code plugin is required for that
+      # https://plugins.jenkins.io/configuration-as-code/
+      # Export current settings with https://jenkins.${var.tls_san}/configuration-as-code/
 
       template {
         right_delimiter = "++"
-        left_delimiter = "++"
-        data = <<EOF
+        left_delimiter  = "++"
+        data            = <<EOF
 credentials:
   system:
     domainCredentials:
@@ -637,7 +639,7 @@ credentials:
       - usernamePassword:
           description: "username and password for gitlab at 10.83.201.64"
           id: "jenkinsbotUsernamePassword"
-          password: "{AQAAABAAAAAQyhOLbLiZRMfjr03vbNKwpd7lgfRrvnZZPx1xp11W0Ys=}"
+          password: "{AQAAABAAAAAQA6V+Taxn7LBndSzyhEOCn1Cdv+tHPible+WV/5YrNFU=}"
           scope: GLOBAL
           username: "jenkinsbot"
       - string:
@@ -649,13 +651,13 @@ credentials:
           description: "Jenkins bot username with api token as passowrd for gitlab\
             \ at 10.83.201.64 ( Http Access )"
           id: "jenkinsbotUsernameAndApiToken"
-          password: "{AQAAABAAAAAg8I+Myq8CejFef2cBwramMMibBOPc25iRk9d2KhMUu9iGSf1rgV8muvLQpMPhcmCI}"
+          password: "{AQAAABAAAAAgguKP4Ip+SQ4xcSr7vZyY+PdzcRDDutMbIJcByBEFNyChX6b+z7kezINI0fqxV5gQ}"
           scope: GLOBAL
           username: "jenkinsbot"
       - usernamePassword:
           description: "Service Account for sending emails over sms email server"
           id: "emailsender"
-          password: "{AQAAABAAAAAg+2KJZla4tJGM8+g+33C59nBjrA77PwyduXrQVj4NDn6v5qkTme2J9PgPOiLG6t4a}"
+          password: "{AQAAABAAAAAgCyZLUY1vds8W4IYxHZ09K23mxHh48OUgjC5Z+iz+qhJtXjoVmx00hgLqEJ4Cmn2M}"
           scope: GLOBAL
           username: "WMS-SLN"
 jenkins:
@@ -698,7 +700,7 @@ jenkins:
       authorizationServerUrl: "https://security.amovacloud.private/realms/nomadder/protocol/openid-connect/auth"
       automanualconfigure: "manual"
       clientId: "jenkins"
-      clientSecret: "{AQAAABAAAAAwD4+TD/nb+1lczDLZKqmLnJ/V8bUNUROnyg381zsjSuE65skA5KEyYlKXYGt/N/uwzRm+M4X2AyCMw31lkxh4EQ==}"
+      clientSecret: "{AQAAABAAAAAwRD4Uf4yyUtkfTY5jqMtwlxht6FRDDwl8ggvK6SvB9QKgcuUsOm2NDPkk5jvXC3bw8aImJ4051l/ed5VSAjaH4A==}"
       disableSslVerification: true
       endSessionEndpoint: "https://security.amovacloud.private/realms/nomadder/protocol/openid-connect/logout?client_id=jenkins&post_logout_redirect_uri=https://jenkins.amovacloud.private"
       fullNameFieldName: "preferred_username"
@@ -728,6 +730,9 @@ globalCredentialsConfiguration:
   configuration:
     providerFilter: "none"
     typeFilter: "none"
+appearance:
+  prism:
+    theme: PRISM
 security:
   apiToken:
     creationOfLegacyTokenEnabled: false
@@ -813,7 +818,7 @@ unclassified:
       name: "jenkins-amova-lib"
       retriever:
         modernSCM:
-          libraryPath: "."
+          libraryPath: "./"
           scm:
             git:
               credentialsId: "jenkinsbotUsernameAndApiToken"
@@ -956,13 +961,13 @@ tool:
     triggerDownstreamUponResultSuccess: true
     triggerDownstreamUponResultUnstable: false
               EOF
-        change_mode   = "noop"
-        destination   = "local/jasc.yaml"
+        change_mode     = "noop"
+        destination     = "local/jasc.yaml"
       }
       resources {
-        cpu    = 1000
-        memory = 2048
-        memory_max= 32192
+        cpu        = 1000
+        memory     = 2048
+        memory_max = 32192
       }
     }
   }
