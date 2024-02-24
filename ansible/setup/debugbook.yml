@@ -1,6 +1,6 @@
 # https://docs.ansible.com/ansible/latest/user_guide/playbooks_debugger.html
 ---
-- hosts: all,!localhost
+- hosts: all
   gather_facts: yes
   vars_files:
     - vars/versions.yml
@@ -11,6 +11,9 @@
 #    - name: Execute a command
 #      ansible.builtin.command: "false"
 #      debugger: on_failed
-    - name: "Debug"
+    - name: "Host IP"
+      debug:
+        msg: "{{ host_ip }}"
+    - name: "Host IPS"
       debug:
         msg: "{{ host_ips }}"

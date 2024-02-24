@@ -4,12 +4,6 @@ tls_san_wc:
   -  "*.{{tls_san}}"
 host_name: "{{ ansible_hostname  }}"
 
-host_default_if : "eth1"
-host_public_if : "eth0"
-host_ip: "{{ ansible_eth1.ipv4.address }}"
-host_ips:
-  - "{{ ansible_eth0.ipv4.address }}"
-  - "{{ ansible_eth1.ipv4.address }}"
 
 
 master_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
@@ -95,7 +89,7 @@ enable_oauth_middleware: false
 # !! Experimental. Set  cpu_hard_limit for all stacks
 ## Set only to true for testing purposes
 set_cpu_hard_limit: false
-env: "dev"
+#env set in inventory group var
 is_env_development : "{{ env == 'dev'}}"
 is_devnode : "{{ host_ip in  host_ips }}"
 # Development env set but host ip not registered as local development node
