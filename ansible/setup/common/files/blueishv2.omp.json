@@ -17,10 +17,13 @@
           "type": "os"
         },
         {
-          "background": "#ADA9A8",
+          "background": "#7aadf4",
           "foreground": "#546E7A",
           "powerline_symbol": "\ue0b0",
-          "template": " {{ if .SSHSession }} \uD83D\uDCBB {{ end }} {{.UserName}}@{{.HostName}} ",
+          "template": " {{ if .SSHSession }} \uD83D\uDCBB {{ end }} {{.UserName}} {{.HostName}}@{{.Env.TLS_SAN}} ",
+          "background_templates": [
+            "{{if (ne \"cloud.private\" .Env.TLS_SAN)}}#741903{{end}}"
+          ],
           "style": "powerline",
           "type": "session"
         },

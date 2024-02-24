@@ -30,20 +30,20 @@
     state: present
 
 
-- name: Override zshrc
-  ansible.builtin.copy:
+- name: Template zshrc
+  template:
+    force: yes
     src: .zshrc
     dest: "/home/{{ansible_ssh_user}}/.zshrc"
-    force: yes
     group: "{{ansible_ssh_user}}"
     owner: "{{ansible_ssh_user}}"
     mode: 0644
 
-- name: Override theme
+- name: Copy theme
   ansible.builtin.copy:
+    force: yes
     src: blueishv2.omp.json
     dest: "/home/{{ansible_ssh_user}}/.oh-my-zsh/custom/themes/blueishv2.omp.json"
-    force: yes
     group: "{{ansible_ssh_user}}"
     owner: "{{ansible_ssh_user}}"
     mode: 0644

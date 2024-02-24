@@ -1,5 +1,7 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
+export TLS_SAN={{tls_san}}
+export ENVIRONMENT={{env}}
 export NOMAD_ADDR=https://localhost:4646
 export NOMAD_CACERT=/usr/local/share/ca-certificates/cloudlocal/cluster-ca-bundle.pem
 export NOMAD_CLIENT_CERT=/etc/opt/certs/nomad/nomad-cli.pem
