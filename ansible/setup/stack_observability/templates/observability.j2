@@ -846,7 +846,7 @@ compactor:
 metrics_generator:
   processor:
     span_metrics:
-      dimensions: [org.name, deployment.environment, otel.scope.name,db.name, db.operation,messaging.operation,messaging.destination.name,messaging.sender]
+      dimensions: [org.name, deployment.environment,db.name, db.operation,messaging.operation,messaging.destination.name,messaging.sender]
   registry:
     external_labels:
       source: tempo
