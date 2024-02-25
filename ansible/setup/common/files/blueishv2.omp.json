@@ -20,9 +20,20 @@
           "background": "#0f70c8",
           "foreground": "#ADA9A8",
           "powerline_symbol": "\ue0b0",
-          "template": " {{ if .SSHSession }} \uD83D\uDCBB {{ end }} {{.UserName}} {{.HostName}}@{{.Env.TLS_SAN}} ",
+          "template": "{{ if .SSHSession }} \uD83D\uDCBB {{ end }} {{.UserName}}",
+          "style": "powerline",
+          "type": "session"
+        },
+        {
+          "background": "#fffb38",
+          "foreground": "#546E7A",
+          "powerline_symbol": "\ue0b0",
+          "template": "{{.HostName}}@{{.Env.TLS_SAN}} ",
           "background_templates": [
             "{{if (ne \"cloud.private\" .Env.TLS_SAN)}}#741903{{end}}"
+          ],
+          "foreground_templates": [
+            "{{if (ne \"cloud.private\" .Env.TLS_SAN)}}#ADA9A8{{end}}"
           ],
           "style": "powerline",
           "type": "session"
