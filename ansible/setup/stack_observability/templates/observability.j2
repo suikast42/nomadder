@@ -671,18 +671,18 @@ limits_config:
         }
         # server grpc port
         # 9095
-        port "zipkin" {
-          static =  9411
-          to = 9411
-        }
-        port "jaeger_http" {
-          static =  14268
-          to = 14268
-        }
-        port "jaeger_grpc" {
-          static =  14250
-          to = 14250
-        }
+#        port "zipkin" {
+#          static =  9411
+#          to = 9411
+#        }
+#        port "jaeger_http" {
+#          static =  14268
+#          to = 14268
+#        }
+#        port "jaeger_grpc" {
+#          static =  14250
+#          to = 14250
+#        }
         port "otlp_grpc" {
           static =  4317
           to = 4317
@@ -714,36 +714,36 @@ limits_config:
         }
        }
     }
-    service{
-       name ="tempo-zipkin"
-       port= "zipkin"
-       check {
-         name     = "tempo_zipkin_check"
-         type     = "tcp"
-         interval = "10s"
-         timeout  = "1s"
-        }
-    }
-    service{
-       name ="jaeger-http"
-       port= "jaeger_http"
-       check {
-         name     = "jaeger_http_check"
-         type     = "tcp"
-         interval = "10s"
-         timeout  = "1s"
-        }
-    }
-    service{
-       name ="jaeger-grpc"
-       port= "jaeger_grpc"
-       check {
-         name     = "jaeger_grpc_check"
-         type     = "tcp"
-         interval = "10s"
-         timeout  = "1s"
-        }
-    }
+#    service{
+#       name ="tempo-zipkin"
+#       port= "zipkin"
+#       check {
+#         name     = "tempo_zipkin_check"
+#         type     = "tcp"
+#         interval = "10s"
+#         timeout  = "1s"
+#        }
+#    }
+#    service{
+#       name ="jaeger-http"
+#       port= "jaeger_http"
+#       check {
+#         name     = "jaeger_http_check"
+#         type     = "tcp"
+#         interval = "10s"
+#         timeout  = "1s"
+#        }
+#    }
+#    service{
+#       name ="jaeger-grpc"
+#       port= "jaeger_grpc"
+#       check {
+#         name     = "jaeger_grpc_check"
+#         type     = "tcp"
+#         interval = "10s"
+#         timeout  = "1s"
+#        }
+#    }
     service{
        name ="otlp-http"
        port= "otlp_http"
@@ -791,7 +791,8 @@ limits_config:
            "com.github.logunifier.application.env" = "${var.env}"
            "com.github.logunifier.application.pattern.key" = "logfmt"
          }
-         ports = ["zipkin","jaeger_http","jaeger_grpc","otlp_http","otlp_grpc"]
+     #    ports = ["zipkin","jaeger_http","jaeger_grpc","otlp_http","otlp_grpc"]
+         ports = ["otlp_http","otlp_grpc"]
          args = [
            "-config.file","/config/tempo.yaml","-config.expand-env","true"
          ]
@@ -819,13 +820,13 @@ server:
 
 distributor:
   receivers:                           # this configuration will listen on all ports and protocols that tempo is capable of.
-    jaeger:                            # the receives all come from the OpenTelemetry collector.  more configuration information can
-      protocols:                       # be found there: https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver
-        thrift_http:                   #
-        grpc:                          # for a production deployment you should only enable the receivers you need!
-        thrift_binary:
-        thrift_compact:
-    zipkin:
+#    jaeger:                            # the receives all come from the OpenTelemetry collector.  more configuration information can
+#      protocols:                       # be found there: https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver
+#        thrift_http:                   #
+#        grpc:                          # for a production deployment you should only enable the receivers you need!
+#        thrift_binary:
+#        thrift_compact:
+#    zipkin:
     otlp:
       protocols:
         http:
