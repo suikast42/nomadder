@@ -30,7 +30,7 @@
           "powerline_symbol": "\ue0b0",
           "template": "{{.HostName}}@{{.Env.TLS_SAN}} ",
           "background_templates": [
-            "{{if (ne \"cloud.private\" .Env.TLS_SAN)}}#741903{{end}}"
+            "{{if (ne \"cloud.private\" .Env.TLS_SAN)}}#A41903{{end}}"
           ],
           "foreground_templates": [
             "{{if (ne \"cloud.private\" .Env.TLS_SAN)}}#ADA9A8{{end}}"
