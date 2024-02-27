@@ -5,6 +5,15 @@ endif::imagesdir[]
 === Settings
 Clarify VMWare workstation settings
 
+
+.Disable power safe for vmware
+[source,shell]
+----
+powercfg /powerthrottling disable /path "C:\Program Files (x86)\VMware\VMware Workstation\x64\vmware-vmx.exe"
+----
+
+
+
 ==== Virtual Machine Settings -> Processors -> Virtualization engine
 
 - Intel VT-x/EPT and AMD-V/RVI +
