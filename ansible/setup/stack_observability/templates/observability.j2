@@ -802,7 +802,7 @@ limits_config:
          }
       resources {
         cpu    = 1024
-        memory = 2048
+        memory = 1024
         memory_max = 32768
       }
 
@@ -834,15 +834,27 @@ distributor:
 #    opencensus:
 
 ingester:
-  trace_idle_period: 10s               # the length of time after a trace has not received spans to consider it complete and flush it
-  max_block_bytes: 1_000_000           # cut the head block when it hits this size or ...
-  max_block_duration: 5m               #   this much time passes
+  trace_idle_period: 10s              # amount of time a trace must be idle before flushing it to the wal.
+  max_block_bytes: 524288000          # maximum size of a block before cutting it 500MB
+  max_block_duration: 30m             # maximum length of time before cutting a block
+  complete_block_timeout: 15m         # duration to keep blocks in the ingester after they have been flushed
+
+query_frontend:
+  search:
+    max_duration: 43800h # 5y
+    query_backend_after: 15m  # (default: 15m)  query_backend_after must be less than or equal to query_ingesters_until.
+    query_ingesters_until: 15m    # (default: 30m)
+#    max_duration: 336h    # The maximum allowed time range for a search.  (default: 168h) 0 disables this limit.
+#    max_result_limit: 400   # The default value of 0 disables this limit.
+#    default_result_limit: 20 #  (default: 20)
+
 
 compactor:
   compaction:
     compaction_window: 1h              # blocks in this time window will be compacted together
     max_block_bytes: 100_000_000       # maximum size of compacted blocks
-    block_retention: 24h               # Duration to keep blocks 1d
+    block_retention: 24h               # Duration to keep blocks 14d
+#    block_retention: 336h               # Duration to keep blocks 14d
 
 metrics_generator:
   processor:
@@ -876,10 +888,6 @@ storage:
       max_workers: 100                 # worker pool determines the number of parallel requests to the object store backend
       queue_depth: 10000
 
-query_frontend:
-  search:
-    # how to define year here ? define 5 years
-    max_duration: 43800h
 
 overrides:
   metrics_generator_processors: [service-graphs, span-metrics]
