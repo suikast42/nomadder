@@ -33,8 +33,11 @@ Group=root
 
 
 
-ExecReload=/bin/kill -HUP $MAINPID
 ExecStart=/usr/local/bin/nomad agent -config {{nomad_conf_dir}}
+ExecReload=/bin/kill -HUP $MAINPID
+# TODO: https://gist.github.com/blalor/246eaf5755e784b353ab756a36a1142e
+#TimeoutStopSec= will send a SIGTERM immediately if ExecStop is not included in the service file.
+#ExecStop=/bin/kill -9 $MAINPID
 {% if is_worker_host  %}
 # See issue https://github.com/hashicorp/nomad/issues/17299
 # See issue https://github.com/suikast42/nomadder/issues/138
