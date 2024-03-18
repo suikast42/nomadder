@@ -4,11 +4,17 @@
       import_tasks: install_nats_cli.yml
     - name: "Install nats cli nsc v {{version_nats_cli_nsc}}"
       import_tasks: install_nats_nsc.yml
+    - name: "Install grafana dash n-grab  v {{version_gdg_cli}}"
+      import_tasks: install_gdg_cli.yml
 
   vars:
-    - version_nats_cli: "0.1.4"
-    - update_nats_cli: "{{update_all or false }}"
-    - version_nats_cli_nsc: "2.8.5"
-    - nats_cli_nsc_checksum: "sha256:c5af53624f52cfbd2732bfdd40c3a0371a921ff11d5d097ede8946c4d83c4207  "
-    - update_nats_cli_nsc: "{{update_all or false }}"
-    - uninstall_nats_cli_nsc: "{{uninstall_all or false }}"
+      - version_nats_cli: "0.1.4"
+      - update_nats_cli: "{{update_all or false }}"
+      - version_nats_cli_nsc: "2.8.5"
+      - nats_cli_nsc_checksum: "sha256:c5af53624f52cfbd2732bfdd40c3a0371a921ff11d5d097ede8946c4d83c4207  "
+      - update_nats_cli_nsc: "{{update_all or false }}"
+      - uninstall_nats_cli_nsc: "{{uninstall_all or false }}"
+        # grafana desktop manager
+      - version_gdg_cli: "0.5.2"
+      - update_gdg_cli: "{{update_all or false }}"
+      - uninstall_gdg_cli: "{{update_all or false }}"

@@ -1,0 +1,84 @@
+- name : Check grafana dash n-grab cli installation present
+  stat:
+    path: /usr/local/bin/gdg
+  register: gdgCliInstalled
+
+- name: "Install gdg cli {{version_gdg_cli}}"
+  when: not gdgCliInstalled.stat.exists or update_gdg_cli | bool == true or uninstall_gdg_cli | bool == true
+  block:
+    - name: "Delete local checkout path if exists"
+      run_once: true
+      become: true
+      delegate_to: localhost
+      file:
+        path: "{{compile_path}}"
+        state: absent
+
+    - name: "Create local checkout path not if exists"
+      run_once: true
+      become: true
+      delegate_to: localhost
+      file:
+        path: "{{compile_path}}"
+        state: directory
+        mode: '0777'
+
+    - name: "Install gdg cli {{version_gdg_cli}}"
+      run_once: true
+      delegate_to: localhost
+      shell: |
+        go install github.com/esnet/gdg/cmd/gdg@v{{version_gdg_cli}}
+        go install github.com/esnet/gdg/cmd/gen@v{{version_gdg_cli}}
+      args:
+        chdir:  "{{compile_path}}"
+
+
+    - name: "Copy  gdg cli {{version_gdg_cli}}"
+      become: true
+      run_once: true
+      when: is_local_host
+      ansible.builtin.copy:
+        src: "/home/{{ansible_user}}/go/bin/gdg"
+        dest: /usr/local/bin/gdg
+        force: yes
+        group: "{{ansible_user}}"
+        owner: "{{ansible_user}}"
+        mode: 0755
+
+    - name: "Copy nats cli {{version_nats_cli}}"
+      become: true
+      when: is_master_host
+      ansible.builtin.copy:
+        src: "/usr/local/bin/gdg"
+        dest: /usr/local/bin/gdg
+        force: yes
+        group: "{{ansible_user}}"
+        owner: "{{ansible_user}}"
+        mode: 0755
+
+
+    - name: "Copy gdg cli gen {{version_gdg_cli}}"
+      become: true
+      run_once: true
+      when: is_local_host
+      ansible.builtin.copy:
+        src: "/home/{{ansible_user}}/go/bin/gen"
+        dest: /usr/local/bin/gen
+        force: yes
+        group: "{{ansible_user}}"
+        owner: "{{ansible_user}}"
+        mode: 0755
+
+    - name: "Copy nats cli gen {{version_nats_cli}}"
+      become: true
+      when: is_master_host
+      ansible.builtin.copy:
+        src: "/usr/local/bin/gen"
+        dest: /usr/local/bin/gen
+        force: yes
+        group: "{{ansible_user}}"
+        owner: "{{ansible_user}}"
+        mode: 0755
+
+  vars:
+    compile_path:  /tmp/gdg_cli
