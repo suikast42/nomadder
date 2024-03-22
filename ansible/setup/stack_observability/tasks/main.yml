@@ -28,7 +28,7 @@
     - version_grafana: "10.4.1"
     - version_grafana_nomadder: "{{version_grafana}}.4"
     - version_grafana_mimir: "2.11.0"
-    - version_grafana_loki: "2.9.5"
+    - version_grafana_loki: "2.9.6"
     - version_grafana_tempo: "2.4.1"
     - version_nats_server: "2.10.12"
     - version_logunifer: "0.5.12"
