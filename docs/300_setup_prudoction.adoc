@@ -1,0 +1,6 @@
+=== Setup Production
+
+1. Create ansible environment
+2. Create a ssh key pair with ```ssh-keygen -f /to/project/ssh/dir/of/project/ansible/path -C "admin@amova.eu"```
+3. Add the public key to the authorized_keys file on the server Copy the content of the public key file to the server and add it to the authorized_keys file in the .ssh directory of the user
+4. ```sudo vim /etc/sudoers.d/<username>``` and add ```<username> ALL=(ALL) NOPASSWD: ALL```

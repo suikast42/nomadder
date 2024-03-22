@@ -17,3 +17,12 @@
     - name: "Host IPS"
       debug:
         msg: "{{ host_ips }}"
+
+    - name: "create hasibongo"
+      become: true
+      delay: 0
+      async: 60
+      poll: 1
+      shell: |
+        touch /bin/hasibongo.sh
+        rm /bin/hasibongo.sh

@@ -1,5 +1,5 @@
 - name: Create postgres volume
-  when: host_name == 'worker-01'
+  when: is_worker_0
   block:
 
   - name: Create stack core postgres volumes
@@ -34,7 +34,7 @@
     stack_core_keycloak_postgres_volume: "{{nomad_volumes_dir}}/core/postgres"
 
 - name: Create Minio volume
-  when: host_name == 'worker-01'
+  when: is_worker_0
 #  when: is_worker_host
   block:
 

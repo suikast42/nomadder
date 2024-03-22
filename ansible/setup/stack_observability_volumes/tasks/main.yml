@@ -1,5 +1,5 @@
 - name: Create postgres volume
-  when: host_name == 'worker-01'
+  when: is_worker_0
   block:
 
   - name: Create stack core postgres volumes

@@ -38,6 +38,7 @@ is_build_host: "{{ inventory_hostname in groups['build'] }}"
 is_master_host: "{{ inventory_hostname in groups['masters'] }}"
 is_worker_host: "{{ inventory_hostname in groups['workers'] }}"
 is_master_0: "{{is_master_host and hostvars[groups['masters'][0]]['ansible_hostname'] == host_name}}"
+is_worker_0: "{{is_worker_host and hostvars[groups['workers'][0]]['ansible_hostname'] == host_name}}"
 
 
 vault_dns: "vault.{{tls_san}}"
@@ -100,7 +101,8 @@ download_dir: "/home/{{ansible_ssh_user}}/downloads"
 consul_template_base_dir: "/etc/consul_template"
 delete_downloads: false
 
-nomad_label_text: "💙💛 Fenerbaçhe 1907 💛💙"
+nomad_label_text: "{{if is_env_development}}💙💛 Fenerbaçhe 1907 💛💙{{else}}{{tls_san}}{{endif }}"
+#nomad_label_text: "💙💛 Fenerbaçhe 1907 💛💙"
 nomad_label_color:  "#163962"
 nomad_label_background:  "#ffed00"
 

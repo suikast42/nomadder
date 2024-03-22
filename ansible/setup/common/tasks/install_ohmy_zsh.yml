@@ -14,7 +14,7 @@
 - name: "Install oh-my-posh"
   become: true
   delay: 0
-  async: 60
+  async: 360
   poll: 1
   shell: |
     wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-linux-amd64 -O /usr/local/bin/oh-my-posh

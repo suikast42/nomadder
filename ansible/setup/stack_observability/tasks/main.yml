@@ -25,7 +25,7 @@
     - docker_build_dir: "/tmp/dockerbuild"
     - nomad_cli_cert: "{{base_cert_dir}}/nomad/nomad-cli.pem"
     - nomad_cli_cert_key: "{{base_cert_dir}}/nomad/nomad-cli-key.pem"
-    - version_grafana: "10.4.0"
+    - version_grafana: "10.4.1"
     - version_grafana_nomadder: "{{version_grafana}}.4"
     - version_grafana_mimir: "2.11.0"
     - version_grafana_loki: "2.9.5"
