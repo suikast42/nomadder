@@ -38,5 +38,7 @@ grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install grafana-opcua-datas
 grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install fzakaria-simple-annotations-datasource &&
 grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install innius-grpc-datasource &&
 grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install golioth-websocket-datasource &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  grafana-cli plugins install gapit-htmlgraphics-panel &&
+grafana-cli  --pluginsDir=$GF_PATHS_PLUGINS  grafana-cli plugins install mckn-funnel-panel &&
 
 echo All plugins are installed
