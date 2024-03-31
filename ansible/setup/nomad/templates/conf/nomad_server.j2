@@ -50,7 +50,11 @@ tls {
 ui {
   enabled =  true
   label {
-   text =  "{{nomad_label_text}}"
+{% if is_env_development  %}
+ text =  "{{nomad_label_text_dev}}"
+{% else %}
+ text =  "{{nomad_label_text_prod}}"
+{% endif %}
    background_color = "{{nomad_label_color}}"
    text_color = "#{{nomad_label_background}}"
   }

@@ -101,8 +101,8 @@ download_dir: "/home/{{ansible_ssh_user}}/downloads"
 consul_template_base_dir: "/etc/consul_template"
 delete_downloads: false
 
-nomad_label_text: "{{if is_env_development}}💙💛 Fenerbaçhe 1907 💛💙{{else}}{{tls_san}}{{endif }}"
-#nomad_label_text: "💙💛 Fenerbaçhe 1907 💛💙"
+nomad_label_text_dev: "💙💛 Fenerbaçhe 1907 💛💙"
+nomad_label_text_prod: "{{tls_san}}"
 nomad_label_color:  "#163962"
 nomad_label_background:  "#ffed00"
 
