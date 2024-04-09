@@ -27,13 +27,13 @@ variable "hostname" {
 variable "image_jenkins" {
   type        = string
   description = "The used jenkins image"
-  default     = "jenkins/jenkins:2.445-jdk17_1"
+  default     = "jenkins/jenkins:2.452-jdk21_1"
 }
 
 variable "image_gitlab" {
   type        = string
   description = "The used jenkins image"
-  default     = "gitlab/gitlab-ce:16.9.0-ce.0"
+  default     = "gitlab/gitlab-ce:16.9.3-ce.0"
 }
 
 # See https://github.com/hashicorp/nomad-pack-community-registry/blob/main/packs/jenkins/templates/jenkins.nomad.tpl
@@ -373,38 +373,38 @@ EOF
       # OIDC Login with keycloak and jenkins https://github.com/jenkinsci/keycloak-plugin
       template {
         data        = <<EOF
-role-strategy:689.v731678c3e0eb_
+role-strategy:713.vb_3837801b_8cc
 keycloak:2.3.2
-oic-auth:2.6
-matrix-auth:3.2.1
+oic-auth:4.236.v4124503b_a_f88
+matrix-auth:3.2.2
 strict-crumb-issuer:2.1.1
 git:5.2.1
 github:1.38.0
 job-dsl:1.87
 nomad:0.10.0
 consul:2.1
-hashicorp-vault-plugin:364.vf5d54b_3dc313
+hashicorp-vault-plugin:367.v8a_1ee1cccf3a
 configuration-as-code:1775.v810dc950b_514
 github-api:1.318-461.v7a_c09c9fa_d63
-github-branch-source:1772.va_69eda_d018d4
+github-branch-source:1785.v99802b_69816c
 gitlab-api:5.3.0-91.v1f9a_fda_d654f
-gitlab-branch-source:702.v7dde70ed1522
+gitlab-branch-source:703.vc5fd7effcc6b_
 gitlab-plugin:1.8.0
 gitlab-logo:1.1.2
 gitlab-oauth:1.19
 multibranch-scan-webhook-trigger:1.0.11
-pipeline-stage-tags-metadata:2.2175.v76a_fff0a_2618
+pipeline-stage-tags-metadata:2.2188.v26e255fd2984
 pipeline-github-lib:42.v0739460cda_c4
-pipeline-model-extensions:2.2175.v76a_fff0a_2618
+pipeline-model-extensions:2.2188.v26e255fd2984
 pipeline-build-step:540.vb_e8849e1a_b_d8
 pipeline-rest-api:2.34
-plain-credentials:143.v1b_df8b_d3b_e48
-pipeline-model-definition:2.2175.v76a_fff0a_2618
-pipeline-stage-step:305.ve96d0205c1c6
+plain-credentials:179.vc5cb_98f6db_38
+pipeline-model-definition:2.2188.v26e255fd2984
+pipeline-stage-step:312.v8cd10304c27a_
 pipeline-stage-view:2.34
-pipeline-milestone-step:111.v449306f708b_7
-pipeline-maven:1376.v18876d10ce9c
-pipeline-model-api:2.2175.v76a_fff0a_2618
+pipeline-milestone-step:119.vdfdc43fc3b_9a_
+pipeline-maven:1396.veb_f07b_2fc1d8
+pipeline-model-api:2.2188.v26e255fd2984
 build-timeout:1.32
 gradle:2.10
 ant:497.v94e7d9fffa_b_9
@@ -413,7 +413,7 @@ docker-workflow:572.v950f58993843
 maven-plugin:3.23
 custom-tools-plugin:0.8
 pipeline-utility-steps:2.16.2
-email-ext:2.104
+email-ext:2.105
 sshd:3.322.v159e91f6a_550
 EOF
         destination = "local/plugins.txt"
@@ -693,8 +693,6 @@ jenkins:
       name: "all"
   projectNamingStrategy: "standard"
   quietPeriod: 5
-  remotingSecurity:
-    enabled: true
   scmCheckoutRetryCount: 0
   securityRealm:
     oic:
