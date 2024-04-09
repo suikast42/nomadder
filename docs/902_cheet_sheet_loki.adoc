@@ -20,4 +20,12 @@ curl -g -X POST \
 
 
 
+|Config check
+a|[source,shell]
+----
+# Copy the loki config file to an empty directory named loki-config.yaml
+docker run --rm -t -v "${PWD}":/config grafana/loki:3.0.0 -config.file=/config/loki-config.yaml -verify-config=true
+----
+
+
 |===

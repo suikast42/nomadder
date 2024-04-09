@@ -532,31 +532,33 @@ ruler:
 
 compactor:
   working_directory: /data/retention
-  shared_store: filesystem
+  delete_request_store: filesystem
   compaction_interval: 10m
   retention_enabled: true
   retention_delete_delay: 2h
   retention_delete_worker_count: 150
 
 schema_config:
+
   configs:
-    - from: 2023-03-01
-      store: boltdb-shipper
+    - from: 2024-04-01
       object_store: filesystem
-      schema: v12
+      store: tsdb
+      schema: v13
       index:
         prefix: index_
         period: 24h
 
 storage_config:
+  tsdb_shipper:
+    active_index_directory: /data/index-tsdb
+    cache_location: /data/index-cache-tsdb
   boltdb_shipper:
     active_index_directory: /data/index
     cache_location: /data/index-cache
-    shared_store: filesystem
   filesystem:
     directory: /data/chunks
   index_queries_cache_config:
-    enable_fifocache: false
     embedded_cache:
       max_size_mb: 4096
       enabled: true
@@ -572,18 +574,15 @@ query_range:
   cache_results: true
   results_cache:
     cache:
-      enable_fifocache: false
       embedded_cache:
         enabled: true
 
 chunk_store_config:
   chunk_cache_config:
-    enable_fifocache: false
     embedded_cache:
       max_size_mb: 4096
       enabled: true
   write_dedupe_cache_config:
-    enable_fifocache: false
     embedded_cache:
       max_size_mb: 4096
       enabled: true
@@ -602,7 +601,6 @@ limits_config:
   ingestion_burst_size_mb: 8
   max_label_name_length: 4096
   max_label_value_length: 8092
-  enforce_metric_name: false
   # Loki will reject any log lines that have already been processed and will not index them again
   reject_old_samples: false
   # 5y
