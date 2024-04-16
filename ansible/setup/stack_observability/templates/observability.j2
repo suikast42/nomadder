@@ -268,7 +268,13 @@ blocks_storage:
     # -querier.query-store-after,
     # -querier.query-ingesters-within and
     # -blocks-storage.bucket-store.ignore-blocks-within.
-    # retention_period: 24h # default 24h
+{% if is_env_development  %}
+    retention_period: 24h # default 24h
+{% else %}
+    retention_period: 720h
+{% endif %}
+
+
 querier:
   # query_ingesters_within: 13h # default 13h
   #query_store_after: 12h #default 12h
@@ -301,7 +307,12 @@ query_scheduler:
 
 alertmanager:
   data_dir: /data/alertmanager
-#  retention: 120h
+{% if is_env_development  %}
+  retention: 24h
+{% else %}
+  retention: 720h
+{% endif %}
+
   sharding_ring:
     replication_factor: 1
   alertmanager_client:
@@ -626,7 +637,12 @@ limits_config:
   # CLI flag: -validation.increment-duplicate-timestamps
   increment_duplicate_timestamp: true
   #Log data retention for all
+{% if is_env_development  %}
   retention_period: 24h
+{% else %}
+  retention_period: 720h
+{% endif %}
+
   # Comment this out for fine grained retention
 #  retention_stream:
 #  - selector: '{namespace="dev"}'
@@ -851,8 +867,11 @@ compactor:
   compaction:
     compaction_window: 1h              # blocks in this time window will be compacted together
     max_block_bytes: 100_000_000       # maximum size of compacted blocks
+{% if is_env_development  %}
     block_retention: 24h               # Duration to keep blocks 14d
-#    block_retention: 336h               # Duration to keep blocks 14d
+{% else %}
+    block_retention: 720h
+{% endif %}
 
 metrics_generator:
   processor:
