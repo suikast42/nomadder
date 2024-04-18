@@ -14,12 +14,12 @@ consul_template_checksum: "sha256:f43567923e57f1e8ad30b07a3bc0a303b7213d13a5ad5c
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "1.7.6"
-nomad_checksum: "sha256:82a438a144066a8f42ceea8548da754c0bd96b5b528cd337a5dc09017afddb56"
+nomad_version: "1.7.7"
+nomad_checksum: "sha256:1d9939232b4700448f64615d352e21619a76f67847933ce8bb106ab182742bb9"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.29.3
+version_envoy: 1.30.0
 
 nomad_plugin_cni_version: "1.4.0"
 nomad_plugin_cni_checksum: "sha256:c2485ddb3ffc176578ae30ae58137f0b88e50f7c7f2af7d53a569276b2949a33"
@@ -47,7 +47,7 @@ uninstall_compose: false
 
 update_certificates: false
 
-version_nexus: "3.64.0"
+version_nexus: "3.67.1"
 version_nexus_initlzr: "1.0.1"
 update_nexus: false
 
