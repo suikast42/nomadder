@@ -19,7 +19,7 @@ nomad_checksum: "sha256:1d9939232b4700448f64615d352e21619a76f67847933ce8bb106ab1
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.30.0
+version_envoy: 1.30.1
 
 nomad_plugin_cni_version: "1.4.0"
 nomad_plugin_cni_checksum: "sha256:c2485ddb3ffc176578ae30ae58137f0b88e50f7c7f2af7d53a569276b2949a33"
@@ -39,7 +39,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "26.0.1"
+version_docker: "26.0.2"
 uninstall_docker: false
 
 version_docker_compose: "2.26.0"
