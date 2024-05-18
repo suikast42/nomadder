@@ -9,8 +9,8 @@ consul_checksum: "sha256:5faa9cc3f2832e3ae454a3ec2dbc6799179d14e1e09463f220bb906
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
-consul_template_version: "0.37.4"
-consul_template_checksum: "sha256:f43567923e57f1e8ad30b07a3bc0a303b7213d13a5ad5c1ed7b3a9ea09be8275"
+consul_template_version: "0.37.6"
+consul_template_checksum: "sha256:b28c97b954cdc04f8793ea233614054f39a30e6d81a6e957ed1c6bc864369f50"
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 

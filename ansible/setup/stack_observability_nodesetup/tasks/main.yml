@@ -18,7 +18,7 @@
     - version_grafana_agent_nodes: "0.40.4"
     - uninstall_grafana_agent: "{{uninstall_all or false }}"
     - update_grafana_agent: "{{update_all or false }}"
-    - version_vector_agent: "0.37.0-1"
+    - version_vector_agent: "0.38.0-1"
     - uninstall_vector_agent: "{{uninstall_all or false }}"
     - update_vector_agent: "{{update_all or false }}"
     - version_nomad_event_sink: "0.2.0"
