@@ -27,7 +27,7 @@ variable "hostname" {
 variable "image_jenkins" {
   type        = string
   description = "The used jenkins image"
-  default     = "jenkins/jenkins:2.452-jdk21_1"
+  default     = "jenkins/jenkins:2.455-jdk21_1"
 }
 
 variable "image_gitlab" {

@@ -39,10 +39,10 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "26.0.2"
+version_docker: "26.1.0"
 uninstall_docker: false
 
-version_docker_compose: "2.26.0"
+version_docker_compose: "2.27.0"
 uninstall_compose: false
 
 update_certificates: false
@@ -63,7 +63,7 @@ version_proto_grpc_curl: "1.8.7"
 uninstall_protoc: "{{uninstall_all or false }}"
 update_protoc: "{{update_all or false }}"
 
-version_busy_box_init_container: "1.36"
+version_busy_box_init_container: "1.36.1"
 version_multi_stage_apline_container: "3.17.2"
 version_grafana_agent_container: "0.40.4"
 version_minio: "RELEASE.2024-03-05T04-48-44Z"

@@ -352,8 +352,14 @@ limits:
   # Allow ingestion of out-of-order samples up to 2 hours since the latest received sample for the series.
   out_of_order_time_window: 1d
   # delete old blocks from long-term storage.
+{% if is_env_development  %}
   # Delete from storage metrics data older than 1d.
   compactor_blocks_retention_period: 1d
+{% else %}
+  # Delete from storage metrics data older than 720h.
+  compactor_blocks_retention_period: 720h
+{% endif %}
+
   ingestion_rate: 100000
       EOF
       destination = "local/mimir.yml"

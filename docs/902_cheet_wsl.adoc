@@ -1,0 +1,14 @@
+.Ansible cheatsheet
+|===
+|Description |Command
+
+| WSL2 connect to host without disabling the windows firewall
+a|[source,shell]
+----
+# See https://superuser.com/questions/1714002/wsl2-connect-to-host-without-disabling-the-windows-firewall
+Set-NetFirewallProfile -Profile Public -DisabledInterfaceAliases "vEthernet (WSL (Hyper-V firewall))"
+----
+
+
+|===
+
