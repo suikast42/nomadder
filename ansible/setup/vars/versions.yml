@@ -21,8 +21,8 @@ update_nomad: "{{update_all or false }}"
 
 version_envoy: 1.30.1
 
-nomad_plugin_cni_version: "1.4.0"
-nomad_plugin_cni_checksum: "sha256:c2485ddb3ffc176578ae30ae58137f0b88e50f7c7f2af7d53a569276b2949a33"
+nomad_plugin_cni_version: "1.5.0"
+nomad_plugin_cni_checksum: "sha256:57a18478422cb321370e30a5ee6ce026321289cd9c94353ca697dddd7714f1a5"
 uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 
 nomad_cli_levant_version: "0.3.2"
