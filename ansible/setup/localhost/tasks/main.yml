@@ -108,7 +108,7 @@
       go install github.com/fullstorydev/grpcurl/cmd/grpcurl@v{{version_proto_grpc_curl}}
       sudo mv grpcurl   /usr/local/bin
       
-      go install github.com/bufbuild/connect-go/cmd/protoc-gen-connect-go@v{{version_proto_buf_connect}}
+      go install github.com/bufbuild/buf/cmd/buf@v{{version_proto_buf_connect}}
       sudo mv protoc-gen-connect-go   /usr/local/bin
       
       curl -sSL "https://github.com/bufbuild/buf/releases/download/v{{version_proto_buf_cli}}/buf-$(uname -s)-$(uname -m)" -o buf
