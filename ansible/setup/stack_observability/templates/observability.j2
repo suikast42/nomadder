@@ -645,8 +645,10 @@ limits_config:
   #Log data retention for all
 {% if is_env_development  %}
   retention_period: 24h
+  max_query_lookback: 24h
 {% else %}
   retention_period: 720h
+  max_query_lookback: 720h
 {% endif %}
 
   # Comment this out for fine grained retention
