@@ -8,23 +8,34 @@
         path: "{{plugin_dir}}"
         state: absent
 
-    - name : Check nomad plugin cli installation present
+    - name: "Delete nomad plugin consul cni {{cni_bin}} if present"
+      when: uninstall_nomad_plugin_consul_cni|bool == true
+      ansible.builtin.file:
+        file: "{{cni_bin}}"
+        state: absent
+
+    - name : Check nomad plugin cni installation present
       stat:
-        path: "{{plugin_dir}}/bridge"
-      register: nomadInstalled
+        path: "{{cni_bin}}"
+      register: cniPluginInstalled
 
-    - name: Install cni pulgin
-      when: not nomadInstalled.stat.exists
+    - name : Check nomad plugin consul cni installation present
+      stat:
+        path: "{{consul_cni_bin}}"
+      register: consulCniPluginInstalled
+
+    - name: "Create nomad cni plugin dir {{plugin_dir}} if needed"
+      become: true
+      file:
+        path: "{{plugin_dir}}"
+        owner: "{{nomad_user}}"
+        group: "{{nomad_group}}"
+        state: directory
+        mode: '0755'
+
+    - name: Install cni plugin
+      when: not cniPluginInstalled.stat.exists
       block:
-      - name: "Create nomad cli plugin dir {{plugin_dir}} if needed"
-        become: true
-        file:
-          path: "{{plugin_dir}}"
-          owner: "{{nomad_user}}"
-          group: "{{nomad_group}}"
-          state: directory
-          mode: '0755'
-
       - name: Download nomad plugin cni binary
         get_url:
           url: https://github.com/containernetworking/plugins/releases/download/v{{nomad_plugin_cni_version}}/cni-plugins-linux-amd64-v{{nomad_plugin_cni_version}}.tgz
@@ -33,11 +44,11 @@
           group: "{{ nomad_group }}"
           mode: 0755
           checksum: "{{nomad_plugin_cni_checksum}}"
-        register: nomad_plugin_download
+        register: nomad_plugin_cni_download
 
       - name: "Unzip nomad plugin cni archive to {{plugin_dir}}"
         unarchive:
-          src: "{{nomad_plugin_download.dest}}"
+          src: "{{nomad_plugin_cni_download.dest}}"
           dest: "{{plugin_dir}}"
           copy: no
           owner: "{{ nomad_user }}"
@@ -51,5 +62,28 @@
           src: conf/host_bridge_network_conf.j2
           dest: /etc/sysctl.d/bridge.conf
 
+    - name: Install consul cni plugin
+      when: not consulCniPluginInstalled.stat.exists
+      block:
+        - name: Download nomad plugin consul cni binary
+          get_url:
+            url: https://releases.hashicorp.com/consul-cni/{{nomad_plugin_consul_cni_version}}/consul-cni_{{nomad_plugin_consul_cni_version}}_linux_amd64.zip
+            dest: "/{{download_dir}}/consul-cni_{{nomad_plugin_consul_cni_version}}_linux_amd64.zip"
+            owner: "{{ nomad_user }}"
+            group: "{{ nomad_group }}"
+            mode: 0755
+            checksum: "{{nomad_plugin_consul_cni_checksum}}"
+          register: nomad_plugin_consul_cni_download
+
+        - name: "Unzip nomad plugin consul cni archive to {{plugin_dir}}"
+          unarchive:
+            src: "{{nomad_plugin_consul_cni_download.dest}}"
+            dest: "{{plugin_dir}}"
+            copy: no
+            owner: "{{ nomad_user }}"
+            group: "{{ nomad_group }}"
+            mode: 0755
   vars:
     plugin_dir: "/opt/cni/bin"
+    consul_cni_bin: "{{plugin_dir}}/consul-cni"
+    cni_bin: "{{plugin_dir}}/bridge"

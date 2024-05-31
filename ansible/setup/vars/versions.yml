@@ -25,6 +25,10 @@ nomad_plugin_cni_version: "1.5.0"
 nomad_plugin_cni_checksum: "sha256:57a18478422cb321370e30a5ee6ce026321289cd9c94353ca697dddd7714f1a5"
 uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 
+nomad_plugin_consul_cni_version: "1.4.3"
+nomad_plugin_consul_cni_checksum: "sha256:6e7f32084dd28576f77e53d6bb30661dde1a906d7a3eebd92d8d06f9ce73a37b"
+uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
+
 nomad_cli_levant_version: "0.3.2"
 nomad_cli_levant_checkusum: "sha256:1e06180f8d8327e721e2ad4c9637d1f391034a22709473b8ed8ee19f1cad1570"
 uninstall_cli_levant: "{{uninstall_all or false }}"
