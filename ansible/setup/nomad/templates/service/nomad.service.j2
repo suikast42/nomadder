@@ -15,6 +15,7 @@ After=network-online.target,containerd.service,docker.service,consul.service
 
 
 [Service]
+Type=notify # see https://github.com/hashicorp/nomad/pull/20528
 ExecStartPre=/bin/bash -c '(while ! nc -z -v -w1 consul.service.consul 8501 2>/dev/null; do echo "Waiting for consul.service.consul 8501 to open..."; sleep 1; done); sleep 1'
 
 # Nomad server should be run as the nomad user. Nomad clients
