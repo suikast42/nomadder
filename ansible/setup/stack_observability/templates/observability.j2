@@ -884,11 +884,13 @@ compactor:
 metrics_generator:
   processor:
     span_metrics:
-      dimensions: [org.name, deployment.environment,db.name, db.operation,messaging.operation,messaging.destination.name,messaging.sender]
+      dimensions: [org.name, deployment.environment, db.name,db.operation, messaging.operation, messaging.destination.name, messaging.sender]
   registry:
     external_labels:
       source: tempo
       cluster: {{data_center}}
+  traces_storage:
+    path: /data/generator/traces
   storage:
     path: /data/generator/wal
     remote_write:
@@ -913,9 +915,13 @@ storage:
       max_workers: 100                 # worker pool determines the number of parallel requests to the object store backend
       queue_depth: 10000
 
-
 overrides:
-  metrics_generator_processors: [service-graphs, span-metrics]
+  defaults:
+    metrics_generator:
+      processors:
+        - service-graphs
+        - span-metrics
+        - local-blocks
        EOF
        destination = "local/tempo.yaml"
      }
