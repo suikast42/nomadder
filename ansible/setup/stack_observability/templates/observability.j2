@@ -722,6 +722,11 @@ limits_config:
     service{
       name ="tempo"
       port= "tempo"
+      tags = [
+        "prometheus",
+        "prometheus:server_id=${NOMAD_ALLOC_NAME}",
+        "prometheus:version={{version_grafana_tempo}}",
+      ]
       check {
         name  = "health"
         type  = "http"
@@ -883,6 +888,9 @@ compactor:
 {% endif %}
 
 metrics_generator:
+  # TODO Delete this value and create an alarm for
+  # sum(rate(tempo_metrics_generator_spans_discarded_total{}[1m])) by (reason) where reason is outside_metrics_ingestion_slack
+  metrics_ingestion_time_range_slack: 60s
   processor:
     span_metrics:
       dimensions: [org.name, deployment.environment, db.name,db.operation, messaging.operation, messaging.destination.name, messaging.sender]
@@ -1398,7 +1406,7 @@ metrics:
             - ++.Address++:8081
 ++- end ++
 
-        # grab all metric endpoints with stadanrd /metrics endpoint
+        # grab all metric endpoints with standard /metrics endpoint
         - job_name: "integrations/consul_sd"
           consul_sd_configs:
             - server: "consul.service.consul:8501"
