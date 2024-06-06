@@ -12,5 +12,7 @@ nameserver {{host_ip}}
 #nameserver {{worker}}
 {% endfor %}
 {% endif %}
-nameserver 8.8.8.8
-nameserver 1.1.1.1
+
+{% for dns in publicdns -%}
+nameserver {{dns}}
+{% endfor %}
