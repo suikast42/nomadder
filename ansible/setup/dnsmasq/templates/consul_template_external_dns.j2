@@ -36,12 +36,12 @@ address=/{{tls_san}}/++ .Address ++
 ++- range service .Name ++
 ++- $labels := .Tags | join ","| splitToMap "," "=" -++
 ++- if index $labels "external_dns" -++
-address=/++index $labels "external_dns"++/++ .Address++
+address=/.++index $labels "external_dns"++/++ .Address++
 ++end ++
 ++- end ++
 ++- end ++
 
-address=/{{tls_san}}/{{host_ip}}
+address=/.{{tls_san}}/{{host_ip}}
 {% endif %}
 EOF
   perms = 0640
