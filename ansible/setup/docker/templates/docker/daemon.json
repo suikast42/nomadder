@@ -10,6 +10,7 @@
   "tlscert": "{{docker_server_cert}}",
   "tlskey": "{{docker_server_cert_key}}",
   "userland-proxy": false,
+  "dns" : ["172.17.0.1"],
   "default-ulimit": "nofile=50:100",
   {% if is_build_host %}
   "hosts": ["unix:///var/run/docker.sock", "tcp://{{host_ip}}:2375"],

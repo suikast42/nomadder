@@ -78,4 +78,10 @@ a|[source,shell]
 vault delete pki/issuer/:issuer_ref
 ----
 
+|Check cert chain for a request
+a|[source,shell]
+----
+openssl s_client -showcerts -connect registry-1.docker.io:443 </dev/null
+----
+
 |===
