@@ -693,10 +693,12 @@ limits_config:
         }
         # server grpc port
         # 9095
-#        port "zipkin" {
-#          static =  9411
-#          to = 9411
-#        }
+
+        # Used by envoy
+        port "zipkin" {
+          static =  9411
+          to = 9411
+        }
 #        port "jaeger_http" {
 #          static =  14268
 #          to = 14268
@@ -741,21 +743,22 @@ limits_config:
         }
        }
     }
-#    service{
-#       name ="tempo-zipkin"
-#       port= "zipkin"
-#       check {
-#         name     = "tempo_zipkin_check"
-#         type     = "tcp"
-#         interval = "10s"
-#         timeout  = "1s"
-#        }
-#    }
+    #Used by envoy
+    service{
+       name ="tempo-zipkin"
+       port= "zipkin"
+       check {
+         name     = "tempo_zipkin_check"
+         type     = "tcp"
+         interval = "10s"
+         timeout  = "1s"
+        }
+    }
 #    service{
 #       name ="jaeger-http"
 #       port= "jaeger_http"
 #       check {
-#         name     = "jaeger_http_check"
+#         name     = "tempo_jaeger_http_check"
 #         type     = "tcp"
 #         interval = "10s"
 #         timeout  = "1s"
@@ -819,7 +822,7 @@ limits_config:
            "com.github.logunifier.application.pattern.key" = "logfmt"
          }
      #    ports = ["zipkin","jaeger_http","jaeger_grpc","otlp_http","otlp_grpc"]
-         ports = ["otlp_http","otlp_grpc"]
+         ports = ["otlp_http","otlp_grpc","zipkin"]
          args = [
            "-config.file","/config/tempo.yaml","-config.expand-env","true"
          ]
@@ -854,7 +857,7 @@ distributor:
 #        grpc:                          # for a production deployment you should only enable the receivers you need!
 #        thrift_binary:
 #        thrift_compact:
-#    zipkin:
+    zipkin:
     otlp:
       protocols:
         http:
