@@ -15,13 +15,11 @@
       state: stopped
       enabled: false
 
-  - name: Template resolv.conf
-    template:
-      force: yes
-      src: resolv.j2
-      dest: "/etc/resolv.conf"
-    register: resolve_conf
+  - name: Populate service facts
+    service_facts:
+
   - name: "Apt Install dnsmasq"
+    when: "'dnsmasq.service' not in services"
     apt:
       update_cache: true
       force_apt_get: true
