@@ -1,18 +1,21 @@
 job "connect_test" {
+  # curl -X GET http://app2-api1.virtual.consul
   group "app1" {
     count = 1
 
     network {
       mode = "bridge"
-      port "api" {
+      port "api1" {
         to = 5000
+      }
+      port "api2" {
+        to = 5001
       }
     }
 
     service {
-      name = "app1"
+      name = "app1-api1"
       port = "5000"
-#       port = "api"
       connect {
         sidecar_service {
           proxy {
@@ -20,22 +23,19 @@ job "connect_test" {
           }
         }
       }
-#       check {
-#         name     = "readiness"
-#         type     = "http"
-#         path     = "/"
-#         interval = "10s"
-#         timeout  = "2s"
-#       }
     }
+#     service {
+#       name = "app1-api2"
+#       port = "5001"
+#     }
 
     task "app1" {
       driver = "docker"
 
       config {
         image = "suikast42/nettools:latest"
-        ports = ["api"]
-        #         entrypoint         = ["tail", "-f", "/dev/null"]
+        ports = ["api1", "api2"]
+        #  entrypoint         = ["tail", "-f", "/dev/null"]
       }
 
       resources {
@@ -44,29 +44,22 @@ job "connect_test" {
       }
     }
   }
-
   group "app2" {
     count = 1
-
+    # curl -X GET http://app1-api1.virtual.consul
     network {
       mode = "bridge"
-      port "api" {
+      port "api1" {
         to = 5000
+      }
+      port "api2" {
+        to = 5001
       }
     }
 
-    # curl -X GET http://app2.virtual.consul
     service {
-      name = "app2"
-       port = "5000"
-#       port = "api"
-#       check {
-#         name     = "readiness"
-#         type     = "http"
-#         path     = "/"
-#         interval = "10s"
-#         timeout  = "2s"
-#       }
+      name = "app2-api1"
+      port = "5000"
       connect {
         sidecar_service {
           proxy {
@@ -75,14 +68,18 @@ job "connect_test" {
         }
       }
     }
+#     service {
+#       name = "app2-api2"
+#       port = "5001"
+#     }
 
     task "app2" {
       driver = "docker"
 
       config {
         image = "suikast42/nettools:latest"
-        ports = ["api"]
-        #   entrypoint         = ["tail", "-f", "/dev/null"]
+        ports = ["api1", "api2"]
+        #  entrypoint         = ["tail", "-f", "/dev/null"]
       }
 
       resources {

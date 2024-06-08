@@ -16,8 +16,14 @@ RUN pip install -r requirements.txt
 # Copy the rest of the application
 COPY app.py app.py
 RUN dos2unix app.py
-ENV FLASK_APP=app.py
+
+COPY app2.py app2.py
+RUN dos2unix app2.py
+COPY start.sh start.sh
+
 # Expose port 5000
 EXPOSE 5000
+EXPOSE 5001
 # Set the entrypoint to start the Flask app
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+#CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+ENTRYPOINT  ["sh", "/app/start.sh"]
