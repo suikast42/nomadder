@@ -11,6 +11,9 @@ job "connect_test" {
       port "api2" {
         to = 5001
       }
+      port "metrics" {
+        to = -1
+      }
     }
 
     service {
@@ -19,15 +22,33 @@ job "connect_test" {
       connect {
         sidecar_service {
           proxy {
-            transparent_proxy {}
+             expose {
+                path {
+                   path            = "/metrics"
+                   protocol        = "http"
+                   local_path_port = 21000
+                   listener_port   = "metrics"
+                }
+             }
+            config{
+              tags = [
+                "prometheus",
+              ]
+              envoy_prometheus_bind_addr ="0.0.0.0:21000"
+            }
+#             transparent_proxy {
+#            #   exclude_outbound_ports = [5001]
+#            #   exclude_inbound_ports = ["5001"]
+#             }
           }
         }
       }
     }
-#     service {
-#       name = "app1-api2"
-#       port = "5001"
-#     }
+    service {
+      name = "app1-api2"
+      port = "5001"
+      #How to expose this over transparent_proxy ??
+    }
 
     task "app1" {
       driver = "docker"
@@ -63,15 +84,19 @@ job "connect_test" {
       connect {
         sidecar_service {
           proxy {
-            transparent_proxy {}
+            transparent_proxy {
+              #   exclude_outbound_ports = [5001]
+              #   exclude_inbound_ports = ["5001"]
+            }
           }
         }
       }
     }
-#     service {
-#       name = "app2-api2"
-#       port = "5001"
-#     }
+    service {
+      name = "app2-api2"
+      port = "5001"
+      #How to expose this over transparent_proxy ??
+    }
 
     task "app2" {
       driver = "docker"

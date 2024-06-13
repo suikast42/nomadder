@@ -4,13 +4,13 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.18.2"
-consul_checksum: "sha256:522045180a4e644af6e2d97824850b470545f176aabdb4898635afda512a6a3f"
+consul_version: "1.19.0"
+consul_checksum: "sha256:e337fba12295fc7bab177a84a7616eb8bcc827f032a2982c8c0e417fbe86541f"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
-consul_template_version: "0.38.0"
-consul_template_checksum: "sha256:9a30bb3599084880fb2acb97e96a25f01803c2025184ab2488ced7f528e88032"
+consul_template_version: "0.38.1"
+consul_template_checksum: "sha256:0014faa80000b767802643c34689852a3de80616dac4770a765d0073bb44a892"
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
@@ -69,7 +69,7 @@ update_protoc: "{{update_all or false }}"
 
 version_busy_box_init_container: "1.36.1"
 version_multi_stage_apline_container: "3.17.2"
-version_grafana_agent_container: "0.41.0"
+version_grafana_agent_container: "0.41.1"
 version_minio: "RELEASE.2024-03-05T04-48-44Z"
 version_minio_mc_admin: "RELEASE.2024-03-03T00-13-08Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"

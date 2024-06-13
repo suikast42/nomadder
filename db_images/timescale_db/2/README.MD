@@ -41,3 +41,14 @@ restore.sh <restore_file> (located in minio bucket)
 [Backup Restore Documentation](https://docs.timescale.com/self-hosted/latest/migration/entire-database/)
 
 
+# update  extension
+
+1. Connect to psql:
+   psql -X -U bi
+2. ALTER EXTENSION timescaledb UPDATE;
+   Check the update version: 
+   \dx timescaledb 
+   or 
+   SELECT extversion
+      FROM pg_extension
+      where extname = 'timescaledb';
