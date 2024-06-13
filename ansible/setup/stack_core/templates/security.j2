@@ -298,11 +298,63 @@ job "security" {
         to = 8080
         host_network = "local"
       }
-     # port "api_expose_healthcheck"{
-     #   to = -1
-     # }
+      port "health_check" {
+        host_network = "local"
+        to = 9000
+      }
     }
 
+    service {
+        name = "keycloak-health"
+        port         = "health_check"
+        address_mode = "alloc"
+        check {
+            name  = "health"
+            type  = "http"
+            port ="health_check"
+            path="/health"
+            interval = "10s"
+            timeout  = "2s"
+            address_mode = "alloc"
+            check_restart {
+            limit = 3
+            grace = "60s"
+            ignore_warnings = false
+            }
+        }
+        check {
+            name  = "live"
+            type  = "http"
+            port ="health_check"
+            path="/health/live"
+            interval = "10s"
+            timeout  = "2s"
+            address_mode = "alloc"
+        }
+        check {
+            name  = "started"
+            type  = "http"
+            port ="health_check"
+            path="/health/started"
+            interval = "10s"
+            timeout  = "2s"
+            address_mode = "alloc"
+        }
+        check {
+            name  = "ready"
+            type  = "http"
+            port ="health_check"
+            path="/health/ready"
+            interval = "10s"
+            timeout  = "2s"
+            address_mode = "alloc"
+            check_restart {
+                limit = 3
+                grace = "60s"
+                ignore_warnings = false
+            }
+        }
+    }
     service {
       name = "keycloak"
 #      port = "ui"
@@ -311,14 +363,6 @@ job "security" {
       connect {
         sidecar_service {
           proxy {
-          #  expose {
-          #     path {
-          #        path            = "/health"
-          #        protocol        = "http"
-          #        local_path_port = 8080
-          #        listener_port   = "api_expose_healthcheck"
-          #     }
-          #  }
             upstreams {
               destination_name = "keycloak-postgres"
               local_bind_port  = 5432
@@ -349,43 +393,7 @@ job "security" {
         "traefik.http.routers.keycloak.rule=Host(`{{security_dns}}`)",
       ]
 
-      check {
-        name  = "health"
-        type  = "http"
-        port ="ui"
-        path="/health"
-        interval = "10s"
-        timeout  = "2s"
-        address_mode = "alloc"
-        check_restart {
-           limit = 3
-           grace = "60s"
-           ignore_warnings = false
-        }
-      }
-      check {
-        name  = "live"
-        type  = "http"
-        port ="ui"
-        path="/health/live"
-        interval = "10s"
-        timeout  = "2s"
-        address_mode = "alloc"
-      }
-      check {
-        name  = "ready"
-        type  = "http"
-        port ="ui"
-        path="/health/ready"
-        interval = "10s"
-        timeout  = "2s"
-        address_mode = "alloc"
-        check_restart {
-          limit = 3
-          grace = "60s"
-          ignore_warnings = false
-        }
-      }
+
 
     }
       task "await-for-keycloak-postgres" {
@@ -423,10 +431,9 @@ job "security" {
       env {
         KEYCLOAK_ADMIN  = "admin"
         KC_HTTP_ENABLED= "true"
-        KC_HOSTNAME_STRICT_HTTPS="false"
+        KC_HOSTNAME="https://{{security_dns}}"
         KC_HEALTH_ENABLED= "true"
-        KC_HOSTNAME="{{security_dns}}"
-        KC_PROXY="edge"
+        KC_METRICS_ENABLED= "true"
         KC_DB                     = "postgres"
         KC_DB_SCHEMA              = "keycloak"
         KC_DB_USERNAME            = "keycloak"

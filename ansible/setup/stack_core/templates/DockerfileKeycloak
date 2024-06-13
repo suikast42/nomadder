@@ -12,7 +12,6 @@ FROM {{registry_dns}}/keycloak/keycloak:{{version_keycloak}} as stage2
 #COPY --from=stage1  /tmp/keycloak-metrics-spi-{{version_keycloak_metrics_spi}}.jar  /opt/keycloak/providers/keycloak-metrics-spi-{{version_keycloak_metrics_spi}}.jar
 ENV KC_HEALTH_ENABLED=true
 ENV KC_METRICS_ENABLED=true
-ENV KC_FEATURES=token-exchange
 ENV KC_DB=postgres
 #RUN echo "$(cat /etc/*-release)"
 # Install custom providers
@@ -21,7 +20,7 @@ COPY nomadder-realm.json /opt/keycloak/data/import/nomadder-realm.json
 USER root
 RUN chown -R keycloak:keycloak /opt/keycloak/data/import
 USER keycloak
-RUN /opt/keycloak/bin/kc.sh build
+RUN /opt/keycloak/bin/kc.sh build --features="token-exchange,persistent-user-sessions"
 #RUN opt/keycloak/bin/kc.sh import --dir /data/import --override true
 
 FROM {{registry_dns}}/keycloak/keycloak:{{version_keycloak}}
