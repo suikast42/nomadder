@@ -8,4 +8,4 @@ ansible-playbook 02_deploy_stacks_playbook.yml --ask-vault-pass --extra-vars="up
 
 #update 22
 ansible-playbook 01_platform_playbook.yml --ask-vault-pass --extra-vars="update_vector_agent=true update_consul_template=true update_consul_template=true uninstall_nomad_plugin_cni=true update_nomad=true"
-ansible-playbook 02_deploy_stacks_playbook.yml --ask-vault-pass --extra-vars="update_vector_agent=true update_consul_template=true update_consul_template=true uninstall_nomad_plugin_cni=true update_nomad=true"  
+ansible-playbook 02_deploy_stacks_playbook.yml --ask-vaVult-pass --extra-vars="update_vector_agent=true update_consul_template=true update_consul_template=true uninstall_nomad_plugin_cni=true update_nomad=true"  
