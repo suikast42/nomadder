@@ -286,26 +286,6 @@ job "ingress" {
 #    [[http.routers.nexus-push.tls.domains]]
 #      sans = ["registry.{{tls_san}}"]
 
-[tcp.services]
-  [tcp.services.opchbs.loadBalancer]
-    [[tcp.services.opchbs.loadBalancer.servers]]
-      address  = "10.7.106.10:4840"
-  [tcp.services.opcasrs.loadBalancer]
-    [[tcp.services.opcasrs.loadBalancer.servers]]
-      address  = "10.7.106.11:4840"
-[tcp.routers]
-  [tcp.routers.opchbs]
-    entryPoints = ["tcp-hbs"]
-    service = "opchbs"
-    rule = "HostSNI(`*`)" # Match all SNI (Server Name Indication) requests
- #     [[tcp.routers.opchbs.tls.domains]]
- #       sans = ["hbs.{{tls_san}}"]
-   [tcp.routers.opcasrs]
-     entryPoints = ["tcp-asrs"]
-     service = "opcasrs"
-     rule = "HostSNI(`*`)" # Match all SNI (Server Name Indication) requests
-  #     [[tcp.routers.opcasrs.tls.domains]]
-  #       sans = ["asrs.{{tls_san}}"]
               EOF
               destination = "local/certconfig.toml"
             }
@@ -333,10 +313,6 @@ job "ingress" {
 #    address = ":3179/udp"
 #  [entryPoints.streaming]
 #    address = ":1704/udp"
-  [entryPoints.tcp-hbs]
-    address = ":4840"
-  [entryPoints.tcp-asrs]
-    address = ":4841"
 [api]
     dashboard = true
     insecure  = false
@@ -413,3 +389,4 @@ EOF
     }
   }
 }
+
