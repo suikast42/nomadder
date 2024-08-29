@@ -4,8 +4,8 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.19.1"
-consul_checksum: "sha256:aa48085aaa6f4130d0f1ee98c416dcd51b1b0f980d34f5b91834fd5b3387891c"
+consul_version: "1.19.2"
+consul_checksum: "sha256:9315d95b19cf851f8fb0013b583ede6f61d591a9024a7dbb9b37eee45270abd2"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
@@ -43,7 +43,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "27.1.2"
+version_docker: "27.2.0"
 uninstall_docker: false
 
 version_docker_compose: "2.29.2"
@@ -56,7 +56,7 @@ version_nexus_initlzr: "1.0.1"
 update_nexus: false
 
 
-version_protoc: "27.3"
+version_protoc: "28.0"
 version_proto_gen: "1.34.1"
 version_proto_grpc: "1.64.0"
 version_proto_grpc_gateway: "2.15.2"
@@ -70,7 +70,7 @@ update_protoc: "{{update_all or false }}"
 version_busy_box_init_container: "1.36.1"
 version_multi_stage_apline_container: "3.17.2"
 version_grafana_agent_container: "0.42.0"
-version_minio: "RELEASE.2024-03-05T04-48-44Z"
-version_minio_mc_admin: "RELEASE.2024-03-03T00-13-08Z"
+version_minio: "RELEASE.2024-08-26T15-33-07Z"
+version_minio_mc_admin: "RELEASE.2024-08-26T10-49-58Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
