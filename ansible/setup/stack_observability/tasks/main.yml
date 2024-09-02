@@ -30,7 +30,7 @@
     - version_grafana_mimir: "2.13.0"
     - version_grafana_loki: "3.1.1"
     - version_grafana_tempo: "2.5.0"
-    - version_nats_server: "2.10.19"
+    - version_nats_server: "2.10.20"
     - version_logunifer: "1.0.1"
     - version_blackbox_exporter: "0.24.0"
     - version_nats_prometheus_exporter: "0.15.0"
