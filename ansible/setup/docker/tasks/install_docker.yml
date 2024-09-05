@@ -148,12 +148,26 @@
         cp /lib/systemd/system/docker.service /etc/systemd/system/
         sed -i 's# -H\ fd:\/\/# #g' /etc/systemd/system/docker.service
         systemctl daemon-reload
+
+
+    - name: Start docker
+      failed_when: false
+      service:
+        name: docker
+        state: restarted
+      register: dockerService
+      until: dockerService.status is defined and dockerService.status.ActiveState == "active"
+      retries: 5
+      delay: 5
+
+    #somehow on master the first restart attempt fails
+    # So we do it again
     - name: Start docker
       service:
         name: docker
         state: restarted
       register: dockerService
-      until: dockerService.status.ActiveState == "active"
+      until: dockerService.status is defined and dockerService.status.ActiveState == "active"
       retries: 10
       delay: 5
 

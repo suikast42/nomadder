@@ -29,7 +29,6 @@
       - dos2unix
       - ruby-dev
       - fortune-mod
-      - ctop
       - python3-pip
       - fzf
       - net-tools
@@ -38,7 +37,8 @@
       - nfs-common
       - python3-docker
       - traceroute
-#      - cadvisor
+      - ubuntu-release-upgrader-core
+    #      - cadvisor
 
     state: present
   register: install_apt
@@ -62,7 +62,7 @@
   pip:
     name:
       - pip
-    extra_args: --user --upgrade
+    extra_args: --user --upgrade  --break-system-packages
   register: install_pip1
 
 - debug:
@@ -75,7 +75,7 @@
       - pexpect
       - kubernetes
       - python-nomad
-    extra_args: --user
+    extra_args: --user --break-system-packages
   register: install_pip2
 
 - debug:

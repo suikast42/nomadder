@@ -1,19 +1,8 @@
 # See https://learn.hashicorp.com/tutorials/consul/dns-forwarding?in=consul/networking#dnsmasq-setup
+# https://deepdoc.at/dokuwiki/doku.php?id=server_und_serverdienste:systemd-resolved_durch_dnsmasq_ersetzen
 - name: DnsMasq
   become: true
   block:
-
-  - name: "Create consul template folder if needed {{consul_template_dir_dnsmasq}}"
-    ansible.builtin.file:
-      path: "{{consul_template_dir_dnsmasq}}"
-      state: directory
-      mode: '0755'
-
-  - name: Stop and disable systemd-resolved
-    service:
-      name: systemd-resolved
-      state: stopped
-      enabled: false
 
   - name: Populate service facts
     service_facts:
@@ -27,7 +16,6 @@
         - dnsmasq
       state: present
 
-
   - name: Template dnsmasq.conf
     template:
       force: yes
@@ -35,7 +23,23 @@
       dest: "/etc/dnsmasq.d/10-consul"
     register: dnsmasq_conf
 
-  - name: Template consul_template_external_dns.j2
+  - name: Disable DNSStubListener
+    become: true
+    lineinfile:
+      state: present
+      path: /etc/systemd/resolved.conf
+      firstmatch: yes
+      insertafter: EOF
+      line: "DNSStubListener=no"
+    register: systemd
+
+  - name: "Create consul template folder if needed {{consul_template_dir_dnsmasq}}"
+    ansible.builtin.file:
+      path: "{{consul_template_dir_dnsmasq}}"
+      state: directory
+      mode: '0755'
+
+  - name: "Template consul_template_external_dns.j2"
     template:
       force: yes
       src: consul_template_external_dns.j2
@@ -56,36 +60,49 @@
       dest: "/etc/NetworkManager/NetworkManager.conf"
     register: nwk_conf
 
+  - name: Stop and disable systemd-resolved
+    service:
+      name: systemd-resolved
+      state: stopped
+      enabled: false
+
+  - name: "Delete resolve conf"
+    become: true
+    changed_when: false
+    failed_when: false
+    shell: |
+      rm /etc/resolv.conf
+#      ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
   - name: Start dnsmasq service
     changed_when: false
     service:
       name: dnsmasq
       state: started
 
-  - name: Template consul_template_service.j2
+  - name: "Template consul_template_service.j2"
     template:
       force: yes
       src: consul_template_service.j2
       dest: /etc/systemd/system/consulTpl_dnsmasq.service
     register: serviceconfig
 
-  - name: enable consul template dnsmasq service
+  - name: "enable consul template dnsmasq service"
     service:
       name: consulTpl_dnsmasq
       enabled: yes
 
-
-  - name: restart consul template service
-    changed_when: false
-    service:
-      name: consulTpl_dnsmasq
-      state: restarted
-
-  - name: restart dnsmasq service
-    when: dnsmasq_conf.changed or nwk_conf.changed or dnsmasq_conf.changed or dnsmasq_tpl.changed
+  - name: "restart dnsmasq service"
+    when: dnsmasq_conf.changed or systemd.changed or dnsmasq_tpl.changed
     changed_when: false
     service:
       name: dnsmasq
+      state: restarted
+
+  - name: "restart consul template service"
+    changed_when: false
+    service:
+      name: consulTpl_dnsmasq
       state: restarted
 
   vars:

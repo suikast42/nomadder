@@ -1,0 +1,28 @@
+ifndef::imagesdir[]
+:imagesdir: ./images
+endif::imagesdir[]
+
+=== Ubuntu
+
+===== How ubutnu resolves DNS
+See https://unix.stackexchange.com/questions/738701/what-is-the-order-in-which-linux-resolves-dns
+
+The order in which Linux resolves DNS is very configurable.
+
+First read the hosts: line in /etc/nsswitch.conf. The keywords on that line specify the order in which various sources are used.
+
+The set of keywords available depends on your Linux distribution. The classic ones are:
+
+files tells the system to read /etc/hosts
+dns tells the system to use the DNS servers specified in /etc/resolv.conf. (New systems using systemd-resolved might be working towards eventually making this obsolete.)
+nis or nisplus would refer to the centrally managed hosts table of the NIS/NIS+ system (practically obsolete)
+compat is like files, but also allows the old NIS extension syntax that was used before /etc/nsswitch.conf existed. (practically obsolete)
+Modern systems may have new keywords added, like:
+
+resolve tells the system to use systemd-resolved. If this keyword is present, use the resolvectl command to view the actual DNS server settings. If the dns keyword is not also present, the /etc/resolv.conf file may be completely ignored.
+
+mdns4_minimal, mdns6_minimal or mdns_minimal tell the system to attempt to resolve short hostnames or long names of the form shortname.local by sending a mDNS packet to the appropriate multicast address, using IPv4, IPv6 or both, respectively. The multicast address is 224.0.0.251 for IPv4 and ff02::fb for IPv6, and the destination port is 5353/UDP in both cases. If other systems in the same network have avahi-daemon or another mDNS responder configured, this might allow you to use hostnames in your local network segment without setting up a real DNS server or maintaining /etc/hosts files on every system.
+
+myhostname allows the system to always successfully resolve its own hostname, even if no /etc/hosts or DNS servers are configured, and no network connections are present.
+
+mymachines allows the system to automatically resolve the hostnames of virtual machines that have been set up using systemd-machined.service
