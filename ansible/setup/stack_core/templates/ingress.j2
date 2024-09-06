@@ -193,6 +193,7 @@ job "ingress" {
     serversTransport = "default"
     [[http.services.nomad.loadBalancer.servers]]
       url = "https://{{master_ip}}:4646"
+
 # Service to consul
   [http.services.consul.loadBalancer]
    serversTransport = "default"
