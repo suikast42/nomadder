@@ -203,7 +203,7 @@ EOF
         destination = "/var/opt/gitlab"
       }
 
-      driver = "docker"
+      driver = "docker"c
 
       config {
         image              = "registry.${var.tls_san}/${var.image_gitlab}"

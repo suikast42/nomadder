@@ -1,0 +1,41 @@
+- hosts: masters,localhost
+  gather_facts: true
+  vars_files:
+    - vars/common_vars.yml
+  tasks:
+    - name: "Check env will fail {{fail_when_not_development_env|bool == true }}"
+      changed_when: false
+      failed_when: fail_when_not_development_env|bool == true
+      shell: |
+        echo current env is {{env}} and hostip is  {{host_ip}}
+      tags:
+        - always
+
+    - name: "Copy docker cert to client"
+      block:
+        - name: "Delete local client certs"
+          run_once: true
+          delegate_to: localhost
+          file:
+            path: "{{local_cert_path_docker_client}}"
+            state: absent
+
+        - name: "Create docker client cert dir on localhost if needed"
+          run_once: true
+          delegate_to: localhost
+          file:
+            state: directory
+            path: "{{local_cert_path_docker_client}}"
+
+        - name: "Copy docker client certs from build host to localhost"
+          when: is_build_host
+          run_once: true
+          include_tasks: cert_install/tasks/copy_from_master_0.yml
+          loop:
+            - { src: '{{cluster_intermediate_ca_bundle}}', dest: '{{local_cert_path_docker_client}}/ca.pem', host: localhost}
+            - { src: '{{server_cert_path_docker_client}}/docker-client.pem', dest: '{{ local_cert_path_docker_client}}/cert.pem', host: localhost }
+            - { src: '{{server_cert_path_docker_client}}/docker-client-key.pem', dest: '{{local_cert_path_docker_client}}/key.pem', host: localhost}
+  vars:
+    - cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/nomad"
+    - server_cert_path_docker_client: "/etc/opt/certs/docker"
+    - local_cert_path_docker_client: "{{ lookup('env','DOCKER_CERT_PATH') }}"

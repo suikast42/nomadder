@@ -1,3 +1,4 @@
 - name: ca_changed handler docker
   include_tasks: generate_docker_certs.yml
   listen: ca_changed
+
