@@ -14,12 +14,12 @@ consul_template_checksum: "sha256:b77c7550defda78c62b036c734e7faceb7f89519dc1240
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "1.8.3"
-nomad_checksum: "sha256:a0c92d427fe8839bf3aab9c62b2d12190483f953a3483c08891e53f65f676797"
+nomad_version: "1.8.4"
+nomad_checksum: "sha256:681832b4ffaff0626119420569f117fb7ad1e323d6c929ef3c0bccb432165c6b"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.31.1
+version_envoy: 1.31.2
 
 nomad_plugin_cni_version: "1.5.1"
 nomad_plugin_cni_checksum: "sha256:77baa2f669980a82255ffa2f2717de823992480271ee778aa51a9c60ae89ff9b"
@@ -43,20 +43,20 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "27.2.1"
+version_docker: "27.3.0"
 uninstall_docker: false
 
-version_docker_compose: "2.29.4"
+version_docker_compose: "2.29.6"
 uninstall_compose: false
 
 update_certificates: false
 
 version_nexus: "3.70.2"
-version_nexus_initlzr: "1.0.1"
+version_nexus_initlzr: "1.0.2"
 update_nexus: false
 
 
-version_protoc: "28.1"
+version_protoc: "28.2"
 version_proto_gen: "1.34.1"
 version_proto_grpc: "1.64.0"
 version_proto_grpc_gateway: "2.15.2"
