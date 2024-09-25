@@ -97,7 +97,13 @@
       ret_code=$?
       if [ $ret_code != 0 ]; then exit $ret_code; fi
 
-
+      rm -fr protoc-gen-validate
+      git  clone -b v{{version_proto_gen_validate}}  https://github.com/bufbuild/protoc-gen-validate.git
+      cd protoc-gen-validate && make build
+      sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-validate  /usr/local/bin
+      sudo mv validate   /usr/local/bin/include
+      ret_code=$?
+      if [ $ret_code != 0 ]; then exit $ret_code; fi
     args:
       chdir: "/tmp/protoc"
       creates: /usr/local/bin/protoc
