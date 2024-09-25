@@ -102,6 +102,15 @@
       cd protoc-gen-validate && make build
       sudo mv /home/{{ansible_user}}/go/bin/protoc-gen-validate  /usr/local/bin
       sudo mv validate   /usr/local/bin/include
+      cd ..
+      ret_code=$?
+      if [ $ret_code != 0 ]; then exit $ret_code; fi
+      
+      rm -fr protobuf-javascript
+      git  clone -b v{{version_proto_gen_js}}  https://github.com/protocolbuffers/protobuf-javascript.git
+      npm install -D protoc-gen-js
+      sudo mv node_modules/protoc-gen-js/bin/protoc-gen-js /usr/local/bin
+      cd ..
       ret_code=$?
       if [ $ret_code != 0 ]; then exit $ret_code; fi
     args:
