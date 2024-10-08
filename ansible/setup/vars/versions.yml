@@ -67,7 +67,7 @@ update_protoc: "{{update_all or false }}"
 
 version_busy_box_init_container: "1.36.1"
 version_multi_stage_apline_container: "3.17.2"
-version_grafana_agent_container: "0.43.0"
+version_grafana_agent_container: "0.43.3"
 version_minio: "RELEASE.2024-08-26T15-33-07Z"
 version_minio_mc_admin: "RELEASE.2024-08-26T10-49-58Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
