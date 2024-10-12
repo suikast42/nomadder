@@ -14,8 +14,8 @@ consul_template_checksum: "sha256:b77c7550defda78c62b036c734e7faceb7f89519dc1240
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "1.8.4"
-nomad_checksum: "sha256:681832b4ffaff0626119420569f117fb7ad1e323d6c929ef3c0bccb432165c6b"
+nomad_version: "1.9.0"
+nomad_checksum: "sha256:b16f46cef003a8f16819697574df018becd1f033a8ca89a0cb431ef151bcda1b"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
