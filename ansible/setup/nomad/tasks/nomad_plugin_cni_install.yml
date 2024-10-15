@@ -1,17 +1,16 @@
 - name: "nomad plugin cni"
   become: true
   block:
-
     - name: "Delete nomad plugin cni dir {{plugin_dir}} if present"
-      when: uninstall_nomad_plugin_cni|bool == true
+      when: uninstall_nomad_plugin_cni|bool == true or update_nomad_plugin_cni|bool == true or uninstall_nomad_plugin_consul_cni|bool == true or update_nomad_plugin_consul_cni|bool == true
       ansible.builtin.file:
         path: "{{plugin_dir}}"
         state: absent
 
-    - name: "Delete nomad plugin consul cni {{cni_bin}} if present"
-      when: uninstall_nomad_plugin_consul_cni|bool == true
+    - name: "Delete consul cni plugin {{consul_cni_bin}} if present"
+      when: uninstall_nomad_plugin_consul_cni|bool == true or update_nomad_plugin_consul_cni|bool == true
       ansible.builtin.file:
-        file: "{{cni_bin}}"
+        path: "{{consul_cni_bin}}"
         state: absent
 
     - name : Check nomad plugin cni installation present

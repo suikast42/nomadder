@@ -4,8 +4,8 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.19.2"
-consul_checksum: "sha256:9315d95b19cf851f8fb0013b583ede6f61d591a9024a7dbb9b37eee45270abd2"
+consul_version: "1.20.0"
+consul_checksum: "sha256:da7a71476f8a83f69853c95316518b888d5863ce3b326523bb8e3ad1a302ed64"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
@@ -21,13 +21,16 @@ update_nomad: "{{update_all or false }}"
 
 version_envoy: 1.31.2
 
-nomad_plugin_cni_version: "1.5.1"
-nomad_plugin_cni_checksum: "sha256:77baa2f669980a82255ffa2f2717de823992480271ee778aa51a9c60ae89ff9b"
+nomad_plugin_cni_version: "1.6.0"
+nomad_plugin_cni_checksum: "sha256:682b49ff8933a997a52107161f1745f8312364b4c7f605ccdf7a77499130d89d"
 uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
+update_nomad_plugin_cni: "{{update_all or false }}"
 
-nomad_plugin_consul_cni_version: "1.4.3"
-nomad_plugin_consul_cni_checksum: "sha256:6e7f32084dd28576f77e53d6bb30661dde1a906d7a3eebd92d8d06f9ce73a37b"
+nomad_plugin_consul_cni_version: "1.5.3"
+nomad_plugin_consul_cni_checksum: "sha256:cab54a4ce9ddad1b2e60672339e202d8b9328f0e6c592aca24aabf436e4b2497"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
+update_nomad_plugin_consul_cni: "{{update_all or false }}"
+
 
 nomad_cli_levant_version: "0.3.2"
 nomad_cli_levant_checkusum: "sha256:1e06180f8d8327e721e2ad4c9637d1f391034a22709473b8ed8ee19f1cad1570"
