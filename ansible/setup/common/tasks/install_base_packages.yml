@@ -38,6 +38,8 @@
       - python3-docker
       - traceroute
       - ubuntu-release-upgrader-core
+      - neofetch
+      - tldr
     #      - cadvisor
 
     state: present
@@ -46,6 +48,17 @@
 - debug:
     msg: "{{ install_apt }}"
 
+- name: "Create tldr folder"
+  become: false
+  file:
+    state: directory
+    path: "/home/{{ansible_user}}/.local/share/tldr"
+    mode: '0755'
+
+- name: "TlDR update"
+  become: false
+  shell: |
+    tldr -u
 
 - name: Install snap packeges
   become: true
