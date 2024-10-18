@@ -2,129 +2,129 @@
 - name: nomad setup
   block:
   - name: nomad cni plugin setup
-    when: update_nomad_plugin_cni|bool == true or uninstall_nomad_plugin_cni|bool == true
+#    when: update_nomad_plugin_cni|bool == true or uninstall_nomad_plugin_cni|bool == true
     block:
       - name: Install nomad plugin cni
         include_tasks: nomad_plugin_cni_install.yml
 
   - name: nomad cli tool wander setup
-    when: uninstall_cli_wander|bool == true or update_cli_wander|bool == true
+#    when: uninstall_cli_wander|bool == true or update_cli_wander|bool == true
     block:
       - name: Install nomad cli tool wander
         include_tasks: nomad_cli_wander_install.yml
 
   - name: nomad cli tool levant setup
-    when: uninstall_cli_levant|bool == true or update_cli_levant|bool == true
+#    when: uninstall_cli_levant|bool == true or update_cli_levant|bool == true
     block:
       - name: Install nomad cli tool levant
         include_tasks: nomad_cli_levant_install.yml
 
 
-#  - name: nomad installation
-#    when: update_nomad|bool == false
-#    block:
-#      - name: "Create user {{nomad_user}}"
-#        include_tasks: common/tasks/user.yml
-#        vars:
-#          create_user: "{{nomad_user}}"
-#          create_group: "{{nomad_group}}"
-#          create_usr_conf_dir: "{{nomad_conf_dir}}"
-#
-#      - name: "Add nomad to docker"
-#        become: true
-#        ansible.builtin.user:
-#          name: nomad
-#          groups: docker
-#          state: present
-#
-#      - name: Install nomad
-#        include_tasks: nomad_install.yml
-#
-#
-#      - name: Nomad config
-#        include_tasks: copy_nomad_config_files.yml
-#
-#      - name: Nomad service
-#        include_tasks: nomad_systemd_install.yml
-#
-#      - name: Reload systemd
-#        become: true
-#        ansible.builtin.systemd:
-#          daemon_reload: yes
-#
-#      - name: stop nomad service
-#        become: true
-#        failed_when: false
-#        service:
-#          name: nomad
-#          state: stopped
-#
-#      - name: start nomad service
-#        become: true
-#        service:
-#          name: nomad
-#          state: started
-#          enabled: yes
-#        register: nomadservice
-#        until: nomadservice.status.ActiveState == "active"
-#        retries: 10
-#        delay: 5
-#
-#      - name: Enable Memory Oversubscription
-#        become: false
-#        when: is_master_host
-#        run_once: true
-#        shell: |
-#          curl  -s  -N \
-#          --cacert "${NOMAD_CACERT}" \
-#          --cert "${NOMAD_CLIENT_CERT}" \
-#          --key "${NOMAD_CLIENT_KEY}" \
-#          "${NOMAD_ADDR}/v1/operator/scheduler/configuration" |\
-#          jq '.SchedulerConfig | .SchedulerAlgorithm= "spread" |  .MemoryOversubscriptionEnabled=true | .PreemptionConfig.SysBatchSchedulerEnabled=true | .PreemptionConfig.BatchSchedulerEnabled=true  | .PreemptionConfig.ServiceSchedulerEnabled=true'   |\
-#          curl \
-#          --cacert "${NOMAD_CACERT}" \
-#          --cert "${NOMAD_CLIENT_CERT}" \
-#          --key "${NOMAD_CLIENT_KEY}" \
-#          -X PUT $NOMAD_ADDR/v1/operator/scheduler/configuration -d @-
-#        changed_when: false
-#        environment:
-#          - NOMAD_ADDR: "https://localhost:4646"
-#          - NOMAD_CACERT: "{{cluster_intermediate_ca_bundle}}"
-#          - NOMAD_CLIENT_CERT: "{{nomad_cert}}"
-#          - NOMAD_CLIENT_KEY: "{{nomad_cert_key}}"
-#
-#  - name: nomad update
-#    when: update_nomad|bool == true
-#    block:
-#      - name: Update nomad
-#        include_tasks: nomad_update.yml
-#
-#      - name: Nomad config
-#        include_tasks: copy_nomad_config_files.yml
-#
-#      - name: Nomad service
-#        include_tasks: nomad_systemd_install.yml
-#
-#      - name: Reload systemd
-#        become: true
-#        ansible.builtin.systemd:
-#          daemon_reload: yes
-#
-#      - name: stop nomad service
-#        failed_when: false
-#        service:
-#          name: nomad
-#          state: stopped
-#
-#      - name: start nomad service
-#        service:
-#          name: nomad
-#          state: started
-#          enabled: yes
-#        register: nomadservice
-#        until: nomadservice.status.ActiveState == "active"
-#        retries: 10
-#        delay: 5
+  - name: nomad installation
+    when: update_nomad|bool == false
+    block:
+      - name: "Create user {{nomad_user}}"
+        include_tasks: common/tasks/user.yml
+        vars:
+          create_user: "{{nomad_user}}"
+          create_group: "{{nomad_group}}"
+          create_usr_conf_dir: "{{nomad_conf_dir}}"
+
+      - name: "Add nomad to docker"
+        become: true
+        ansible.builtin.user:
+          name: nomad
+          groups: docker
+          state: present
+
+      - name: Install nomad
+        include_tasks: nomad_install.yml
+
+
+      - name: Nomad config
+        include_tasks: copy_nomad_config_files.yml
+
+      - name: Nomad service
+        include_tasks: nomad_systemd_install.yml
+
+      - name: Reload systemd
+        become: true
+        ansible.builtin.systemd:
+          daemon_reload: yes
+
+      - name: stop nomad service
+        become: true
+        failed_when: false
+        service:
+          name: nomad
+          state: stopped
+
+      - name: start nomad service
+        become: true
+        service:
+          name: nomad
+          state: started
+          enabled: yes
+        register: nomadservice
+        until: nomadservice.status.ActiveState == "active"
+        retries: 10
+        delay: 5
+
+      - name: Enable Memory Oversubscription
+        become: false
+        when: is_master_host
+        run_once: true
+        shell: |
+          curl  -s  -N \
+          --cacert "${NOMAD_CACERT}" \
+          --cert "${NOMAD_CLIENT_CERT}" \
+          --key "${NOMAD_CLIENT_KEY}" \
+          "${NOMAD_ADDR}/v1/operator/scheduler/configuration" |\
+          jq '.SchedulerConfig | .SchedulerAlgorithm= "spread" |  .MemoryOversubscriptionEnabled=true | .PreemptionConfig.SysBatchSchedulerEnabled=true | .PreemptionConfig.BatchSchedulerEnabled=true  | .PreemptionConfig.ServiceSchedulerEnabled=true'   |\
+          curl \
+          --cacert "${NOMAD_CACERT}" \
+          --cert "${NOMAD_CLIENT_CERT}" \
+          --key "${NOMAD_CLIENT_KEY}" \
+          -X PUT $NOMAD_ADDR/v1/operator/scheduler/configuration -d @-
+        changed_when: false
+        environment:
+          - NOMAD_ADDR: "https://localhost:4646"
+          - NOMAD_CACERT: "{{cluster_intermediate_ca_bundle}}"
+          - NOMAD_CLIENT_CERT: "{{nomad_cert}}"
+          - NOMAD_CLIENT_KEY: "{{nomad_cert_key}}"
+
+  - name: nomad update
+    when: update_nomad|bool == true
+    block:
+      - name: Update nomad
+        include_tasks: nomad_update.yml
+
+      - name: Nomad config
+        include_tasks: copy_nomad_config_files.yml
+
+      - name: Nomad service
+        include_tasks: nomad_systemd_install.yml
+
+      - name: Reload systemd
+        become: true
+        ansible.builtin.systemd:
+          daemon_reload: yes
+
+      - name: stop nomad service
+        failed_when: false
+        service:
+          name: nomad
+          state: stopped
+
+      - name: start nomad service
+        service:
+          name: nomad
+          state: started
+          enabled: yes
+        register: nomadservice
+        until: nomadservice.status.ActiveState == "active"
+        retries: 10
+        delay: 5
 
   vars:
     consul_cert_path: "{{base_cert_dir}}/consul"
