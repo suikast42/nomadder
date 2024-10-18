@@ -64,7 +64,7 @@ Vagrant.configure("2") do |config|
 
   config.timezone.value = :host
   #master
-  config.vm.define "master_001" do |mastercfg|
+  config.vm.define "master_01" do |mastercfg|
     mastercfg.vm.provider :vmware_desktop do |master_01|
       mastercfg.vm.hostname = $vm_hostname_master_01
       mastercfg.vm.network :private_network, ip: $vm_master_01_ip, :netmask => "255.255.0.0"
@@ -78,7 +78,7 @@ Vagrant.configure("2") do |config|
   end
 
   #worker
-  config.vm.define "worker_001" do |workercfg|
+  config.vm.define "worker_01" do |workercfg|
     workercfg.vm.provider :vmware_desktop do |worker_01|
       workercfg.vm.hostname = $vm_hostname_worker_01
       workercfg.vm.network :private_network, ip: $vm_worker_01_ip, :netmask => "255.255.0.0"
