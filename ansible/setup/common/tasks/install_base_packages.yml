@@ -56,6 +56,7 @@
     mode: '0755'
 
 - name: "TlDR update"
+  failed_when: false
   become: false
   shell: |
     tldr -u

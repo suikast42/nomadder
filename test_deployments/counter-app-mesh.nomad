@@ -5,10 +5,10 @@ job "countdash_app_mesh" {
 #    constraint {
 #      distinct_hosts = true
 #    }
-        constraint {
-          attribute    = "${attr.unique.hostname}"
-          set_contains = "worker-02"
-        }
+#         constraint {
+#           attribute    = "${attr.unique.hostname}"
+#           set_contains = "worker-02"
+#         }
     network {
       mode = "bridge"
       port "api" {
@@ -54,10 +54,10 @@ job "countdash_app_mesh" {
 
   group "dashboard" {
     count = 1
-        constraint {
-          attribute    = "${attr.unique.hostname}"
-          set_contains = "worker-01"
-        }
+        # constraint {
+        #   attribute    = "${attr.unique.hostname}"
+        #   set_contains = "worker-01"
+        # }
     network {
       mode = "bridge"
 

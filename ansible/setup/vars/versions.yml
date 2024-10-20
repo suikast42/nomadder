@@ -14,20 +14,32 @@ consul_template_checksum: "sha256:b77c7550defda78c62b036c734e7faceb7f89519dc1240
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
+#nomad_version: "1.8.4"
+#nomad_checksum: "sha256:681832b4ffaff0626119420569f117fb7ad1e323d6c929ef3c0bccb432165c6b"
 nomad_version: "1.9.0"
 nomad_checksum: "sha256:b16f46cef003a8f16819697574df018becd1f033a8ca89a0cb431ef151bcda1b"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.31.2
+version_envoy: 1.32.0
 
 nomad_plugin_cni_version: "1.6.0"
 nomad_plugin_cni_checksum: "sha256:682b49ff8933a997a52107161f1745f8312364b4c7f605ccdf7a77499130d89d"
+#nomad_plugin_cni_version: "1.5.1"
+#nomad_plugin_cni_checksum: "sha256:77baa2f669980a82255ffa2f2717de823992480271ee778aa51a9c60ae89ff9b"
 uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
-nomad_plugin_consul_cni_version: "1.5.3"
-nomad_plugin_consul_cni_checksum: "sha256:cab54a4ce9ddad1b2e60672339e202d8b9328f0e6c592aca24aabf436e4b2497"
+#nomad_plugin_consul_cni_version: "1.4.3"
+#nomad_plugin_consul_cni_checksum: "sha256:6e7f32084dd28576f77e53d6bb30661dde1a906d7a3eebd92d8d06f9ce73a37b"
+#nomad_plugin_consul_cni_version: "1.4.6"
+#nomad_plugin_consul_cni_checksum: "sha256:2edf7b36e2b7ba3c73529d6ef5a7a3420accfb6ea7c56b8a91934b7dc124f7f3"
+#nomad_plugin_consul_cni_version: "1.5.1"
+#nomad_plugin_consul_cni_checksum: "sha256:4a5fd14db4c4ae10a8b8b4befe006c4271d14bece4ea670b1c5f2afafdc400e0"
+#nomad_plugin_consul_cni_version: "1.5.3"
+#nomad_plugin_consul_cni_checksum: "sha256:cab54a4ce9ddad1b2e60672339e202d8b9328f0e6c592aca24aabf436e4b2497"
+nomad_plugin_consul_cni_version: "1.6.0"
+nomad_plugin_consul_cni_checksum: "sha256:90cd9419d4530740c07df7c0db476e1801753a6a8f7f7d03a40a2294e3630aad"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 
@@ -46,7 +58,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "27.3.0"
+version_docker: "27.3.1"
 uninstall_docker: false
 
 version_docker_compose: "2.29.6"
@@ -68,7 +80,7 @@ version_proto_grpc_curl: "1.9.1"
 uninstall_protoc: "{{uninstall_all or false }}"
 update_protoc: "{{update_all or false }}"
 
-version_busy_box_init_container: "1.36.1"
+version_busy_box_init_container: "1.37.0"
 version_multi_stage_apline_container: "3.17.2"
 version_grafana_agent_container: "0.43.3"
 version_minio: "RELEASE.2024-08-26T15-33-07Z"

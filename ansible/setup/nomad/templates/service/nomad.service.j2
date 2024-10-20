@@ -5,7 +5,7 @@
 Description=Nomad
 Documentation=https://www.nomadproject.io/docs/
 {% if is_master_host  %}
-Wants=network-online.target,containerd.service,docker.service, consul.service
+Wants=network-online.target,containerd.service,docker.service,consul.service
 After=network-online.target,containerd.service,docker.service,consul.service
 {% else %}
 Wants=network-online.target,containerd.service,docker.service,consul.service
