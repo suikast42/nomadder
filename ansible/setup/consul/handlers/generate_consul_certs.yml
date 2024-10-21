@@ -1,7 +1,7 @@
 - name: "Generate consul certs"
   become: true
   block:
-    - name: Check if nomad service exists
+    - name: Check if consul service exists
       stat:
         path: /etc/init.d/consul.service
       register: service_status
@@ -107,6 +107,12 @@
       retries: 10
       delay: 5
 
+    # If consul certs changed then the template service need a restart too
+    - name: Restart consul template service
+      failed_when: false
+      service:
+        name: consulTpl_dnsmasq
+        state: restarted
 
   vars:
     - cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/consul"

@@ -38,4 +38,3 @@
       until: consulservice.status.ActiveState == "active"
       retries: 10
       delay: 5
-

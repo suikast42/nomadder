@@ -17,13 +17,18 @@
       state: directory
       mode: '0755'
 
-  - name: Install pip modules
-    pip:
+#  - name: Install pip modules
+#    pip:
+#      name:
+#        - pexpect
+#        - docker
+#      extra_args: --user
+  - name: "Install pip modules"
+    become: true
+    apt:
       name:
-        - pexpect
-        - docker
-      extra_args: --user --break-system-packages
-
+        - python3-pexpect
+        - python3-docker
   # Install secint on localhost
   # Need for autoconfigure consul
   # See https://github.com/hashicorp/learn-consul-docker/tree/main/datacenter-deploy-auto-config/secint

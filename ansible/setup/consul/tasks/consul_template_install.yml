@@ -11,7 +11,7 @@
         mode: '0755'
 
 
-- name : Check consul installation present
+- name : Check consul template installation present
   stat:
     path: /usr/local/bin/consul-template
   register: consulTemplateInstalled

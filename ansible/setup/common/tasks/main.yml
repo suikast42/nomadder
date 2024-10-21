@@ -6,6 +6,9 @@
 
 - name: Nodes setup
   block:
+  - name: "Host config {{host_name}}"
+    import_tasks: host_config.yml
+
   - name: "Create download dir"
     import_tasks: create_download_dir.yml
 
@@ -19,8 +22,6 @@
   - name: "Install base packages {{host_name}}"
     import_tasks: install_base_packages.yml
 
-  - name: "Host config {{host_name}}"
-    import_tasks: host_config.yml
 
   - name: "Install oh my zsh {{host_name}}"
     import_tasks: install_ohmy_zsh.yml
