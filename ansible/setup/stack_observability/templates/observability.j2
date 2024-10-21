@@ -60,34 +60,12 @@ job "observability" {
     }
     service {
           name = "grafana"
-          #      port = "ui"
-          port = "3000"
-          connect {
-            sidecar_service {
-#              proxy {
-#                config {
-#                   protocol = "http"
-#                }
-#            }
-          }
-            sidecar_task{
-              config{
-               {% if set_cpu_hard_limit %}
-                cpu_hard_limit = "true"
-               {% endif %}
-                labels = {
-                  "com.github.logunifier.application.pattern.key" = "envoy"
-                  "com.github.logunifier.application.name" = "grafana_agent"
-                  "com.github.logunifier.application.version" = "{{version_grafana_agent_container}}"
-                  "com.github.logunifier.application.org" = "${var.org}"
-                  "com.github.logunifier.application.env" = "${var.env}"
-                }
-              }
-            }
-        }
+          port = "ui"
+         #port = "3000"
+
         tags = [
           "traefik.enable=true",
-          "traefik.consulcatalog.connect=true",
+          "traefik.consulcatalog.connect=false",
           "traefik.http.routers.grafana.tls=true",
           "traefik.http.routers.grafana.rule=Host(`grafana.{{tls_san}}`)",
         ]
