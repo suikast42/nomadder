@@ -55,13 +55,31 @@ job "security" {
       mode = "bridge"
       port "db" {
         to = 5432
+        host_network = "local"
       }
     }
 
     service {
       name = "keycloak-postgres"
-      port = "db"
-
+      port = "5432"
+      address_mode = "alloc"
+      connect {
+        sidecar_service {}
+        sidecar_task{
+          config{
+ {% if set_cpu_hard_limit %}
+            cpu_hard_limit = "true"
+ {% endif %}
+            labels = {
+              "com.github.logunifier.application.name" = "envoy-proxy-keycloak-postgres"
+              "com.github.logunifier.application.version" = "{{version_envoy}}"
+              "com.github.logunifier.application.org" = "${var.org}"
+              "com.github.logunifier.application.env" = "${var.env}"
+              "com.github.logunifier.application.pattern.key" = "envoy"
+            }
+          }
+        }
+      }
      check {
         name     = "keycloak_postgres_ping"
         type     = "script"
@@ -69,6 +87,7 @@ job "security" {
         task     = "keycloak_postgres"
         interval = "10s"
         timeout  = "2s"
+        address_mode = "alloc"
         check_restart {
           limit = 3
           grace = "30s"
@@ -157,11 +176,13 @@ job "security" {
       mode = "bridge"
       port "auth" {
         to = 4181
+        host_network = "local"
       }
     }
     service {
       name = "forwardauth"
       port = "auth"
+      address_mode = "alloc"
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.forwardauth.entrypoints=https",
@@ -275,8 +296,10 @@ job "security" {
       mode = "bridge"
       port "ui" {
         to = 8080
+        host_network = "local"
       }
       port "health_check" {
+        host_network = "local"
         to = 9000
       }
     }
@@ -284,6 +307,7 @@ job "security" {
     service {
         name = "keycloak-health"
         port         = "health_check"
+        address_mode = "alloc"
         check {
             name  = "health"
             type  = "http"
@@ -291,6 +315,7 @@ job "security" {
             path="/health"
             interval = "10s"
             timeout  = "2s"
+            address_mode = "alloc"
             check_restart {
             limit = 3
             grace = "60s"
@@ -304,6 +329,7 @@ job "security" {
             path="/health/live"
             interval = "10s"
             timeout  = "2s"
+            address_mode = "alloc"
         }
         check {
             name  = "started"
@@ -312,6 +338,7 @@ job "security" {
             path="/health/started"
             interval = "10s"
             timeout  = "2s"
+            address_mode = "alloc"
         }
         check {
             name  = "ready"
@@ -320,6 +347,7 @@ job "security" {
             path="/health/ready"
             interval = "10s"
             timeout  = "2s"
+            address_mode = "alloc"
             check_restart {
                 limit = 3
                 grace = "60s"
@@ -329,11 +357,38 @@ job "security" {
     }
     service {
       name = "keycloak"
-      port = "ui"
-    #  port = "8080"
+#      port = "ui"
+      port = "8080"
+      address_mode = "alloc"
+      connect {
+        sidecar_service {
+          proxy {
+            upstreams {
+              destination_name = "keycloak-postgres"
+              local_bind_port  = 5432
+            }
+          }
+        }
+        sidecar_task{
 
+
+          config{
+ {% if set_cpu_hard_limit %}
+            cpu_hard_limit = "true"
+ {% endif %}
+            labels = {
+              "com.github.logunifier.application.name" = "envoy-proxy-keycloak"
+              "com.github.logunifier.application.pattern.key" = "envoy"
+              "com.github.logunifier.application.version" = "{{version_envoy}}"
+              "com.github.logunifier.application.org" = "${var.org}"
+              "com.github.logunifier.application.env" = "${var.env}"
+            }
+          }
+        }
+      }
       tags = [
         "traefik.enable=true",
+        "traefik.consulcatalog.connect=true",
         "traefik.http.routers.keycloak.tls=true",
         "traefik.http.routers.keycloak.rule=Host(`{{security_dns}}`)",
       ]
@@ -382,6 +437,8 @@ job "security" {
         KC_DB                     = "postgres"
         KC_DB_SCHEMA              = "keycloak"
         KC_DB_USERNAME            = "keycloak"
+        KC_DB_URL_HOST            = "${NOMAD_UPSTREAM_IP_keycloak_postgres}"
+        KC_DB_URL_PORT            = "${NOMAD_UPSTREAM_PORT_keycloak_postgres}"
       }
       config {
         image = "{{registry_dns}}/{{stack_name}}/keycloak:{{version_keycloak_nomadder}}"
@@ -409,21 +466,13 @@ job "security" {
             destination = "${NOMAD_SECRETS_DIR}/env.vars"
             env         = true
             change_mode = "restart"
-            right_delimiter = "++"
-            left_delimiter = "++"
             data        = <<EOF
-        ++- with nomadVar "{{nomad_security_job_path}}" -++
-      KEYCLOAK_ADMIN_PASSWORD      = ++.keycloak_password++
-      KC_DB_PASSWORD               = ++.keycloak_db_password++
-      KC_NOMADDER_CLIENT_SECRET    = ++.keycloak_ingress_secret++
-      KC_NOMADDER_CLIENT_SECRET_GRAFANA    = ++.keycloak_secret_observability_grafana++
-      ++- end -++
-++- range  $index, $service := service "keycloak-postgres" -++
-++- if eq $index 0  ++
-KC_DB_URL_HOST            = ++$service.Address++
-KC_DB_URL_PORT            = ++$service.Port++
-++- end ++
-++- end ++
+    {{ '{{' }}- with nomadVar "{{nomad_security_job_path}}" -{{ '}}' }}
+      KEYCLOAK_ADMIN_PASSWORD      = {{ '{{' }}.keycloak_password{{ '}}' }}
+      KC_DB_PASSWORD               = {{ '{{' }}.keycloak_db_password{{ '}}' }}
+      KC_NOMADDER_CLIENT_SECRET    = {{ '{{' }}.keycloak_ingress_secret{{ '}}' }}
+      KC_NOMADDER_CLIENT_SECRET_GRAFANA    = {{ '{{' }}.keycloak_secret_observability_grafana{{ '}}' }}
+    {{ '{{' }}- end -{{ '}}' }}
     EOF
          }
     }
