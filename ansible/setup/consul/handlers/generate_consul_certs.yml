@@ -76,7 +76,8 @@
           -profile peer consul_server.json | cfssljson -bare consul
       args:
         chdir: "{{cfssl_working_dir}}"
-
+# The consul to consul communication needs a peer certificate
+# TODO: define a seperate cli certificate with client profile
     - name: "Generate consul client certificate(s)  on master 0"
       register: cfsslgen
       when: is_worker_host
@@ -87,7 +88,7 @@
           -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
           -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
           -config {{cert_path_master_0}}/cfssl/config.json \
-          -profile client consul_client.json | cfssljson -bare consul
+          -profile peer consul_client.json | cfssljson -bare consul
       args:
         chdir: "{{cfssl_working_dir}}"
 

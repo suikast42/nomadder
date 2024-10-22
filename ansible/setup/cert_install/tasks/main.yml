@@ -101,10 +101,10 @@
           src: cluster-ca.j2
           dest: "{{cfssl_working_dir}}/cluster-ca.json"
 
-      - name: Template config.json
+      - name: Template config.j2
         template:
           force: yes
-          src: config.json
+          src: config.j2
           dest: "{{cfssl_working_dir}}/config.json"
       - name: "Generate ca certificates in {{cfssl_working_dir}}"
         shell: |
