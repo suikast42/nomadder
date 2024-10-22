@@ -146,7 +146,6 @@ job "minio" {
          "prometheus:server=${NOMAD_ALLOC_NAME}",
          "prometheus:version={{version_minio}}",
          "traefik.enable=true",
-         "traefik.consulcatalog.connect=false",
          "traefik.http.routers.minio.tls=true",
          "traefik.http.routers.minio.rule=Host(`minio.{{tls_san}}`)",
 
@@ -182,7 +181,6 @@ job "minio" {
              "console",
              "minio",
              "traefik.enable=true",
-             "traefik.consulcatalog.connect=false",
              "traefik.http.routers.minio-console.tls=true",
              "traefik.http.routers.minio-console.rule=Host(`minio.console.{{tls_san}}`)",
            ]

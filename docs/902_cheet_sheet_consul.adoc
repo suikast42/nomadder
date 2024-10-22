@@ -93,6 +93,14 @@ curl   -s  -N \
 https://"${CONSUL_HTTP_ADDR}"/v1/catalog/services \| jq .
 ----
 
+
+| Consul catalog services over rest with jq.
+a|[source,shell]
+----
+curl --cacert "${CONSUL_CACERT}" --cert "${CONSUL_CLIENT_CERT}" --key "${CONSUL_CLIENT_KEY}"  "https://${CONSUL_HTTP_ADDR}/v1/catalog/services" \| jq 'to_entries[] \| {key, value: .value[] \| select(contains("catalog"))}'
+----
+
+
 | Consul catalog services over rest
 a|[source,shell]
 ----

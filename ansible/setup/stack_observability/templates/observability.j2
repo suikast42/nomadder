@@ -65,7 +65,6 @@ job "observability" {
 
         tags = [
           "traefik.enable=true",
-          "traefik.consulcatalog.connect=false",
           "traefik.http.routers.grafana.tls=true",
           "traefik.http.routers.grafana.rule=Host(`grafana.{{tls_san}}`)",
         ]
@@ -1240,7 +1239,6 @@ mappings = {
           port = "http"
   #        tags = [
   #          "traefik.enable=true",
-  #          "traefik.consulcatalog.connect=false",
   #          "traefik.http.routers.blackbox.tls=true",
   #          "traefik.http.routers.blackbox.rule=Host(`blackbox.cloud.private`)",
   #        ]
