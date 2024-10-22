@@ -4,9 +4,6 @@
     "algo": "rsa",
     "size": 4096
   },
-  "ca": {
-      "expiry": "36288h"
-  },
   "names": [
     {
       "C": "DE",

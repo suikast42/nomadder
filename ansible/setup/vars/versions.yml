@@ -89,3 +89,9 @@ version_minio: "RELEASE.2024-08-26T15-33-07Z"
 version_minio_mc_admin: "RELEASE.2024-08-26T10-49-58Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
+
+
+validityCaCert: "87600h"
+validityClusterCa: "87600h"
+validityServerCert: "87600h"
+validityClientCert: "87600h"
