@@ -92,6 +92,9 @@ update_minio_admin: "{{update_all or false }}"
 
 
 validityCaCert: "87600h"
-validityClusterCa: "87600h"
-validityServerCert: "87600h"
-validityClientCert: "87600h"
+# 1h less than validityCaCert
+validityClusterCa: "87599h"
+# 1h less than validityClusterCa
+validityServerCert: "87598h"
+# 1h less than validityServerCert
+validityClientCert: "87597h"

@@ -7,6 +7,7 @@
 a|[source,shell]
 ----
 openssl x509 -text -noout -in <path>/my.crt
+openssl x509 -text -noout -in $(echo $CONSUL_CLIENT_CERT)
 ----
 
 |show the certificate content:

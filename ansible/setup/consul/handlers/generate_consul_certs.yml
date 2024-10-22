@@ -87,7 +87,7 @@
           -ca {{cert_path_master_0}}/cluster-ca/cluster-ca.pem \
           -ca-key {{cert_path_master_0}}/cluster-ca/cluster-ca-key.pem \
           -config {{cert_path_master_0}}/cfssl/config.json \
-          -profile peer consul_client.json | cfssljson -bare consul
+          -profile client consul_client.json | cfssljson -bare consul
       args:
         chdir: "{{cfssl_working_dir}}"
 

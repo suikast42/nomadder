@@ -29,7 +29,8 @@
           "client auth",
           "server auth"
         ],
-        "expiry": "{{validityClientCert}}"
+        "expiry": "{{validityClientCert}}",
+        "not_before" : "{{ ansible_date_time.year }}-{{ ansible_date_time.month }}-01T00:00:00Z"
       },
       "server": {
         "usages": [
@@ -38,7 +39,8 @@
           "key encipherment",
           "server auth"
         ],
-        "expiry": "{{validityServerCert}}"
+        "expiry": "{{validityServerCert}}",
+        "not_before" : "{{ ansible_date_time.year }}-{{ ansible_date_time.month }}-01T00:00:00Z"
       },
       "client": {
         "usages": [
@@ -47,7 +49,8 @@
           "key encipherment",
           "client auth"
         ],
-        "expiry": "{{validityClientCert}}"
+        "expiry": "{{validityClientCert}}",
+        "not_before" : "{{ ansible_date_time.year }}-{{ ansible_date_time.month }}-01T00:00:00Z"
       }
     }
   }
