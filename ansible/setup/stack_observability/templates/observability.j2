@@ -628,6 +628,10 @@ limits_config:
   retention_period: 720h
   max_query_lookback: 720h
 {% endif %}
+  # For enabling explore logs in grafana
+  # See https://grafana.com/docs/grafana-cloud/visualizations/simplified-exploration/logs/access/
+  allow_structured_metadata: true
+  volume_enabled: true
 
   # Comment this out for fine grained retention
 #  retention_stream:
@@ -636,6 +640,15 @@ limits_config:
 #    period: 24h
   # Comment this out for having overrides
 #  per_tenant_override_config: /etc/overrides.yaml
+
+# For enabling explore logs in grafana
+# See https://grafana.com/docs/grafana-cloud/visualizations/simplified-exploration/logs/access/
+pattern_ingester:
+  enabled: true
+  lifecycler:
+    ring:
+      kvstore:
+        store: memberlist
          EOF
         destination = "local/loki.yaml"
       }

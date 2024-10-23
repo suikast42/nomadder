@@ -26,7 +26,7 @@
     - nomad_cli_cert: "{{base_cert_dir}}/nomad/nomad-cli.pem"
     - nomad_cli_cert_key: "{{base_cert_dir}}/nomad/nomad-cli-key.pem"
     - version_grafana: "11.3.0"
-    - version_grafana_nomadder: "{{version_grafana}}.1"
+    - version_grafana_nomadder: "{{version_grafana}}.4"
     - version_grafana_mimir: "2.14.0"
     - version_grafana_loki: "3.2.1"
     - version_grafana_tempo: "2.6.1"

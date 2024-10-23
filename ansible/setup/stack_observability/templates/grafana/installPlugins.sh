@@ -41,4 +41,8 @@ grafana cli --pluginsDir=$GF_PATHS_PLUGINS  plugins install golioth-websocket-da
 grafana cli --pluginsDir=$GF_PATHS_PLUGINS  plugins install gapit-htmlgraphics-panel &&
 grafana cli --pluginsDir=$GF_PATHS_PLUGINS  plugins install mckn-funnel-panel &&
 
+grafana cli --pluginsDir=$GF_PATHS_PLUGINS  plugins install  grafana-pyroscope-app &&
+grafana cli --pluginsDir=$GF_PATHS_PLUGINS  --pluginUrl=https://storage.googleapis.com/integration-artifacts/grafana-lokiexplore-app/grafana-lokiexplore-app-latest.zip plugins install grafana-lokiexplore-app &&
+grafana cli --pluginsDir=$GF_PATHS_PLUGINS  --pluginUrl=https://storage.googleapis.com/integration-artifacts/grafana-exploretraces-app/grafana-exploretraces-app-latest.zip plugins install grafana-traces-app &&
+
 echo All plugins are installed
