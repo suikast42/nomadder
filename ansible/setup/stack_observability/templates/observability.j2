@@ -92,7 +92,7 @@ job "observability" {
       driver = "docker"
       env {
         GF_AUTH_OAUTH_AUTO_LOGIN= "true"
-        GF_FEATURE_TOGGLES_ENABLE= "dashboardScene"
+        GF_FEATURE_TOGGLES_ENABLE="dashboardScene accessControlOnCall lokiLogsDataplane exploreLogsShardSplitting"
         GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP= "true"
         GF_PATHS_CONFIG  = "/etc/grafana/grafana2.ini"
         GF_PATHS_PLUGINS = "/data/grafana/plugins"
@@ -534,11 +534,10 @@ compactor:
   retention_delete_worker_count: 150
 
 schema_config:
-
   configs:
-    - from: 2024-04-01
-      object_store: filesystem
+    - from: 2020-05-15
       store: tsdb
+      object_store: filesystem
       schema: v13
       index:
         prefix: index_
@@ -632,6 +631,9 @@ limits_config:
   # See https://grafana.com/docs/grafana-cloud/visualizations/simplified-exploration/logs/access/
   allow_structured_metadata: true
   volume_enabled: true
+  discover_log_levels: true
+    #defaults
+  # discover_service_name : [service app application name app_kubernetes_io_name container container_name k8s_container_name component workload job k8s_job_name]
 
   # Comment this out for fine grained retention
 #  retention_stream:
@@ -645,6 +647,10 @@ limits_config:
 # See https://grafana.com/docs/grafana-cloud/visualizations/simplified-exploration/logs/access/
 pattern_ingester:
   enabled: true
+  metric_aggregation:
+    enabled: true
+    loki_address: 127.0.0.1:3100
+
   lifecycler:
     ring:
       kvstore:
@@ -1563,7 +1569,7 @@ metrics:
                   "-natsServers",
                   "nats-observability.service.consul:4222",
                   "-lokiServers",
-                  "loki.service.consul:9005",
+                  "http://loki.service.consul:3100",
                ]
              }
 
