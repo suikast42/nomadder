@@ -63,7 +63,7 @@ update_cfssl: "{{update_all or false }}"
 version_docker: "27.3.1"
 uninstall_docker: false
 
-version_docker_compose: "2.30.0"
+version_docker_compose: "2.30.1"
 uninstall_compose: false
 
 update_certificates: false
