@@ -6,8 +6,8 @@ update_vault: "{{update_all or false }}"
 
 #consul_version: "1.19.2"
 #consul_checksum: "sha256:9315d95b19cf851f8fb0013b583ede6f61d591a9024a7dbb9b37eee45270abd2"
-consul_version: "1.20.0"
-consul_checksum: "sha256:da7a71476f8a83f69853c95316518b888d5863ce3b326523bb8e3ad1a302ed64"
+consul_version: "1.20.1"
+consul_checksum: "sha256:d38e7571177909d437a9cbcc62fb65083bc567266b74a62d02c6abe783951648"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
