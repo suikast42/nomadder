@@ -55,11 +55,11 @@
     path: "/home/{{ansible_user}}/.local/share/tldr"
     mode: '0755'
 
-- name: "TlDR update"
-  failed_when: false
-  become: false
-  shell: |
-    tldr -u
+#- name: "TlDR update"
+#  failed_when: false
+#  become: false
+#  shell: |
+#    tldr -u
 
 - name: Install snap packeges
   become: true

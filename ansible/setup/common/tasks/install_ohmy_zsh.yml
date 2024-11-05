@@ -1,4 +1,23 @@
 ---
+- name: "Uninstall zsh"
+  become: true
+  community.general.gem:
+    name: colorls
+    user_install: false
+    state: present
+
+- name: "Dos2unix"
+  become: true
+  shell: |
+    rm -fR /home/{{ansible_ssh_user}}/.oh-my-zsh
+    rm -fR /usr/local/bin/oh-my-posh
+    rm -fR /home/{{ansible_ssh_user}}/.zshrc
+    rm -fR /home/{{ansible_ssh_user}}/.oh-my-zsh/custom/themes/blueishv2.omp.json
+  register: install
+  failed_when: install.rc > 0
+
+
+
 - name: "Install oh-my-zsh"
   become: false
   delay: 0
@@ -8,6 +27,8 @@
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+  register: install
+  failed_when: install.rc > 0
   args:
     creates: ~/.oh-my-zsh # oh-my-zs is already installed
 
@@ -28,6 +49,16 @@
     name: colorls
     user_install: false
     state: present
+
+
+- name: Template zshrc
+  template:
+    force: yes
+    src: .zshrc
+    dest: "/home/{{ansible_ssh_user}}/.zshrc"
+    group: "{{ansible_ssh_user}}"
+    owner: "{{ansible_ssh_user}}"
+    mode: 0644
 
 
 - name: Template zshrc
