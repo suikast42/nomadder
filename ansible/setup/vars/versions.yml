@@ -18,8 +18,8 @@ uninstall_consul_template: "{{uninstall_all or false }}"
 
 #nomad_version: "1.8.4"
 #nomad_checksum: "sha256:681832b4ffaff0626119420569f117fb7ad1e323d6c929ef3c0bccb432165c6b"
-nomad_version: "1.9.1"
-nomad_checksum: "sha256:6a3ad4d9afd8986b48df0cb73a6ac0fb72888b0795c17a1db03f80b832411205"
+nomad_version: "1.9.2"
+nomad_checksum: "sha256:23e07975ceb6f5adcf23afaed1ef50810eaee6c894bce915afa04c82a85e8e7c"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
@@ -63,7 +63,7 @@ update_cfssl: "{{update_all or false }}"
 version_docker: "27.3.1"
 uninstall_docker: false
 
-version_docker_compose: "2.30.2"
+version_docker_compose: "2.30.3#"
 uninstall_compose: false
 
 update_certificates: false
