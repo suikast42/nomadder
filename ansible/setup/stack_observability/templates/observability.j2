@@ -975,7 +975,8 @@ overrides:
         port = "client"
         name = "nats-observability"
         tags = [
-            "prometheus",
+    # Do not enable    "prometheus", here. The metrics collected over  prometheus-exporter
+    "prometheus:server_id=bi-nats",
             "prometheus:server_id=nats-observability",
             "prometheus:version={{version_nats_server}}",
         ]
