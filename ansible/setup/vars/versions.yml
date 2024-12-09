@@ -23,7 +23,7 @@ nomad_checksum: "sha256:517bce4fcebdc71335ac33a1e34a4c262d2417d8ed4e60cf895fc59e
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.32.1
+version_envoy: 1.32.2
 
 nomad_plugin_cni_version: "1.6.0"
 nomad_plugin_cni_checksum: "sha256:682b49ff8933a997a52107161f1745f8312364b4c7f605ccdf7a77499130d89d"
@@ -85,8 +85,8 @@ update_protoc: "{{update_all or false }}"
 version_busy_box_init_container: "1.37.0"
 version_multi_stage_apline_container: "3.17.2"
 version_grafana_agent_container: "0.43.4"
-version_minio: "RELEASE.2024-08-26T15-33-07Z"
-version_minio_mc_admin: "RELEASE.2024-08-26T10-49-58Z"
+version_minio: "RELEASE.2024-11-07T00-52-20Z"
+version_minio_mc_admin: "RELEASE.2024-11-17T19-35-25Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
 
