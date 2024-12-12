@@ -1,0 +1,33 @@
+.Minio cli
+|===
+|Description |Command
+
+
+|Add server
+a|[source,shell]
+----
+mc alias set myminio https://minioserver.example.net ACCESS_KEY SECRET_KEY
+# For example with username password
+mc alias set cloud_private https://minio.cloud.private  minadmin minadmin
+mc alias set cloud_private https://minio.cloud.private  d6WtYqrb8m91TYGNWTBm jF9wRi9YygM5gRfqRY37gQNDZoAgHnprqYB4l4AG
+----
+
+|Create bucket
+a|[source,shell]
+----
+mc mb cloud_private/bibackups
+----
+
+
+|Delete bucket
+a|[source,shell]
+----
+mc rb cloud_private/bibackups
+----
+
+|Bucket size
+a|[source,shell]
+----
+mc du --depth=1  cloud_private/dbbackups
+----
+
