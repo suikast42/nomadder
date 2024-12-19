@@ -153,7 +153,8 @@ job "ingress" {
           "com.github.logunifier.application.version" = "{{version_traefik}}"
           "com.github.logunifier.application.org" = "${var.org}"
           "com.github.logunifier.application.env" = "${var.env}"
-          "com.github.logunifier.application.pattern.key" = "logfmt"
+          "com.github.logunifier.application.pattern.key" = "traefik"
+          "com.github.logunifier.application.strip.ansi" = "true"
         }
         network_mode = "host"
         volumes = [

@@ -40,7 +40,7 @@
     - docker_build_dir: "/tmp/dockerbuild"
     - nomad_cli_cert: "{{base_cert_dir}}/nomad/nomad-cli.pem"
     - nomad_cli_cert_key: "{{base_cert_dir}}/nomad/nomad-cli-key.pem"
-    - version_traefik: "3.2.2"
+    - version_traefik: "3.2.3"
     - version_keycloak_metrics_spi: "2.5.3"
     - version_keycloak: "26.0.7"
     - version_keycloak_nomadder: "{{version_keycloak}}.0"
