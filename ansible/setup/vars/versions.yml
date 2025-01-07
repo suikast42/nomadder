@@ -4,8 +4,8 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.20.1"
-consul_checksum: "sha256:d38e7571177909d437a9cbcc62fb65083bc567266b74a62d02c6abe783951648"
+consul_version: "1.20.2"
+consul_checksum: "sha256:1bf7ddf332f02e6e36082b0fdf6c3e8ce12a391e7ec7dafd3237bb12766a7fd5"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
@@ -21,8 +21,8 @@ update_nomad: "{{update_all or false }}"
 
 version_envoy: 1.32.3
 
-nomad_plugin_cni_version: "1.6.0"
-nomad_plugin_cni_checksum: "sha256:682b49ff8933a997a52107161f1745f8312364b4c7f605ccdf7a77499130d89d"
+nomad_plugin_cni_version: "1.6.2"
+nomad_plugin_cni_checksum: "sha256:b8e811578fb66023f90d2e238d80cec3bdfca4b44049af74c374d4fae0f9c090"
 uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
@@ -47,10 +47,10 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "27.3.1"
+version_docker: "27.3.1r_"
 uninstall_docker: false
 
-version_docker_compose: "2.32.1"
+version_docker_compose: "2.32.2"
 uninstall_compose: false
 
 update_certificates: false
