@@ -16,11 +16,25 @@ a|[source,shell]
 openssl x509 -in / <path>/my.crt -noout -text
 ----
 
+|Check if Certificates expired:
+a|[source,shell]
+----
+for file in $(find "/etc/ssl/private/cloudlocal" -type f -name "*.pem" ! -name "*key.pem"); do
+    echo "Checking certificate: $file"
+	EXPIRY_DATE=$(openssl x509 -in "$file" -noout -enddate \| cut -d= -f2)
+    EXPIRY_TIMESTAMP=$(date -d "$EXPIRY_DATE" +%s)
+    CURRENT_TIMESTAMP=$(date +%s)
+    if [ "$CURRENT_TIMESTAMP" -gt "$EXPIRY_TIMESTAMP" ]; then
+        echo "Certificate $file is expired."
+    fi
+done
+----
+
 
 |Slurp certificate from remote server:
 a|[source,shell]
 ----
-openssl s_client -showcerts -connect gitlab.cloud.private:443 </dev/null 2> /dev/null | openssl x509 -outform PEM > root_ca.pem
+openssl s_client -showcerts -connect gitlab.cloud.private:443 </dev/null 2> /dev/null \| openssl x509 -outform PEM > root_ca.pem
 ----
 
 |Import certificate to java trust store:
