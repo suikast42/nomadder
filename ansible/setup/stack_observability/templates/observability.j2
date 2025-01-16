@@ -856,10 +856,13 @@ distributor:
 #        thrift_binary:
 #        thrift_compact:
     zipkin:
+      endpoint: "0.0.0.0:9411"
     otlp:
       protocols:
         http:
+          endpoint: "0.0.0.0:4318"
         grpc:
+          endpoint: "0.0.0.0:4317"
 #    opencensus:
 
 ingester:
@@ -869,7 +872,14 @@ ingester:
   complete_block_timeout: 15m         # duration to keep blocks in the ingester after they have been flushed
 
 query_frontend:
+
+  # Metrics query configuration
+  metrics:
+    # The target number of bytes for each job to handle when querying the backend. 0 disabled 3h default
+    max_duration: 0
   search:
+    # The maximum allowed value of spans per span set. 0 disables this limit. Default is 100
+    max_spans_per_span_set: 0
     max_duration: 43800h # 5y
     query_backend_after: 15m  # (default: 15m)  query_backend_after must be less than or equal to query_ingesters_until.
     query_ingesters_until: 15m    # (default: 30m)
