@@ -28,4 +28,21 @@ docker run --rm -t -v "${PWD}":/config grafana/loki:3.0.0 -config.file=/config/l
 ----
 
 
+|Test loki logs
+a|[source,shell]
+----
+ cat > loki_push.sh << ENDOFFILE
+#!/bin/bash
+NOW=\$(date -u +%FT%T.%NZ)
+LINE=\$1
+DATA="{\"streams\": [{ \"labels\": \"{application=\\\\\"my-test-application\\\\\", type=\\\\\"events\\\\\"}\", \"entries\": [{ \"ts\": \"\${NOW}\", \"line\": \"\${LINE}\" }] }]}"
+echo 'Seding ' \${DATA}
+curl \\
+  -H "Content-Type: application/json" \\
+  -XPOST "http://localhost:3100/api/prom/push" \\
+  --data-raw "\$DATA"
+ENDOFFILE
+----
+
+
 |===
