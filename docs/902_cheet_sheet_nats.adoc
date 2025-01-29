@@ -25,6 +25,13 @@ a|[source,shell]
 nats server mapping "ingress.eventlog.*" "ingress.eventlog.{{wildcard(1)}}.{{partition(10,1)}}"
 ----
 
+
+| Read all jetstream configs
+a|[source,shell]
+----
+nats --user=sys --password=natsadmin server request jsz --all --config \| jq .
+----
+
 |===
 
 Links for nats topics:

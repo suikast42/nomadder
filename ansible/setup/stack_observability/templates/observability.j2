@@ -1117,6 +1117,22 @@ debug: false
 http_port: ++ env "NOMAD_PORT_http" ++
 #http: nats.service.consul:++ env "NOMAD_PORT_http" ++
 
+# System-Account for internal management (Monitoring, Account-Management)
+system_account: SYS
+
+accounts: {
+   SYS: {
+   users: [
+     {user:sys, password:natsadmin}
+    ]
+   }
+}
+#authorization: {
+#  default_permissions {
+#    pub = [">"]
+#    sub = [">"]
+#  }
+#}
 jetstream: enabled
 jetstream {
   store_dir: /data/jetstream
