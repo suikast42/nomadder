@@ -55,7 +55,7 @@ uninstall_compose: false
 
 update_certificates: false
 
-version_nexus: "3.76.0"
+version_nexus: "3.76.1"
 version_nexus_initlzr: "1.0.2"
 update_nexus: false
 
