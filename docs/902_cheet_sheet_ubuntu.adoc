@@ -123,5 +123,11 @@ strace -e trace=network curl https://registry.cloud.private
 ----
 
 
+|Set ssh chipper
+a|[source,shell]
+----
+ssh -o Ciphers=aes256-ctr -i /path/to/id_rsa user@ip
+----
+
 |===
 
