@@ -11,6 +11,6 @@ ansible_ssh_private_key_file: "{{ inventory_dir }}/../ssh/id_rsa"
 env: "production"
 
 # Somehow the assan dns not works. Services in grafana goes up and down.
-#publicdns:
-#  - "8.8.8.8"
-#  - "1.1.1.1"
+publicdns:
+  - "8.8.8.8"
+  - "1.1.1.1"
