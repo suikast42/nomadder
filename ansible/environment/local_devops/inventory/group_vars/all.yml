@@ -12,5 +12,5 @@ env: "production"
 
 # Somehow the assan dns not works. Services in grafana goes up and down.
 publicdns:
-  - "8.8.8.8"
-  - "1.1.1.1"
+  - "192.168.30.1"
+#  - "1.1.1.1"
