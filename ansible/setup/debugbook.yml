@@ -11,15 +11,6 @@
 #    - name: Execute a command
 #      ansible.builtin.command: "false"
 #      debugger: on_failed
-    - name: "Public IP"
-      debug:
-        msg: "{{ host_public_if }}"
-    - name: "Public IP"
-
-    - name: "Private IP"
-      debug:
-        msg: "{{ host_default_if }}"
-    - name: "Private IP"
 
     - name: "Host IP"
       debug:
