@@ -63,24 +63,24 @@ Vagrant.configure("2") do |config|
       SHELL
   end
 
-  config.timezone.value = :host
-   #provisioner node ( TMP Solution somehow ansible does not connect to the VMS from WSL2 )
-   config.vm.define "provisioner" do |provcfg|
-       provcfg.vm.hostname = $vm_hostname_provision
-       provcfg.vm.network :private_network, ip: $vm_provision_ip, :netmask => "255.255.255.0"
-       provcfg.vm.box_version = $vm_base_box_version
-       provcfg.vm.provider :vmware_esxi  do |esxi|
-          esxi.esxi_hostname = $esxi_host
-          esxi.esxi_username = $esxi_username
-          esxi.esxi_password = $esxi_password
-          esxi.guest_memsize = $vm_mem_provision
-          esxi.guest_numvcpus = $vm_cpus_provision
-          esxi.esxi_virtual_network = ['TDP-Intern']
-          esxi.esxi_disk_store = 'datastore0'
-          esxi.guest_autostart ="true"
-          esxi.debug ="true"
-        end
-   end
+   config.timezone.value = :host
+  # #provisioner node ( TMP Solution somehow ansible does not connect to the VMS from WSL2 )
+  # config.vm.define "provisioner" do |provcfg|
+  #     provcfg.vm.hostname = $vm_hostname_provision
+  #     provcfg.vm.network :private_network, ip: $vm_provision_ip, :netmask => "255.255.255.0"
+  #     provcfg.vm.box_version = $vm_base_box_version
+  #     provcfg.vm.provider :vmware_esxi  do |esxi|
+  #        esxi.esxi_hostname = $esxi_host
+  #        esxi.esxi_username = $esxi_username
+  #        esxi.esxi_password = $esxi_password
+  #        esxi.guest_memsize = $vm_mem_provision
+  #        esxi.guest_numvcpus = $vm_cpus_provision
+  #        esxi.esxi_virtual_network = ['TDP-Intern']
+  #        esxi.esxi_disk_store = 'datastore0'
+  #        esxi.guest_autostart ="true"
+  #        esxi.debug ="true"
+  #      end
+  # end
 
   #master
   config.vm.define "master_01" do |mastercfg|
@@ -93,7 +93,7 @@ Vagrant.configure("2") do |config|
          esxi.esxi_password = $esxi_password
          esxi.guest_memsize = $vm_mem_master_01
          esxi.guest_numvcpus = $vm_cpus_master_01
-         esxi.esxi_virtual_network = ['TDP-Intern']
+         esxi.esxi_virtual_network = ['TDP-Intern','TDP-Intern']
          esxi.esxi_disk_store = 'datastore0'
          esxi.guest_autostart ="true"
          esxi.debug ="true"
@@ -111,7 +111,7 @@ Vagrant.configure("2") do |config|
          esxi.esxi_password = $esxi_password
          esxi.guest_memsize = $vm_mem_worker_01
          esxi.guest_numvcpus = $vm_cpus_worker_01
-         esxi.esxi_virtual_network = ['TDP-Intern']
+         esxi.esxi_virtual_network = ['TDP-Intern','TDP-Intern']
          esxi.esxi_disk_store = 'datastore0'
          esxi.guest_autostart ="true"
          esxi.debug ="true"

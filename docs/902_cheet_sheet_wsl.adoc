@@ -1,0 +1,24 @@
+.WSL cheat sheet
+|===
+|Description |Command
+
+
+|View the settings per profile, use the following command:
+a|[source,shell]
+----
+Get-NetFirewallHyperVProfile -PolicyStore ActiveStore
+----
+
+|to create an inbound rule to allow TCP traffic to WSL on port 80, use the following command
+a|[source,shell]
+----
+New-NetFirewallHyperVRule -Name MyWebServer -DisplayName "My Web Server" -Direction Inbound -VMCreatorId '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -Protocol TCP -LocalPorts 80e
+----
+
+|Set  default inbound connection to Allow
+a|[source,shell]
+----
+Set-NetFirewallHyperVVMSetting -Name '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -DefaultInboundAction Allow
+----
+
+|===
