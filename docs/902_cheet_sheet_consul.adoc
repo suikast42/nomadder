@@ -118,4 +118,16 @@ echo "$unhealthy_checks" \| while read -r check; do
   fi
 done
 ----
+
+| Consul metrics api.
+a|[source,shell]
+----
+curl  -v -s  -N \
+--cacert "${CONSUL_CACERT}" \
+--cert "${CONSUL_CLIENT_CERT}" \
+--key "${CONSUL_CLIENT_KEY}" \
+"https://${CONSUL_HTTP_ADDR}/v1/agent/metrics" \| jq .
+----
+
+
 |===

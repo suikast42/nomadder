@@ -10,6 +10,8 @@ variable "env" {
   default = "{{env}}"
 }
 
+
+
 job "observability" {
  {% if is_env_development %}
 # Enable this for redeploy all the job file even if nothing changed
@@ -403,8 +405,10 @@ limits:
        port= "http"
        tags = [
              "prometheus",
-             "prometheus:server_id=${NOMAD_ALLOC_NAME}",
+             "prometheus:service_id=${NOMAD_ALLOC_NAME}",
              "prometheus:version={{version_grafana_loki}}",
+             "prometheus:environment=${var.env}",
+             "prometheus:organisation=${var.org}",
           ]
        check {
          name  = "health"
@@ -726,6 +730,8 @@ pattern_ingester:
         "prometheus",
         "prometheus:server_id=${NOMAD_ALLOC_NAME}",
         "prometheus:version={{version_grafana_tempo}}",
+        "prometheus:environment=${var.env}",
+        "prometheus:organisation=${var.org}",
       ]
       check {
         name  = "health"
@@ -984,12 +990,6 @@ overrides:
       service {
         port = "client"
         name = "nats-observability"
-        tags = [
-    # Do not enable    "prometheus", here. The metrics collected over  prometheus-exporter
-    "prometheus:server_id=bi-nats",
-            "prometheus:server_id=nats-observability",
-            "prometheus:version={{version_nats_server}}",
-        ]
         check {
           type     = "http"
           port     = "http"
@@ -1004,34 +1004,38 @@ overrides:
           }
       }
 
-        service {
-           port = "prometheus-exporter"
-           # Change the service selector in grafana agent config as well if you cange this name
-           name = "${NOMAD_ALLOC_NAME}"
-           tags = [
-                "prometheus",
-                "prometheus:server_id=${NOMAD_ALLOC_NAME}",
-                "prometheus:version={{version_nats_prometheus_exporter}}",
-           ]
-           check {
-              type     = "http"
-              port     = "prometheus-exporter"
-              path     = "/metrics"
-              interval = "5s"
-              timeout  = "2s"
-              check_restart {
-                limit = 3
-                grace = "60s"
-                ignore_warnings = false
-               }
-           }
-      }
+
       task "nats-prometheus-exporter" {
         lifecycle {
           hook = "poststart"
           sidecar = true
         }
-
+        service {
+          port = "prometheus-exporter"
+          # Change the service selector in grafana agent config as well if you change this name
+          name = "nats-observability-exporter"
+          tags = [
+            "prometheus",
+            "prometheus:service_id=${NOMAD_ALLOC_NAME}",
+            "prometheus:exporter_id=${NOMAD_TASK_NAME}",
+            "prometheus:version={{version_nats_server}}",
+            "prometheus:version_exporter={{version_nats_prometheus_exporter}}",
+            "prometheus:environment=${var.env}",
+            "prometheus:organisation=${var.org}",
+            ]
+            check {
+                type     = "http"
+                port     = "prometheus-exporter"
+                path     = "/metrics"
+                interval = "5s"
+                timeout  = "2s"
+                check_restart {
+                    limit = 3
+                    grace = "60s"
+                    ignore_warnings = false
+                }
+            }
+          }
         driver = "docker"
         config {
            # for debugging
@@ -1450,11 +1454,35 @@ metrics:
               target_label: instance
             - source_labels: [__meta_consul_service]
               target_label: service
-            - source_labels: ['__meta_consul_tags']
-              target_label: 'labels'
-              regex: '(.+)'
+            - source_labels: [__meta_consul_tags]
+              target_label: 'service_id'
+              regex: '.*?prometheus:service_id=([^, ]+).*'
               replacement: '$${1}'
-              action: 'keep'
+              action: 'replace'
+            - source_labels: [__meta_consul_tags]
+              target_label: 'exporter_id'
+              regex: '.*?prometheus:exporter_id=([^, ]+).*'
+              replacement: '$${1}'
+              action: 'replace'
+            - source_labels: [__meta_consul_tags]
+              target_label: 'version'
+              regex: '.*?prometheus:version=([^, ]+).*'
+              replacement: '$${1}'
+            - source_labels: [__meta_consul_tags]
+              target_label: 'version_exporter'
+              regex: '.*?prometheus:version_exporter=([^, ]+).*'
+              replacement: '$${1}'
+              action: 'replace'
+            - source_labels: [__meta_consul_tags]
+              target_label: 'environment'
+              regex: '.*?prometheus:environment=([^, ]+).*'
+              replacement: '$${1}'
+              action: 'replace'
+            - source_labels: [__meta_consul_tags]
+              target_label: 'organisation'
+              regex: '.*?prometheus:organisation=([^, ]+).*'
+              replacement: '$${1}'
+              action: 'replace'
  #           - action: replace
  #             replacement: '1'
  #             target_label: 'test'
@@ -1480,11 +1508,35 @@ metrics:
               target_label: instance
             - source_labels: [__meta_consul_service]
               target_label: service
-            - source_labels: ['__meta_consul_tags']
-              target_label: 'labels'
-              regex: '(.+)'
+            - source_labels: [__meta_consul_tags]
+              target_label: 'service_id'
+              regex: '.*?prometheus:service_id=([^, ]+).*'
               replacement: '$${1}'
-              action: 'keep'
+              action: 'replace'
+            - source_labels: [__meta_consul_tags]
+              target_label: 'exporter_id'
+              regex: '.*?prometheus:exporter_id=([^, ]+).*'
+              replacement: '$${1}'
+              action: 'replace'
+            - source_labels: [__meta_consul_tags]
+              target_label: 'version'
+              regex: '.*?prometheus:version=([^, ]+).*'
+              replacement: '$${1}'
+            - source_labels: [__meta_consul_tags]
+              target_label: 'version_exporter'
+              regex: '.*?prometheus:version_exporter=([^, ]+).*'
+              replacement: '$${1}'
+              action: 'replace'
+            - source_labels: [__meta_consul_tags]
+              target_label: 'environment'
+              regex: '.*?prometheus:environment=([^, ]+).*'
+              replacement: '$${1}'
+              action: 'replace'
+            - source_labels: [__meta_consul_tags]
+              target_label: 'organisation'
+              regex: '.*?prometheus:organisation=([^, ]+).*'
+              replacement: '$${1}'
+              action: 'replace'
           metric_relabel_configs:
             - action: labeldrop
               regex: 'exported_.*'

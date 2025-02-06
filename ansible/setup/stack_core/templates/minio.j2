@@ -145,6 +145,8 @@ job "minio" {
          "minio",
          "prometheus:server=${NOMAD_ALLOC_NAME}",
          "prometheus:version={{version_minio}}",
+         "prometheus:environment=${var.env}",
+         "prometheus:organisation=${var.org}",
          "traefik.enable=true",
          "traefik.http.routers.minio.tls=true",
          "traefik.http.routers.minio.rule=Host(`minio.{{tls_san}}`)",
