@@ -1,0 +1,37 @@
+=== Dnsmsq
+.Dnsmsq Address Resolution
+|===
+|Goal |dnsmasq.conf Setting
+
+
+|One domain → Multiple IPs
+a|[source,shell]
+----
+address=/cloud.private/192.168.91.73 +
+address=/cloud.private/192.168.91.74
+----
+
+|Multiple domains → Different IPs
+a|[source,shell]
+----
+address=/cloud.private/192.168.91.73 +
+address=/cloud2.private/192.168.91.74
+----
+
+|Multiple domains → Same IP
+a|[source,shell]
+----
+address=/cloud.private/cloud2.private/cloud3.private/192.168.91.73
+----
+
+|Prevent Forwarding cloud.private to External Nameservers
+a|[source,shell]
+----
+local=/cloud.private/
+----
+
+
+
+
+|===
+

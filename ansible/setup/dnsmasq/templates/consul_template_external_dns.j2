@@ -26,21 +26,16 @@ template {
 ++- $services := service "nomad-client" -++
   ++- if $services -++
   ++- range $services ++
+# Prevents forwarding {{tls_san}} to other DNS servers.
+local=/{{tls_san}}/
 address=/{{tls_san}}/++ .Address ++
   ++- end ++
 ++- end ++
 {% endif %}
 
 {% if is_worker_host  %}
-++ range services ++
-++- range service .Name ++
-++- $labels := .Tags | join ","| splitToMap "," "=" -++
-++- if index $labels "external_dns" -++
-address=/.++index $labels "external_dns"++/++ .Address++
-++end ++
-++- end ++
-++- end ++
-
+# Prevents forwarding {{tls_san}} to other DNS servers.
+local=/{{tls_san}}/
 address=/.{{tls_san}}/{{host_ip}}
 {% endif %}
 EOF

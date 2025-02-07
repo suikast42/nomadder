@@ -1,0 +1,24 @@
+.Regex cheat sheet
+|===
+|Description |Command
+
+
+|Extract first word of foo.bar
+a|[source,shell]
+----
+(^[^\.]+)
+----
+
+|Extract second word of foo.bar
+a|[source,shell]
+----
+\.([^\.]+)$
+----
+
+
+|===
+
+
+
+
+
