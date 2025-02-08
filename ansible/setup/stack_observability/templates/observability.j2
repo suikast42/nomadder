@@ -11,6 +11,67 @@ variable "env" {
 }
 
 
+variable "version_blackbox_exporter" {
+    type = string
+    description = "Version blackbox exporter"
+    default = "{{version_blackbox_exporter}}"
+}
+
+
+variable "version_logunifer" {
+    type = string
+    description = "Version logunifer"
+    default = "{{version_logunifer}}"
+}
+
+variable "version_nats_prometheus_exporter" {
+    type = string
+    description = "Version nats exporter"
+    default = "{{version_nats_prometheus_exporter}}"
+}
+
+variable "version_nats_server" {
+    type = string
+    description = "Version nats server"
+    default = "{{version_nats_server}}"
+}
+
+
+variable "version_grafana_agent_container" {
+    type = string
+    description = "Version grafana exporter"
+    default = "{{version_grafana_agent_container}}"
+}
+
+variable "version_grafana_nomadder" {
+    type = string
+    description = "Version grafana exporter"
+    default = "{{version_grafana_nomadder}}"
+}
+
+
+
+variable "version_grafana_mimir" {
+    type = string
+    description = "Version grafana tempo"
+    default = "{{version_grafana_tempo}}"
+}
+
+variable "version_grafana_loki" {
+    type = string
+    description = "Version grafana loki"
+    default = "{{version_grafana_loki}}"
+}
+
+variable "version_grafana_tempo" {
+    type = string
+    description = "Version grafana loki"
+    default = "{{version_grafana_tempo}}"
+}
+
+
+
+
 
 job "observability" {
  {% if is_env_development %}
@@ -103,13 +164,13 @@ job "observability" {
         GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH = "contains(realm_access.roles[*], 'admin') && 'GrafanaAdmin' || contains(realm_access.roles[*], 'editor') && 'Editor' || 'Viewer'"
       }
       config {
-        image = "{{registry_dns}}/{{stack_name}}/grafana:{{version_grafana_nomadder}}"
+        image = "{{registry_dns}}/{{stack_name}}/grafana:${var.version_grafana_nomadder}"
  {% if set_cpu_hard_limit %}
         cpu_hard_limit = "true"
  {% endif %}
         labels = {
           "com.github.logunifier.application.name" = "grafana"
-          "com.github.logunifier.application.version" = "{{version_grafana_nomadder}}"
+          "com.github.logunifier.application.version" = "${var.version_grafana_nomadder}"
           "com.github.logunifier.application.org" = "${var.org}"
           "com.github.logunifier.application.env" = "${var.env}"
           "com.github.logunifier.application.pattern.key" = "logfmt"
@@ -188,13 +249,13 @@ job "observability" {
    #        JAEGER_SAMPLER_PARAM="1"
    #      }
          config {
-         image = "{{registry_dns}}/grafana/mimir:{{version_grafana_mimir}}"
+         image = "{{registry_dns}}/grafana/mimir:${var.version_grafana_mimir}"
  {% if set_cpu_hard_limit %}
          cpu_hard_limit = "true"
  {% endif %}
          labels = {
            "com.github.logunifier.application.name" = "mimir"
-           "com.github.logunifier.application.version" = "{{version_grafana_mimir}}"
+           "com.github.logunifier.application.version" = "${var.version_grafana_mimir}"
            "com.github.logunifier.application.org" = "${var.org}"
            "com.github.logunifier.application.env" = "${var.env}"
            "com.github.logunifier.application.pattern.key" = "logfmt"
@@ -406,7 +467,7 @@ limits:
        tags = [
              "prometheus",
              "prometheus:service_id=${NOMAD_ALLOC_NAME}",
-             "prometheus:version={{version_grafana_loki}}",
+             "prometheus:version=${var.version_grafana_loki}",
              "prometheus:environment=${var.env}",
              "prometheus:organisation=${var.org}",
           ]
@@ -440,13 +501,13 @@ limits:
    #    JAEGER_SAMPLER_PARAM="1"
    #  }
     config {
-       image = "{{registry_dns}}/grafana/loki:{{version_grafana_loki}}"
+       image = "{{registry_dns}}/grafana/loki:${var.version_grafana_loki}"
   {% if set_cpu_hard_limit %}
        cpu_hard_limit = "true"
   {% endif %}
        labels = {
          "com.github.logunifier.application.name" = "loki"
-         "com.github.logunifier.application.version" = "{{version_grafana_loki}}"
+         "com.github.logunifier.application.version" = "${var.version_grafana_loki}"
          "com.github.logunifier.application.org" = "${var.org}"
          "com.github.logunifier.application.env" = "${var.env}"
          "com.github.logunifier.application.pattern.key" = "logfmt"
@@ -729,7 +790,7 @@ pattern_ingester:
       tags = [
         "prometheus",
         "prometheus:server_id=${NOMAD_ALLOC_NAME}",
-        "prometheus:version={{version_grafana_tempo}}",
+        "prometheus:version=${var.version_grafana_tempo}",
         "prometheus:environment=${var.env}",
         "prometheus:organisation=${var.org}",
       ]
@@ -814,13 +875,13 @@ pattern_ingester:
        #     JAEGER_SAMPLER_PARAM="1"
        #   }
          config {
-         image = "{{registry_dns}}/grafana/tempo:{{version_grafana_tempo}}"
+         image = "{{registry_dns}}/grafana/tempo:${var.version_grafana_tempo}"
  {% if set_cpu_hard_limit %}
          cpu_hard_limit = "true"
  {% endif %}
          labels = {
            "com.github.logunifier.application.name" = "tempo"
-           "com.github.logunifier.application.version" = "{{version_grafana_tempo}}"
+           "com.github.logunifier.application.version" = "${var.version_grafana_tempo}"
            "com.github.logunifier.application.org" = "${var.org}"
            "com.github.logunifier.application.env" = "${var.env}"
            "com.github.logunifier.application.pattern.key" = "logfmt"
@@ -1018,8 +1079,8 @@ overrides:
             "prometheus",
             "prometheus:service_id=${NOMAD_ALLOC_NAME}",
             "prometheus:exporter_id=${NOMAD_TASK_NAME}",
-            "prometheus:version={{version_nats_server}}",
-            "prometheus:version_exporter={{version_nats_prometheus_exporter}}",
+            "prometheus:version=${var.version_nats_server}",
+            "prometheus:version_exporter=${var.version_nats_prometheus_exporter}",
             "prometheus:environment=${var.env}",
             "prometheus:organisation=${var.org}",
             ]
@@ -1039,14 +1100,14 @@ overrides:
         driver = "docker"
         config {
            # for debugging
-          #  image = "{{registry_dns}}/{{stack_name}}/prometheus-nats-exporter:{{version_nats_prometheus_exporter_nomadder}}"
-            image = "{{registry_dns}}/natsio/prometheus-nats-exporter:{{version_nats_prometheus_exporter}}"
+          #  image = "{{registry_dns}}/{{stack_name}}/prometheus-nats-exporter:${var.version_nats_prometheus_exporter}"
+            image = "{{registry_dns}}/natsio/prometheus-nats-exporter:${var.version_nats_prometheus_exporter}"
  {% if set_cpu_hard_limit %}
             cpu_hard_limit = "true"
  {% endif %}
             labels = {
                 "com.github.logunifier.application.name" = "${NOMAD_ALLOC_NAME}"
-                "com.github.logunifier.application.version" = "{{version_nats_prometheus_exporter_nomadder}}"
+                "com.github.logunifier.application.version" = "${var.version_nats_prometheus_exporter}"
                 "com.github.logunifier.application.pattern.key" = "tslevelmsg"
                 "com.github.logunifier.application.org" = "${var.org}"
                 "com.github.logunifier.application.env" = "${var.env}"
@@ -1074,13 +1135,13 @@ overrides:
           }
              driver = "docker"
              config {
-             image = "{{registry_dns}}/nats:{{version_nats_server}}-alpine"
+             image = "{{registry_dns}}/nats:${var.version_nats_server}-alpine"
  {% if set_cpu_hard_limit %}
              cpu_hard_limit = "true"
  {% endif %}
              labels = {
                 "com.github.logunifier.application.name" = "nats"
-                "com.github.logunifier.application.version" = "{{version_nats_server}}"
+                "com.github.logunifier.application.version" = "${var.version_nats_server}"
                 "com.github.logunifier.application.pattern.key" = "tslevelmsg"
                 "com.github.logunifier.application.org" = "${var.org}"
                 "com.github.logunifier.application.env" = "${var.env}"
@@ -1235,10 +1296,10 @@ mappings = {
           destination = "/etc/opt/certs/client"
         }
         config {
-          image = "prom/blackbox-exporter:v{{version_blackbox_exporter}}"
+          image = "prom/blackbox-exporter:v${var.version_blackbox_exporter}"
           labels = {
             "com.github.logunifier.application.name" = "blackbox-exporter"
-            "com.github.logunifier.application.version" = "{{version_blackbox_exporter}}"
+            "com.github.logunifier.application.version" = "${var.version_blackbox_exporter}"
             "com.github.logunifier.application.org" = "${var.org}"
             "com.github.logunifier.application.env" = "${var.env}"
           }
@@ -1386,13 +1447,13 @@ mappings = {
           }
        driver = "docker"
        config {
-       image = "{{registry_dns}}/grafana/agent:v{{version_grafana_agent_container}}"
+       image = "{{registry_dns}}/grafana/agent:v${var.version_grafana_agent_container}"
  {% if set_cpu_hard_limit %}
          cpu_hard_limit = "true"
  {% endif %}
          labels = {
            "com.github.logunifier.application.name" = "grafana_agent"
-           "com.github.logunifier.application.version" = "{{version_grafana_agent_container}}"
+           "com.github.logunifier.application.version" = "${var.version_grafana_agent_container}"
            "com.github.logunifier.application.pattern.key" = "logfmt"
            "com.github.logunifier.application.org" = "${var.org}"
            "com.github.logunifier.application.env" = "${var.env}"
@@ -1630,13 +1691,13 @@ metrics:
                 GOMAXPROCS = "1"
             }
             config {
-              image = "{{registry_dns}}/suikast42/logunifier:{{version_logunifer}}"
+              image = "{{registry_dns}}/suikast42/logunifier:${var.version_logunifer}"
  {% if set_cpu_hard_limit %}
               cpu_hard_limit = "true"
  {% endif %}
               labels = {
                 "com.github.logunifier.application.name" = "logunifier"
-                "com.github.logunifier.application.version" = "{{version_logunifer}}"
+                "com.github.logunifier.application.version" = "${var.version_logunifer}"
                 "com.github.logunifier.application.pattern.key" = "tslevelmsg"
                 "com.github.logunifier.application.strip.ansi" = "true"
                 "com.github.logunifier.application.org" = "${var.org}"
