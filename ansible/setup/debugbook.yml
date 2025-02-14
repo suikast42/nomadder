@@ -5,6 +5,7 @@
   vars_files:
     - vars/versions.yml
     - vars/common_vars.yml
+    - vars/job_secrets.yml
     - vars/vault.yml
   debugger: never
   tasks:
@@ -28,3 +29,22 @@
       shell: |
         touch /bin/hasibongo.sh
         rm /bin/hasibongo.sh
+
+    - name: "Login {{registry_dns}}"
+      # do not trigger a change
+      changed_when: false
+      community.docker.docker_login:
+        registry_url: "{{registry_dns}}"
+        username: "{{registry_user}}"
+        password: "{{registry_password}}"
+        reauthorize: yes
+
+
+    - name: "Login {{push_registry}}"
+      # do not trigger a change
+      changed_when: false
+      community.docker.docker_login:
+        registry_url: "{{push_registry}}"
+        username: "{{registry_user}}"
+        password: "{{registry_password}}"
+        reauthorize: yes

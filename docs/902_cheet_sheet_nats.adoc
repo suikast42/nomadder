@@ -32,7 +32,17 @@ a|[source,shell]
 nats --user=sys --password=natsadmin server request jsz --all --config \| jq .
 ----
 
+
+
+| Nats report all connections
+a|[source,shell]
+----
+nats server report connections
+----
+
 |===
+
+
 
 Links for nats topics:
 

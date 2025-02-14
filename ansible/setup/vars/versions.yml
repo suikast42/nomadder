@@ -4,8 +4,8 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.20.2"
-consul_checksum: "sha256:1bf7ddf332f02e6e36082b0fdf6c3e8ce12a391e7ec7dafd3237bb12766a7fd5"
+consul_version: "1.20.3"
+consul_checksum: "sha256:23f55df756d6fd9dbf11973738468183599b66e737bf50cd7d1f29ed92a79776"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
@@ -14,8 +14,8 @@ consul_template_checksum: "sha256:b77c7550defda78c62b036c734e7faceb7f89519dc1240
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "1.9.5"
-nomad_checksum: "sha256:290ab1f7fdab2b7197a05eaea4a962d8f2966f7736c957c4c2a8f0196d2bcdb2"
+nomad_version: "1.9.6"
+nomad_checksum: "sha256:2a34f08154e5ac72c43bfe56bec1836028c5b3fff3468915a9cffcf6cd2cdf52"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
@@ -47,14 +47,15 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "27.3.1"
+version_docker: "27.5.1"
 uninstall_docker: false
 
-version_docker_compose: "2.32.4"
+version_docker_compose: "2.33.0"
 uninstall_compose: false
 
 update_certificates: false
 
+#version_nexus: "3.77.1" that version is blocked until https://github.com/sonatype/nexus-public/issues/565 is resolved
 version_nexus: "3.76.1"
 version_nexus_initlzr: "1.0.2"
 update_nexus: false

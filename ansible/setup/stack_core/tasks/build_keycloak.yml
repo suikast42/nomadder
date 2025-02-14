@@ -50,7 +50,7 @@
       # do not trigger a change
       changed_when: false
       community.docker.docker_login:
-        registry_url: "{{push_registry}}"
+        registry_url: "{{registry_dns}}"
         username: "{{registry_user}}"
         password: "{{registry_password}}"
         reauthorize: yes
