@@ -24,6 +24,16 @@ curl -sk  https://security.cloud.private/realms/nomadder/protocol/openid-connect
 -d "client_secret=ipsdmGYL0JjCPEptKk393IFAtpD7Srbt" \| jq -r '.access_token'
 ----
 
+
+|Delete realm
+a|[source,shell]
+----
+# Login into kk container and change into bin dir
+# Login first
+./kcadm.sh config credentials --server http://localhost:8080 --realm master --user admin
+./kcadm.sh delete realms/<realm name to delete>
+----
+
 |===
 
 
