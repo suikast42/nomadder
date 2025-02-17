@@ -34,6 +34,33 @@ a|[source,shell]
 ./kcadm.sh delete realms/<realm name to delete>
 ----
 
+
+
+|Import Public key to keycloak with curl
+a|[source,shell]
+----
+#!/bin/bash
+
+URL="http://localhost:8080"
+REALM=master
+CLIENT=admin-cli
+USER="admin"
+USER_SECRET="admin"
+
+export TKN=$(curl -vX POST "${URL}/realms/${REALM}/protocol/openid-connect/token" \
+-H "Content-Type: application/x-www-form-urlencoded" \
+-d "username=${USER}" \
+-d "password=${USER_SECRET}" \
+-d 'grant_type=password' \
+-d "client_id=${CLIENT}" \| jq -r '.access_token')
+
+curl -v -H "Authorization: Bearer $TKN" \
+-F "keystoreFormat=Public Key PEM" \
+-F "file=@/home/rmartinc/rsa.pem" \
+"${URL}/admin/realms/${REALM}/clients/ad5dd8ba-e531-4bea-baac-2b3ecc4b9135/certificates/jwt.credential/upload-certificate"
+----
+
+
 |===
 
 
