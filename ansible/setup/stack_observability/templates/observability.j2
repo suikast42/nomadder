@@ -850,6 +850,7 @@ pattern_ingester:
         }
     }
     service{
+       # If you rename this service then  adopt the lookup in alloy config as well
        name ="otlp-grpc"
        port= "otlp_grpc"
        check {
@@ -1481,11 +1482,39 @@ mappings = {
           left_delimiter = "++"
           data = <<EOF
 logging {
-   level  = "debug"
+   level  = "info"
    format = "logfmt"
 }
-          EOF
+tracing {
+  // Sample all traces. This value should be lower for production configs!
+  sampling_fraction = 1
+  write_to = [otelcol.exporter.otlp.tempo.input]
+}
 
+otelcol.exporter.otlp "tempo" {
+  client {
+   ++- range service "otlp-grpc" ++
+     // Tempo endpoint for otlp
+     endpoint= "http://++.Name++.service.consul:++.Port++"
+   ++- end ++
+      tls {
+        insecure = true
+      }
+  }
+}
+
+// Metric push endpoints
+prometheus.remote_write "mimir_metrics" {
+   endpoint {
+     name = "mimir"
+     ++- range service "mimir" ++
+     // Mimir endpoint for otlp
+     url= "http://++.Name++.service.consul:++.Port++/otlp"
+//     url= "http://++.Name++.service.consul:++.Port++/api/v1/push"
+     ++- end ++
+  }
+}
+        EOF
           destination = "local/config.alloy"
           change_mode = "restart"
        }
