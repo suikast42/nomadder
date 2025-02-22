@@ -1576,6 +1576,23 @@ prometheus.scrape "scrape_traefik_metrics" {
         ++- end ++
    ]
 }
+
+//Metrics of blackbox exporter jobs
+++- $services := service "blackbox-exporter" ++
+++- if $services ++
+prometheus.scrape "scrape_blackbox_metrics" {
+   job_name = "integrations/blackbox-checks"
+   forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
+   metrics_path = "/metrics"
+   targets = [
+   ++- range  $index, $service := service "blackbox-exporter" -++
+   {__address__ = "++.Name++.service.consul:++.Port++"},
+   ++- end ++
+   ]
+ }
+ ++- end ++
+
+
 // Backbock host monitoring when consul cluster has keys   blackbox_hosts
 ++- if keyExists "blackbox_hosts" ++
 prometheus.scrape "scrape_blackbox_hosts" {
