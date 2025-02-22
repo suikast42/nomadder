@@ -5,7 +5,7 @@ prometheus.scrape "nomad_exporter" {
   targets = [{
      __address__ = "localhost:4646", agent_hostname = "{{host_name}}",
   }]
-  forward_to = [prometheus.relabel.relabel_nomad_metrics.receiver]
+  forward_to = [prometheus.relabel.job_to_hostname.receiver]
   params = {
     format = ["prometheus"],
   }
@@ -20,15 +20,6 @@ prometheus.scrape "nomad_exporter" {
   }
 }
 
-// Nomad metric relabeling
-prometheus.relabel "relabel_nomad_metrics" {
-  forward_to = [prometheus.remote_write.metrics_integration_nomad.receiver]
-  rule {
-    source_labels = ["instance"]
-    target_label = "instance"
-    replacement = "{{host_name}}"
-  }
-}
 
 
 prometheus.exporter.unix "node_exporter" {
@@ -71,8 +62,7 @@ prometheus.exporter.consul "consul_exporter" {
 prometheus.scrape "scrape_consul_exporter" {
   job_name = "integrations/consul"
   targets = prometheus.exporter.consul.consul_exporter.targets
-  // Same relabeling as nomad here
-  forward_to = [prometheus.relabel.relabel_nomad_metrics.receiver]
+  forward_to = [prometheus.relabel.job_to_hostname.receiver]
   scrape_interval = "15s"
 }
 
@@ -82,5 +72,23 @@ prometheus.remote_write "metrics_integration_nomad" {
   endpoint {
     name = "mimir"
     url = "http://mimir.service.consul:9009/api/v1/push"
+  }
+}
+
+// Agent monitoriing
+prometheus.scrape "selfmonitor" {
+  job_name = "integrations/alloy"
+  metrics_path = "/metrics"
+  targets = [{__address__ = "127.0.0.1:12345",}]
+  forward_to = [prometheus.relabel.job_to_hostname.receiver]
+}
+
+// Job to hosname
+prometheus.relabel "job_to_hostname" {
+  forward_to = [prometheus.remote_write.metrics_integration_nomad.receiver]
+  rule {
+    source_labels = ["instance"]
+    target_label = "instance"
+    replacement = "{{host_name}}"
   }
 }

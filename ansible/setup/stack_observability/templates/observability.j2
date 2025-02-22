@@ -1532,7 +1532,7 @@ otelcol.exporter.otlphttp "mimir" {
 }
 
 
-// Direct push with promethuies protocol
+
 // Direct push with promethuies protocol
 prometheus.remote_write "mimir_metrics" {
    endpoint {
@@ -1542,6 +1542,25 @@ prometheus.remote_write "mimir_metrics" {
      ++- end ++
   }
 }
+
+// Agent monitoriing
+prometheus.scrape "selfmonitor" {
+    job_name = "integrations/alloy"
+    metrics_path = "/metrics"
+    targets = [{__address__ = "127.0.0.1:++env "NOMAD_HOST_PORT_server"++",}]
+    forward_to = [prometheus.relabel.job_to_hostname.receiver]
+}
+
+// Job to hosname
+prometheus.relabel "job_to_hostname" {
+    forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
+    rule {
+      source_labels = ["instance"]
+      target_label = "instance"
+      replacement = "++env "NOMAD_JOB_NAME"++-++env "NOMAD_TASK_NAME"++"
+    }
+}
+
 
 // Scrape traefik metrics
 prometheus.scrape "scrape_traefik_metrics" {
