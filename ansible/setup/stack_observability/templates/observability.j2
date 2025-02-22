@@ -1380,9 +1380,9 @@ mappings = {
       mode = "fail"
     }
 
-    volume "stack_observability_grafana_agent_volume" {
+    volume "stack_observability_grafana_alloy_volume" {
       type      = "host"
-      source    = "stack_observability_grafana_agent_volume"
+      source    = "stack_observability_grafana_alloy_volume"
       read_only = false
     }
     volume "ca_certs" {
@@ -1440,11 +1440,10 @@ mappings = {
             memory = 128
             memory_max = 2048
         }
-     # TODO: Add volume with args -storage.path=/var/lib/alloy/data
-     #   volume_mount {
-     #       volume      = "stack_observability_grafana_agent_volume"
-     #       destination = "/var/lib/alloy/data"
-     #   }
+        volume_mount {
+           volume      = "stack_observability_grafana_alloy_volume"
+           destination = "/var/lib/alloy/data"
+        }
         volume_mount {
             volume      = "ca_certs"
             destination = "/certs/ca"
