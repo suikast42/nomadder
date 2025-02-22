@@ -19,6 +19,7 @@ metrics:
     - name: integration/nomad
       scrape_configs:
         # Scrape metrics from nomad
+        # alloy replacement prometheus.scrape
         - job_name: integrations/nomad
           metrics_path: /v1/metrics
           tls_config:
@@ -130,6 +131,7 @@ integrations:
           - agent_hostname
         target_label: instance
   # Scrape metrics from linux host
+  # alloy replacement  prometheus.exporter.unix
   node_exporter:
     enabled: true
     relabel_configs:
@@ -141,6 +143,7 @@ integrations:
   #  This scrapper sends up = 1 when then consul service is down
   # Check consul with consul_up
   #  See https://github.com/grafana/agent/issues/3959
+  # alloy replacement prometheus.exporter.consul
   consul_exporter:
     enabled: true
     server: https://localhost:8501

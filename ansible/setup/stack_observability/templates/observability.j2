@@ -1497,7 +1497,7 @@ metrics:
 ++- range service "traefik" ++
             - ++.Address++:8081
 ++- end ++
-
+        ## Alloy replacement discovery.consul from Consul’s Catalog API.  or
         # grab all metric endpoints with standard /metrics endpoint
         - job_name: "integrations/consul_sd"
           consul_sd_configs:

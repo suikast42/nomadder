@@ -62,7 +62,7 @@
     - vars/job_secrets.yml
   gather_facts: yes
   roles:
-    - {role: stack_observability_nodesetup, tags: ['stack_observability_nodes','grafana_agent','vector_agent']}
+    - {role: stack_observability_nodesetup, tags: ['stack_observability_nodes','grafana_agent','grafana_alloy','vector_agent']}
 
 - hosts: all
   name: "Stack observability cli tools setups"
