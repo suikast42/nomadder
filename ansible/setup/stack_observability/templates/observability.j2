@@ -1268,107 +1268,7 @@ mappings = {
        }
 
     }
-   group "blackbox-group" {
-      count = 1
-      volume "ca_cert" {
-        type      = "host"
-        source    = "ca_cert"
-        read_only = true
-      }
-      volume "cert_consul" {
-        type      = "host"
-        source    = "cert_consul"
-        read_only = true
-      }
-      network {
-        mode = "bridge"
-        port "http" {
-          to = 9115
-        }
-      }
-      task "blackbox-task" {
-        driver = "docker"
-        volume_mount {
-          volume      = "ca_cert"
-          destination = "/etc/opt/certs/ca"
-        }
-        volume_mount {
-          volume      = "cert_consul"
-          destination = "/etc/opt/certs/client"
-        }
-        config {
-          image = "prom/blackbox-exporter:v${var.version_blackbox_exporter}"
-          labels = {
-            "com.github.logunifier.application.name" = "blackbox-exporter"
-            "com.github.logunifier.application.version" = "${var.version_blackbox_exporter}"
-            "com.github.logunifier.application.org" = "${var.org}"
-            "com.github.logunifier.application.env" = "${var.env}"
-          }
- {% if set_cpu_hard_limit %}
-          cpu_hard_limit = "true"
- {% endif %}
-          ports = ["http"]
-          args = ["--config.file","/config/blackbox.yaml"]
-          volumes = [
-            "local/blackbox.yaml:/config/blackbox.yaml",
-          ]
-        }
-  #Default config from https://raw.githubusercontent.com/prometheus/blackbox_exporter/master/blackbox.yml
-  #Example config https://github.com/prometheus/blackbox_exporter/blob/master/example.yml
-  # http_integrations module is for validating that the grafana agents scrapping config
-  # all the listed integrations must exists
-        template {
-          right_delimiter = "++"
-          left_delimiter = "++"
-          data = <<EOF
-  modules:
-    http_integrations:
-      prober: http
-      http:
-        preferred_ip_protocol: "ip4"
-        # Probe fails if response body does not match regex.
-        fail_if_body_not_matches_regexp:
-          - '.*integration/agent.*'
-          - '.*integration/consul.*'
-          - '.*integration/node_exporter.*'
-          - '.*integration/nomad.*'
-        tls_config:
-          ca_file: "/etc/opt/certs/ca/cluster-ca-bundle.pem"
-          cert_file: "/etc/opt/certs/client/consul.pem"
-          key_file: "/etc/opt/certs/client/consul-key.pem"
-          insecure_skip_verify: true
-                EOF
-          destination = "local/blackbox.yaml"
-        }
 
-
-        resources {
-          cpu    = 500
-          memory = 256
-        }
-
-        service {
-          name = "blackbox-exporter"
-          port = "http"
-  #        tags = [
-  #          "traefik.enable=true",
-  #          "traefik.http.routers.blackbox.tls=true",
-  #          "traefik.http.routers.blackbox.rule=Host(`blackbox.cloud.private`)",
-  #        ]
-          check {
-            type     = "tcp"
-            port     = "http"
-            interval = "10s"
-            timeout  = "2s"
-            check_restart {
-              limit = 3
-              grace = "30s"
-              ignore_warnings = false
-            }
-          }
-        }
-      }
-    }
   group "grafana-alloy"{
         count = 1
         # Grafana alloy is deployed on every node and scrapes the general nomad job metrics
@@ -1577,63 +1477,40 @@ prometheus.scrape "scrape_traefik_metrics" {
    ]
 }
 
-//Metrics of blackbox exporter jobs
-++- $services := service "blackbox-exporter" ++
-++- if $services ++
-prometheus.scrape "scrape_blackbox_metrics" {
-   job_name = "integrations/blackbox-checks"
-   forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
-   metrics_path = "/metrics"
-   targets = [
-   ++- range  $index, $service := service "blackbox-exporter" -++
-   {__address__ = "++.Name++.service.consul:++.Port++"},
-   ++- end ++
-   ]
- }
- ++- end ++
-
-
-// Backbock host monitoring when consul cluster has keys   blackbox_hosts
-++- if keyExists "blackbox_hosts" ++
-prometheus.scrape "scrape_blackbox_hosts" {
-    job_name = "integrations/blackbox-checks"
-    metrics_path = "/probe"
-    forward_to = [prometheus.relabel.relabel_blackbox_to_hostname.receiver]
-    params = {
-        module = ["http_integrations"],
-    }
-  targets = [
- ++- $hosts := key "blackbox_hosts" -++
- ++- $hostList := $hosts | split ","  -++
- ++- range $hostList ++
-   {__address__ = "https://++ .| trimSpace ++.node.consul:12345/agent/api/v1/instances"},
-  ++- end ++
-  ]
-}
-
-prometheus.relabel "relabel_blackbox_to_hostname" {
-    forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
-    rule {
-       source_labels = ["__address__"]
-       target_label = "__param_target"
-    }
-    rule {
-      source_labels = ["__param_target"]
-      target_label = "instance"
-      regex = "https:\\/\\/(.+)\\.node\\.consul.*"
-      replacement = "$1"
-    }
-    rule {
-      target_label = "__address__"
-      regex = "https:\\/\\/(.+)\\.node\\.consul.*"
-      ++- range  $index, $service := service "blackbox-exporter" -++
-      ++- if eq $index 0 ++
-      replacement = "++.Name++.service.consul:++.Port++"
-      ++- end ++
-      ++- end ++
-    }
-}
+++- if keyExists "blackbox_tcp_checks" ++
+prometheus.exporter.blackbox "blackbox_tcp_checks" {
+config = "{ modules: { tcp_connect: { prober: tcp, timeout: 5s } } }"
+++- $checks := key "blackbox_tcp_checks" -++
+++- $checkList := $checks | split ","  -++
+++- range $checkList ++
+  target {
+    name = "++ .| trimSpace ++"
+    address = "++ .| trimSpace ++"
+    module = "tcp_connect"
+  }
 ++- end ++
+}
+
+prometheus.scrape "scrape_blacbox_tcp_checks" {
+   job_name = "integrations/blackbox_tcp_checks"
+   targets = discovery.relabel.relable_scrape_blacbox_tcp_checks.output
+   forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
+}
+
+discovery.relabel "relable_scrape_blacbox_tcp_checks" {
+   targets = prometheus.exporter.blackbox.blackbox_tcp_checks.targets
+   rule {
+     source_labels = ["__param_target"]
+     target_label = "instance"
+   }
+   rule {
+     target_label = "job"
+     replacement = "integrations/blackbox_tcp_checks"
+   }
+
+ }
+++- end ++
+
         EOF
           destination = "local/config.alloy"
           change_mode = "restart"
