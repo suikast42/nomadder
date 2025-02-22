@@ -1466,6 +1466,8 @@ mappings = {
                 "com.github.logunifier.application.org" = "${var.org}"
                 "com.github.logunifier.application.env" = "${var.env}"
             }
+            # For debugging in container  alloy  run --server.http.listen-addr=0.0.0.0:12345 /etc/alloy/config.alloy
+            # entrypoint         = ["tail", "-f", "/dev/null"]
             args = [
                     "run",
                     "--server.http.listen-addr=0.0.0.0:${NOMAD_HOST_PORT_server}",
@@ -1502,16 +1504,57 @@ otelcol.exporter.otlp "tempo" {
   }
 }
 
-// Metric push endpoints
+// Convert Prometheus metrics to OTLP format
+otelcol.receiver.prometheus "scrape_receiver" {
+  output {
+     metrics = [otelcol.processor.batch.batch_metrics.input]
+  }
+}
+
+// Batch the metrics for efficient transmission
+otelcol.processor.batch "batch_metrics" {
+output {
+   metrics = [otelcol.exporter.otlphttp.mimir.input]
+   }
+}
+
+
+otelcol.exporter.otlphttp "mimir" {
+  client {
+  ++- range service "mimir" ++
+  // Mimir endpoint for otlp
+  endpoint= "http://++.Name++.service.consul:++.Port++/otlp"
+  ++- end ++
+  tls {
+     insecure = true
+  }
+ }
+}
+
+
+// Direct push with promethuies protocol
+// Direct push with promethuies protocol
 prometheus.remote_write "mimir_metrics" {
    endpoint {
      name = "mimir"
      ++- range service "mimir" ++
-     // Mimir endpoint for otlp
-     url= "http://++.Name++.service.consul:++.Port++/otlp"
-//     url= "http://++.Name++.service.consul:++.Port++/api/v1/push"
+    url= "http://++.Name++.service.consul:++.Port++/api/v1/push"
      ++- end ++
   }
+}
+
+// Scrape traefik metrics
+prometheus.scrape "scrape_traefik_metrics" {
+   job_name = "integrations/traefik"
+   forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
+//   forward_to = [prometheus.remote_write.mimir_metrics.receiver]
+   scheme= "http"
+   metrics_path = "/metrics"
+   targets = [
+        ++- range service "traefik" ++
+        {__address__ = "++.Address++:8081"},
+        ++- end ++
+   ]
 }
         EOF
           destination = "local/config.alloy"
