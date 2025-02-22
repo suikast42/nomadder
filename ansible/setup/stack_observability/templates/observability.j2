@@ -1543,15 +1543,9 @@ prometheus.remote_write "mimir_metrics" {
   }
 }
 
-// Agent monitoriing
-prometheus.scrape "selfmonitor" {
-    job_name = "integrations/alloy"
-    metrics_path = "/metrics"
-    targets = [{__address__ = "127.0.0.1:++env "NOMAD_HOST_PORT_server"++",}]
-    forward_to = [prometheus.relabel.job_to_hostname.receiver]
-}
 
-// Job to hosname
+
+// Relabel Job to hosname
 prometheus.relabel "job_to_hostname" {
     forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
     rule {
@@ -1561,6 +1555,13 @@ prometheus.relabel "job_to_hostname" {
     }
 }
 
+// Agent monitoriing
+prometheus.scrape "selfmonitor" {
+   job_name = "integrations/alloy"
+   metrics_path = "/metrics"
+   targets = [{__address__ = "127.0.0.1:++env "NOMAD_HOST_PORT_server"++",}]
+   forward_to = [prometheus.relabel.job_to_hostname.receiver]
+}
 
 // Scrape traefik metrics
 prometheus.scrape "scrape_traefik_metrics" {
@@ -1575,6 +1576,47 @@ prometheus.scrape "scrape_traefik_metrics" {
         ++- end ++
    ]
 }
+// Backbock host monitoring when consul cluster has keys   blackbox_hosts
+++- if keyExists "blackbox_hosts" ++
+prometheus.scrape "scrape_blackbox_hosts" {
+    job_name = "integrations/blackbox-checks"
+    metrics_path = "/probe"
+    forward_to = [prometheus.relabel.relabel_blackbox_to_hostname.receiver]
+    params = {
+        module = ["http_integrations"],
+    }
+  targets = [
+ ++- $hosts := key "blackbox_hosts" -++
+ ++- $hostList := $hosts | split ","  -++
+ ++- range $hostList ++
+   {__address__ = "https://++ .| trimSpace ++.node.consul:12345/agent/api/v1/instances"},
+  ++- end ++
+  ]
+}
+
+prometheus.relabel "relabel_blackbox_to_hostname" {
+    forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
+    rule {
+       source_labels = ["__address__"]
+       target_label = "__param_target"
+    }
+    rule {
+      source_labels = ["__param_target"]
+      target_label = "instance"
+      regex = "https:\\/\\/(.+)\\.node\\.consul.*"
+      replacement = "$1"
+    }
+    rule {
+      target_label = "__address__"
+      regex = "https:\\/\\/(.+)\\.node\\.consul.*"
+      ++- range  $index, $service := service "blackbox-exporter" -++
+      ++- if eq $index 0 ++
+      replacement = "++.Name++.service.consul:++.Port++"
+      ++- end ++
+      ++- end ++
+    }
+}
+++- end ++
         EOF
           destination = "local/config.alloy"
           change_mode = "restart"
