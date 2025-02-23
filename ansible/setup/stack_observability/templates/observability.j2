@@ -1539,20 +1539,20 @@ discovery.consul "consul_minio" {
 
  prometheus.scrape "scrape_consul_minio" {
      job_name = "integrations/consul_disvovery"
-     targets    = discovery.consul.consul_minio.targets
-     forward_to = [prometheus.relabel.relabel_consul_targets.receiver]
+     targets = discovery.relabel.relabel_consul_targets.output
+     forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
      metrics_path ="/minio/v2/metrics/cluster"
  }
 
-prometheus.scrape "scrape_consul_generic" {
-    job_name = "integrations/consul_disvovery"
-    targets    = discovery.consul.consul_generic.targets
-    forward_to = [prometheus.relabel.relabel_consul_targets.receiver]
-    metrics_path ="/metrics"
-}
+//prometheus.scrape "scrape_consul_generic" {
+//    job_name = "integrations/consul_disvovery"
+//    targets = discovery.relabel.relabel_consul_targets.output
+//    forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
+//    metrics_path ="/metrics"
+//}
 
-prometheus.relabel "relabel_consul_targets" {
-   forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
+discovery.relabel "relabel_consul_targets" {
+   targets = discovery.consul.consul_minio.targets
    rule {
      source_labels = ["__meta_consul_node"]
      target_label = "instance"
