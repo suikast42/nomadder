@@ -43,6 +43,13 @@ variable "version_grafana_alloy" {
     default = "{{version_grafana_alloy}}"
 }
 
+variable "grafana_alloy_livedebug" {
+    type = bool
+    description = "Enables the live debugging feature, which streams real-time data from your components directly to the Alloy UI."
+    default = "false"
+}
+
+
 variable "version_grafana_nomadder" {
     type = string
     description = "Version grafana exporter"
@@ -73,6 +80,7 @@ variable "version_busy_box_init_container" {
     description = "Version busibox"
     default = "{{version_busy_box_init_container}}"
 }
+
 
 
 
@@ -1340,43 +1348,13 @@ mappings = {
      }
    }
 
-   task "await-for-mimir" {
-      driver = "docker"
 
-      config {
-            image        = "{{registry_dns}}/busybox:{{version_busy_box_init_container}}"
-            labels = {
-                "com.github.logunifier.application.name" = "await-for-mimir"
-                "com.github.logunifier.application.version" = "{{version_busy_box_init_container}}"
-                "com.github.logunifier.application.org" = "${var.org}"
-                "com.github.logunifier.application.env" = "${var.env}"
-            }
-            {% if set_cpu_hard_limit %}
-                cpu_hard_limit = "true"
-            {% endif %}
-            command      = "sh"
-            args         = ["-c", "echo -n 'Waiting for service mimir'; until nslookup mimir.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
-            #network_mode = "host"
-            }
-
-            resources {
-                cpu    = 200
-                memory = 128
-                memory_max = 1024
-            }
-
-            lifecycle {
-                hook    = "prestart"
-                sidecar = false
-            }
-        }
-
-        task "await-for-tempo" {
+        task "await-for-ltm" {
             driver = "docker"
             config {
                 image        = "{{registry_dns}}/busybox:{{version_busy_box_init_container}}"
                 labels = {
-                    "com.github.logunifier.application.name" = "await-for-tempo"
+                    "com.github.logunifier.application.name" = "await-for-ltm"
                     "com.github.logunifier.application.version" = "{{version_busy_box_init_container}}"
                     "com.github.logunifier.application.org" = "${var.org}"
                     "com.github.logunifier.application.env" = "${var.env}"
@@ -1385,7 +1363,7 @@ mappings = {
                 cpu_hard_limit = "true"
                 {% endif %}
                 command      = "sh"
-                args         = ["-c", "echo -n 'Waiting for service tempo'; until nslookup tempo.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
+                args         = ["-c", "echo -n 'Waiting for service tempo'; until nslookup tempo.service.consul && nslookup mimir.service.consul  2>&1 >/dev/null; do echo '.'; sleep 2; done"]
                 #network_mode = "host"
             }
 
@@ -1454,6 +1432,13 @@ logging {
    level  = "info"
    format = "logfmt"
 }
+
+livedebugging {
+    enabled = ${var.grafana_alloy_livedebug}
+}
+
+
+
 tracing {
   // Sample all traces. This value should be lower for production configs!
   sampling_fraction = 1
@@ -1529,6 +1514,7 @@ prometheus.scrape "selfmonitor" {
    metrics_path = "/metrics"
    targets = [{__address__ = "127.0.0.1:++env "NOMAD_HOST_PORT_server"++"}]
    forward_to = [prometheus.relabel.job_to_hostname.receiver]
+   scrape_interval = "10s"
 }
 
 // Scrape traefik metrics
@@ -1538,6 +1524,7 @@ prometheus.scrape "scrape_traefik_metrics" {
 //   forward_to = [prometheus.remote_write.mimir_metrics.receiver]
    scheme= "http"
    metrics_path = "/metrics"
+   scrape_interval = "10s"
    targets = [
         ++- range service "traefik" ++
         {__address__ = "++.Address++:8081"},
@@ -1563,6 +1550,7 @@ prometheus.scrape "scrape_blacbox_tcp_checks" {
    job_name = "integrations/blackbox_tcp_checks"
    targets = discovery.relabel.relable_scrape_blacbox_tcp_checks.output
    forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
+   scrape_interval = "60s"
 }
 
 discovery.relabel "relable_scrape_blacbox_tcp_checks" {
@@ -1598,6 +1586,7 @@ prometheus.scrape "scrape_consul_generic" {
     job_name = "integrations/consul_disvovery"
     targets = discovery.relabel.relabel_consul_targets.output
     forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
+    scrape_interval = "10s"
 }
 
 discovery.relabel "relabel_consul_targets" {
