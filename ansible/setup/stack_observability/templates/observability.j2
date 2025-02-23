@@ -68,6 +68,11 @@ variable "version_grafana_tempo" {
     description = "Version grafana loki"
     default = "{{version_grafana_tempo}}"
 }
+variable "version_busy_box_init_container" {
+    type = string
+    description = "Version busibox"
+    default = "{{version_busy_box_init_container}}"
+}
 
 
 
@@ -1334,7 +1339,70 @@ mappings = {
       }
      }
    }
-   task "grafana-alloy" {
+
+   task "await-for-mimir" {
+      driver = "docker"
+
+      config {
+            image        = "{{registry_dns}}/busybox:{{version_busy_box_init_container}}"
+            labels = {
+                "com.github.logunifier.application.name" = "await-for-mimir"
+                "com.github.logunifier.application.version" = "{{version_busy_box_init_container}}"
+                "com.github.logunifier.application.org" = "${var.org}"
+                "com.github.logunifier.application.env" = "${var.env}"
+            }
+            {% if set_cpu_hard_limit %}
+                cpu_hard_limit = "true"
+            {% endif %}
+            command      = "sh"
+            args         = ["-c", "echo -n 'Waiting for service mimir'; until nslookup mimir.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
+            #network_mode = "host"
+            }
+
+            resources {
+                cpu    = 200
+                memory = 128
+                memory_max = 1024
+            }
+
+            lifecycle {
+                hook    = "prestart"
+                sidecar = false
+            }
+        }
+
+        task "await-for-tempo" {
+            driver = "docker"
+            config {
+                image        = "{{registry_dns}}/busybox:{{version_busy_box_init_container}}"
+                labels = {
+                    "com.github.logunifier.application.name" = "await-for-tempo"
+                    "com.github.logunifier.application.version" = "{{version_busy_box_init_container}}"
+                    "com.github.logunifier.application.org" = "${var.org}"
+                    "com.github.logunifier.application.env" = "${var.env}"
+                }
+                {% if set_cpu_hard_limit %}
+                cpu_hard_limit = "true"
+                {% endif %}
+                command      = "sh"
+                args         = ["-c", "echo -n 'Waiting for service tempo'; until nslookup tempo.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
+                #network_mode = "host"
+            }
+
+            resources {
+                cpu    = 200
+                memory = 128
+                memory_max = 1024
+            }
+
+            lifecycle {
+                hook    = "prestart"
+                sidecar = false
+            }
+        }
+
+        task "grafana-alloy" {
+
         resources {
             cpu    = 200
             memory = 128
