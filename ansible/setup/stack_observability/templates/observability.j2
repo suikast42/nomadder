@@ -1314,6 +1314,30 @@ mappings = {
       port "server" {}
     }
    service {
+     name = "oltp"
+     port = "server"
+
+    tags = [
+       "traefik.enable=true",
+       "traefik.http.routers.oltp.tls=true",
+       "traefik.http.routers.oltp.rule=Host(`oltp.{{tls_san}}`)",
+     ]
+
+     check {
+        name     = "health"
+        type     = "http"
+        port     = "server"
+        path     = "/-/healthy"
+        interval = "10s"
+        timeout  = "2s"
+        check_restart {
+          limit = 3
+          grace = "60s"
+          ignore_warnings = false
+         }
+       }
+     }
+   service {
       name = "grafana-alloy-health"
       #name = "${NOMAD_ALLOC_NAME}-health"
       port = "server"
@@ -1349,35 +1373,38 @@ mappings = {
    }
 
 
-        task "await-for-ltm" {
-            driver = "docker"
-            config {
-                image        = "{{registry_dns}}/busybox:{{version_busy_box_init_container}}"
-                labels = {
-                    "com.github.logunifier.application.name" = "await-for-ltm"
-                    "com.github.logunifier.application.version" = "{{version_busy_box_init_container}}"
-                    "com.github.logunifier.application.org" = "${var.org}"
-                    "com.github.logunifier.application.env" = "${var.env}"
-                }
-                {% if set_cpu_hard_limit %}
-                cpu_hard_limit = "true"
-                {% endif %}
-                command      = "sh"
-                args         = ["-c", "echo -n 'Waiting for service tempo'; until nslookup tempo.service.consul && nslookup mimir.service.consul  2>&1 >/dev/null; do echo '.'; sleep 2; done"]
-                #network_mode = "host"
-            }
-
-            resources {
-                cpu    = 200
-                memory = 128
-                memory_max = 1024
-            }
-
-            lifecycle {
-                hook    = "prestart"
-                sidecar = false
-            }
+  task "await-for-ltm" {
+     driver = "docker"
+     config {
+        image        = "{{registry_dns}}/busybox:{{version_busy_box_init_container}}"
+        labels = {
+           "com.github.logunifier.application.name" = "await-for-ltm"
+           "com.github.logunifier.application.version" = "{{version_busy_box_init_container}}"
+           "com.github.logunifier.application.org" = "${var.org}"
+           "com.github.logunifier.application.env" = "${var.env}"
         }
+       {% if set_cpu_hard_limit %}
+        cpu_hard_limit = "true"
+       {% endif %}
+        command      = "sh"
+        args         = [
+        "-c",
+        "echo -n 'Waiting for service tempo'; until nslookup tempo.service.consul && nslookup mimir.service.consul  2>&1 >/dev/null; do echo '.'; sleep 2; done"
+        ]
+                #network_mode = "host"
+       }
+
+       resources {
+          cpu    = 100
+          memory = 64
+          memory_max = 1024
+       }
+
+      lifecycle {
+        hook    = "prestart"
+        sidecar = false
+        }
+      }
 
         task "grafana-alloy" {
 
