@@ -1513,7 +1513,7 @@ discovery.relabel "relable_scrape_blacbox_tcp_checks" {
 
 discovery.consul "consul_generic" {
   server = "consul.service.consul:8501"
-  tags = ["prometheus"]
+  tags=["prometheus"]
   tls_config {
     ca_file = "/certs/ca/ca.crt"
     cert_file = "/certs/consul/consul.pem"
@@ -1524,39 +1524,31 @@ discovery.consul "consul_generic" {
   scheme ="https"
 }
 
-discovery.consul "consul_minio" {
-  server = "consul.service.consul:8501"
-  tags = ["prometheus_minio"]
-  tls_config {
-    ca_file = "/certs/ca/ca.crt"
-    cert_file = "/certs/consul/consul.pem"
-    key_file = "/certs/consul/consul-key.pem"
-    insecure_skip_verify = true
-  }
- datacenter= "{{data_center}}"
- scheme ="https"
+
+
+prometheus.scrape "scrape_consul_generic" {
+    job_name = "integrations/consul_disvovery"
+    targets = discovery.relabel.relabel_consul_targets.output
+    forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
 }
 
- prometheus.scrape "scrape_consul_minio" {
-     job_name = "integrations/consul_disvovery"
-     targets = discovery.relabel.relabel_consul_targets.output
-     forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
-     metrics_path ="/minio/v2/metrics/cluster"
- }
-
-//prometheus.scrape "scrape_consul_generic" {
-//    job_name = "integrations/consul_disvovery"
-//    targets = discovery.relabel.relabel_consul_targets.output
-//    forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
-//    metrics_path ="/metrics"
-//}
-
 discovery.relabel "relabel_consul_targets" {
-   targets = discovery.consul.consul_minio.targets
+   targets = discovery.consul.consul_generic.targets
    rule {
      source_labels = ["__meta_consul_node"]
      target_label = "instance"
    }
+   // Rule to set metrics_path based on service name
+   // __metrics_path__ is a special labels can change the behavior of prometheus.scrape:
+
+   rule {
+      source_labels = ["__meta_consul_tags"]
+      target_label = "__metrics_path__"
+      regex = ".*prometheus:metric_path=([^,]+).*"
+      replacement= "$${1}"
+      action= "replace"
+   }
+
   rule {
     source_labels = ["__meta_consul_service"]
     target_label = "service"
