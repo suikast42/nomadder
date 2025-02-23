@@ -1459,7 +1459,7 @@ prometheus.relabel "job_to_hostname" {
 prometheus.scrape "selfmonitor" {
    job_name = "integrations/alloy"
    metrics_path = "/metrics"
-   targets = [{__address__ = "127.0.0.1:++env "NOMAD_HOST_PORT_server"++",}]
+   targets = [{__address__ = "127.0.0.1:++env "NOMAD_HOST_PORT_server"++"}]
    forward_to = [prometheus.relabel.job_to_hostname.receiver]
 }
 
@@ -1511,7 +1511,104 @@ discovery.relabel "relable_scrape_blacbox_tcp_checks" {
  }
 ++- end ++
 
-        EOF
+discovery.consul "consul_generic" {
+  server = "consul.service.consul:8501"
+  tags = ["prometheus"]
+  tls_config {
+    ca_file = "/certs/ca/ca.crt"
+    cert_file = "/certs/consul/consul.pem"
+    key_file = "/certs/consul/consul-key.pem"
+    insecure_skip_verify = true
+  }
+  datacenter= "{{data_center}}"
+  scheme ="https"
+}
+
+discovery.consul "consul_minio" {
+  server = "consul.service.consul:8501"
+  tags = ["prometheus_minio"]
+  tls_config {
+    ca_file = "/certs/ca/ca.crt"
+    cert_file = "/certs/consul/consul.pem"
+    key_file = "/certs/consul/consul-key.pem"
+    insecure_skip_verify = true
+  }
+ datacenter= "{{data_center}}"
+ scheme ="https"
+}
+
+ prometheus.scrape "scrape_consul_minio" {
+     job_name = "integrations/consul_disvovery"
+     targets    = discovery.consul.consul_minio.targets
+     forward_to = [prometheus.relabel.relabel_consul_targets.receiver]
+     metrics_path ="/minio/v2/metrics/cluster"
+ }
+
+prometheus.scrape "scrape_consul_generic" {
+    job_name = "integrations/consul_disvovery"
+    targets    = discovery.consul.consul_generic.targets
+    forward_to = [prometheus.relabel.relabel_consul_targets.receiver]
+    metrics_path ="/metrics"
+}
+
+prometheus.relabel "relabel_consul_targets" {
+   forward_to = [otelcol.receiver.prometheus.scrape_receiver.receiver]
+   rule {
+     source_labels = ["__meta_consul_node"]
+     target_label = "instance"
+   }
+  rule {
+    source_labels = ["__meta_consul_service"]
+    target_label = "service"
+  }
+  rule {
+     source_labels = ["__meta_consul_tags"]
+     target_label = "service_id"
+     regex = ".*?prometheus:service_id=([^, ]+).*"
+     replacement= "$${1}"
+     action= "replace"
+  }
+  rule {
+    source_labels = ["__meta_consul_tags"]
+    target_label = "exporter_id"
+    regex = ".*?prometheus:exporter_id=([^, ]+).*"
+    replacement= "$${1}"
+    action= "replace"
+  }
+  rule {
+    source_labels = ["__meta_consul_tags"]
+    target_label = "version"
+    regex = ".*?prometheus:version=([^, ]+).*"
+    replacement= "$${1}"
+    action= "replace"
+  }
+  rule {
+    source_labels = ["__meta_consul_tags"]
+    target_label = "version_exporter"
+    regex = ".*?prometheus:version_exporter=([^, ]+).*"
+    replacement= "$${1}"
+    action= "replace"
+  }
+  rule {
+    source_labels = ["__meta_consul_tags"]
+    target_label = "environment"
+    regex = ".*?prometheus:environment=([^, ]+).*"
+    replacement= "$${1}"
+    action= "replace"
+  }
+  rule {
+    source_labels = ["__meta_consul_tags"]
+    target_label = "organisation"
+    regex = ".*?prometheus:organisation=([^, ]+).*"
+    replacement= "$${1}"
+    action= "replace"
+  }
+  rule {
+    action = "labeldrop"
+    regex  = "exported_.*"
+  }
+}
+       EOF
           destination = "local/config.alloy"
           change_mode = "restart"
        }
