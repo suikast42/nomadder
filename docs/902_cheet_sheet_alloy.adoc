@@ -1,0 +1,159 @@
+.Grafana alloy Post metrics and traces
+|===
+|Description |Command
+
+| Push metrics with oltp http
+a|[source,shell]
+----
+curl -X POST "oltp-http.cloud.private/v1/metrics" \
+-H "Content-Type: application/json" \
+-d '{
+  "resourceMetrics": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": { "stringValue": "my-metric-service" }
+          }
+        ]
+      },
+      "scopeMetrics": [
+        {
+          "metrics": [
+            {
+              "name": "custom_requests_total",
+              "description": "Total number of requests",
+              "unit": "1",
+              "sum": {
+                "dataPoints": [
+                  {
+                    "attributes": [
+                      {
+                        "key": "http.status_code",
+                        "value": { "stringValue": "200" }
+                      }
+                    ],
+                    "asInt": 10,
+                    "timeUnixNano": "1699000000000000000"
+                  }
+                ],
+                "isMonotonic": true,
+                "aggregationTemporality": 2
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}'
+----
+
+| Push traces with oltp http
+a|[source,shell]
+----
+curl -X POST "http://localhost:4318/v1/traces" \
+-H "Content-Type: application/json" \
+-d '{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          { "key": "service.name", "value": { "stringValue": "test-service" } }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "spans": [
+            {
+              "traceId": "abcd1234abcd1234abcd1234abcd1234",
+              "spanId": "abcd1234abcd1234",
+              "name": "test-span",
+              "startTimeUnixNano": "1699000000000000000",
+              "endTimeUnixNano": "1699000001000000000"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}'
+----
+
+
+| Push traces with oltp grpc
+a|[source,shell]
+----
+grpcurl -plaintext -d '{
+  "resource_spans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": { "stringValue": "test-service" }
+          }
+        ]
+      },
+      "scope_spans": [
+        {
+          "spans": [
+            {
+              "trace_id": "abcdabcdabcdabcdabcdabcdabcdabcd",
+              "span_id": "1234123412341234",
+              "name": "test-span",
+              "start_time_unix_nano": "1699000000000000000",
+              "end_time_unix_nano": "1699000001000000000"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}' localhost:4317 opentelemetry.proto.collector.trace.v1.TraceService/Export
+----
+
+| Push metrics with oltp grpc
+a|[source,shell]
+----
+grpcurl -plaintext -d '{
+  "resource_metrics": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": { "stringValue": "test-service" }
+          }
+        ]
+      },
+      "scope_metrics": [
+        {
+          "metrics": [
+            {
+              "name": "custom_requests_total",
+              "description": "Total number of requests",
+              "unit": "1",
+              "sum": {
+                "data_points": [
+                  {
+                    "as_int": 10,
+                    "time_unix_nano": "1699000000000000000"
+                  }
+                ],
+                "is_monotonic": true,
+                "aggregation_temporality": 2
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}' localhost:4317 opentelemetry.proto.collector.metrics.v1.MetricsService/Export
+----
+
+|===
+
+
