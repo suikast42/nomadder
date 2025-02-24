@@ -1311,16 +1311,18 @@ mappings = {
 
     network {
       mode = "bridge"
+      // TODO: make this dnymic again
+      // This is static because of support http for external clients.
       port "server" {}
     }
    service {
-     name = "oltp"
+     name = "otlp"
      port = "server"
 
     tags = [
        "traefik.enable=true",
-       "traefik.http.routers.oltp.tls=true",
-       "traefik.http.routers.oltp.rule=Host(`oltp.{{tls_san}}`)",
+       "traefik.http.routers.otlp.tls=false",
+       "traefik.http.routers.otlp.rule=Host(`otlp.{{tls_san}}`)",
      ]
 
      check {

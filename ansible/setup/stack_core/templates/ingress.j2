@@ -298,10 +298,10 @@ job "ingress" {
 [entryPoints]
     [entryPoints.http]
     address = ":80"
-    [entryPoints.http.http.redirections]
-      [entryPoints.http.http.redirections.entryPoint]
-        to = "https"
-        scheme = "https"
+#    [entryPoints.http.http.redirections]
+#      [entryPoints.http.http.redirections.entryPoint]
+#        to = "https"
+#        scheme = "https"
     [entryPoints.https]
     address = ":443"
 
