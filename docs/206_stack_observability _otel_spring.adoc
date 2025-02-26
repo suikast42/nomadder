@@ -1,0 +1,97 @@
+= Best Approach for OpenTelemetry and Micrometer in Spring
+
+== Key Points
+- It seems likely that the best approach is to use OpenTelemetry for both metrics and tracing, while disabling Micrometer's export to OTLP, to avoid mixing the two systems.
+- Research suggests setting `management.otlp.metrics.export.enabled=false`, `management.otlp.tracing.export.enabled=false`, and `management.otlp.logging.export.enabled=false` to prevent Micrometer from exporting data, and configuring OpenTelemetry with `otel.traces.exporter=otlp`, `otel.metrics.exporter=otlp`, and `otel.logs.exporter=none` for exports.
+- The evidence leans toward using the OpenTelemetry Spring Boot starter for automatic instrumentation, ensuring custom metrics use OpenTelemetry's API instead of Micrometer's to maintain separation.
+
+== Configuration Overview
+To ensure a clean separation between Micrometer and OpenTelemetry, configure your Spring application to rely solely on OpenTelemetry for observability data. This involves disabling Micrometer's OTLP exports and leveraging OpenTelemetry's capabilities for both metrics and tracing.
+
+=== Disabling Micrometer Exports
+Set the following properties in your application configuration (e.g., `application.properties` or `application.yml`) to disable Micrometer's export to OTLP:
+
+- `management.otlp.metrics.export.enabled=false`
+- `management.otlp.tracing.export.enabled=false`
+- `management.otlp.logging.export.enabled=false`
+
+This prevents Micrometer from sending any data to the OpenTelemetry Protocol (OTLP) endpoint, ensuring no overlap with OpenTelemetry's exports.
+
+=== Configuring OpenTelemetry Exports
+Configure OpenTelemetry to handle the export of traces and metrics using these properties:
+
+- `otel.traces.exporter=otlp`
+- `otel.metrics.exporter=otlp`
+- `otel.logs.exporter=none`
+
+These settings ensure that traces and metrics are exported to OTLP, while logs are not exported, aligning with your configuration.
+
+=== Using OpenTelemetry Spring Boot Starter
+Include the OpenTelemetry Spring Boot starter in your project dependencies to enable automatic instrumentation for metrics and tracing. This starter provides a lightweight alternative to the OpenTelemetry Java agent, suitable for Spring Boot applications, especially native image applications (link:https://opentelemetry.io/docs/zero-code/java/spring-boot-starter/[OpenTelemetry Spring Boot Starter]).
+
+=== Custom Metrics
+For any custom metrics, use OpenTelemetry's API instead of Micrometer's to maintain consistency and avoid mixing the two systems. This ensures that all observability data is handled by OpenTelemetry, reducing potential confusion.
+
+== Detailed Survey Note
+In Spring applications, both Micrometer and OpenTelemetry provide observability capabilities, with Micrometer focusing on metrics and OpenTelemetry offering a comprehensive framework for traces, metrics, and logs. The user's query seeks the best approach to manage these tools without mixing them, given specific configuration properties. This section provides a detailed analysis, expanding on the direct answer with additional context and considerations, as of 03:59 PM CET on Monday, February 24, 2025.
+
+=== Background on Micrometer and OpenTelemetry
+Micrometer is a metrics collection library integrated into Spring Boot, particularly through the Actuator, enabling the collection and export of metrics to various monitoring systems, including OpenTelemetry via OTLP. OpenTelemetry, a CNCF incubating project, provides a vendor-neutral framework for collecting and exporting telemetry data, including traces, metrics, and logs, with support for Spring Boot through its starter and Java agent.
+
+The user's configuration includes disabling Micrometer's OTLP exports (`management.otlp.metrics.export.enabled=false`, `management.otlp.tracing.export.enabled=false`, `management.otlp.logging.export.enabled=false`) and setting OpenTelemetry export formats (`otel.traces.exporter=otlp`, `otel.metrics.exporter=otlp`, `otel.logs.exporter=none`). This suggests a desire to use OpenTelemetry independently for observability, avoiding overlap with Micrometer.
+
+=== Analyzing the Configuration
+The properties `management.otlp.*.export.enabled=false` disable the export of Micrometer-collected data to OTLP, ensuring that Micrometer does not interfere with OpenTelemetry's export pipeline. Conversely, `otel.*.exporter` properties configure OpenTelemetry's export behavior, directing traces and metrics to OTLP while excluding logs, aligning with the user's intent to manage observability through OpenTelemetry.
+
+This configuration implies that the user is using OpenTelemetry for metric collection and export, potentially via the OpenTelemetry Spring Boot starter, which provides automatic instrumentation. However, Spring Boot's Actuator includes Micrometer by default, which may still collect metrics internally, potentially leading to duplication if not managed properly.
+
+=== Best Approach Without Mixing
+To avoid mixing Micrometer and OpenTelemetry, the recommended approach is to rely solely on OpenTelemetry for both metrics and tracing, minimizing Micrometer's role. This involves:
+
+==== Using the OpenTelemetry Spring Boot Starter
+The starter, available at link:https://opentelemetry.io/docs/zero-code/java/spring-boot-starter/[OpenTelemetry Spring Boot Starter], offers zero-code instrumentation for Spring Boot applications, collecting telemetry data without manual intervention. It is particularly useful for native image applications and when the Java agent is not suitable. Documentation suggests it handles both traces and metrics, providing automatic instrumentation for libraries like Spring Web and Hibernate (link:https://opentelemetry.io/docs/instrumentations/[OpenTelemetry Instrumentation]).
+
+==== Disabling Micrometer's OTLP Export
+The user's settings (`management.otlp.*.export.enabled=false`) already prevent Micrometer from exporting to OTLP, ensuring no overlap in the export pipeline. This is crucial to maintain separation, as confirmed by Spring Boot documentation on metrics (link:https://docs.spring.io/spring-boot/reference/actuator/metrics.html[Metrics :: Spring Boot]).
+
+==== Configuring OpenTelemetry Exports
+The settings `otel.traces.exporter=otlp` and `otel.metrics.exporter=otlp` ensure that OpenTelemetry exports traces and metrics to OTLP, while `otel.logs.exporter=none` disables log exports, aligning with the user's configuration. This is standard OpenTelemetry practice, as detailed in link:https://www.baeldung.com/spring-boot-opentelemetry-setup[OpenTelemetry Setup in Spring Boot Application | Baeldung].
+
+==== Managing Custom Metrics
+For custom metrics, use OpenTelemetry's API instead of Micrometer's to ensure consistency. This avoids mixing, as Micrometer's API would otherwise collect metrics that could conflict with OpenTelemetry's collection. The OpenTelemetry API allows manual instrumentation, extending automatically generated telemetry, as noted in link:https://opentelemetry.io/docs/zero-code/java/spring-boot-starter/[Spring Boot starter | OpenTelemetry].
+
+=== Potential Challenges and Considerations
+While the above approach is ideal, challenges arise due to Micrometer's integration with Spring Boot Actuator. Excluding Actuator entirely may not be feasible if other endpoints (e.g., health, info) are needed. Instead, users can disable specific Micrometer metrics to reduce overlap. For example, properties like `management.metrics.enable.jvm=false` can disable JVM metrics, as seen in link:https://stackoverflow.com/questions/48451381/spring-boot-actuator-micrometer-metrics-disable-some[Spring Boot Actuator/Micrometer Metrics Disable Some - Stack Overflow].
+
+However, completely disabling Micrometer's metric collection is complex, as it is deeply integrated. The user may accept Micrometer collecting metrics for internal use (e.g., `/actuator/metrics` endpoint) without exporting to OTLP, as long as OpenTelemetry handles external exports. This introduces a potential for duplicate metrics, which can be mitigated by disabling specific Micrometer metrics that overlap with OpenTelemetry's collection.
+
+=== Detailed Configuration Table
+Below is a table summarizing the configuration properties and their effects:
+
+[cols="1,1,2",options="header"]
+|===
+|Property|Value|Effect
+|`management.otlp.metrics.export.enabled`|`false`|Disables Micrometer metric export to OTLP, preventing overlap.
+|`management.otlp.tracing.export.enabled`|`false`|Disables Micrometer tracing export to OTLP, ensuring separation.
+|`management.otlp.logging.export.enabled`|`false`|Disables Micrometer log export to OTLP, aligning with OpenTelemetry.
+|`otel.traces.exporter`|`otlp`|Configures OpenTelemetry to export traces to OTLP.
+|`otel.metrics.exporter`|`otlp`|Configures OpenTelemetry to export metrics to OTLP.
+|`otel.logs.exporter`|`none`|Disables OpenTelemetry log export, as per user's configuration.
+|===
+
+=== Unexpected Detail: Integration with Native Images
+An unexpected detail is that the OpenTelemetry Spring Boot starter is particularly beneficial for Spring Boot native image applications, where the Java agent may not work, as highlighted in link:https://opentelemetry.io/blog/2024/spring-starter-stable/[The OpenTelemetry Spring Boot starter is now stable | OpenTelemetry]. This is relevant for users leveraging GraalVM, expanding the applicability beyond traditional JVM setups.
+
+=== Conclusion
+The user's current configuration is on the right track, using OpenTelemetry for metrics and tracing while disabling Micrometer's OTLP exports. To ensure no mixing, rely on the OpenTelemetry Spring Boot starter, configure exports via `otel.*.exporter` properties, and use OpenTelemetry's API for custom metrics. While completely eliminating Micrometer may be challenging due to Actuator integration, disabling its exports and managing overlaps through property settings should suffice for most use cases.
+
+== Key Citations
+- link:https://opentelemetry.io/docs/zero-code/java/spring-boot-starter/[Spring Boot starter OpenTelemetry zero-code instrumentation]
+- link:https://www.baeldung.com/spring-boot-opentelemetry-setup[OpenTelemetry Setup in Spring Boot Application Baeldung]
+- link:https://opentelemetry.io/blog/2024/spring-starter-stable/[The OpenTelemetry Spring Boot starter is now stable OpenTelemetry blog]
+- link:https://docs.spring.io/spring-boot/reference/actuator/metrics.html[Metrics Spring Boot documentation]
+- link:https://stackoverflow.com/questions/48451381/spring-boot-actuator-micrometer-metrics-disable-some[Spring Boot Actuator Micrometer Metrics Disable Some Stack Overflow]
+- link:https://opentelemetry.io/docs/instrumentations/[OpenTelemetry Instrumentation supported libraries]
+- link:https://opentelemetry.io/docs/languages/java/intro/[Intro to OpenTelemetry Java]
+- link:https://github.com/open-telemetry/opentelemetry-java-examples/tree/main][opentelemetry-java-examples]
+- link:https://github.com/open-telemetry/opentelemetry-java-contrib][community otel packages]

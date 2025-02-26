@@ -302,7 +302,7 @@ target: all,alertmanager,overrides-exporter
 multitenancy_enabled: false
 
 server:
-  http_listen_port: 9009
+  http_listen_port: ++env "NOMAD_HOST_PORT_api"++
   log_level: info
   # Configure the server to allow messages up to 100MB.
   grpc_server_max_recv_msg_size: 104857600
