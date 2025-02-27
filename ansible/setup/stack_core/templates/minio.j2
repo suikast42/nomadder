@@ -140,9 +140,10 @@ job "minio" {
         port = "http"
         name = "minio"
         tags = [
-         "prometheus_minio",
          "frontend",
          "minio",
+         "prometheus",
+         "prometheus:metric_path=/minio/v2/metrics/cluster",
          "prometheus:server=${NOMAD_ALLOC_NAME}",
          "prometheus:version={{version_minio}}",
          "prometheus:environment=${var.env}",

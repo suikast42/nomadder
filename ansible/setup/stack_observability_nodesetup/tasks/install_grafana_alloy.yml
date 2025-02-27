@@ -1,0 +1,60 @@
+#docu https://github.com/grafana/grafana-ansible-collection/tree/main
+- name: Grafana alloy agent installation
+  become: true
+  block:
+  - name: Grafana alloy agent uninstall
+    when: uninstall_grafana_alloy|bool == true
+    block:
+      - name: Uninstall Alloy
+        ansible.builtin.include_role:
+          name: grafana.grafana.alloy
+        vars:
+          alloy_uninstall:  "{{uninstall_grafana_alloy}}"
+
+      - name: "Delete grafana agent conf dir {{grafana_alloy_config_dir}}"
+        ansible.builtin.file:
+          path: "{{grafana_alloy_config_dir}}"
+          state: absent
+          mode: '0755'
+
+  - name: "Create {{grafana_alloy_config_dir}} if needed"
+    ansible.builtin.file:
+      path: "{{grafana_alloy_config_dir}}"
+      state: directory
+      mode: '0755'
+
+  - name: Template grafana agent config
+    template:
+      force: yes
+      src: config/alloy-config.hcl
+      dest: "{{grafana_alloy_config_dir}}/config.alloy"
+    register: serviceconfig
+
+  - name: stop grafana alloy service
+    when: serviceconfig.changed
+    failed_when: false
+    service:
+      name: alloy
+      state: stopped
+
+  - name: Install Alloy
+    ansible.builtin.include_role:
+       name: grafana.grafana.alloy
+    vars:
+      alloy_version: "{{version_grafana_alloy}}"
+      ansible_check_mode: true
+      alloy_env_file_vars:
+        CONFIG_FILE: "{{grafana_alloy_config_dir}}/config.alloy"
+#        CUSTOM_ARGS : "--storage.path=/var/lib/alloy"
+#        CUSTOM_ARGS : "--server.http.listen-addr=localhost:12345"
+
+#  - name: start grafana agent service
+#    when: serviceconfig.changed
+#    failed_when: true
+#    service:
+#      name: alloy.service
+#      state: started
+  vars:
+    grafana_alloy_config_dir: /etc/grafana.alloy.d
+
+
