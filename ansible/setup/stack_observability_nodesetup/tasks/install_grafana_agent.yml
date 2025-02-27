@@ -41,13 +41,13 @@
         state: absent
         mode: '0755'
 
+
     - name: "Delete grafana agent  volume definition"
       become: true
       ansible.builtin.file:
         path: "/etc/nomad.d/nomad_volume_stack_observability_grafana_agent_volume"
         state: absent
         mode: '0755'
-
 
 #- name : Check grafana agent installation present
 #  stat:
