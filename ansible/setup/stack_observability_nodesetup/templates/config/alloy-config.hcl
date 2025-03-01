@@ -35,10 +35,7 @@ prometheus.scrape "scrape_node_exporter" {
 
 prometheus.relabel "relabel_node_exporter" {
   forward_to = [prometheus.remote_write.metrics_integration_nomad.receiver]
-  rule {
-    source_labels = ["nodename"]
-    target_label = "instance"
-  }
+
   // Somehow the job_name of scrape_node_exporter not set. Lets do it again
   rule {
     target_label = "job"
