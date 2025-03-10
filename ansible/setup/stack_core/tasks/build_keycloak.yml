@@ -46,11 +46,11 @@
         src: nomadder-realm.json
         dest: "{{docker_build_dir_keycloak}}/nomadder-realm.json"
 
-    - name: "Login {{registry_dns}}"
+    - name: "Login {{push_registry}}"
       # do not trigger a change
       changed_when: false
       community.docker.docker_login:
-        registry_url: "{{registry_dns}}"
+        registry_url: "{{push_registry}}"
         username: "{{registry_user}}"
         password: "{{registry_password}}"
         reauthorize: yes

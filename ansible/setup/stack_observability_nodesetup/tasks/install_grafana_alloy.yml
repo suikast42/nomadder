@@ -1,8 +1,8 @@
 #docu https://github.com/grafana/grafana-ansible-collection/tree/main
-- name: Grafana alloy agent installation
+- name: Grafana alloy  installation
   become: true
   block:
-  - name: Grafana alloy agent uninstall
+  - name: Grafana alloy uninstall
     when: uninstall_grafana_alloy|bool == true
     block:
       - name: Uninstall Alloy
@@ -11,7 +11,7 @@
         vars:
           alloy_uninstall:  "{{uninstall_grafana_alloy}}"
 
-      - name: "Delete grafana agent conf dir {{grafana_alloy_config_dir}}"
+      - name: "Delete grafana alloy conf dir {{grafana_alloy_config_dir}}"
         ansible.builtin.file:
           path: "{{grafana_alloy_config_dir}}"
           state: absent
@@ -23,7 +23,7 @@
       state: directory
       mode: '0755'
 
-  - name: Template grafana agent config
+  - name: Template grafana alloy config
     template:
       force: yes
       src: config/alloy-config.hcl

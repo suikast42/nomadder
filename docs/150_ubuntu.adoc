@@ -26,3 +26,14 @@ mdns4_minimal, mdns6_minimal or mdns_minimal tell the system to attempt to resol
 myhostname allows the system to always successfully resolve its own hostname, even if no /etc/hosts or DNS servers are configured, and no network connections are present.
 
 mymachines allows the system to automatically resolve the hostnames of virtual machines that have been set up using systemd-machined.service
+
+
+.Ping with MTU
+[source,shell]
+----
+ping -s 1472 -M do 192.168.30.121
+----
+
+
+
+

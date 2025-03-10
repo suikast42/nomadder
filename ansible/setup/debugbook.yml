@@ -1,6 +1,16 @@
 # https://docs.ansible.com/ansible/latest/user_guide/playbooks_debugger.html
 ---
+# Ping everything first
 - hosts: all
+  # Do not gater facts at first
+  gather_facts: no
+  tasks:
+    - name: Ping test
+      ping:
+# The docker login will fail on localhost because
+# DOCKER_HOST ist set to the buildhost and all docker commands on localhost will executed on this hosts
+# Activate localhost after migrate to local docker build
+- hosts: all,!localhost
   gather_facts: yes
   vars_files:
     - vars/versions.yml
@@ -12,39 +22,68 @@
 #    - name: Execute a command
 #      ansible.builtin.command: "false"
 #      debugger: on_failed
+    - name: Tests
+      block:
+      - name: Ping test
+        ping:
 
-    - name: "Host IP"
-      debug:
-        msg: "{{ host_ip }}"
-    - name: "Host IPS"
+      - name: "Host IP"
+        debug:
+          msg: "{{ host_ip }}"
+      - name: "Host IPS"
 
-      debug:
-        msg: "{{ host_ips }}"
+        debug:
+          msg: "{{ host_ips }}"
 
-    - name: "create hasibongo"
-      become: true
-      delay: 0
-      async: 60
-      poll: 1
-      shell: |
-        touch /bin/hasibongo.sh
-        rm /bin/hasibongo.sh
+      - name: "create hasibongo"
+        become: true
+        delay: 0
+        async: 60
+        poll: 1
+        shell: |
+          touch /bin/hasibongo.sh
+          rm /bin/hasibongo.sh
 
-    - name: "Login {{registry_dns}}"
-      # do not trigger a change
-      changed_when: false
-      community.docker.docker_login:
-        registry_url: "{{registry_dns}}"
-        username: "{{registry_user}}"
-        password: "{{registry_password}}"
-        reauthorize: yes
+      - name: "Test Login to registry {{registry_dns}}"
+        # do not trigger a change
+        changed_when: false
+        community.docker.docker_login:
+          registry_url: "{{registry_dns}}"
+          username: "{{registry_user}}"
+          password: "{{registry_password}}"
+          reauthorize: yes
+        register: login_results
+      - debug:
+          var: login_results
 
+      - name: "Test Login to registry {{push_registry}}"
+        # do not trigger a change
+        changed_when: false
+        community.docker.docker_login:
+          registry_url: "{{push_registry}}"
+          username: "{{registry_user}}"
+          password: "{{registry_password}}"
+          reauthorize: yes
+        register: login_results
+      - debug:
+          var: login_results
 
-    - name: "Login {{push_registry}}"
-      # do not trigger a change
-      changed_when: false
-      community.docker.docker_login:
-        registry_url: "{{push_registry}}"
-        username: "{{registry_user}}"
-        password: "{{registry_password}}"
-        reauthorize: yes
+      always:
+        - name : Finally
+          block:
+            - name: "Logout from {{push_registry}}"
+              changed_when: false
+              community.docker.docker_login:
+                state: absent
+                registry_url: "{{push_registry}}"
+              register: logout_results
+            - debug:
+                var: logout_results
+            - name: "Logout from {{registry_dns}}"
+              changed_when: false
+              community.docker.docker_login:
+                state: absent
+                registry_url: "{{registry_dns}}"
+              register: logout_results
+            - debug:
+                var: logout_results
