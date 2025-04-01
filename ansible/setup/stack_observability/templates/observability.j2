@@ -1132,14 +1132,15 @@ overrides:
              }
             ports = ["prometheus_exporter"]
             args = [
-              "-varz",
-              "-channelz",
-              "-connz",
+              "-accstatz",
+              "-connz_detailed",
               "-gatewayz",
-              "-leafz",
-              "-serverz",
-              "-subz",
+              "-healthz",
               "-jsz=all",
+              "-leafz",
+              "-subz",
+              "-routez",
+              "-varz",
               "-use_internal_server_name",
               "http://localhost:${NOMAD_PORT_http}"
             ]
