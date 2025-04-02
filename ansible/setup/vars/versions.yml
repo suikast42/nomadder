@@ -56,8 +56,8 @@ uninstall_compose: false
 update_certificates: false
 
 #version_nexus: ">3.77.1" that version is blocked until https://github.com/sonatype/nexus-public/issues/565 is resolved
-version_nexus: "3.76.1"
-version_nexus_initlzr: "1.0.2"
+version_nexus: "3.79.0"
+version_nexus_initlzr: "1.0.3"
 update_nexus: false
 
 
