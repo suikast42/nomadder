@@ -65,8 +65,27 @@
           password: "{{registry_password}}"
           reauthorize: yes
         register: login_results
+
       - debug:
           var: login_results
+
+      - name: "Pull hello world  from {{registry_dns}}"
+        community.docker.docker_image:
+          name: "{{registry_dns}}/hello-world"
+          source: pull
+
+      - name: "Pull hello world  from {{registry_ip}}:{{registry_port}}"
+        community.docker.docker_image:
+          name: "{{registry_ip}}:{{registry_port}}/hello-world"
+          source: pull
+
+
+      - name: "Test push image {{push_registry}}/test/hello-world:latest"
+        community.docker.docker_image:
+          name: "{{registry_dns}}/hello-world"
+          repository: "{{push_registry}}/test/hello-world:latest"
+          push: yes
+          source: local
 
       always:
         - name : Finally
