@@ -15,4 +15,10 @@ a|[source,shell]
  docker ps | grep "amd64:3.2"  |  awk '{print $4,$5,$1,$10 }'
 ----
 
+|Networks speed test from inside docker daemon
+a|[source,shell]
+----
+docker run --rm moutten/speedtest-cli speedtest --accept-gdpr
+----
+
 |===
