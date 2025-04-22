@@ -14,12 +14,14 @@ consul_template_checksum: "sha256:f73cb36988b9aaccb0ac918df26c854ccd199e60c0df01
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "1.9.7"
-nomad_checksum: "sha256:e9c7337893eceb549557ef9ad341b3ae64f5f43e29ff1fb167b70cfd16748d2d"
+#nomad_version: "1.9.7"
+#nomad_checksum: "sha256:e9c7337893eceb549557ef9ad341b3ae64f5f43e29ff1fb167b70cfd16748d2d"
+nomad_version: "1.10.0"
+nomad_checksum: "sha256:d0936673cfa026b87744d60ad21ba85db70fe792b0685bfce95ac06a98d30b9d"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.33.2
+version_envoy: 1.34.0
 
 nomad_plugin_cni_version: "1.6.2"
 nomad_plugin_cni_checksum: "sha256:b8e811578fb66023f90d2e238d80cec3bdfca4b44049af74c374d4fae0f9c090"
@@ -47,10 +49,10 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "27.5.1"
+version_docker: "28.1.1"
 uninstall_docker: false
 
-version_docker_compose: "2.34.0"
+version_docker_compose: "2.35.1"
 uninstall_compose: false
 
 update_certificates: false
@@ -79,7 +81,7 @@ version_minio_mc_admin: "RELEASE.2025-03-12T17-29-24Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
 
-version_grafana_alloy : "1.7.4"
+version_grafana_alloy : "1.8.1"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version
