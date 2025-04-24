@@ -36,6 +36,8 @@ client {
     force              = false
     ignore_system_jobs = false
   }
+  # Base path for dynamic host volumes
+  host_volumes_dir= "/opt/nomadvolumes/dynamic_host_volumes/"
   host_volume "ca_cert" {
     path      = "/usr/local/share/ca-certificates/cloudlocal"
     read_only = true
