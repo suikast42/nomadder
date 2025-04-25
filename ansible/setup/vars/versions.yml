@@ -23,14 +23,14 @@ update_nomad: "{{update_all or false }}"
 
 version_envoy: 1.34.0
 
-nomad_plugin_cni_version: "1.6.2"
-nomad_plugin_cni_checksum: "sha256:b8e811578fb66023f90d2e238d80cec3bdfca4b44049af74c374d4fae0f9c090"
+nomad_plugin_cni_version: "1.7.1"
+nomad_plugin_cni_checksum: "sha256:1a28a0506bfe5bcdc981caf1a49eeab7e72da8321f1119b7be85f22621013098"
 uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
 
-nomad_plugin_consul_cni_version: "1.6.0"
-nomad_plugin_consul_cni_checksum: "sha256:90cd9419d4530740c07df7c0db476e1801753a6a8f7f7d03a40a2294e3630aad"
+nomad_plugin_consul_cni_version: "1.6.3"
+nomad_plugin_consul_cni_checksum: "sha256:ba7eaef6d1d08655c6e6398d0680c626886f6f9dc9eb4c50ed209c6999b9b2ee"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 
