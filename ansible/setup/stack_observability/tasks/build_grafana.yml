@@ -100,4 +100,4 @@
             registry_url: "{{registry_dns}}"
 
   vars:
-    - docker_build_dir_grafana: "{{docker_build_dir}}/grafana"
+    docker_build_dir_grafana: "{{docker_build_dir}}/grafana"

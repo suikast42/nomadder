@@ -82,4 +82,4 @@
       force_start: true
 
   vars:
-    - nomad_observability_job_path: nomad/jobs/observability
+    nomad_observability_job_path: nomad/jobs/observability

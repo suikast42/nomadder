@@ -105,9 +105,9 @@
     group: docker
     mode: '0644'
   vars:
-    - docker_cert_path: "{{base_cert_dir}}/docker"
-    - docker_server_cert: "{{docker_cert_path}}/docker-server.pem"
-    - docker_server_cert_key: "{{docker_cert_path}}/docker-server-key.pem"
+    docker_cert_path: "{{base_cert_dir}}/docker"
+    docker_server_cert: "{{docker_cert_path}}/docker-server.pem"
+    docker_server_cert_key: "{{docker_cert_path}}/docker-server-key.pem"
 
 
 - name: "Install docker certificates"

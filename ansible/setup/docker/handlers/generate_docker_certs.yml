@@ -136,10 +136,10 @@
       delay: 5
 
   vars:
-    - local_cert_path_docker_client: "{{ lookup('env','DOCKER_CERT_PATH') }}"
-    - cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/docker"
-    - docker_cert_path: "{{base_cert_dir}}/docker"
-    - docker_server_cert: "{{docker_cert_path}}/docker-server.pem"
-    - docker_server_cert_key: "{{docker_cert_path}}/docker-server-key.pem"
-    - docker_client_cert: "{{docker_cert_path}}/docker-client.pem"
-    - docker_client_cert_key: "{{docker_cert_path}}/docker-client-key.pem"
+    local_cert_path_docker_client: "{{ lookup('env','DOCKER_CERT_PATH') }}"
+    cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/docker"
+    docker_cert_path: "{{base_cert_dir}}/docker"
+    docker_server_cert: "{{docker_cert_path}}/docker-server.pem"
+    docker_server_cert_key: "{{docker_cert_path}}/docker-server-key.pem"
+    docker_client_cert: "{{docker_cert_path}}/docker-client.pem"
+    docker_client_cert_key: "{{docker_cert_path}}/docker-client-key.pem"

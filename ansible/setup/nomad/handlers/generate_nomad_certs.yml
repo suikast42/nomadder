@@ -149,22 +149,22 @@
 
 
   vars:
-    - cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/nomad"
-    - nomad_cert_path: "{{ base_cert_dir}}/nomad"
-    - nomad_cert: "{{nomad_cert_path}}/nomad.pem"
-    - nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"
-    - nomad_cert_cli: "{{nomad_cert_path}}/nomad-cli.pem"
-    - nomad_cert_cli_key: "{{nomad_cert_path}}/nomad-cli-key.pem"
-    - nomad_cert_ingress_path: "{{base_cert_dir}}/ingress"
-    - nomad_cert_ingress_key: "{{nomad_cert_ingress_path}}/nomad-ingress-key.pem"#
-    - nomad_cert_ingress: "{{nomad_cert_ingress_path}}/nomad-ingress.pem"
-    - nomad_dns: "nomad.{{tls_san}}"
-    - data_center: "nomadder1"
-    - nomad_servers:
-      - "127.0.0.1"
-      - "{{host_ip}}"
-      - "server.global.nomad"
-      - "localhost"
-      - "{{host_name}}.node.{{data_center}}"
-      - "{{host_name}}.node.{{data_center}}.consul"
+    cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/nomad"
+    nomad_cert_path: "{{ base_cert_dir}}/nomad"
+    nomad_cert: "{{nomad_cert_path}}/nomad.pem"
+    nomad_cert_key: "{{nomad_cert_path}}/nomad-key.pem"
+    nomad_cert_cli: "{{nomad_cert_path}}/nomad-cli.pem"
+    nomad_cert_cli_key: "{{nomad_cert_path}}/nomad-cli-key.pem"
+    nomad_cert_ingress_path: "{{base_cert_dir}}/ingress"
+    nomad_cert_ingress_key: "{{nomad_cert_ingress_path}}/nomad-ingress-key.pem"#
+    nomad_cert_ingress: "{{nomad_cert_ingress_path}}/nomad-ingress.pem"
+    nomad_dns: "nomad.{{tls_san}}"
+    data_center: "nomadder1"
+    nomad_servers:
+      "127.0.0.1"
+      "{{host_ip}}"
+      "server.global.nomad"
+      "localhost"
+      "{{host_name}}.node.{{data_center}}"
+      "{{host_name}}.node.{{data_center}}.consul"
 

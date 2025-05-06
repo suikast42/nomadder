@@ -36,6 +36,6 @@
             - { src: '{{server_cert_path_docker_client}}/docker-client.pem', dest: '{{ local_cert_path_docker_client}}/cert.pem', host: localhost }
             - { src: '{{server_cert_path_docker_client}}/docker-client-key.pem', dest: '{{local_cert_path_docker_client}}/key.pem', host: localhost}
   vars:
-    - cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/nomad"
-    - server_cert_path_docker_client: "/etc/opt/certs/docker"
-    - local_cert_path_docker_client: "{{ lookup('env','DOCKER_CERT_PATH') }}"
+    cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/nomad"
+    server_cert_path_docker_client: "/etc/opt/certs/docker"
+    local_cert_path_docker_client: "{{ lookup('env','DOCKER_CERT_PATH') }}"

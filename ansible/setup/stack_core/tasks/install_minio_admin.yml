@@ -40,4 +40,4 @@
         shell: mc --autocompletion
 
   vars:
-    - install_file: "/usr/local/bin/mc"
+    install_file: "/usr/local/bin/mc"

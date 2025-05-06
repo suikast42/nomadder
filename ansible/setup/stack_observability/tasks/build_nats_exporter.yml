@@ -79,4 +79,4 @@
             registry_url: "{{registry_dns}}"
 
   vars:
-    - docker_build_dir_prom_exporter: "{{docker_build_dir}}/nats_prometheus_exporter"
+    docker_build_dir_prom_exporter: "{{docker_build_dir}}/nats_prometheus_exporter"

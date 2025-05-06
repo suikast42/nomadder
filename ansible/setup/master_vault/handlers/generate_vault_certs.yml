@@ -95,7 +95,7 @@
       delay: 5
 
   vars:
-    - cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/vault_master"
-    - vault_cert_path: "{{base_cert_dir}}/vault"
-    - vault_cert: "{{vault_cert_path}}/vault.pem"
-    - vault_cert_key: "{{vault_cert_path}}/vault-key.pem"
+    cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/vault_master"
+    vault_cert_path: "{{base_cert_dir}}/vault"
+    vault_cert: "{{vault_cert_path}}/vault.pem"
+    vault_cert_key: "{{vault_cert_path}}/vault-key.pem"
