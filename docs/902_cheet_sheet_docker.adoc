@@ -21,4 +21,10 @@ a|[source,shell]
 docker run --rm moutten/speedtest-cli speedtest --accept-gdpr
 ----
 
+|List Tags with of a repo with skopeo
+a|[source,shell]
+----
+skopeo list-tags docker://timescale/timescaledb-ha | grep pg14
+----
+
 |===
