@@ -161,10 +161,10 @@
     nomad_dns: "nomad.{{tls_san}}"
     data_center: "nomadder1"
     nomad_servers:
-      "127.0.0.1"
-      "{{host_ip}}"
-      "server.global.nomad"
-      "localhost"
-      "{{host_name}}.node.{{data_center}}"
-      "{{host_name}}.node.{{data_center}}.consul"
+      - "127.0.0.1"
+      - "{{host_ip}}"
+      - "server.global.nomad"
+      - "localhost"
+      - "{{host_name}}.node.{{data_center}}"
+      - "{{host_name}}.node.{{data_center}}.consul"
 
