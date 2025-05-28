@@ -26,8 +26,8 @@
   - name: "Install oh my zsh {{host_name}}"
     import_tasks: install_ohmy_zsh.yml
 
-  - name: "Config tmux {{host_name}}"
-    import_tasks: config_tmux.yml
+#  - name: "Config tmux {{host_name}}"
+#    import_tasks: config_tmux.yml
 
   - name: "Install cfssl tmux {{host_name}}"
     when: is_master_0
