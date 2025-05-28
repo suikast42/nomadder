@@ -122,8 +122,8 @@
     consul_cert_key: "{{consul_cert_path}}/consul-key.pem"
     consul_dns: "consul.{{tls_san}}"
     consul_servers:
-      "127.0.0.1"
-      "localhost"
-      "{{consul_dns}}"
-      "server.{{data_center}}.consul"
-      "server.{{host_name}}.{{data_center}}.consul"
+      - "127.0.0.1"
+      - "localhost"
+      - "{{consul_dns}}"
+      - "server.{{data_center}}.consul"
+      - "server.{{host_name}}.{{data_center}}.consul"
