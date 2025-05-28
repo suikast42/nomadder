@@ -4,8 +4,8 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.21.0"
-consul_checksum: "sha256:e916e30904eedfa7ee2e2a378b5e8a9a374f2f351e645aa4c0a03adc15dabaec"
+consul_version: "1.21.1"
+consul_checksum: "sha256:cf5b8d429c67d4e3c86e2f52eb3245ee00119a9a389f2af36a77b16b1e1eb27c"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
@@ -14,10 +14,11 @@ consul_template_checksum: "sha256:f73cb36988b9aaccb0ac918df26c854ccd199e60c0df01
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-#nomad_version: "1.9.7"
-#nomad_checksum: "sha256:e9c7337893eceb549557ef9ad341b3ae64f5f43e29ff1fb167b70cfd16748d2d"
 nomad_version: "1.10.0"
 nomad_checksum: "sha256:d0936673cfa026b87744d60ad21ba85db70fe792b0685bfce95ac06a98d30b9d"
+# Blocked until https://github.com/hashicorp/nomad/issues/25938 is resolved
+#nomad_version: "1.10.1"
+#nomad_checksum: "sha256:cc1cffd95d81943d0a7f8abe7dc2b025a644512d1af253456267caebc1f38065"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
@@ -52,7 +53,7 @@ update_cfssl: "{{update_all or false }}"
 version_docker: "28.1.1"
 uninstall_docker: false
 
-version_docker_compose: "2.36.0"
+version_docker_compose: "2.36.2"
 uninstall_compose: false
 
 update_certificates: false
