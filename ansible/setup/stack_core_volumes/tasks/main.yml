@@ -5,7 +5,7 @@
   - name: Create stack core postgres volumes
     include_tasks: nomad/tasks/nomad_volumes.yml
     loop:
-      - { name: 'stack_core_keycloak_postgres_volume' , path: '{{stack_core_keycloak_postgres_volume}}'}
+      - { name: 'stack_core_keycloak_postgres_volume_17' , path: '{{stack_core_keycloak_postgres_volume_17}}'}
 
   - name: Stop nomad service if needed
     # fact comes from task nomad/tasks/nomad_volumes.yml
@@ -31,7 +31,7 @@
 
 
   vars:
-    stack_core_keycloak_postgres_volume: "{{nomad_volumes_dir}}/core/postgres"
+    stack_core_keycloak_postgres_volume_17: "{{nomad_volumes_dir}}/core/postgres17"
 
 - name: Create Minio volume
   when: is_worker_0
