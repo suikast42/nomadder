@@ -61,7 +61,7 @@ variable "version_grafana_nomadder" {
 variable "version_grafana_mimir" {
     type = string
     description = "Version grafana tempo"
-    default = "{{version_grafana_tempo}}"
+    default = "{{version_grafana_mimir}}"
 }
 
 variable "version_grafana_loki" {
@@ -1426,7 +1426,7 @@ mappings = {
         command      = "sh"
         args         = [
         "-c",
-        "echo -n 'Waiting for service tempo'; until nslookup tempo.service.consul && nslookup mimir.service.consul  2>&1 >/dev/null; do echo '.'; sleep 2; done"
+        "echo -n 'Waiting for service tempo and mimir are up'; until nslookup tempo.service.consul && nslookup mimir.service.consul  2>&1 >/dev/null; do echo '.'; sleep 2; done"
         ]
                 #network_mode = "host"
        }

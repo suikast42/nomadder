@@ -4,18 +4,18 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.21.1"
-consul_checksum: "sha256:cf5b8d429c67d4e3c86e2f52eb3245ee00119a9a389f2af36a77b16b1e1eb27c"
+consul_version: "1.21.2"
+consul_checksum: "sha256:07a738cc8f7937f28d1418e8f289b28445e82d5cbd0aabdbcf2b5a0cacf26a29"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
-consul_template_version: "0.40.0"
-consul_template_checksum: "sha256:f73cb36988b9aaccb0ac918df26c854ccd199e60c0df011357405672f3d934bc"
+consul_template_version: "0.41.0"
+consul_template_checksum: "sha256:64e732cdd75a778ea6a5e16b32792a1effc88963d37e73f0088a115ea790938f"
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "1.10.0"
-nomad_checksum: "sha256:d0936673cfa026b87744d60ad21ba85db70fe792b0685bfce95ac06a98d30b9d"
+nomad_version: "1.10.2"
+nomad_checksum: "sha256:f6aa335261637574c00ce39519ab1fede41493d369b2a0eb17052dba830ff8df"
 # Blocked until https://github.com/hashicorp/nomad/issues/25938 is resolved
 #nomad_version: "1.10.1"
 #nomad_checksum: "sha256:cc1cffd95d81943d0a7f8abe7dc2b025a644512d1af253456267caebc1f38065"
@@ -30,8 +30,8 @@ uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
 
-nomad_plugin_consul_cni_version: "1.6.4"
-nomad_plugin_consul_cni_checksum: "sha256:ef7df8a37af4439ea1ee3c4f8b522d4707040f2a67e226f74beabf7faf7f3da2"
+nomad_plugin_consul_cni_version: "1.7.1"
+nomad_plugin_consul_cni_checksum: "sha256:5046e8defd40e505ac8844b7fcb234aa1e89fbfe17496feb9a716439777af2aa"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 
@@ -50,10 +50,10 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "28.1.1"
+version_docker: "28.3.0"
 uninstall_docker: false
 
-version_docker_compose: "2.36.2"
+version_docker_compose: "2.37.3"
 uninstall_compose: false
 
 update_certificates: false
@@ -65,7 +65,7 @@ version_nexus_initlzr: "1.0.4"
 update_nexus: false
 
 
-version_protoc: "30.2"
+version_protoc: "31.1"
 version_proto_gen: "1.34.2"
 version_proto_gen_js: "3.21.4"
 version_proto_gen_validate: "1.1.0"
@@ -82,7 +82,7 @@ version_minio_mc_admin: "RELEASE.2025-04-16T18-13-26Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
 
-version_grafana_alloy : "1.8.3"
+version_grafana_alloy : "1.9.2"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version

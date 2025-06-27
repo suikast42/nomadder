@@ -35,6 +35,12 @@
         debug:
           msg: "{{ host_ips }}"
 
+      - name: Ping google IP
+        changed_when: false
+        ansible.builtin.shell: ping -c 4 8.8.8.8
+        register: ping_result
+        failed_when: ping_result.rc != 0
+
       - name: "create hasibongo"
         become: true
         delay: 0
