@@ -27,4 +27,14 @@ a|[source,shell]
 skopeo list-tags docker://timescale/timescaledb-ha \| grep pg14
 ----
 
+
 |===
+
+
+
+=== Install docker cli on windows
+
+https://dev.to/julianlasso/how-to-install-docker-cli-on-windows-without-docker-desktop-and-not-die-trying-4033
+
+download cli  from https://download.docker.com/win/static/stable/x86_64/
+download latest release of docker buildx from https://github.com/docker/buildx/releases and unzip it to %USER_PROFILE%/.docker/cli-plugins and rename to docker-buildx.exe
