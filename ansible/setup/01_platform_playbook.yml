@@ -27,9 +27,19 @@
     - import_tasks: consul/handlers/main.yml
     - import_tasks: nomad/handlers/main.yml
   roles:
+    - {role: docker, tags: [ 'docker' ] }
     - {role: dnsmasq, tags: ['dnsmasq']}
     - {role: cert_install, tags: ['cert_install']}
 
+- hosts: build
+  name: "Build host specific installations"
+  vars_files:
+    - vars/versions.yml
+    - vars/common_vars.yml
+    - vars/vault.yml
+  gather_facts: yes
+  roles:
+    - {role: registry, tags: ['registry']}
 
 # Single master setup
 # HA Setup is planed in second release
@@ -51,19 +61,9 @@
     - vars/vault.yml
   gather_facts: yes
   roles:
-    - {role: docker, tags: ['docker']}
     - {role: consul, tags: ['consul']}
     - {role: nomad, tags: ['nomad']}
 
-- hosts: build
-  name: "Build host specific installations"
-  vars_files:
-    - vars/versions.yml
-    - vars/common_vars.yml
-    - vars/vault.yml
-  gather_facts: yes
-  roles:
-    - {role: registry, tags: ['registry']}
 
 - hosts: all
   name: "Test"

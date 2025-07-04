@@ -30,6 +30,13 @@
           - containerd.io
           - docker-compose-plugin
           - docker-scan-plugin
+          - docker.io
+#          - docker-doc
+#          - docker-compose
+#          - docker-compose-v2
+          - podman-docker
+          - containerd
+          - runc
 
         state: absent
 
@@ -160,22 +167,22 @@
       retries: 5
       delay: 5
 
-    #somehow on master the first restart attempt fails
-    # So we do it again
-    - name: Start docker
-      service:
-        name: docker
-        state: restarted
-      register: dockerService
-      until: dockerService.status is defined and dockerService.status.ActiveState == "active"
-      retries: 10
-      delay: 5
+#    #somehow on master the first restart attempt fails
+#    # So we do it again
+#    - name: Start docker
+#      service:
+#        name: docker
+#        state: restarted
+#      register: dockerService
+#      until: dockerService.status is defined and dockerService.status.ActiveState == "active"
+#      retries: 10
+#      delay: 5
 
-- name: "Restart build host"
-  become: true
-  when: not dockerInstalled.stat.exists and is_build_host
-  ansible.builtin.reboot:
-    msg: "Rebooting machine in 5 seconds"
+#- name: "Restart build host"
+#  become: true
+#  when: not dockerInstalled.stat.exists and is_build_host
+#  ansible.builtin.reboot:
+#    msg: "Rebooting machine in 5 seconds"
 
 #    - name: Debug docker install
 #      debug:
@@ -192,13 +199,13 @@
       path: /usr/bin/docker-compose
       state: absent
 
-  - name: "Install docker compose v {{version_docker_compose}}"
-    become: true
-    delay: 0
-    async: 300
-    poll: 1
-    shell: |
-      curl -L "https://github.com/docker/compose/releases/download/v{{version_docker_compose}}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose
-      chmod +x /usr/bin/docker-compose
-    args:
-      creates: /usr/bin/docker-compose  # docker-compose is already installed
+#  - name: "Install docker compose v {{version_docker_compose}}"
+#    become: true
+#    delay: 0
+#    async: 300
+#    poll: 1
+#    shell: |
+#      curl -L "https://github.com/docker/compose/releases/download/v{{version_docker_compose}}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose
+#      chmod +x /usr/bin/docker-compose
+#    args:
+#      creates: /usr/bin/docker-compose  # docker-compose is already installed
