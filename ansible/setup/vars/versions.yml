@@ -14,11 +14,8 @@ consul_template_checksum: "sha256:64e732cdd75a778ea6a5e16b32792a1effc88963d37e73
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "1.10.2"
-nomad_checksum: "sha256:f6aa335261637574c00ce39519ab1fede41493d369b2a0eb17052dba830ff8df"
-# Blocked until https://github.com/hashicorp/nomad/issues/25938 is resolved
-#nomad_version: "1.10.1"
-#nomad_checksum: "sha256:cc1cffd95d81943d0a7f8abe7dc2b025a644512d1af253456267caebc1f38065"
+nomad_version: "1.10.3"
+nomad_checksum: "sha256:a161b8d59b42555d97d37f7a75c122831be485e89dfb97d16d6b60cfaec8d88b"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
@@ -53,8 +50,9 @@ update_cfssl: "{{update_all or false }}"
 version_docker: "28.3.1"
 uninstall_docker: false
 
-version_docker_compose: "2.37.3"
-uninstall_compose: false
+# docker-compose is not used anymore use docker compose plugin instead
+#version_docker_compose: "2.37.3"
+#uninstall_compose: false
 
 update_certificates: false
 
