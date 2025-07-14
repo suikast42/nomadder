@@ -45,6 +45,7 @@
       ansible_check_mode: true
       alloy_env_file_vars:
         CONFIG_FILE: "{{grafana_alloy_config_dir}}/config.alloy"
+        CUSTOM_ARGS: "--disable-reporting"
 #        CUSTOM_ARGS : "--storage.path=/var/lib/alloy"
 #        CUSTOM_ARGS : "--server.http.listen-addr=localhost:12345"
 

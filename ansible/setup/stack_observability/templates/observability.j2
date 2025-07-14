@@ -1482,6 +1482,7 @@ mappings = {
                     "run",
                     "--server.http.listen-addr=0.0.0.0:${NOMAD_HOST_PORT_server}",
                     "--storage.path=/var/lib/alloy/data",
+                    "--disable-reporting=true",
                     "/etc/alloy/config.alloy"
                 ]
             volumes = ["local/config.alloy:/etc/alloy/config.alloy"]
