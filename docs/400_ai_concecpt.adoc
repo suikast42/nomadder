@@ -1,0 +1,170 @@
+SPEC-1-NomadAgenticMonitor
+
+Background
+
+You have an existing system that monitors a HashiCorp Nomad cluster using the Grafana LGTM (Loki, Grafana, Tempo, Mimir) stack and the open-source tool Nomadder. The goal is to add an agentic layer to this system using a Spring Boot service that communicates with a Model Context Protocol (MCP) server, enabling intelligent, autonomous diagnostics using an AGI reasoning engine.
+
+This Spring Boot service will periodically gather logs and metrics from LGTM or Nomadder endpoints, format them into MCP context objects, and send them to an AGI agent. The agent will interpret the data, return diagnoses, and suggest actions that the Spring Boot app can log or act upon.
+
+Requirements
+
+Must Have
+
+[M] Communicate with MCP-compatible AGI over HTTP/WebSocket using JSON.
+
+[M] Query Grafana Mimir and Loki for system metrics and logs.
+
+[M] Aggregate and forward data to an AGI agent via MCP.
+
+[M] Parse agentic responses to detect diagnoses and actionable insights.
+
+[M] Trigger alerting or audit logging based on responses.
+
+Should Have
+
+[S] REST endpoint to trigger ad-hoc diagnostics.
+
+[S] Pluggable agent tools (e.g., restart node, post Slack message).
+
+Could Have
+
+[C] Database to persist diagnostics and agent decisions.
+
+[C] Frontend dashboard to visualize system health and agent output.
+
+Won’t Have (in MVP)
+
+[W] Direct node remediation or job control in Nomad.
+
+[W] Multi-cluster or Kubernetes integration.
+
+Method
+
+Architecture Diagram
+
+@startuml
+package "Agentic Diagnostic System" {
+[Spring Boot MCP Agent] --> [MCP Server / AGI Engine]
+[Spring Boot MCP Agent] --> [Grafana Loki]
+[Spring Boot MCP Agent] --> [Grafana Mimir]
+[Spring Boot MCP Agent] --> [Nomadder API (optional)]
+[Spring Boot MCP Agent] --> [Slack / Alerting Endpoint]
+[Spring Boot MCP Agent] --> [PostgreSQL DB] : optional
+}
+@enduml
+
+Components
+
+Spring Boot MCP Agent
+
+Scheduled job: fetch metrics & logs
+
+WebSocket/HTTP MCP client
+
+JSON serialization/deserialization of context
+
+Tool registry for AGI action hooks
+
+Grafana LGTM Stack
+
+Mimir: Prometheus API for metrics
+
+Loki: log querying by job or label
+
+AGI Reasoner (via MCP)
+
+Accepts context payloads with observability data
+
+Responds with diagnoses and suggested actions
+
+Persistence (optional)
+
+PostgreSQL schema:
+
+CREATE TABLE observations (
+id UUID PRIMARY KEY,
+timestamp TIMESTAMP,
+source TEXT,
+context JSONB
+);
+
+CREATE TABLE diagnoses (
+id UUID PRIMARY KEY,
+observation_id UUID REFERENCES observations(id),
+severity TEXT,
+message TEXT,
+actions JSONB,
+created_at TIMESTAMP
+);
+
+MCP Message Example
+
+Observation sent to AGI:
+
+{
+"type": "context.observation",
+"payload": {
+"nodeStats": {...},
+"recentLogs": [...],
+"metrics": {...}
+}
+}
+
+Diagnosis received from AGI:
+
+{
+"type": "agent.response",
+"payload": {
+"diagnosis": "High CPU on node-3",
+"severity": "critical",
+"actions": [
+{"type": "alert.slack", "message": "Node-3 CPU is critical"}
+]
+}
+}
+
+Implementation
+
+Scaffold Spring Boot project with Web + Scheduler + WebSocket
+
+Define DTOs for MCP messages
+
+Implement REST + scheduled data collector
+
+Query LGTM stack via HTTP clients
+
+Format data and send to MCP server
+
+Implement action handlers (e.g., Slack alert)
+
+(Optional) Connect to PostgreSQL and log observations/diagnoses
+
+Milestones
+
+✅ Setup Spring Boot + MCP client
+
+✅ Connect to Loki + Mimir
+
+✅ MCP message exchange with mock AGI
+
+⏳ Implement scheduler and REST endpoint
+
+⏳ Parse AGI response + execute actions
+
+⏳ Alerting and database persistence
+
+⏳ MVP Deployment
+
+Gathering Results
+
+Evaluate correctness of AGI diagnostics vs. known cluster state
+
+Measure latency between data collection and response
+
+Track accuracy of anomaly detection
+
+User feedback from ops team
+
+Need Professional Help in Developing Your Architecture?
+
+Please contact me at sammuti.com :)

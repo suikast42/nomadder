@@ -1,7 +1,9 @@
 
 # Initial privision
 
-Adopt the env vars in [set_env.bat](set_env.bat) and run vagrant up
+1. Adopt the env vars in [set_env.bat](set_env.bat) and run vagrant up
+2. Change the network for your ESX   esxi.esxi_virtual_network = ['TDP-Intern','TDP-Intern']
+3. Change the ips of the vms 
 
 # Network Settings
 For every provisioned vm
@@ -12,10 +14,6 @@ For every provisioned vm
 4. run sudo netplan apply
 
 
-
-
-
-## FIXED with section Network Settings
 
 # BUG:
 Somehow ansible does not connect over ssh to the vms on esxi.
@@ -41,3 +39,4 @@ That works
 ```
 
 
+ssh -o Ciphers=aes256-ctr -i /home/dev/nomadder/vagrant/ssh/id_rsa cloudmaster@192.168.65.150
