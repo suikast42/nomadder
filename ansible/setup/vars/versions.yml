@@ -27,8 +27,8 @@ uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
 
-nomad_plugin_consul_cni_version: "1.7.2"
-nomad_plugin_consul_cni_checksum: "sha256:bf2c09c206181458ef5d335e0319ee6a9a80e0c4b883ae85266f6c72cbe06992"
+nomad_plugin_consul_cni_version: "1.8.0"
+nomad_plugin_consul_cni_checksum: "sha256:ddcaa91f652f7b6476f296378635244b64e189f7bb0291ab313d0ba7e837e573"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 
