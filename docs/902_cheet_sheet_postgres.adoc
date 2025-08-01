@@ -1,0 +1,19 @@
+.Postgres troubleshoot
+|===
+|Description |Command
+
+| does not come up after power shutdown
+a|[source,shell]
+----
+# 1. Override the entrypoint of the container with
+entrypoint         = ["tail", "-f", "/dev/null"]
+# 2. dry-run first
+pg_resetwal --dry-run /var/lib/postgresql/data/pgdata
+# 3. Reset the WAL to the last valid point. ( Datalost of until the last valid wal entry )
+pg_resetwal -f /var/lib/postgresql/data/pgdata
+----
+
+
+|===
+
+
