@@ -28,7 +28,7 @@ update_nomad_plugin_cni: "{{update_all or false }}"
 
 
 nomad_plugin_consul_cni_version: "1.8.0"
-nomad_plugin_consul_cni_checksum: "sha256:ddcaa91f652f7b6476f296378635244b64e189f7bb0291ab313d0ba7e837e573"
+nomad_plugin_consul_cni_checksum: "sha256:ddcaa91f652f7b6476^^f296378635244b64e189f7bb0291ab313d0ba7e837e573"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 
@@ -47,7 +47,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "28.3.2"
+version_docker: "28.3.3"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead
