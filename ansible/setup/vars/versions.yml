@@ -80,11 +80,11 @@ version_minio_mc_admin: "RELEASE.2025-04-16T18-13-26Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
 
-version_grafana_alloy : "1.10.0"
+version_grafana_alloy : "1.10.1"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version
-#update_grafana_alloy : "{{update_all or false }}"
+#update_grafana_alloy : "{{update_all or false }}"1
 
 validityCaCert: "87600h"
 # 1h less than validityCaCert
