@@ -92,8 +92,24 @@
       name: consulTpl_dnsmasq
       enabled: yes
 
+  - name: Dnsmasq restart config
+    become: true
+    lineinfile:
+      state: present
+      path: /usr/lib/systemd/system/dnsmasq.service
+      firstmatch: yes
+      insertafter: '^\[Service\]$'
+      line: "Restart=on-failure"
+    register: systemdRestart
+
+
+  - name: Reload systemd daemon
+    when: systemd.changed or dnsmasq_tpl.changed or systemdRestart.changed
+    ansible.builtin.command: systemctl daemon-reload
+    become: yes
+
   - name: "restart dnsmasq service"
-    when: dnsmasq_conf.changed or systemd.changed or dnsmasq_tpl.changed
+    when: dnsmasq_conf.changed or systemd.changed or dnsmasq_tpl.changed or systemdRestart.changed
     changed_when: false
     service:
       name: dnsmasq
