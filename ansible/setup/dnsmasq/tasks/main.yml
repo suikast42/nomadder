@@ -99,7 +99,12 @@
       path: /usr/lib/systemd/system/dnsmasq.service
       firstmatch: yes
       insertafter: '^\[Service\]$'
-      line: "Restart=on-failure"
+      line: '{{ item }}'
+    with_items:
+      - "Restart=on-failure"
+      - "RestartSec=5"
+      - "StartLimitInterval=0"
+
     register: systemdRestart
 
 
