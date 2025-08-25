@@ -4,8 +4,8 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.21.3"
-consul_checksum: "sha256:ba20631037a5f63f70b0351c0875887a66c0a0d3feac2d255a768c9eb8c95e8b"
+consul_version: "1.21.4"
+consul_checksum: "sha256:a641502dc2bd28e1ed72d3d48a0e8b98c83104d827cf33bee2aed198c0b849df"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
@@ -14,12 +14,12 @@ consul_template_checksum: "sha256:ab68e09642437dcc5b6e9a572a1924d3969e4fe131f50a
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "1.10.3"
-nomad_checksum: "sha256:a161b8d59b42555d97d37f7a75c122831be485e89dfb97d16d6b60cfaec8d88b"
+nomad_version: "1.10.4"
+nomad_checksum: "sha256:33f50ef9a56ceb995768a1301c7bc73d9270fd751378de5b3cffcf21af9112a2"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.35.0
+version_envoy: 1.35.1
 
 nomad_plugin_cni_version: "1.7.1"
 nomad_plugin_cni_checksum: "sha256:1a28a0506bfe5bcdc981caf1a49eeab7e72da8321f1119b7be85f22621013098"
@@ -27,8 +27,8 @@ uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
 
-nomad_plugin_consul_cni_version: "1.8.0"
-nomad_plugin_consul_cni_checksum: "sha256:ddcaa91f652f7b6476^^f296378635244b64e189f7bb0291ab313d0ba7e837e573"
+nomad_plugin_consul_cni_version: "1.8.1"
+nomad_plugin_consul_cni_checksum: "sha256:0996013330a158c8f47fb2c3762a776bdf5ccd90ea908a9b52da8e545e541b42"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 
@@ -56,9 +56,7 @@ uninstall_docker: false
 
 update_certificates: false
 
-#version_nexus: ">3.77.1" that version is blocked until https://github.com/sonatype/nexus-public/issues/565 is resolved
-# resolved since 3.79.0. Delete this comment if the issue is in closed state
-version_nexus: "3.76.1"
+version_nexus: "3.83.1"
 version_nexus_initlzr: "1.0.4"
 update_nexus: false
 
@@ -80,7 +78,7 @@ version_minio_mc_admin: "RELEASE.2025-04-16T18-13-26Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
 
-version_grafana_alloy : "1.10.1"
+version_grafana_alloy : "1.10.2"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version
