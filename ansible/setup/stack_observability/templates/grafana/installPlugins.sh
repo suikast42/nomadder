@@ -1,6 +1,6 @@
 #!/bin/bash -e
-grafana cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install grafana-influxdb-flux-datasource &&
-grafana cli  --pluginsDir=$GF_PATHS_PLUGINS  plugins install grafana-clock-panel &&
+grafana cli --pluginsDir=$GF_PATHS_PLUGINS  plugins install grafana-influxdb-flux-datasource &&
+grafana cli --pluginsDir=$GF_PATHS_PLUGINS  plugins install grafana-clock-panel &&
 grafana cli --pluginsDir=$GF_PATHS_PLUGINS  plugins install grafana-piechart-panel &&
 grafana cli --pluginsDir=$GF_PATHS_PLUGINS  plugins install natel-discrete-panel &&
 grafana cli --pluginsDir=$GF_PATHS_PLUGINS  plugins install natel-plotly-panel &&
