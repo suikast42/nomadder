@@ -22,6 +22,7 @@
       - lvm2
       - tree
       - htop
+      - iotop
       - zsh
       - jq
       - zip

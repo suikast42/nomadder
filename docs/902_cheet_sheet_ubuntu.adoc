@@ -129,5 +129,12 @@ a|[source,shell]
 ssh -o Ciphers=aes256-ctr -i /path/to/id_rsa user@ip
 ----
 
+|Measure disk io
+a|[source,shell]
+----
+dd if=/dev/zero of=/tmp/test1.img bs=1G count=5 oflag=dsync
+----
+
+
 |===
 
