@@ -172,6 +172,7 @@ job "observability" {
         GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP= "true"
         GF_SERVER_DOMAIN = "grafana.{{tls_san}}"
         GF_PATHS_CONFIG  = "/etc/grafana/grafana2.ini"
+        GF_PATHS_PLUGINS  = "/var/lib/grafana2/plugins"
         GF_SERVER_ROOT_URL = "https://grafana.{{tls_san}}"
         GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH = "contains(realm_access.roles[*], 'admin') && 'GrafanaAdmin' || contains(realm_access.roles[*], 'editor') && 'Editor' || 'Viewer'"
       }

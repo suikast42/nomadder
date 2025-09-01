@@ -16,9 +16,14 @@ COPY --from=tarampampam/curl:7.78.0 /bin/curl /bin/curl
 
 FROM {{registry_dns}}/grafana/grafana:{{version_grafana}}
 LABEL org.opencontainers.image.authors="sueleyman.vurucu@amova.eu"
-#ENV GF_PATHS_PLUGINS=/data/grafana/plugins
+# /var/lib/grafana is a mounted volume in deployment
+# For flexible plugin update map the plugins folder outise of volume config
+ENV GF_PATHS_PLUGINS=/var/lib/grafana2/plugins
 USER root
-COPY --from=builder /var/lib/grafana/plugins /var/lib/grafana/plugins
+RUN mkdir  -p /var/lib/grafana2/plugins
+RUN chown -R grafana /var/lib/grafana2
+RUN chmod -R 777 /var/lib/grafana2
+COPY --from=builder /var/lib/grafana/plugins /var/lib/grafana2/plugins
 COPY --from=builder /bin/curl /bin/curl
 # Do not provision datasources anymore. The DS can't be updated after setup
 # Use grafana manager for provision dasources over api

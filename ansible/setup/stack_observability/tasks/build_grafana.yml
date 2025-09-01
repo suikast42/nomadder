@@ -87,11 +87,11 @@
   always:
     - name : Finally
       block:
-        - name: "Delete {{docker_build_dir_grafana}}"
-          become: true
-          file:
-            path: "{{docker_build_dir_grafana }}"
-            state: absent
+#        - name: "Delete {{docker_build_dir_grafana}}"
+#          become: true
+#          file:
+#            path: "{{docker_build_dir_grafana }}"
+#            state: absent
         - name: "Logout {{registry_dns}}"
           # do not trigger a change
           changed_when: false
