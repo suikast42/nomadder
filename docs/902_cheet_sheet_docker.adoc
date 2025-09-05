@@ -21,6 +21,13 @@ a|[source,shell]
 docker run --rm moutten/speedtest-cli speedtest --accept-gdpr
 ----
 
+|Login to a container image
+a|[source,shell]
+----
+docker run -it --entrypoint /bin/bash d7a280c3cd7f
+----
+
+
 |List Tags with of a repo with skopeo
 a|[source,shell]
 ----
