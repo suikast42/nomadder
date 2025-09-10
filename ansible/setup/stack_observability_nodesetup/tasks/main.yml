@@ -18,7 +18,7 @@
 
   vars:
     tmp_install_dir_base: "/{{download_dir}}/grafana_agent"
-    version_grafana_agent_nodes: "0.44.2"
+    version_grafana_agent_nodes: "0.44.3"
      ## grafana agent is replaced by alloy TODO: delete grafana agent stuff after migration
     uninstall_grafana_agent: "true"
     update_grafana_agent: "false"

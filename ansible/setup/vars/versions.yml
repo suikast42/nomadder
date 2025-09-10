@@ -19,7 +19,7 @@ nomad_checksum: "sha256:33f50ef9a56ceb995768a1301c7bc73d9270fd751378de5b3cffcf21
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.35.2
+version_envoy: 1.35.3
 
 nomad_plugin_cni_version: "1.8.0"
 nomad_plugin_cni_checksum: "sha256:ab3bda535f9d90766cccc90d3dddb5482003dd744d7f22bcf98186bf8eea8be6"
@@ -56,7 +56,7 @@ uninstall_docker: false
 
 update_certificates: false
 
-version_nexus: "3.83.1"
+version_nexus: "3.84.0"
 version_nexus_initlzr: "1.0.4"
 update_nexus: false
 
@@ -72,7 +72,7 @@ update_protoc: "{{update_all or false }}"
 
 version_busy_box_init_container: "1.37.0"
 version_multi_stage_apline_container: "3.17.2"
-version_grafana_agent_container: "0.44.2"
+version_grafana_agent_container: "0.44.3"
 version_minio: "RELEASE.2025-04-22T22-12-26Z"
 version_minio_mc_admin: "RELEASE.2025-04-16T18-13-26Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
