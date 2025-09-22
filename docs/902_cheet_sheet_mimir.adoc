@@ -13,7 +13,7 @@ curl -H "X-Scope-OrgID:1" http://mimir.service.consul:9009/prometheus/api/v1/lab
 |Read all metric metadata
 a|[source,shell]
 ----
-curl -H "X-Scope-OrgID:1" http://mimir.service.consul:9009/prometheus/api/v1/metadata | jq .
+curl -H "X-Scope-OrgID:1" http://mimir.service.consul:9009/prometheus/api/v1/metadata \| jq .
 ----
 |===
 

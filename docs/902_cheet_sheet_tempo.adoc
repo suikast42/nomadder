@@ -1,4 +1,4 @@
-.NATS cheatsheet
+.Tempo cheatsheet
 |===
 |Description |Command
 
@@ -66,3 +66,6 @@ __span.tags	Namespace for the tags in the span. To access a specific tag named v
 __trace.traceId	The ID of the trace.
 __trace.duration	The duration of the trace.
 __trace.name	The name of the trace.
+
+TraceQl
+https://youtu.be/cI2rmWl8ag0

@@ -29,3 +29,26 @@ while true; do
 done
 
 ----
+
+
+Tempo metrics for ingestion errors ( mimir query )
+[source,shell]
+----
+sum(rate(tempo_warnings_total{}[5m])) by (reason)
+----
+
+
+
+Tempo metrics for ingestion errors ( mimir query )
+[source,shell]
+----
+1 - sum(rate(tempo_warnings_total{reason="disconnected_trace_flushed_to_wal"}[5m])) / sum(rate(tempo_ingester_traces_created_total{}[5m]))
+----
+
+Missed traces debug
+[source,shell]
+----
+Ingestion limits
+The default limits in Tempo may not be sufficient in high-volume tracing environments. Errors including RATE_LIMITED/TRACE_TOO_LARGE/LIVE_TRACES_EXCEEDED occur when these limits are exceeded. See below for how to override these limits globally or per tenant.
+See https://grafana.com/docs/tempo/latest/configuration/
+----

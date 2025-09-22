@@ -947,7 +947,8 @@ distributor:
 #    opencensus:
 
 ingester:
-  trace_idle_period: 10s              # amount of time a trace must be idle before flushing it to the wal.
+  flush_check_period: 120s
+  trace_idle_period: 120s             # amount of time a trace must be idle before flushing it to the wal.
   max_block_bytes: 524288000          # maximum size of a block before cutting it 500MB
   max_block_duration: 30m             # maximum length of time before cutting a block
   complete_block_timeout: 15m         # duration to keep blocks in the ingester after they have been flushed
@@ -972,7 +973,7 @@ query_frontend:
 compactor:
   compaction:
     compaction_window: 1h              # blocks in this time window will be compacted together
-    max_block_bytes: 100_000_000       # maximum size of compacted blocks
+    max_block_bytes: 1048576000        # maximum size of compacted blocks 1GB
 {% if is_env_development  %}
     block_retention: 24h               # Duration to keep blocks 14d
 {% else %}
@@ -1022,6 +1023,8 @@ storage:
 
 overrides:
   defaults:
+    global:
+      max_bytes_per_trace: 0     # Maximum size of a single trace in bytes. A value of 0 disables the size
     metrics_generator:
       processors:
         - service-graphs
