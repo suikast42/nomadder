@@ -4,13 +4,13 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.21.4"
-consul_checksum: "sha256:a641502dc2bd28e1ed72d3d48a0e8b98c83104d827cf33bee2aed198c0b849df"
+consul_version: "1.21.5"
+consul_checksum: "sha256:2dfb63fcabe9f15b956cf408248d9ebe36cfd662ca182352942a3bd4e5d5faca"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
-consul_template_version: "0.41.1"
-consul_template_checksum: "sha256:ab68e09642437dcc5b6e9a572a1924d3969e4fe131f50a1a3a4f782d7a21f530"
+consul_template_version: "0.41.2"
+consul_template_checksum: "sha256:03a8ad4c3daf718dd0bbc14f45e5fcd05eba1d5d04e545849f1cb929a7ee5e54"
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 

@@ -28,7 +28,7 @@
       delegate_to: localhost
       shell: |
         go install github.com/esnet/gdg/cmd/gdg@v{{version_gdg_cli}}
-        go install github.com/esnet/gdg/cmd/gen@v{{version_gdg_cli}}
+        go install github.com/esnet/gdg/cmd/gdg-generate@v{{version_gdg_cli}}
       args:
         chdir:  "{{compile_path}}"
 
