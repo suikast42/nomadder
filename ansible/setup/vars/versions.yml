@@ -27,8 +27,8 @@ uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
 
-nomad_plugin_consul_cni_version: "1.8.1"
-nomad_plugin_consul_cni_checksum: "sha256:0996013330a158c8f47fb2c3762a776bdf5ccd90ea908a9b52da8e545e541b42"
+nomad_plugin_consul_cni_version: "1.8.2"
+nomad_plugin_consul_cni_checksum: "sha256:6f0fec160763e1f16568cdd49cd52203f181ac3584f1704361993a1b53b1c336"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 
@@ -78,7 +78,7 @@ version_minio_mc_admin: "RELEASE.2025-04-16T18-13-26Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
 
-version_grafana_alloy : "1.10.2"
+version_grafana_alloy : "1.11.0"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version
