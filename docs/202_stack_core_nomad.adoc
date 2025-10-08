@@ -333,6 +333,75 @@ For playing with update strategies you can use test_deployments/fail-service_hea
 
 . SIGXFSZ - File size limit exceeded signal. Sent to a process when it exceeds its allotted file size.
 
+=== Nomad CPU Allocation: MHz to vCPU Conversion
+
+Nomad's use of MHz (Megahertz) for CPU allocation is intentional. It models the CPU as a unit of raw processing bandwidth rather than abstract cores. This allows for incredibly fine-grained scheduling and properly accounts for nodes with different clock speeds and modern core architectures (like Intel's P-cores and E-cores).
+
+To calculate your vCPU needs from a Nomad MHz allocation, you must first establish a definition for what one vCPU represents on your underlying physical hardware.
+
+==== 1. The Core Conversion Formula
+
+The fundamental conversion is based on the average clock speed of a single core (or the logical equivalent of a vCPU) on your Nomad client machines:
+
+image::nomad_vcpu_1.png[]
+
+==== 2. Step-by-Step Calculation Guide
+
+This process ensures you translate the requested bandwidth (MHz) into a predictable unit of core capacity (vCPU equivalent).
+
+===== Step A: Determine the Baseline (Clock Speed of One Core)
+
+You need to know the clock speed of the physical cores on the machines running the Nomad client. This establishes your denominator.
+
+1 Physical Core = X MHz (The effective frequency of one core).
+
+Example: If your physical servers have cores running at a base clock speed of 2.5 GHz, this translates to 2,500 MHz.
+
+Tip: Use the base clock speed to ensure you are reserving resources that are always available, regardless of burst or turbo frequencies.
+
+===== Step B: Determine the Total Available Bandwidth (cpu.totalcompute)
+
+The Nomad client agent automatically calculates the total available CPU bandwidth of the entire node and reports it as the cpu.totalcompute attribute (in MHz).
+
+image::nomad_vpcu2.png[]
+
+Tip: You can check this value directly on a client node by running nomad node status <node-id> and looking at the Client Attributes under the cpu section.
+
+===== Step C: Calculate the vCPU Equivalent
+
+Use the formula from Section 1 to perform the conversion using your baseline core speed.
+
+[cols="1,2,2"]
+|===
+|Term |Value |Calculation
+
+|Nomad Request (A)
+|cpu = 4000 (4000 MHz)
+|
+
+|Core Speed (B)
+|2500 MHz (2.5 GHz)
+|
+
+|vCPU Equivalent
+|
+|stem:[\frac{4000 \text{ MHz}}{2500 \text{ MHz/vCPU}} = 1.6 \text{ vCPUs}]
+|===
+
+In this example, an allocation requesting 4000 MHz is equivalent to 1.6 vCPUs on a host with 2.5 GHz cores.
+
+==== 3. Consideration: Hyperthreading/SMT
+
+While the term "vCPU" often implies a Logical Core (Hyperthread), Nomad's MHz allocation maps to time slices of the CPU bandwidth.
+
+If you treat 1 vCPU=1 Physical Core (Full Performance), the calculation provides the required fraction of full physical cores.
+
+Even with Hyperthreading enabled, the MHz value represents the total available capacity. A 4000 MHz request means:
+
+The job will receive CPU time equivalent to 1.6 full 2.5 GHz cores.
+
+Nomad handles the scheduling and CPU isolation via cgroups, which manage time shares based on the requested MHz value, ensuring the job gets its proportional slice of the total host compute.
+
 === Links
 [[_200_link_nomad_task_init,nomad task dependencies]]https://developer.hashicorp.com/nomad/tutorials/task-deps/task-dependencies-interjob[Express Inter-job Dependencies with Init Tasks]
 
