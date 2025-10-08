@@ -29,9 +29,19 @@
       shell: |
         go install github.com/esnet/gdg/cmd/gdg@v{{version_gdg_cli}}
         go install github.com/esnet/gdg/cmd/gdg-generate@v{{version_gdg_cli}}
+        gdg  completion zsh > ~/.zsh/completions/gdg.sh
       args:
         chdir:  "{{compile_path}}"
 
+    - name: Add autocompletion to .zshrc
+      run_once: true
+      delegate_to: localhost
+      lineinfile:
+        state: present
+        path: ~/.zsh/completions/gdg.sh
+        firstmatch: yes
+        insertafter: EOF
+        line: "source ~/.zsh/completions/gdg.sh"
 
     - name: "Copy  gdg cli {{version_gdg_cli}}"
       become: true

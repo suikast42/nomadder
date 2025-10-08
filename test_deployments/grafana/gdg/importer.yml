@@ -1,0 +1,40 @@
+context_name: grafana_local
+storage_engine: {}
+contexts:
+    grafana_local:
+        token: glsa_TQatht9oESxbBz2up5YKu7RGVHqthOeH_5fd1b2fd
+        connections: null
+        dashboard_settings: null
+        watched:
+            - .*
+        watched_folders_override: []
+        organization_name: ""
+        secure_location: ""
+        output_path: exports
+        password: ""
+        storage: ""
+        url: https://grafana.cloud.private
+        user_name: ""
+        user: null
+    grafana_local_restore:
+        token: glsa_NqcCetOY8kTVCSHLlCFWpsKYwOfqobUK_7a8fa365
+        connections: null
+        dashboard_settings: null
+        watched:
+            - .*
+        watched_folders_override: []
+        organization_name: ""
+        secure_location: ""
+        output_path: exports
+        password: ""
+        storage: ""
+        url: https://grafana2.cloud.private
+        user_name: ""
+        user: null
+global:
+    debug: true
+    api_debug: false
+    ignore_ssl_errors: true
+    retry_count: 0
+    retry_delay: ""
+    clear_output: false
