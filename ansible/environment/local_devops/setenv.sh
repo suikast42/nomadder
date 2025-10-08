@@ -1,4 +1,4 @@
-!#/bin/bash
+#!/bin/bash
 
 export DOCKER_HOST=192.168.30.121
 export TLS_SAN=tdp.private
