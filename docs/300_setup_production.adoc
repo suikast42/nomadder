@@ -1,6 +1,61 @@
 === Setup Production
+.if the user not exists
+```shell
+# 1. Create the group
+sudo groupadd cloudmaster
+
+# 2. Create the user and add them to the group
+sudo useradd -m -s /bin/bash -g cloudmaster cloudmaster
+
+# 3. Set a password for the new user
+sudo passwd cloudmaster
+
+# 4. Add the user to the sudo group to grant sudo privileges
+sudo usermod -aG sudo cloudmaster
+
+# 5. (Optional) Verify the groups for the user
+groups cloudmaster
+```
 
 1. Create ansible environment
-2. Create a ssh key pair with ```ssh-keygen -f /to/project/ssh/dir/of/project/ansible/path -C "admin@amova.eu"```
+2. Create a ssh key pair with
+
+    ```
+    ssh-keygen -f /to/project/ssh/dir/of/project/ansible/path -C "admin@amova.eu"```
+
+    # For eaxample
+    ssh-keygen -f /mnt/c/IDE/Projects_Git/ADI-Bourbon/adi-bourbon/wms-adibourbon/src/ansible/environment/prod/inventory/ssh/id_rsa -C "admin@amova.eu"
+    ```
+
 3. Add the public key to the authorized_keys file on the server Copy the content of the public key file to the server and add it to the authorized_keys file in the .ssh directory of the user
-4. ```sudo vim /etc/sudoers.d/<username>``` and add ```<username> ALL=(ALL) NOPASSWD: ALL```
+.example for user cloudmaster
+```shell
+sudo mkdir -p /home/cloudmaster/.ssh
+sudo chown cloudmaster:cloudmaster /home/cloudmaster/.ssh
+sudo chmod 700 /home/cloudmaster/.ssh
+
+# Add the pub key here
+sudo vim /home/cloudmaster/.ssh/authorized_keys
+# Set the permissions
+sudo chown cloudmaster:cloudmaster /home/cloudmaster/.ssh/authorized_keys
+sudo chmod 600 /home/cloudmaster/.ssh/authorized_keys
+
+# Allow remote user access with pöassword if nedded
+sudo vim /etc/ssh/sshd_config
+PermitRootLogin no
+PasswordAuthentication yes   # or "no" if you only want key-based login
+AllowUsers cloudmaster
+
+sudo systemctl restart ssh
+```
+4. Allow sudo with no pass
+```shell
+sudo vim /etc/sudoers.d/<username>
+and add
+<username> ALL=(ALL) NOPASSWD: ALL
+
+# Folr cloudmaster for example
+sudo vim /etc/sudoers.d/cloudmaster
+and add
+cloudmaster ALL=(ALL) NOPASSWD: ALL
+```
