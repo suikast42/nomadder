@@ -27,8 +27,8 @@ uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
 
-nomad_plugin_consul_cni_version: "1.8.2"
-nomad_plugin_consul_cni_checksum: "sha256:6f0fec160763e1f16568cdd49cd52203f181ac3584f1704361993a1b53b1c336"
+nomad_plugin_consul_cni_version: "1.8.3"
+nomad_plugin_consul_cni_checksum: "sha256:36c283d2302621c17e764b8c09418d5a42614d1f1bc16e90010fa9ac51d1e6ff"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 
@@ -47,7 +47,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "28.5.0"
+version_docker: "28.5.1"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead
@@ -56,7 +56,7 @@ uninstall_docker: false
 
 update_certificates: false
 
-version_nexus: "3.84.0"
+version_nexus: "3.85.0"
 version_nexus_initlzr: "1.0.4"
 update_nexus: false
 
@@ -78,7 +78,7 @@ version_minio_mc_admin: "RELEASE.2025-04-16T18-13-26Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
 
-version_grafana_alloy : "1.11.0"
+version_grafana_alloy : "1.11.2"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version
