@@ -19,6 +19,7 @@
     - vars/common_vars.yml
   tasks:
   - name: Add nameserver to localhost
+    failed_when: false
     become: true
     lineinfile:
       state: present

@@ -18,6 +18,7 @@
   apt:
     name:
       - snapd
+      - curl
       - thin-provisioning-tools
       - lvm2
       - tree

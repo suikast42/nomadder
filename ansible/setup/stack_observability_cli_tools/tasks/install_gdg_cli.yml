@@ -29,6 +29,7 @@
       shell: |
         go install github.com/esnet/gdg/cmd/gdg@v{{version_gdg_cli}}
         go install github.com/esnet/gdg/cmd/gdg-generate@v{{version_gdg_cli}}
+        mkdir -p ~/.zsh/completions/
         gdg  completion zsh > ~/.zsh/completions/gdg.sh
       args:
         chdir:  "{{compile_path}}"
@@ -55,7 +56,7 @@
         owner: "{{ansible_user}}"
         mode: 0755
 
-    - name: "Copy nats cli {{version_nats_cli}}"
+    - name: "Copy gdg cli {{version_gdg_cli}}"
       become: true
       when: is_master_host
       ansible.builtin.copy:
@@ -67,24 +68,24 @@
         mode: 0755
 
 
-    - name: "Copy gdg cli gen {{version_gdg_cli}}"
+    - name: "Copy gdg cli {{version_gdg_cli}} to master"
       become: true
       run_once: true
       when: is_local_host
       ansible.builtin.copy:
-        src: "/home/{{ansible_user}}/go/bin/gen"
-        dest: /usr/local/bin/gen
+        src: "/home/{{ansible_user}}/go/bin/gdg-generate"
+        dest: /usr/local/bin/gdg-generate
         force: yes
         group: "{{ansible_user}}"
         owner: "{{ansible_user}}"
         mode: 0755
 
-    - name: "Copy nats cli gen {{version_nats_cli}}"
+    - name: "Copy gdg cli gen {{version_gdg_cli}} to master"
       become: true
       when: is_master_host
       ansible.builtin.copy:
-        src: "/usr/local/bin/gen"
-        dest: /usr/local/bin/gen
+        src: "/usr/local/bin/gdg-generate"
+        dest: /usr/local/bin/gdg-generate
         force: yes
         group: "{{ansible_user}}"
         owner: "{{ansible_user}}"

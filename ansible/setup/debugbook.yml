@@ -54,6 +54,17 @@
         # do not trigger a change
         changed_when: false
         community.docker.docker_login:
+          username: "{{dockerhub_user}}"
+          password: "{{dockerhub_password}}"
+          reauthorize: yes
+        register: login_results
+      - debug:
+          var: login_results
+
+      - name: "Test Login to dockerub "
+        # do not trigger a change
+        changed_when: false
+        community.docker.docker_login:
           registry_url: "{{registry_dns}}"
           username: "{{registry_user}}"
           password: "{{registry_password}}"
