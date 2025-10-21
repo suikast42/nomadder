@@ -947,8 +947,8 @@ distributor:
 #    opencensus:
 
 ingester:
-  flush_check_period: 120s
-  trace_idle_period: 120s             # amount of time a trace must be idle before flushing it to the wal.
+  flush_check_period: 10s
+  trace_idle_period: 10s             # amount of time a trace must be idle before flushing it to the wal.
   max_block_bytes: 524288000          # maximum size of a block before cutting it 500MB
   max_block_duration: 30m             # maximum length of time before cutting a block
   complete_block_timeout: 15m         # duration to keep blocks in the ingester after they have been flushed
