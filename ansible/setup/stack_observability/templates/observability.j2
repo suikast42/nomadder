@@ -72,7 +72,7 @@ variable "version_grafana_loki" {
 
 variable "version_grafana_tempo" {
     type = string
-    description = "Version grafana loki"
+    description = "Version grafana tempo"
     default = "{{version_grafana_tempo}}"
 }
 variable "version_busy_box_init_container" {
@@ -986,12 +986,14 @@ metrics_generator:
   metrics_ingestion_time_range_slack: 60s
   processor:
     service_graphs:
+ #     wait: 60s
       enable_virtual_node_label: true
       histogram_buckets: [0.001, 0.005, 0.05, 0.5, 1.0, 3.0 , 5.0, 7.0, 10.0, 15.0, 30.0, 45.0, 60.0, 120.0, 180.0 ,300.0]
     span_metrics:
       histogram_buckets: [0.001, 0.005, 0.05, 0.5, 1.0, 3.0 , 5.0, 7.0, 10.0, 15.0, 30.0, 45.0, 60.0, 120.0, 180.0 ,300.0]
       dimensions: [org.name,organisation.name,  deployment.environment, db.name,db.operation, messaging.operation, messaging.destination.name, messaging.sender]
   registry:
+ #   collection_interval: 15s
     external_labels:
       source: tempo
       cluster: {{data_center}}
@@ -1002,6 +1004,8 @@ metrics_generator:
     remote_write:
 ++- range service "mimir" ++
       - url: http://++.Name++.service.consul:++.Port++/api/v1/push
+ #       queue_config:
+ #         batch_send_deadline: 15s
         send_exemplars: true
         headers:
           x-scope-orgid: 1
