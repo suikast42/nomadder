@@ -15,6 +15,7 @@
 
 
 - hosts: localhost
+  gather_facts: true
   vars_files:
     - vars/common_vars.yml
   tasks:

@@ -9,8 +9,8 @@ consul_checksum: "sha256:9891495a2defabc3d637b376c66550e9879102868fbe6456a9a6830
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
-consul_template_version: "0.41.2"
-consul_template_checksum: "sha256:03a8ad4c3daf718dd0bbc14f45e5fcd05eba1d5d04e545849f1cb929a7ee5e54"
+consul_template_version: "0.41.3"
+consul_template_checksum: "sha256:f708323c5a9eeedf1e125662fa1dd3c54f8cadd0758ef2a9a27c7a22e181e93c"
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
@@ -47,7 +47,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "28.5.1"
+version_docker: "28.5.2"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead
@@ -56,7 +56,7 @@ uninstall_docker: false
 
 update_certificates: false
 
-version_nexus: "3.85.0"
+version_nexus: "3.86.0"
 version_nexus_initlzr: "1.0.4"
 update_nexus: false
 
