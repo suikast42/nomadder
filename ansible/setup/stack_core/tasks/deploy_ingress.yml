@@ -28,8 +28,10 @@
     state: present
     force_start: true
     #        content: "{{ job.content | b64decode }}"
-    content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/ingress.nomad') }}"
-    timeout: 360
+#    content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/ingress.nomad') }}"
+    content: "{{ lookup('ansible.builtin.file', role_path ~ '/files/ingress.nomad') }}"
+
+
 
 #- name: " Wait https://ingress.{{tls_san}} is available"
 #  uri:

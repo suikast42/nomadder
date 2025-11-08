@@ -37,7 +37,8 @@
       state: present
       force_start: true
       #        content: "{{ job.content | b64decode }}"
-      content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/minio.nomad') }}"
+   #   content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/minio.nomad') }}"
+      content: "{{ lookup('ansible.builtin.file', role_path ~ '/files/minio.nomad') }}"
       timeout: 360
 
   - name: Install minio admin cli

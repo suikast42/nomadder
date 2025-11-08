@@ -54,7 +54,8 @@
 #      state: present
 #      force_start: true
 #      #        content: "{{ job.content | b64decode }}"
-#      content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/observability.nomad') }}"
+##      content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/observability.nomad') }}"
+#      content: "{{ lookup('ansible.builtin.file', role_path ~ '/files/observability.nomad') }}"
 #      timeout: 120
 
   # The ansible nomad module can't handle jobs with files in template stanza

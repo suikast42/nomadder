@@ -44,7 +44,8 @@
       state: present
       force_start: true
       #        content: "{{ job.content | b64decode }}"
-      content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/security.nomad') }}"
+      #content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/security.nomad') }}"
+      content: "{{ lookup('ansible.builtin.file', role_path ~ '/files/security.nomad') }}"
       timeout: 360
 
   vars:
