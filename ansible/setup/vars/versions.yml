@@ -14,8 +14,8 @@ consul_template_checksum: "sha256:f708323c5a9eeedf1e125662fa1dd3c54f8cadd0758ef2
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "1.10.5"
-nomad_checksum: "sha256:4242244ab1f6887e963d6bb674ac490ee9b270a29aff6f826c51ef3187c77044"
+nomad_version: "1.11.0"
+nomad_checksum: "sha256:ea4beab31494b810f40e8b2ed5fd74950348546879570780406e6647363e32ba"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
@@ -47,7 +47,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "28.5.2"
+version_docker: "29.0.0"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead
