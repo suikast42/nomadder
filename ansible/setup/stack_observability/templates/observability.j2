@@ -1032,6 +1032,7 @@ overrides:
     global:
       max_bytes_per_trace: 0     # Maximum size of a single trace in bytes. A value of 0 disables the size
     metrics_generator:
+      collection_interval: 15s
       processors:
         - service-graphs
         - span-metrics
