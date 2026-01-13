@@ -19,7 +19,7 @@ nomad_checksum: "sha256:8e8fbc9c3ddae39a63f7ed70a99bb4b936bb6e88ed9160ce0e9d36ff
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.36.4
+version_envoy: 1.37.0
 
 nomad_plugin_cni_version: "1.9.0"
 nomad_plugin_cni_checksum: "sha256:58c03705426e929658f45a851df15a86d06ef680cacbf3f2dc127731ca265c28"
@@ -47,7 +47,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "29.1.3"
+version_docker: "29.1.4"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead
@@ -56,12 +56,12 @@ uninstall_docker: false
 
 update_certificates: false
 
-version_nexus: "3.87.1"
+version_nexus: "3.88.0"
 version_nexus_initlzr: "1.0.4"
 update_nexus: false
 
 
-version_protoc: "33.2"
+version_protoc: "33.4"
 version_proto_gen: "1.34.2"
 version_proto_gen_js: "3.21.4"
 version_proto_gen_validate: "1.1.0"
@@ -78,7 +78,7 @@ version_minio_mc_admin: "RELEASE.2025-04-16T18-13-26Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
 
-version_grafana_alloy : "1.12.1"
+version_grafana_alloy : "1.12.2"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version
