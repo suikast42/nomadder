@@ -15,6 +15,6 @@
       update_nats_cli_nsc: "{{update_all or false }}"
       uninstall_nats_cli_nsc: "{{uninstall_all or false }}"
         # grafana desktop manager
-      version_gdg_cli: "0.9.1"
+      version_gdg_cli: "0.9.2"
       update_gdg_cli: "{{update_all or false }}"
       uninstall_gdg_cli: "{{update_all or false }}"
