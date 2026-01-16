@@ -233,6 +233,13 @@ job "observability" {
     service{
       name ="mimir"
       port= "api"
+      tags = [
+         "prometheus",
+         "prometheus:server_id=${NOMAD_ALLOC_NAME}",
+         "prometheus:version=${var.version_grafana_mimir}",
+         "prometheus:environment=${var.env}",
+         "prometheus:organisation=${var.org}",
+      ]
       check {
         name  = "health"
         type  = "http"
