@@ -757,6 +757,7 @@ pattern_ingester:
       }
     }
   group "tempo"{
+  # example https://github.com/grafana/tempo/blob/main/example/nomad/tempo-distributed/tempo.hcl
     restart {
       attempts = 1
       interval = "1h"
@@ -988,7 +989,7 @@ compactor:
 {% else %}
     block_retention: 720h
 {% endif %}
-
+# example https://github.com/grafana/tempo/tree/v${var.version_grafana_tempo}/integration/e2e
 metrics_generator:
   # TODO Delete this value and create an alarm for
   # sum(rate(tempo_metrics_generator_spans_discarded_total{}[1m])) by (reason) where reason is outside_metrics_ingestion_slack
@@ -998,11 +999,12 @@ metrics_generator:
  #     wait: 60s
       enable_virtual_node_label: true
       histogram_buckets: [0.001, 0.005, 0.05, 0.5, 1.0, 3.0 , 5.0, 7.0, 10.0, 15.0, 30.0, 45.0, 60.0, 120.0, 180.0 ,300.0]
+      enable_messaging_system_latency_histogram: true
     span_metrics:
       histogram_buckets: [0.001, 0.005, 0.05, 0.5, 1.0, 3.0 , 5.0, 7.0, 10.0, 15.0, 30.0, 45.0, 60.0, 120.0, 180.0 ,300.0]
       dimensions: [org.name,organisation.name,  deployment.environment, db.name,db.operation, messaging.operation, messaging.destination.name, messaging.sender]
   registry:
- #   collection_interval: 15s
+    collection_interval: 1s
     external_labels:
       source: tempo
       cluster: {{data_center}}
@@ -1039,8 +1041,12 @@ overrides:
     global:
       max_bytes_per_trace: 0     # Maximum size of a single trace in bytes. A value of 0 disables the size
     metrics_generator:
-      collection_interval: 15s
-     # generate_native_histograms: both
+      # Maximum number of active series in the registry, per instance of the metrics-generator. A
+      # value of 0 disables this check.
+      # If the limit is reached, no new series will be added but existing series will still be
+      # updated. The amount of limited series can be observed with the metric
+      #   tempo_metrics_generator_registry_series_limited_total
+      max_active_series: 0
       processors:
         - service-graphs
         - span-metrics
