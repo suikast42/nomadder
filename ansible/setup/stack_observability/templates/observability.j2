@@ -994,7 +994,7 @@ metrics_generator:
   # TODO Delete this value and create an alarm for
   # sum(rate(tempo_metrics_generator_spans_discarded_total{}[1m])) by (reason) where reason is outside_metrics_ingestion_slack
   metrics_ingestion_time_range_slack: 60s
-  max_active_series: 0
+
   processor:
     service_graphs:
  #     wait: 60s
@@ -1042,6 +1042,7 @@ overrides:
     global:
       max_bytes_per_trace: 0     # Maximum size of a single trace in bytes. A value of 0 disables the size
     metrics_generator:
+      max_active_series: 0
       # Maximum number of active series in the registry, per instance of the metrics-generator. A
       # value of 0 disables this check.
       # If the limit is reached, no new series will be added but existing series will still be
