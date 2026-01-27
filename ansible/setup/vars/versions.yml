@@ -4,13 +4,13 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.22.2"
-consul_checksum: "sha256:e9ad339128e396238f053269bf8f76aeba1b5fada6f6cb60ab19fe70e133acde"
+consul_version: "1.22.3"
+consul_checksum: "sha256:0942ef6ed43522adfb4cddbefea2f0e64306318afb8aeab3727563f0caef04be"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
-consul_template_version: "0.41.3"
-consul_template_checksum: "sha256:f708323c5a9eeedf1e125662fa1dd3c54f8cadd0758ef2a9a27c7a22e181e93c"
+consul_template_version: "0.41.4"
+consul_template_checksum: "sha256:9e999cfbfdc47e67d3d91e6e4edbecaa3d7c3b026307b18c0485b64d15e5083a"
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
@@ -47,7 +47,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "29.1.5"
+version_docker: "29.2.0"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead

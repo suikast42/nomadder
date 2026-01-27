@@ -997,15 +997,18 @@ metrics_generator:
 
   processor:
     service_graphs:
- #     wait: 60s
+      wait: 60s
       enable_virtual_node_label: true
       histogram_buckets: [0.001, 0.005, 0.05, 0.5, 1.0, 3.0 , 5.0, 7.0, 10.0, 15.0, 30.0, 45.0, 60.0, 120.0, 180.0 ,300.0]
       enable_messaging_system_latency_histogram: false
     span_metrics:
       histogram_buckets: [0.001, 0.005, 0.05, 0.5, 1.0, 3.0 , 5.0, 7.0, 10.0, 15.0, 30.0, 45.0, 60.0, 120.0, 180.0 ,300.0]
       dimensions: [org.name,organisation.name,  deployment.environment, db.name,db.operation, messaging.operation, messaging.destination.name, messaging.sender]
+    local_blocks:
+      trace_idle_period: 10s
   registry:
     collection_interval: 1s
+    stale_duration: 15m
     external_labels:
       source: tempo
       cluster: {{data_center}}
