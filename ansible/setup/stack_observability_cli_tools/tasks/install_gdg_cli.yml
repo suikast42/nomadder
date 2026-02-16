@@ -29,8 +29,8 @@
       shell: |
         go install github.com/esnet/gdg/cmd/gdg@v{{version_gdg_cli}}
         go install github.com/esnet/gdg/cmd/gdg-generate@v{{version_gdg_cli}}
-        mkdir -p ~/.zsh/completions/
-        gdg  completion zsh > ~/.zsh/completions/gdg.sh
+        mkdir -p ~/.oh-my-zsh/custom/completions
+        gdg  completion zsh > ~/.oh-my-zsh/custom/completions/gdg.sh
       args:
         chdir:  "{{compile_path}}"
 
@@ -39,10 +39,10 @@
       delegate_to: localhost
       lineinfile:
         state: present
-        path: ~/.zsh/completions/gdg.sh
+        path: ~/.zshrc
         firstmatch: yes
         insertafter: EOF
-        line: "source ~/.zsh/completions/gdg.sh"
+        line: "source ~/.oh-my-zsh/custom/completions/gdg.sh"
 
     - name: "Copy  gdg cli {{version_gdg_cli}}"
       become: true

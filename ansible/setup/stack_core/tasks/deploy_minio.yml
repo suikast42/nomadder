@@ -65,6 +65,6 @@
   - name: "Add minio server to cli"
     become: false
     shell: |
-      mc config host add --insecure local https://minio.{{tls_san}} {{minio_root_user}} {{minio_root_password}}
+      mc alias set local https://minio.{{tls_san}} {{minio_root_user}} {{minio_root_password}}
   vars:
     nomad_minio_job_path: nomad/jobs/minio
