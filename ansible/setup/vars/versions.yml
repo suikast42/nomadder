@@ -4,8 +4,8 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.22.3"
-consul_checksum: "sha256:0942ef6ed43522adfb4cddbefea2f0e64306318afb8aeab3727563f0caef04be"
+consul_version: "1.22.4"
+consul_checksum: "sha256:34c6376d40752118e4a09564c18191da6226f8c38019f0cf4cc7d963d75c6d9c"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
@@ -78,7 +78,7 @@ version_minio_mc_admin: "RELEASE.2025-08-13T08-35-41Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
 
-version_grafana_alloy : "1.13.1"
+version_grafana_alloy : "1.13.2"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version

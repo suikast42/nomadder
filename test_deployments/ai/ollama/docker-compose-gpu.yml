@@ -1,0 +1,36 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    volumes:
+      - ./ai/ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+    # No deploy/resources/reservations needed for CPU-only
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_KEEP_ALIVE=-1
+      - OLLAMA_REQUEST_TIMEOUT=600s
+      - ENABLE_IMAGE_GENERATION=false
+      - WEBUI_AUTH=false
+    volumes:
+      - ./ai/webui_data:/app/backend/data
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
