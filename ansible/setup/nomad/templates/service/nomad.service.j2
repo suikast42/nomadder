@@ -5,18 +5,37 @@
 Description=Nomad
 Documentation=https://www.nomadproject.io/docs/
 {% if is_master_host  %}
-Wants=network-online.target,containerd.service,docker.service,consul.service
-After=network-online.target,containerd.service,docker.service,consul.service
+
+Wants=network-online.target
+Wants=containerd.service
+Wants=docker.service
+Wants=consul.service
+Wants=consulTpl_dnsmasq.service
+
+After=network-online.target
+After=containerd.service
+After=docker.service
+After=consul.service
+After=consulTpl_dnsmasq.service
 {% else %}
-Wants=network-online.target,containerd.service,docker.service,consul.service
-After=network-online.target,containerd.service,docker.service,consul.service
+Wants=network-online.target
+Wants=containerd.service
+Wants=docker.service
+Wants=consul.service
+Wants=consulTpl_dnsmasq.service
+
+After=network-online.target
+After=containerd.service
+After=docker.service
+After=consul.service
+After=consulTpl_dnsmasq.service
 {% endif %}
 
 
 
 [Service]
-Type=notify # see https://github.com/hashicorp/nomad/pull/20528
-ExecStartPre=/bin/bash -c '(while ! nc -z -v -w1 consul.service.consul 8501 2>/dev/null; do echo "Waiting for consul.service.consul 8501 to open..."; sleep 1; done); sleep 1'
+#Type=notify # see https://github.com/hashicorp/nomad/pull/20528
+#ExecStartPre=/bin/bash -c '(while ! nc -z -v -w1 consul.service.consul 8501 2>/dev/null; do echo "Waiting for consul.service.consul 8501 to open..."; sleep 1; done); sleep 1'
 
 # Nomad server should be run as the nomad user. Nomad clients
 # should be run as root
@@ -32,13 +51,8 @@ Group={{nomad_group}}
 Group=root
 {% endif %}
 
-
-
-ExecStart=/usr/local/bin/nomad agent -config {{nomad_conf_dir}}
 ExecReload=/bin/kill -HUP $MAINPID
-# TODO: https://gist.github.com/blalor/246eaf5755e784b353ab756a36a1142e
-#TimeoutStopSec= will send a SIGTERM immediately if ExecStop is not included in the service file.
-#ExecStop=/bin/kill -9 $MAINPID
+ExecStart=/usr/local/bin/nomad agent -config {{nomad_conf_dir}}
 {% if is_worker_host  %}
 # See issue https://github.com/hashicorp/nomad/issues/17299
 # See issue https://github.com/suikast42/nomadder/issues/138

@@ -22,4 +22,5 @@
         src: conf/nomad_client.j2
         dest: "{{nomad_conf_dir}}/client.hcl"
         owner: "{{ nomad_user }}"
+        group: "{{ nomad_group }}"
       register: cfgClient

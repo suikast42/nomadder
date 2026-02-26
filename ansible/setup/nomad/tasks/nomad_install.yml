@@ -10,9 +10,9 @@
         enabled: false
 
 
-    - name: "Delete nomad dir  {{nomad_data_dir}} if present"
+    - name: "Delete nomad dir  {{nomad_working_dir}} if present"
       ansible.builtin.file:
-        path: "{{nomad_data_dir}}"
+        path: "{{nomad_working_dir}}"
         state: absent
 
     - name: "Delete nomad conf dir  {{nomad_conf_dir}} if present"
@@ -91,8 +91,8 @@
       become: true
       file:
         path: "{{nomad_data_dir}}"
-        owner: root
-        group: root
+        owner: "{{nomad_user}}"
+        group: "{{nomad_group}}"
         state: directory
         mode: '0700'
 

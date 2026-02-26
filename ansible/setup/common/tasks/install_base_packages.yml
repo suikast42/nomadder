@@ -42,6 +42,7 @@
       - ubuntu-release-upgrader-core
       - neofetch
       - tldr
+      - members
     #      - cadvisor
 
     state: present

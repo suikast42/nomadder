@@ -71,11 +71,17 @@ job "ingress" {
 
 
   group "traefik" {
-    restart {
-      attempts = 1
+#    restart {
+#      attempts = 1
+#      interval = "1h"
+#      delay = "5s"
+#      mode = "fail"
+#    }
+   restart {
+     attempts = 10
       interval = "1h"
-      delay = "5s"
-      mode = "fail"
+      delay = "15s"
+      mode = "delay"
     }
     volume "cert_ingress" {
       type      = "host"
