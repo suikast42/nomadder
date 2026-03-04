@@ -1,5 +1,5 @@
 # Setup
-
+SET VAGRANT_PREFERRED_POWERSHELL=powershell.exe
 ## Prepare 
 1. You need at least 2 Ubuntu Vms ( 24.04 ) zu can use vagrant up from vagrant folder for this
 2. Adopt your machines under the path ENVIRONMENT un .evrc file
