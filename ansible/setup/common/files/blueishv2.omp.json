@@ -45,7 +45,7 @@
           "template": " \ue5ff <transparent>\ue0bd </>{{ .Path }} <transparent>\ue0bd </>",
           "properties": {
             "folder_separator_icon": "<transparent> \ue0bd </>",
-            "home_icon": "\uf7dd",
+            "home_icon": "⌂<",
             "mixed_threshold": 10,
             "style": "folder"
           },

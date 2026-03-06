@@ -35,7 +35,8 @@
         state: absent
 
 
-    - name: "Delete local client certs"
+    - name: "Delete local client certs {{local_cert_path_docker_client}}"
+      when: is_local_cert_path_docker_client_set
       run_once: true
       delegate_to: localhost
       file:
@@ -59,6 +60,7 @@
         path: "{{cfssl_working_dir}}"
 
     - name: "Create docker client cert dir on localhost if needed"
+      when: is_local_cert_path_docker_client_set
       run_once: true
       delegate_to: localhost
       file:
@@ -137,6 +139,7 @@
 
   vars:
     local_cert_path_docker_client: "{{ lookup('env','DOCKER_CERT_PATH') }}"
+    is_local_cert_path_docker_client_set: "{{ local_cert_path_docker_client | length > 0 }}"
     cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/docker"
     docker_cert_path: "{{base_cert_dir}}/docker"
     docker_server_cert: "{{docker_cert_path}}/docker-server.pem"

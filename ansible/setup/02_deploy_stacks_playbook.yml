@@ -4,6 +4,7 @@
   gather_facts: true
   vars_files:
     - vars/common_vars.yml
+    - vars/local_secret.yml
   tasks:
     - name: "Check env will fail {{fail_when_not_development_env|bool == true }}"
       changed_when: false
@@ -18,6 +19,7 @@
   gather_facts: true
   vars_files:
     - vars/common_vars.yml
+    - vars/local_secret.yml
   tasks:
   - name: Add nameserver to localhost
     failed_when: false
@@ -38,6 +40,7 @@
     - vars/versions.yml
     - vars/common_vars.yml
     - vars/vault.yml
+    - vars/local_secret.yml
   gather_facts: yes
   roles:
     - {role: stack_core_volumes, tags: ['stack_core','stack_core_volumes']}
@@ -50,6 +53,7 @@
     - vars/common_vars.yml
     - vars/vault.yml
     - vars/job_secrets.yml
+    - vars/local_secret.yml
   gather_facts: yes
   roles:
     - {role: stack_core, tags: ['stack_core','stack_core_build']}
@@ -62,6 +66,7 @@
     - vars/common_vars.yml
     - vars/vault.yml
     - vars/job_secrets.yml
+    - vars/local_secret.yml
   gather_facts: yes
   roles:
     - {role: stack_observability_nodesetup, tags: ['stack_observability_nodes','grafana_agent','grafana_alloy','vector_agent']}
@@ -73,6 +78,7 @@
     - vars/common_vars.yml
     - vars/vault.yml
     - vars/job_secrets.yml
+    - vars/local_secret.yml
   gather_facts: yes
   roles:
     - {role: stack_observability_cli_tools, tags: ['stack_observability_cli_tools','cli_tools']}

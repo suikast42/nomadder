@@ -3,6 +3,7 @@
   gather_facts: true
   vars_files:
     - vars/common_vars.yml
+    - vars/local_secret.yml
   tasks:
     - name: "Check update flags will fail {{fail_when_not_development_env|bool == true }}"
       changed_when: false
@@ -19,6 +20,7 @@
     - vars/versions.yml
     - vars/common_vars.yml
     - vars/vault.yml
+    - vars/local_secret.yml
   gather_facts: yes
   # include the handlers for ca changed
   handlers:
@@ -38,6 +40,7 @@
     - vars/versions.yml
     - vars/common_vars.yml
     - vars/vault.yml
+    - vars/local_secret.yml
   gather_facts: yes
   roles:
     - {role: registry, tags: ['registry']}
@@ -60,6 +63,7 @@
     - vars/versions.yml
     - vars/common_vars.yml
     - vars/vault.yml
+    - vars/local_secret.yml
   gather_facts: yes
   roles:
     - {role: consul, tags: ['consul']}
@@ -72,6 +76,7 @@
     - vars/versions.yml
     - vars/common_vars.yml
     - vars/vault.yml
+    - vars/local_secret.yml
   gather_facts: yes
   roles:
     - {role: test, tags: ['never','test']}
@@ -80,6 +85,7 @@
   gather_facts: true
   vars_files:
     - vars/common_vars.yml
+    - vars/local_secret.yml
   tasks:
     - name: "Restart host"
       become: true

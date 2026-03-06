@@ -2,6 +2,7 @@
   gather_facts: true
   vars_files:
     - vars/common_vars.yml
+    - vars/local_secret.yml
   tasks:
     - name: "Check env will fail {{fail_when_not_development_env|bool == true }}"
       changed_when: false

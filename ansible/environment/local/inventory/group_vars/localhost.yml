@@ -1,5 +1,10 @@
+ansible_connection: local
+ansible_user: "{{ lookup('env', 'USER') }}"
+#ansible_become_pass: dev
+
 host_default_if : "eth0"
-host_public_if : "eth0"
-host_ip: "{{ ansible_eth0.ipv4.address }}"
+host_public_if : "eth1"
+host_ip: "{{ ansible_facts['eth0']['ipv4']['address']}}"
 host_ips:
-  - "{{ ansible_eth0.ipv4.address }}"
+  - "{{ ansible_facts['eth0']['ipv4']['address']}}"
+  - "{{ ansible_facts['eth1']['ipv4']['address']}}"

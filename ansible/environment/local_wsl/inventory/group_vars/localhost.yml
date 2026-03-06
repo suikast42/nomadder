@@ -1,0 +1,5 @@
+host_default_if : "eth0"
+host_public_if : "eth0"
+host_ip: "{{ ansible_eth0.ipv4.address }}"
+host_ips:
+  - "{{ ansible_eth0.ipv4.address }}"

@@ -3,10 +3,40 @@
 # Ping everything first
 - hosts: all
   # Do not gater facts at first
-  gather_facts: no
+  gather_facts: true
+  vars_files:
+    - vars/versions.yml
+    - vars/job_secrets.yml
+    - vars/vault.yml
+    - vars/common_vars.yml
+    - vars/local_secret.yml
   tasks:
     - name: Ping test
       ping:
+    - name: "Host IP"
+      debug:
+        msg: "{{ host_ip }}"
+#      vars:
+#        host_ip_var: "{{ ansible_facts['eth0']['ipv4']['address']}}"
+    - name: "Host IPS"
+      debug:
+        msg: "{{ host_ips }}"
+
+    - name: Ping google IP
+      changed_when: false
+      shell: |
+        ping -c 4 8.8.8.8
+      register: ping_result
+      failed_when: ping_result.rc != 0
+
+    - name: "create hasibongo"
+      become: true
+      delay: 0
+      async: 60
+      poll: 1
+      shell: |
+        touch /bin/hasibongo.sh
+        rm /bin/hasibongo.sh
 # The docker login will fail on localhost because
 # DOCKER_HOST ist set to the buildhost and all docker commands on localhost will executed on this hosts
 # Activate localhost after migrate to local docker build
@@ -17,31 +47,17 @@
     - vars/common_vars.yml
     - vars/job_secrets.yml
     - vars/vault.yml
+    - vars/local_secret.yml
   debugger: never
   tasks:
+    - name: Tests
+      block:
 #    - name: Execute a command
 #      ansible.builtin.command: "false"
 #      debugger: on_failed
-    - name: Tests
-      block:
-      - name: Ping test
-        ping:
 
-      - name: "Host IP"
-        debug:
-          msg: "{{ host_ip }}"
-      - name: "Host IPS"
-
-        debug:
-          msg: "{{ host_ips }}"
-
-      - name: Ping google IP
-        changed_when: false
-        ansible.builtin.shell: ping -c 4 8.8.8.8
-        register: ping_result
-        failed_when: ping_result.rc != 0
-
-      - name: "create hasibongo"
+      - name: "Test delegate to localhost"
+        delegate_to: localhost
         become: true
         delay: 0
         async: 60
@@ -50,76 +66,78 @@
           touch /bin/hasibongo.sh
           rm /bin/hasibongo.sh
 
-      - name: "Test Login to registry {{registry_dns}}"
-        # do not trigger a change
-        changed_when: false
-        community.docker.docker_login:
-          username: "{{dockerhub_user}}"
-          password: "{{dockerhub_password}}"
-          reauthorize: yes
-        register: login_results
-      - debug:
-          var: login_results
+#
+#      - name: "Test Login to registry {{registry_dns}}"
+#        # do not trigger a change
+#        changed_when: false
+#        community.docker.docker_login:
+#          username: "{{dockerhub_user}}"
+#          password: "{{dockerhub_password}}"
+#          reauthorize: yes
+#        register: login_results
+#      - debug:
+#          var: login_results
+#
+#      - name: "Test Login to dockerub "
+#        # do not trigger a change
+#        changed_when: false
+#        community.docker.docker_login:
+#          registry_url: "{{registry_dns}}"
+#          username: "{{registry_user}}"
+#          password: "{{registry_password}}"
+#          reauthorize: yes
+#        register: login_results
+#      - debug:
+#          var: login_results
+#
+#      - name: "Test Login to registry {{push_registry}}"
+#        # do not trigger a change
+#        changed_when: false
+#        community.docker.docker_login:
+#          registry_url: "{{push_registry}}"
+#          username: "{{registry_user}}"
+#          password: "{{registry_password}}"
+#          reauthorize: yes
+#        register: login_results
+#
+#      - debug:
+#          var: login_results
+#
+#      - name: "Pull hello world  from {{registry_dns}}"
+#        community.docker.docker_image:
+#          name: "{{registry_dns}}/hello-world"
+#          source: pull
+#
+#      - name: "Pull hello world  from {{registry_ip}}:{{registry_port}}"
+#        community.docker.docker_image:
+#          name: "{{registry_ip}}:{{registry_port}}/hello-world"
+#          source: pull
+#
+#
+#      - name: "Test push image {{push_registry}}/test/hello-world:latest"
+#        community.docker.docker_image:
+#          name: "{{registry_dns}}/hello-world"
+#          repository: "{{push_registry}}/test/hello-world:latest"
+#          push: yes
+#          source: local
+#
+#      always:
+#        - name : Finally
+#          block:
+#            - name: "Logout from {{push_registry}}"
+#              changed_when: false
+#              community.docker.docker_login:
+#                state: absent
+#                registry_url: "{{push_registry}}"
+#              register: logout_results
+#            - debug:
+#                var: logout_results
+#            - name: "Logout from {{registry_dns}}"
+#              changed_when: false
+#              community.docker.docker_login:
+#                state: absent
+#                registry_url: "{{registry_dns}}"
+#              register: logout_results
+#            - debug:
+#                var: logout_results
 
-      - name: "Test Login to dockerub "
-        # do not trigger a change
-        changed_when: false
-        community.docker.docker_login:
-          registry_url: "{{registry_dns}}"
-          username: "{{registry_user}}"
-          password: "{{registry_password}}"
-          reauthorize: yes
-        register: login_results
-      - debug:
-          var: login_results
-
-      - name: "Test Login to registry {{push_registry}}"
-        # do not trigger a change
-        changed_when: false
-        community.docker.docker_login:
-          registry_url: "{{push_registry}}"
-          username: "{{registry_user}}"
-          password: "{{registry_password}}"
-          reauthorize: yes
-        register: login_results
-
-      - debug:
-          var: login_results
-
-      - name: "Pull hello world  from {{registry_dns}}"
-        community.docker.docker_image:
-          name: "{{registry_dns}}/hello-world"
-          source: pull
-
-      - name: "Pull hello world  from {{registry_ip}}:{{registry_port}}"
-        community.docker.docker_image:
-          name: "{{registry_ip}}:{{registry_port}}/hello-world"
-          source: pull
-
-
-      - name: "Test push image {{push_registry}}/test/hello-world:latest"
-        community.docker.docker_image:
-          name: "{{registry_dns}}/hello-world"
-          repository: "{{push_registry}}/test/hello-world:latest"
-          push: yes
-          source: local
-
-      always:
-        - name : Finally
-          block:
-            - name: "Logout from {{push_registry}}"
-              changed_when: false
-              community.docker.docker_login:
-                state: absent
-                registry_url: "{{push_registry}}"
-              register: logout_results
-            - debug:
-                var: logout_results
-            - name: "Logout from {{registry_dns}}"
-              changed_when: false
-              community.docker.docker_login:
-                state: absent
-                registry_url: "{{registry_dns}}"
-              register: logout_results
-            - debug:
-                var: logout_results
