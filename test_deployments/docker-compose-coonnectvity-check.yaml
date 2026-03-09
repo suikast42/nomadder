@@ -1,0 +1,21 @@
+services:
+  network-tester:
+    image: alpine:latest
+    container_name: connectivity-check
+    # Keep the container running so we can exec into it
+    command: sh -c "apk add --no-cache curl bind-tools mtr iputils && tail -f /dev/null"
+    restart: unless-stopped
+
+
+# A. Test DNS Resolution:
+# docker exec connectivity-check dig google.com
+
+
+#B. Test Basic Ping (ICMP):
+# docker exec connectivity-check ping -c 4 8.8.8.8
+
+# C. Test HTTP/HTTPS Access:
+# docker exec connectivity-check curl -I [https://www.google.com](https://www.google.com)
+
+# D. Trace the Route (MTR):
+# docker exec connectivity-check mtr --report google.com
