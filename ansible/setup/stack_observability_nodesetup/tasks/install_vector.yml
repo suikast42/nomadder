@@ -41,6 +41,11 @@
         path:  /etc/vector/vector.toml
         state: absent
 
+    - name: "Delete vector tmp dir"
+      ansible.builtin.file:
+        path:  /tmp/vector
+        state: absent
+
 - name : Check vector agent installation present
   stat:
     path: /usr/bin/vector
@@ -53,7 +58,6 @@
     - name: Add datadog vector apt repo
       shell: |
         CSM_MIGRATE=true bash -c "$(curl -L https://setup.vector.dev)"
-
 
     - name: "Update installed packages"
       apt:
@@ -68,7 +72,15 @@
         name:
           - "vector={{version_vector_agent}}"
 
+    - name: "Create vector tmp dir"
+      ansible.builtin.file:
+        path:  /tmp/vector
+        state: present
 
+    - name: "Delete vector sample config"
+      ansible.builtin.file:
+        path:  /ect/vector/vector.yaml
+        state: absent
 
 - name: Vector agent config
   become: true
