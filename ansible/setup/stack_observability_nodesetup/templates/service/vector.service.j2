@@ -10,7 +10,7 @@ User=root
 Group=root
 Environment=VECTOR_LOG=error
 ExecStartPre=/usr/bin/vector  validate
-ExecStart=/usr/bin/vector --config /etc/vector/*.toml --require-healthy true
+ExecStart=/usr/bin/vector --config-dir /etc/vector/ --require-healthy true
 ExecReload=/bin/kill --signal HUP $MAINPID
 KillMode=process
 KillSignal=SIGTERM
