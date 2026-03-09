@@ -75,7 +75,10 @@
     - name: "Create vector tmp dir"
       ansible.builtin.file:
         path:  /tmp/vector
-        state: present
+        owner: "vector"
+        group: "vector"
+        state: directory
+        mode: '0755'
 
     - name: "Delete vector sample config"
       ansible.builtin.file:

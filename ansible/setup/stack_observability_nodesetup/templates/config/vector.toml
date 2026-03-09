@@ -27,7 +27,7 @@ type = "internal_logs"
 [sources.source_journald]
 type = "journald"
 current_boot_only = true
-exclude_units = ["vector","docker","containerd","nomad_event_sink","consul","nomad"]
+exclude_units = ["vector","docker","containerd","consul","nomad"]
 exclude_matches = { }
 include_units = [ ]
 include_matches = { }
@@ -37,7 +37,7 @@ type = "journald"
 current_boot_only = true
 exclude_units = []
 exclude_matches = { }
-include_units = ["docker","containerd","nomad_event_sink"]
+include_units = ["docker","containerd"]
 include_matches = { }
 
 [sources.source_journald_tsLevelMsg]

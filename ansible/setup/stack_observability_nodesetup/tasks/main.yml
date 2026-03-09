@@ -12,9 +12,7 @@
     - name: "Install vector agent v {{version_vector_agent}}"
       import_tasks: install_vector.yml
 
-    - name: "Install nomad event sink v {{version_nomad_event_sink}}"
-      when: is_master_host
-      import_tasks: install_nomad_event_sink.yml
+
 
   vars:
     tmp_install_dir_base: "/{{download_dir}}/grafana_agent"
@@ -29,11 +27,6 @@
     version_vector_agent: "0.53.0-1"
     uninstall_vector_agent: "{{uninstall_all or false }}"
     update_vector_agent: "{{update_all or false }}"
-    version_nomad_event_sink: "0.2.0"
-    uninstall_nomad_event_sink: "{{uninstall_all or false }}"
-    update_nomad_event_sink: "{{update_all or false }}"
-    nomad_event_sink_working_dir: "{{service_working_dir_base}}/nomad_event_sink"
-    nomad_event_sink_config_dir: "/etc/nomad_event_sink.d"
     consul_cert_path: "{{base_cert_dir}}/consul"
     consul_cert: "{{consul_cert_path}}/consul.pem"
     consul_cert_key: "{{consul_cert_path}}/consul-key.pem"
