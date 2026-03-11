@@ -9,6 +9,12 @@
         state: stopped
         enabled: false
 
+    # nomad_working_dir holds mounts of allocs. Try to unmount them if it presents
+    - name: "Umount {{nomad_working_dir}}"
+      changed_when: false
+      failed_when: false
+      shell: |
+        mount | grep "on {{nomad_working_dir}}" | awk '{print $3}' | xargs -r sudo umount
 
     - name: "Delete nomad dir  {{nomad_working_dir}} if present"
       ansible.builtin.file:
