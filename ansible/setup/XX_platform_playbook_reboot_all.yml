@@ -1,0 +1,12 @@
+- hosts: all,!localhost
+  gather_facts: false
+  vars_files:
+    - vars/common_vars.yml
+    - vars/local_secret.yml
+  tasks:
+    - name: "Restart host"
+      become: true
+      ansible.builtin.reboot:
+        pre_reboot_delay: 10
+        msg: "Rebooting machine in 10 seconds"
+

@@ -34,7 +34,7 @@
     - {role: dnsmasq, tags: ['dnsmasq']}
 
 
-- hosts: build
+- hosts: masters[0]
   name: "Build host specific installations"
   vars_files:
     - vars/versions.yml

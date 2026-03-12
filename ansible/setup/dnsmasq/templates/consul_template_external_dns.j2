@@ -36,7 +36,7 @@ address=/{{tls_san}}/++ .Address ++
 {% if is_worker_host  %}
 # Prevents forwarding {{tls_san}} to other DNS servers.
 local=/{{tls_san}}/
-address=/.{{tls_san}}/{{host_ip}}
+address=/{{tls_san}}/{{host_ip}}
 {% endif %}
 EOF
   perms = 0640

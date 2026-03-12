@@ -21,17 +21,24 @@
     - vars/common_vars.yml
     - vars/local_secret.yml
   tasks:
-  - name: Add nameserver to localhost
-    failed_when: false
-    become: true
-    lineinfile:
-      state: present
-      path: /etc/resolv.conf
-      firstmatch: yes
-      insertbefore: "nameserver.*"
-      line: "nameserver {{worker_01_ip}}"
-    tags:
-      - always
+    # If dnsmasq is not installed then we neeed at least one nameserver entry of the cluster on the localhost
+    - name : Check dnsmasq installation present
+      stat:
+        path: /usr/sbin/dnsmasq
+      register: dnsmaqInstalled
+
+    - name: Add nameserver to localhost
+      failed_when: false
+      when: not dnsmaqInstalled.stat.exists
+      become: true
+      lineinfile:
+        state: present
+        path: /etc/resolv.conf
+        firstmatch: yes
+        insertbefore: "nameserver.*"
+        line: "nameserver {{worker_01_ip}}"
+  tags:
+    - always
 
 # start the deployment jobs on master_0
 - hosts: all,!localhost

@@ -8,7 +8,7 @@ host_name: "{{ ansible_hostname  }}"
 
 master_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
 worker_01_ip: "{{ hostvars[groups['workers'][0]]['ansible_host'] | default(groups['workers'][0]) }}"
-registry_ip: "{{ hostvars[groups['build'][0]]['ansible_host'] | default(groups['build'][0]) }}"
+registry_ip: "{{ master_ip }}"
 registry_port: "5000"
 registry_port_push: "5001"
 registry_port_http: "5002"
@@ -97,7 +97,7 @@ is_devnode : "{{ host_ip in  host_ips }}"
 # Avoid dev deployments to prod
 fail_when_not_development_env : "{{is_env_development|bool == true and is_devnode|bool == false}}"
 
-download_dir: "/home/{{ansible_ssh_user}}/downloads"
+download_dir: "/home/{{ansible_ssh_user}}/Downloads"
 consul_template_base_dir: "/etc/consul_template"
 delete_downloads: false
 

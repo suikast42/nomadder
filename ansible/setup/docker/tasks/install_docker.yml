@@ -37,6 +37,9 @@
           - podman-docker
           - containerd
           - runc
+          - docker-model-plugin
+          - docker-ce-rootless-extras
+          - docker-buildx-plugin
 
         state: absent
 
@@ -93,7 +96,7 @@
         groups: root, docker
         state: present
 
-    - name: "Create docker download dir if needed"
+    - name: "Create docker download dir {{docker_download_dir}} if needed"
       file:
         state: directory
         path: "{{docker_download_dir}}"
@@ -124,17 +127,21 @@
     - name: install_cert handler docker
       include_tasks: handlers/generate_docker_certs.yml
 
+- name: "Docker Installed ?"
+  debug:
+    msg: "{{ dockerInstalled.stat.exists }}"
 
-- name: "Install docker"
+- name: "Install docker V {{ version_docker }}"
   become: true
   when: not dockerInstalled.stat.exists
   block:
     - name: "Install docker V {{ version_docker }}"
+      failed_when: dockerInstall.rc != 0
       delay: 0
       async: 300
       poll: 1
       shell: |
-        export VERSION={{version_docker}}
+        export VERSION={{ version_docker }}
         curl -fsSL https://get.docker.com -o install-docker.sh
         chmod +x install-docker.sh
         ./install-docker.sh
@@ -144,6 +151,15 @@
         creates: /usr/bin/docker # docker is already installed
         chdir: "{{docker_download_dir}}"
       register: dockerInstall
+
+    - name: "Check docker version"
+      failed_when: dockerVersion.rc != 0
+      shell: docker --version
+      register: dockerVersion
+#
+#    - name: "Docker install result"
+#      debug:
+#        msg: "{{ dockerInstall}}"
 
     - name: "Docker Hosts Workaround"
       when: is_build_host
@@ -189,15 +205,15 @@
 #        msg: "{{dockerInstall}}"
 
 
-- name: "Install docker compose"
-  when: is_build_host
-  block:
-  - name: "Uninstall docker compose"
-#    when: uninstall_compose|bool == true
-    become: true
-    ansible.builtin.file:
-      path: /usr/bin/docker-compose
-      state: absent
+#- name: "Install docker compose"
+#  when: is_build_host
+#  block:
+#  - name: "Uninstall docker compose"
+##    when: uninstall_compose|bool == true
+#    become: true
+#    ansible.builtin.file:
+#      path: /usr/bin/docker-compose
+#      state: absent
 
 #  - name: "Install docker compose v {{version_docker_compose}}"
 #    become: true

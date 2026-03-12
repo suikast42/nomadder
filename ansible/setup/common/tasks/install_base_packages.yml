@@ -43,6 +43,7 @@
       - neofetch
       - tldr
       - members
+      - speedtest-cli
     #      - cadvisor
 
     state: present
