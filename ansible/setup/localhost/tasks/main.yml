@@ -75,6 +75,6 @@
 
   vars:
     # Override the download_dir for localhost
-    download_dir: "/home/{{ansible_user}}/downloads"
+    download_dir: "/home/{{ansible_user}}/Downloads"
   tags:
     - localhost

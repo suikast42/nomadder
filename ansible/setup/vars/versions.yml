@@ -4,8 +4,8 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.22.4"
-consul_checksum: "sha256:34c6376d40752118e4a09564c18191da6226f8c38019f0cf4cc7d963d75c6d9c"
+consul_version: "1.22.5"
+consul_checksum: "sha256:58603b87fd085282f882fcd02b5165c93b321692514b2ab822dec8dd4cd028a3"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
@@ -14,13 +14,13 @@ consul_template_checksum: "sha256:9e999cfbfdc47e67d3d91e6e4edbecaa3d7c3b026307b1
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "1.11.1"
+nomad_version: "1.11.3"
 #nomad_version: "1.11.2" is blocked due to issue https://github.com/hashicorp/nomad/issues/27495
-nomad_checksum: "sha256:8e8fbc9c3ddae39a63f7ed70a99bb4b936bb6e88ed9160ce0e9d36ff2909c1f3"
+nomad_checksum: "sha256:19dac5642a2ba5305e6ff8efee06a708d760ebe4d1cd7936bc3dc526f477dc12"
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.37.0
+version_envoy: 1.37.1
 
 nomad_plugin_cni_version: "1.9.0"
 nomad_plugin_cni_checksum: "sha256:58c03705426e929658f45a851df15a86d06ef680cacbf3f2dc127731ca265c28"
@@ -28,8 +28,8 @@ uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
 
-nomad_plugin_consul_cni_version: "1.9.3"
-nomad_plugin_consul_cni_checksum: "sha256:139720a5f7f2d74d36a2064e7c83ec3902db1df38e69263d2abdac1a03c61b71"
+nomad_plugin_consul_cni_version: "1.9.5"
+nomad_plugin_consul_cni_checksum: "sha256:cd44a1b75ce8b9a5d854febb940b3a5f1ebf4dfa17ab2f06ed81cb340872c7c5"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 
@@ -48,7 +48,8 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "29.2.1"
+#version_docker: "29.2.1"
+version_docker: "29.3.0"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead
@@ -59,8 +60,8 @@ update_certificates: false
 
 # upper versions blocked now because of bugs in rest api
 # 3.90.0 is not booting test clean nexus initlzr after new fixes version is released
-version_nexus: "3.87.2"
-version_nexus_initlzr: "1.0.4"
+version_nexus: "3.90.1"
+version_nexus_initlzr: "1.0.7"
 update_nexus: false
 
 
@@ -72,7 +73,7 @@ version_minio_mc_admin: "RELEASE.2025-08-13T08-35-41Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
 
-version_grafana_alloy : "1.13.2"
+version_grafana_alloy : "1.14.0"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version
