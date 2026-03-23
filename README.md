@@ -1,6 +1,7 @@
 # Setup
 
 
+SET VAGRANT_PREFERRED_POWERSHELL=powershell.exe
 ## Prepare 
 ### From master node
 
