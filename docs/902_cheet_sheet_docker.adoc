@@ -45,3 +45,6 @@ https://dev.to/julianlasso/how-to-install-docker-cli-on-windows-without-docker-d
 
 download cli  from https://download.docker.com/win/static/stable/x86_64/
 download latest release of docker buildx from https://github.com/docker/buildx/releases and unzip it to %USER_PROFILE%/.docker/cli-plugins and rename to docker-buildx.exe
+
+=== Trouble shoots
+https://oneuptime.com/blog/post/2026-01-25-debug-docker-registry-pull-issues/view

@@ -14,16 +14,19 @@ consul_template_checksum: "sha256:9e999cfbfdc47e67d3d91e6e4edbecaa3d7c3b026307b1
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
+#nomad_version: "1.11.1"
 nomad_version: "1.11.3"
-#nomad_version: "1.11.2" is blocked due to issue https://github.com/hashicorp/nomad/issues/27495
 nomad_checksum: "sha256:19dac5642a2ba5305e6ff8efee06a708d760ebe4d1cd7936bc3dc526f477dc12"
+#nomad_version: "1.11.2" is blocked due to issue https://github.com/hashicorp/nomad/issues/27495
+#nomad_checksum: "sha256:8e8fbc9c3ddae39a63f7ed70a99bb4b936bb6e88ed9160ce0e9d36ff2909c1f3"
+
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
 version_envoy: 1.37.1
 
-nomad_plugin_cni_version: "1.9.0"
-nomad_plugin_cni_checksum: "sha256:58c03705426e929658f45a851df15a86d06ef680cacbf3f2dc127731ca265c28"
+nomad_plugin_cni_version: "1.9.1"
+nomad_plugin_cni_checksum: "sha256:b98f74a0f8522f0a83867178729c1aa70f2158f90c45a2ca8fa791db1c76b303"
 uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
@@ -73,7 +76,7 @@ version_minio_mc_admin: "RELEASE.2025-08-13T08-35-41Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
 
-version_grafana_alloy : "1.14.0"
+version_grafana_alloy : "1.14.1"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version

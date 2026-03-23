@@ -67,28 +67,7 @@
         retries: 10
         delay: 5
 
-      - name: Enable Memory Oversubscription
-        become: false
-        when: is_master_host
-        run_once: true
-        shell: |
-          curl  -s  -N \
-          --cacert "${NOMAD_CACERT}" \
-          --cert "${NOMAD_CLIENT_CERT}" \
-          --key "${NOMAD_CLIENT_KEY}" \
-          "${NOMAD_ADDR}/v1/operator/scheduler/configuration" |\
-          jq '.SchedulerConfig | .SchedulerAlgorithm= "spread" |  .MemoryOversubscriptionEnabled=true | .PreemptionConfig.SysBatchSchedulerEnabled=true | .PreemptionConfig.BatchSchedulerEnabled=true  | .PreemptionConfig.ServiceSchedulerEnabled=true'   |\
-          curl \
-          --cacert "${NOMAD_CACERT}" \
-          --cert "${NOMAD_CLIENT_CERT}" \
-          --key "${NOMAD_CLIENT_KEY}" \
-          -X PUT $NOMAD_ADDR/v1/operator/scheduler/configuration -d @-
-        changed_when: false
-        environment:
-          - NOMAD_ADDR: "https://localhost:4646"
-          - NOMAD_CACERT: "{{cluster_intermediate_ca_bundle}}"
-          - NOMAD_CLIENT_CERT: "{{nomad_cert}}"
-          - NOMAD_CLIENT_KEY: "{{nomad_cert_key}}"
+
 
   - name: nomad update
     when: update_nomad|bool == true
@@ -123,6 +102,36 @@
         retries: 10
         delay: 5
 
+  - name: Nomad tweak
+    when: update_nomad|bool == true or uninstall_nomad|bool == true
+    block:
+      - name: Enable Memory Oversubscription
+        become: false
+        when: is_master_host
+        failed_when: result.rc != 0
+        #        run_once: true
+        shell: |
+          curl  -s  -N \
+          --cacert "${NOMAD_CACERT}" \
+          --cert "${NOMAD_CLIENT_CERT}" \
+          --key "${NOMAD_CLIENT_KEY}" \
+          "${NOMAD_ADDR}/v1/operator/scheduler/configuration" |\
+          jq '.SchedulerConfig | .SchedulerAlgorithm= "spread" |  .MemoryOversubscriptionEnabled=true | .PreemptionConfig.SysBatchSchedulerEnabled=true | .PreemptionConfig.BatchSchedulerEnabled=true  | .PreemptionConfig.ServiceSchedulerEnabled=true'   |\
+          curl \
+          --cacert "${NOMAD_CACERT}" \
+          --cert "${NOMAD_CLIENT_CERT}" \
+          --key "${NOMAD_CLIENT_KEY}" \
+          -X PUT $NOMAD_ADDR/v1/operator/scheduler/configuration -d @-
+        changed_when: false
+        environment:
+          - NOMAD_ADDR: "https://localhost:4646"
+          - NOMAD_CACERT: "{{cluster_intermediate_ca_bundle}}"
+          - NOMAD_CLIENT_CERT: "{{nomad_cert}}"
+          - NOMAD_CLIENT_KEY: "{{nomad_cert_key}}"
+        register: result
+        until: result.rc == 0
+        retries: 10
+        delay: 10
   vars:
     consul_cert_path: "{{base_cert_dir}}/consul"
     consul_cert: "{{consul_cert_path}}/consul.pem"
