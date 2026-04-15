@@ -1,0 +1,31 @@
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
+export TLS_SAN={{tls_san}}
+export ENVIRONMENT={{env}}
+export NOMAD_ADDR=https://localhost:4646
+export NOMAD_CACERT=/usr/local/share/ca-certificates/cloudlocal/cluster-ca-bundle.pem
+export NOMAD_CLIENT_CERT=/etc/opt/certs/nomad/nomad-cli.pem
+export NOMAD_CLIENT_KEY=/etc/opt/certs/nomad/nomad-cli-key.pem
+
+export CONSUL_HTTP_SSL=true
+export CONSUL_HTTP_SSL_VERIFY=true
+export CONSUL_HTTP_ADDR=127.0.0.1:8501
+export CONSUL_HTTP_TOKEN=e95b599e-166e-7d80-08ad-aee76e7ddf19
+export CONSUL_CACERT=/usr/local/share/ca-certificates/cloudlocal/cluster-ca-bundle.pem
+export CONSUL_CLIENT_KEY=/etc/opt/certs/consul/consul-key.pem
+export CONSUL_CLIENT_CERT=/etc/opt/certs/consul/consul.pem
+
+
+{% if is_devnode  %}
+export GRAPHVIZ_DOT=/usr/bin/dot
+export GO111MODULE=on
+export ANSIBLE_NOCOWS=1
+export GOCACHE=/home/{{ansible_user}}/go/cache
+export GOTMPDIR=/home/{{ansible_user}}/go/tmp
+export GOBIN=/home/{{ansible_user}}/go/bin
+export PATH=$PATH:/usr/local/go/bin:$GOBIN
+export WILDFLY_HOME=/opt/wildfly
+export IDE_HOME=~/projects
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://oltp-grpc.${TLS_SAN}
+export OTEL_SDK_DISABLED=false
+{% endif %}

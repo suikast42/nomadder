@@ -55,7 +55,7 @@
   template:
     force: yes
     src: .zshrc
-    dest: "/home/{{ansible_ssh_user}}/.zshrc"
+    dest: "{{ansible_env.HOME}}/.zshrc"
     group: "{{ansible_ssh_user}}"
     owner: "{{ansible_ssh_user}}"
     mode: 0644
@@ -65,16 +65,40 @@
   template:
     force: yes
     src: .zshrc
-    dest: "/home/{{ansible_ssh_user}}/.zshrc"
+    dest: "{{ansible_env.HOME}}/.zshrc"
     group: "{{ansible_ssh_user}}"
     owner: "{{ansible_ssh_user}}"
     mode: 0644
+
+- name: Template zshenv
+  when: not is_devnode
+  template:
+    force: yes
+    src: .zshenv
+    dest: "{{ ansible_env.HOME }}/.zshenv"
+    group: "{{ansible_ssh_user}}"
+    owner: "{{ansible_ssh_user}}"
+    mode: 0644
+
+- name: Ensure ~/.profile sources ~/.zshenv for graphical sessions
+  when: not is_devnode
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.profile"
+    # The 'line' is the exact text we want to appear
+    line: 'if [ -f "$HOME/.zshenv" ]; then . "$HOME/.zshenv"; fi'
+    # The 'regexp' ensures that if a similar line exists, it is replaced instead of duplicated
+    regexp: '^if \[ -f "\$HOME/.zshenv" \].*'
+    state: present
+    create: yes
+    firstmatch: yes
+    insertafter: EOF
+    mode: '0644'
 
 - name: Copy theme
   ansible.builtin.copy:
     force: yes
     src: blueishv2.omp.json
-    dest: "/home/{{ansible_ssh_user}}/.oh-my-zsh/custom/themes/blueishv2.omp.json"
+    dest: "{{ansible_env.HOME}}/.oh-my-zsh/custom/themes/blueishv2.omp.json"
     group: "{{ansible_ssh_user}}"
     owner: "{{ansible_ssh_user}}"
     mode: 0644

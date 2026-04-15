@@ -39,7 +39,7 @@ is_master_host: "{{ inventory_hostname in groups['masters'] }}"
 is_worker_host: "{{ inventory_hostname in groups['workers'] }}"
 is_master_0: "{{is_master_host and hostvars[groups['masters'][0]]['ansible_hostname'] == host_name}}"
 is_worker_0: "{{is_worker_host and hostvars[groups['workers'][0]]['ansible_hostname'] == host_name}}"
-
+is_devnode : "{{ groups['devnode'] is defined and inventory_hostname in groups['devnode'] }}"
 
 vault_dns: "vault.{{tls_san}}"
 vault_ip: "{{ hostvars[groups['masters'][0]]['ansible_host'] | default(groups['masters'][0]) }}"
@@ -92,7 +92,7 @@ enable_oauth_middleware: false
 set_cpu_hard_limit: false
 #env set in inventory group var
 is_env_development : "{{ env == 'dev'}}"
-is_devnode : "{{ host_ip in  host_ips }}"
+
 # Development env set but host ip not registered as local development node
 # Avoid dev deployments to prod
 fail_when_not_development_env : "{{is_env_development|bool == true and is_devnode|bool == false}}"

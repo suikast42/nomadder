@@ -37,6 +37,14 @@ variable "version_nats_server" {
 }
 
 
+variable "version_nats_server_ui" {
+    type = string
+    description = "Version nats server"
+    default = "{{version_nats_server_ui}}"
+}
+
+
+
 variable "version_grafana_alloy" {
     type = string
     description = "Version grafana alloy"
@@ -1060,7 +1068,71 @@ overrides:
      }
     }
   }
+    group "nats_ui"{
+         restart {
+              attempts = 1
+              interval = "1h"
+              delay = "5s"
+              mode = "fail"
+            }
+            update {
+               max_parallel      = 1
+            }
+            volume "stack_observability_nats_ui_volume" {
+               type      = "host"
+               source    = "stack_observability_nats_ui_volume"
+                 read_only = false
+            }
+         count = 1
+          network {
+            mode = "bridge"
+            port "ui" {
+              to = 31311
+            }
 
+          }
+        service {
+          port = "ui"
+          name = "nats-ui"
+        tags = [
+                 "traefik.enable=true",
+                 "traefik.http.routers.nats-ui.tls=true",
+                 "traefik.http.routers.nats-ui.rule=Host(`natsui.{{tls_san}}`)",
+               ]
+          check {
+            type     = "tcp"
+            interval = "10s"
+            timeout  = "2s"
+            check_restart {
+              limit = 3
+              grace = "60s"
+              ignore_warnings = false
+              }
+            }
+        }
+       task "nats_ui" {
+          volume_mount {
+            volume      = "stack_observability_nats_ui_volume"
+            destination = "/db"
+          }
+         driver = "docker"
+         config {
+         image = "{{registry_dns}}/nats-nui/nui:${var.version_nats_server_ui}"
+         {% if set_cpu_hard_limit %}
+              cpu_hard_limit = "true"
+         {% endif %}
+
+         labels = {
+             "com.github.logunifier.application.name" = "${NOMAD_ALLOC_NAME}"
+             "com.github.logunifier.application.version" = "${var.version_nats_server_ui}"
+             "com.github.logunifier.application.pattern.key" = "tslevelmsg"
+             "com.github.logunifier.application.org" = "${var.org}"
+             "com.github.logunifier.application.env" = "${var.env}"
+          }
+         ports = ["ui"]
+        }
+        }
+    }
     group "nats"{
         restart {
           attempts = 1

@@ -64,7 +64,7 @@ update_certificates: false
 # upper versions blocked now because of bugs in rest api
 # 3.90.0 is not booting test clean nexus initlzr after new fixes version is released
 version_nexus: "3.90.1"
-version_nexus_initlzr: "1.0.7"
+version_nexus_initlzr: "1.0.8"
 update_nexus: false
 
 

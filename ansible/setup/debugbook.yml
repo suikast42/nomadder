@@ -11,6 +11,10 @@
     - vars/common_vars.yml
     - vars/local_secret.yml
   tasks:
+    - name: "Is devnode"
+      debug:
+        msg: "{{ is_devnode }} {{ansible_user}}"
+
     - name: Ping test
       ping:
     - name: "Host IP"

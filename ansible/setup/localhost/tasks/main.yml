@@ -73,8 +73,33 @@
     args:
       creates: ~/.vim/pack/jvirtanen/start
 
+  - name: Template zshenv
+    when: is_devnode
+    template:
+      force: yes
+      src: .zshenv
+      dest: "{{ ansible_env.HOME }}/.zshenv"
+      group: "{{ansible_ssh_user}}"
+      owner: "{{ansible_ssh_user}}"
+      mode: 0644
+
+  - name: Ensure ~/.profile sources ~/.zshenv for graphical sessions
+    when: is_devnode
+    ansible.builtin.lineinfile:
+      path: "{{ ansible_env.HOME }}/.profile"
+      # The 'line' is the exact text we want to appear
+      line: 'if [ -f "$HOME/.zshenv" ]; then . "$HOME/.zshenv"; fi'
+      # The 'regexp' ensures that if a similar line exists, it is replaced instead of duplicated
+      regexp: '^if \[ -f "\$HOME/.zshenv" \].*'
+      state: present
+      create: yes
+      firstmatch: yes
+      insertafter: EOF
+      mode: '0644'
+
   vars:
     # Override the download_dir for localhost
-    download_dir: "/home/{{ansible_user}}/Downloads"
+    download_dir: "{{ansible_env.HOME}}/Downloads"
   tags:
     - localhost
+
