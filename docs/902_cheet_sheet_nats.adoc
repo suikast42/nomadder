@@ -40,6 +40,13 @@ a|[source,shell]
 nats server report connections
 ----
 
+
+
+| Pending ACKnats
+a|[source,shell]
+----
+nats server report connections
+----
 |===
 
 

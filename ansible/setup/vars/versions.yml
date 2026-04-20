@@ -4,13 +4,13 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.22.5"
-consul_checksum: "sha256:58603b87fd085282f882fcd02b5165c93b321692514b2ab822dec8dd4cd028a3"
+consul_version: "1.22.6"
+consul_checksum: "sha256:5c2d67c6a364512b3dd0646eaf8bb58fa2fd6b9c890e2f374475deab2a6ec648"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
-consul_template_version: "0.41.4"
-consul_template_checksum: "sha256:9e999cfbfdc47e67d3d91e6e4edbecaa3d7c3b026307b18c0485b64d15e5083a"
+consul_template_version: "0.42.0"
+consul_template_checksum: "sha256:94d5044b822c5219bb116916b8d4d2545630e6ce0e1639ddd25309a26cf62ff2"
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
@@ -23,7 +23,7 @@ nomad_checksum: "sha256:19dac5642a2ba5305e6ff8efee06a708d760ebe4d1cd7936bc3dc526
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.37.1
+version_envoy: 1.37.2
 
 nomad_plugin_cni_version: "1.9.1"
 nomad_plugin_cni_checksum: "sha256:b98f74a0f8522f0a83867178729c1aa70f2158f90c45a2ca8fa791db1c76b303"
@@ -31,8 +31,8 @@ uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
 
-nomad_plugin_consul_cni_version: "1.9.5"
-nomad_plugin_consul_cni_checksum: "sha256:cd44a1b75ce8b9a5d854febb940b3a5f1ebf4dfa17ab2f06ed81cb340872c7c5"
+nomad_plugin_consul_cni_version: "1.9.6"
+nomad_plugin_consul_cni_checksum: "sha256:80208dbf81fc6a0fd3786683c8f1042b559e251cebc6bcdeb56ff3e13a1ab546"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 
@@ -52,7 +52,7 @@ version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
 #version_docker: "29.2.1"
-version_docker: "29.3.0"
+version_docker: "29.4.0"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead
@@ -63,7 +63,7 @@ update_certificates: false
 
 # upper versions blocked now because of bugs in rest api
 # 3.90.0 is not booting test clean nexus initlzr after new fixes version is released
-version_nexus: "3.90.1"
+version_nexus: "3.90.2"
 version_nexus_initlzr: "1.0.8"
 update_nexus: false
 
@@ -76,7 +76,7 @@ version_minio_mc_admin: "RELEASE.2025-08-13T08-35-41Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
 
-version_grafana_alloy : "1.14.1"
+version_grafana_alloy : "1.15.1"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version
