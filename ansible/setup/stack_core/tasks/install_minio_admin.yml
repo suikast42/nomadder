@@ -23,8 +23,8 @@
         async: 360
         poll: 1
         shell: |
-          curl https://dl.min.io/client/mc/release/linux-amd64/archive/mc.{{version_minio_mc_admin}} \
-            -o {{install_file}}
+          wget https://dl.min.io/client/mc/release/linux-amd64/archive/mc.{{version_minio_mc_admin}} \
+            -O{{install_file}}
         args:
           creates: "{{install_file}}"
 
@@ -33,7 +33,7 @@
           path: "{{install_file}}"
           owner: "{{ansible_ssh_user}}"
           group: "{{ansible_ssh_user}}"
-          mode: '0700'
+          mode: '0755'
 
       - name: "Install minio cli autocompletion"
         become: false

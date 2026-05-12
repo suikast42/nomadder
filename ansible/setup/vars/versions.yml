@@ -4,8 +4,8 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.22.6"
-consul_checksum: "sha256:5c2d67c6a364512b3dd0646eaf8bb58fa2fd6b9c890e2f374475deab2a6ec648"
+consul_version: "1.22.7"
+consul_checksum: "sha256:fe25cecd8dd3552a8e5b0941cde1d79bb6004eac384aa45679dd1398f947201d"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
@@ -15,15 +15,15 @@ update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
 #nomad_version: "1.11.1"
-nomad_version: "1.11.3"
-nomad_checksum: "sha256:19dac5642a2ba5305e6ff8efee06a708d760ebe4d1cd7936bc3dc526f477dc12"
+nomad_version: "2.0.0"
+nomad_checksum: "sha256:01d175b8467c2d694ab65755da4bb4d6d771bf8e38d411bf80e17a03f9b83419"
 #nomad_version: "1.11.2" is blocked due to issue https://github.com/hashicorp/nomad/issues/27495
 #nomad_checksum: "sha256:8e8fbc9c3ddae39a63f7ed70a99bb4b936bb6e88ed9160ce0e9d36ff2909c1f3"
 
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.37.2
+version_envoy: 1.38.0
 
 nomad_plugin_cni_version: "1.9.1"
 nomad_plugin_cni_checksum: "sha256:b98f74a0f8522f0a83867178729c1aa70f2158f90c45a2ca8fa791db1c76b303"
@@ -31,8 +31,8 @@ uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
 
-nomad_plugin_consul_cni_version: "1.9.6"
-nomad_plugin_consul_cni_checksum: "sha256:80208dbf81fc6a0fd3786683c8f1042b559e251cebc6bcdeb56ff3e13a1ab546"
+nomad_plugin_consul_cni_version: "1.9.7"
+nomad_plugin_consul_cni_checksum: "sha256:0f7a3c835d40b85b5e119197f1ad07b970e0f6546115560698548093b61270b8"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 
@@ -63,7 +63,7 @@ update_certificates: false
 
 # upper versions blocked now because of bugs in rest api
 # 3.90.0 is not booting test clean nexus initlzr after new fixes version is released
-version_nexus: "3.90.2"
+version_nexus: "3.91.1"
 version_nexus_initlzr: "1.0.8"
 update_nexus: false
 
@@ -76,7 +76,7 @@ version_minio_mc_admin: "RELEASE.2025-08-13T08-35-41Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
 
-version_grafana_alloy : "1.15.1"
+version_grafana_alloy : "1.16.1"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version
