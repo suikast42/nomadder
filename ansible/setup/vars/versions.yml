@@ -15,8 +15,8 @@ update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
 #nomad_version: "1.11.1"
-nomad_version: "2.0.0"
-nomad_checksum: "sha256:01d175b8467c2d694ab65755da4bb4d6d771bf8e38d411bf80e17a03f9b83419"
+nomad_version: "2.0.1"
+nomad_checksum: "sha256:cf5d820b5dc3fcd1ceb8baf3afab46e3a52a56fc3016fcdaed0505f531a39540"
 #nomad_version: "1.11.2" is blocked due to issue https://github.com/hashicorp/nomad/issues/27495
 #nomad_checksum: "sha256:8e8fbc9c3ddae39a63f7ed70a99bb4b936bb6e88ed9160ce0e9d36ff2909c1f3"
 
