@@ -168,6 +168,7 @@ job "observability" {
         }
     }
     task "grafana" {
+     shutdown_delay ="10s"
      volume_mount {
         volume      = "stack_observability_grafana_volume"
         destination = "/var/lib/grafana"
@@ -263,6 +264,7 @@ job "observability" {
        }
     }
       task "mimir"{
+     shutdown_delay ="10s"
         volume_mount {
           volume      = "stack_observability_mimir_volume"
           destination = "/data"
@@ -515,6 +517,7 @@ limits:
      }
 
      task "loki"{
+     shutdown_delay ="10s"
        volume_mount {
          volume      = "stack_observability_loki_volume"
          destination = "/data"
@@ -892,6 +895,7 @@ pattern_ingester:
         }
     }
       task "tempo"{
+      shutdown_delay ="10s"
         volume_mount {
           volume      = "stack_observability_tempo_volume"
           destination = "/data"
@@ -1111,6 +1115,7 @@ overrides:
             }
         }
        task "nats_ui" {
+       shutdown_delay ="10s"
           volume_mount {
             volume      = "stack_observability_nats_ui_volume"
             destination = "/db"
@@ -1185,7 +1190,8 @@ overrides:
 
 
       task "nats-prometheus-exporter" {
-        lifecycle {
+      shutdown_delay ="10s"
+              lifecycle {
           hook = "poststart"
           sidecar = true
         }
@@ -1248,6 +1254,7 @@ overrides:
       }
 
     task "nats" {
+        shutdown_delay ="10s"
          volume_mount {
             volume      = "stack_observability_nats_volume"
             destination = "/data/jetstream"
@@ -1544,7 +1551,7 @@ mappings = {
       }
 
         task "grafana-alloy" {
-
+shutdown_delay ="10s"
         resources {
             cpu    = 200
             memory = 128
@@ -1892,6 +1899,7 @@ discovery.relabel "relabel_consul_targets" {
            }
      }
      task "logunifier" {
+     shutdown_delay ="10s"
      driver = "docker"
             env {
                 GOMAXPROCS = "1"

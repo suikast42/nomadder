@@ -78,6 +78,7 @@ job "security" {
     }
 
     task "keycloak_postgres" {
+      shutdown_delay ="10s"
       volume_mount {
         volume      = "keycloak_postgres_volume"
         destination = "/var/lib/postgresql/data/pgdata"
@@ -178,6 +179,7 @@ job "security" {
 
     }
       task "await-for-keycloak" {
+
         driver = "docker"
 
         config {
@@ -208,6 +210,7 @@ job "security" {
         }
       }
     task "forwardauth" {
+      shutdown_delay ="10s"
       driver = "docker"
       env {
         #        https://brianturchyn.net/traefik-forwardauth-support-with-keycloak/
@@ -372,6 +375,7 @@ job "security" {
         }
       }
     task "keycloak" {
+      shutdown_delay ="10s"
       driver = "docker"
       env {
         KEYCLOAK_ADMIN  = "admin"

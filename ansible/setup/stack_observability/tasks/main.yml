@@ -28,7 +28,7 @@
     version_grafana: "13.0.1"
     version_grafana_nomadder: "{{version_grafana}}.0"
     version_grafana_mimir: "3.0.6"
-    version_grafana_loki: "3.7.1"
+    version_grafana_loki: "3.7.2"
     version_grafana_tempo: "2.10.5"
     version_nats_server: "2.14.0"
     version_nats_server_ui: "0.9.2"

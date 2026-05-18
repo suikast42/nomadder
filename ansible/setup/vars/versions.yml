@@ -15,6 +15,8 @@ update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
 #nomad_version: "1.11.1"
+#nomad_version: "2.0.0"
+#nomad_checksum: "sha256:01d175b8467c2d694ab65755da4bb4d6d771bf8e38d411bf80e17a03f9b83419"
 nomad_version: "2.0.1"
 nomad_checksum: "sha256:cf5d820b5dc3fcd1ceb8baf3afab46e3a52a56fc3016fcdaed0505f531a39540"
 #nomad_version: "1.11.2" is blocked due to issue https://github.com/hashicorp/nomad/issues/27495
@@ -30,7 +32,8 @@ nomad_plugin_cni_checksum: "sha256:b98f74a0f8522f0a83867178729c1aa70f2158f90c45a
 uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
-
+#nomad_plugin_consul_cni_version: "1.9.6"
+#nomad_plugin_consul_cni_checksum: "sha256:80208dbf81fc6a0fd3786683c8f1042b559e251cebc6bcdeb56ff3e13a1ab546"
 nomad_plugin_consul_cni_version: "1.9.7"
 nomad_plugin_consul_cni_checksum: "sha256:0f7a3c835d40b85b5e119197f1ad07b970e0f6546115560698548093b61270b8"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
@@ -51,8 +54,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-#version_docker: "29.2.1"
-version_docker: "29.4.0"
+version_docker: "29.5.0"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead
@@ -61,9 +63,7 @@ uninstall_docker: false
 
 update_certificates: false
 
-# upper versions blocked now because of bugs in rest api
-# 3.90.0 is not booting test clean nexus initlzr after new fixes version is released
-version_nexus: "3.91.1"
+version_nexus: "3.92.2"
 version_nexus_initlzr: "1.0.8"
 update_nexus: false
 

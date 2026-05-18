@@ -66,6 +66,7 @@ job "minio" {
     }
 
     task "minio" {
+      shutdown_delay ="10s"
       volume_mount {
          volume      = "stack_core_minio_volume"
          destination = "/data"
