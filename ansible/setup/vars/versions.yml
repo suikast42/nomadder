@@ -54,7 +54,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "29.5.0"
+version_docker: "29.5.1"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead
