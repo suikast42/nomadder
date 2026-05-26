@@ -4,8 +4,8 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "1.22.7"
-consul_checksum: "sha256:fe25cecd8dd3552a8e5b0941cde1d79bb6004eac384aa45679dd1398f947201d"
+consul_version: "2.0.0"
+consul_checksum: "sha256:25fe76d3203529af59834cff4a29a128050b630d62901be7ad850b9991ddf991"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
@@ -14,8 +14,8 @@ consul_template_checksum: "sha256:94d5044b822c5219bb116916b8d4d2545630e6ce0e1639
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "2.0.0"
-nomad_checksum: "sha256:01d175b8467c2d694ab65755da4bb4d6d771bf8e38d411bf80e17a03f9b83419"
+nomad_version: "2.0.2"
+nomad_checksum: "sha256:694bbbcec397f994299f1a52fe4b1d9276e08ce8a524af54226eb51b9eceddb8"
 # Nomad 2.0.1 has a bug with the job ui view
 #nomad_version: "2.0.1"
 #nomad_checksum: "sha256:cf5d820b5dc3fcd1ceb8baf3afab46e3a52a56fc3016fcdaed0505f531a39540"
@@ -32,8 +32,8 @@ update_nomad_plugin_cni: "{{update_all or false }}"
 
 #nomad_plugin_consul_cni_version: "1.9.6"
 #nomad_plugin_consul_cni_checksum: "sha256:80208dbf81fc6a0fd3786683c8f1042b559e251cebc6bcdeb56ff3e13a1ab546"
-nomad_plugin_consul_cni_version: "1.9.7"
-nomad_plugin_consul_cni_checksum: "sha256:0f7a3c835d40b85b5e119197f1ad07b970e0f6546115560698548093b61270b8"
+nomad_plugin_consul_cni_version: "2.0.0"
+nomad_plugin_consul_cni_checksum: "sha256:8d6367f4e2966bd8ec54d14b5005cccf69d537c9ceb80bdf5c2aa898ab0783a0"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 
@@ -52,7 +52,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "29.5.1"
+version_docker: "29.5.2"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead
