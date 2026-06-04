@@ -24,7 +24,7 @@
     grafana_agent_user: grafana_agent
     grafana_agent_config_dir: "/etc/grafana.agent.d"
     grafana_agent_working_dir: "{{service_working_dir_base}}/observability/grafana_agent"
-    version_vector_agent: "0.55.0-1"
+    version_vector_agent: "0.56.0-1"
     uninstall_vector_agent: "{{uninstall_all or false }}"
     update_vector_agent: "{{update_all or false }}"
     consul_cert_path: "{{base_cert_dir}}/consul"

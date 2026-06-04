@@ -23,7 +23,7 @@
 #        owner: "{{ ansible_ssh_user }}"
 #        group: "{{ ansible_ssh_user }}"
 #        mode: 0755
-        checksum: "{{nats_cli_nsc_checksum}}"
+#        checksum: "{{nats_cli_nsc_checksum}}"
       register: nats_cli_nsc_download
 
     - name: "Unzip nats cli archive"

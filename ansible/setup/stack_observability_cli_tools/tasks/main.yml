@@ -10,8 +10,8 @@
   vars:
       version_nats_cli: "0.4.0"
       update_nats_cli: "{{update_all or false }}"
-      version_nats_cli_nsc: "2.12.2"
-      nats_cli_nsc_checksum: "sha256:8414c04db40a7ee18c3ce389604230c2f327c0093fd1c84cb237dfe94480af5f"
+      version_nats_cli_nsc: "2.15.0"
+#      nats_cli_nsc_checksum: "sha256:7d55eda757dc9f233675a3038fcf8779bcda99753b1603f7009fc8537e126b7e"
       update_nats_cli_nsc: "{{update_all or false }}"
       uninstall_nats_cli_nsc: "{{uninstall_all or false }}"
         # grafana desktop manager
