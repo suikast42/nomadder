@@ -49,6 +49,21 @@ curl -X POST -H 'Content-Type: application/json' http://localhost:4318/v1/traces
 ----
 
 
+|Migration and config check
+
+a|[source,shell]
+----
+git clone https://github.com/grafana/tempo.git
+go mod tidy
+go  build -v  ./cmd/tempo-cli
+make tempo-cli
+sudo mv ./bin/linux/tempo-cli-amd64 /usr/local/bin/tempo-cli
+
+tempo-cli migrate config --mode=monolithic tempo2.yaml > tempo3.yaml
+----
+
+
+
 |===
 
 
