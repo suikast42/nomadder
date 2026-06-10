@@ -14,8 +14,8 @@ consul_template_checksum: "sha256:94d5044b822c5219bb116916b8d4d2545630e6ce0e1639
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "2.0.2"
-nomad_checksum: "sha256:694bbbcec397f994299f1a52fe4b1d9276e08ce8a524af54226eb51b9eceddb8"
+nomad_version: "2.0.3"
+nomad_checksum: "sha256:8455d5691de4cb451e9443282f1c0171570b480737fc6386992638c52a4795e4"
 # Nomad 2.0.1 has a bug with the job ui view
 #nomad_version: "2.0.1"
 #nomad_checksum: "sha256:cf5d820b5dc3fcd1ceb8baf3afab46e3a52a56fc3016fcdaed0505f531a39540"
@@ -23,7 +23,7 @@ nomad_checksum: "sha256:694bbbcec397f994299f1a52fe4b1d9276e08ce8a524af54226eb51b
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.38.0
+version_envoy: 1.38.1
 
 nomad_plugin_cni_version: "1.9.1"
 nomad_plugin_cni_checksum: "sha256:b98f74a0f8522f0a83867178729c1aa70f2158f90c45a2ca8fa791db1c76b303"
@@ -61,7 +61,7 @@ uninstall_docker: false
 
 update_certificates: false
 
-version_nexus: "3.92.3"
+version_nexus: "3.93.0"
 version_nexus_initlzr: "1.0.8"
 update_nexus: false
 
@@ -74,7 +74,7 @@ version_minio_mc_admin: "RELEASE.2025-08-13T08-35-41Z"
 uninstall_minio_admin: "{{uninstall_all or false }}"
 update_minio_admin: "{{update_all or false }}"
 
-version_grafana_alloy: "1.16.2"
+version_grafana_alloy: "1.16.3"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version
