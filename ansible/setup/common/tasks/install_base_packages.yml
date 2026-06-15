@@ -40,8 +40,7 @@
       - python3-docker
       - traceroute
       - ubuntu-release-upgrader-core
-      - neofetch
-      - tldr
+      - hyfetch
       - members
       - speedtest-cli
     #      - cadvisor

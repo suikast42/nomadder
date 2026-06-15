@@ -10,7 +10,7 @@ if not plugins_to_install.empty?
   end
 end
 
-$vm_base_box="suikast42/ubuntu-24.04_64"
+$vm_base_box="suikast420/ubuntu-26.04_64"
 $vm_base_box_version="1.0.0"
 
 $vm_mem_master_01 = 8096 # 8 GB RAM for master
@@ -26,13 +26,13 @@ $vm_worker_01_ip = "172.21.1.21"
 
 $vm_mem_worker_02 = 14000  # 42 GB RAM for the workloads
 $vm_cpus_worker_02 = 4
-$vm_hostname_worker_02 = "worker-02"
+$vm_hostname_worker_02 = "worker-002"
 $vm_worker_02_ip = "172.21.1.21"
 
 
 $vm_mem_worker_03 = 14000  # 42 GB RAM for the workloads
 $vm_cpus_worker_03 = 4
-$vm_hostname_worker_03 = "worker-03"
+$vm_hostname_worker_03 = "worker-003"
 $vm_worker_03_ip = "172.21.1.22"
 
 

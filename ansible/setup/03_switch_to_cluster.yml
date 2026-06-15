@@ -4,13 +4,6 @@
     - vars/common_vars.yml
     - vars/local_secret.yml
   tasks:
-    - name: "Check env will fail {{fail_when_not_development_env|bool == true }}"
-      changed_when: false
-      failed_when: fail_when_not_development_env|bool == true
-      shell: |
-        echo current env is {{env}} and hostip is  {{host_ip}}
-      tags:
-        - always
 
     - name: "Copy docker cert to client"
       block:
@@ -40,3 +33,4 @@
     cfssl_working_dir: "{{cert_path_master_0}}/{{host_name}}/nomad"
     server_cert_path_docker_client: "/etc/opt/certs/docker"
     local_cert_path_docker_client: "{{ lookup('env','DOCKER_CERT_PATH') }}"
+    env: "dev"
