@@ -33,36 +33,3 @@
   vars:
     stack_core_keycloak_postgres_volume_17: "{{nomad_volumes_dir}}/core/postgres17"
 
-- name: Create Minio volume
-  when: is_worker_0
-#  when: is_worker_host
-  block:
-
-    - name: Create stack core create minio volume
-      include_tasks: nomad/tasks/nomad_volumes.yml
-      loop:
-        - { name: 'stack_core_minio_volume' , path: '{{stack_core_minio_volume}}'}
-
-    - name: Stop nomad service if needed
-      become: true
-      # fact comes from task nomad/tasks/nomad_volumes.yml
-      when: volume_changed | bool == true
-      service:
-        name: nomad
-        state: stopped
-
-    - name: Start nomad if needed
-      become: true
-      # fact comes from task nomad/tasks/nomad_volumes.yml
-      when: volume_changed | bool == true
-      service:
-        name: nomad
-        state: started
-      register: nomadService
-      until: nomadService.status.ActiveState == "active"
-      async: 300
-      retries: 10
-      delay: 5
-
-  vars:
-    stack_core_minio_volume: "{{nomad_volumes_dir}}/core/minio"
