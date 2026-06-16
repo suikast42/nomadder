@@ -3,13 +3,13 @@
   become: true
   block:
   - name: Grafana alloy uninstall
-    when: uninstall_grafana_alloy|bool == true
+    when: uninstall_grafana_alloy| bool == true
     block:
       - name: Uninstall Alloy
         ansible.builtin.include_role:
           name: grafana.grafana.alloy
         vars:
-          alloy_uninstall:  "{{uninstall_grafana_alloy}}"
+          alloy_uninstall:  true
 
       - name: "Delete grafana alloy conf dir {{grafana_alloy_config_dir}}"
         ansible.builtin.file:
