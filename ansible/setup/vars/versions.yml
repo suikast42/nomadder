@@ -23,7 +23,7 @@ nomad_checksum: "sha256:8455d5691de4cb451e9443282f1c0171570b480737fc6386992638c5
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.38.2
+version_envoy: 1.38.3
 
 nomad_plugin_cni_version: "1.9.1"
 nomad_plugin_cni_checksum: "sha256:b98f74a0f8522f0a83867178729c1aa70f2158f90c45a2ca8fa791db1c76b303"
