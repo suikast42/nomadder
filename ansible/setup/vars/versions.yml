@@ -68,7 +68,7 @@ version_busy_box_init_container: "1.37.0"
 version_multi_stage_apline_container: "3.17.2"
 version_grafana_agent_container: "0.44.3"
 
-version_grafana_alloy: "1.17.0"
+version_grafana_alloy: "1.17.1"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version

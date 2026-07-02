@@ -84,6 +84,8 @@ job "security" {
         destination = "/var/lib/postgresql/data/pgdata"
       }
       driver = "docker"
+      kill_timeout = "30s"
+      kill_signal  = "SIGTERM"
       env {
         POSTGRES_USER        = "keycloak"
         # tell pg_isready to use this user
@@ -377,6 +379,9 @@ job "security" {
     task "keycloak" {
       shutdown_delay ="10s"
       driver = "docker"
+      kill_timeout = "30s"
+      kill_signal  = "SIGTERM"
+
       env {
         KEYCLOAK_ADMIN  = "admin"
         KC_HTTP_ENABLED= "true"

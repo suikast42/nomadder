@@ -169,12 +169,15 @@ job "observability" {
     }
     task "grafana" {
      shutdown_delay ="10s"
+     driver = "docker"
+     kill_timeout = "30s"
+     kill_signal  = "SIGTERM"
      volume_mount {
         volume      = "stack_observability_grafana_volume"
         destination = "/var/lib/grafana"
       }
 
-      driver = "docker"
+
       env {
         GF_AUTH_OAUTH_AUTO_LOGIN= "true"
         GF_FEATURE_TOGGLES_ENABLE="dashboardScene accessControlOnCall lokiLogsDataplane exploreLogsShardSplitting"
@@ -264,13 +267,15 @@ job "observability" {
        }
     }
       task "mimir"{
-     shutdown_delay ="10s"
+       shutdown_delay ="10s"
+       driver = "docker"
+       kill_timeout = "30s"
+       kill_signal  = "SIGTERM"
         volume_mount {
           volume      = "stack_observability_mimir_volume"
           destination = "/data"
         }
 
-         driver = "docker"
    #      env {
    #        JAEGER_ENDPOINT = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift" # send traces to Tempo
    #        JAEGER_REPORTER_LOG_SPANS=true
@@ -517,13 +522,15 @@ limits:
      }
 
      task "loki"{
-     shutdown_delay ="10s"
+       shutdown_delay ="10s"
+       driver = "docker"
+       kill_timeout = "30s"
+       kill_signal  = "SIGTERM"
        volume_mount {
          volume      = "stack_observability_loki_volume"
          destination = "/data"
        }
 
-     driver = "docker"
    #  env {
    #    JAEGER_ENDPOINT = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift" # send traces to Tempo
    #    JAEGER_REPORTER_LOG_SPANS=true
@@ -895,13 +902,15 @@ pattern_ingester:
         }
     }
       task "tempo"{
-      shutdown_delay ="10s"
+        shutdown_delay ="10s"
+        driver = "docker"
+        kill_timeout = "30s"
+        kill_signal  = "SIGTERM"
         volume_mount {
           volume      = "stack_observability_tempo_volume"
           destination = "/data"
         }
 
-         driver = "docker"
        #   env {
        #   # Not needed for tempo itself
        #  #   JAEGER_ENDPOINT = "http://tempo-jaeger.service.consul:14268/api/traces?format=jaeger.thrift" # send traces to Tempo
@@ -1095,12 +1104,14 @@ overrides:
             }
         }
        task "nats_ui" {
-       shutdown_delay ="10s"
+         shutdown_delay ="10s"
+         driver = "docker"
+         kill_timeout = "30s"
+         kill_signal  = "SIGTERM"
           volume_mount {
             volume      = "stack_observability_nats_ui_volume"
             destination = "/db"
           }
-         driver = "docker"
          config {
          image = "{{registry_dns}}/nats-nui/nui:${var.version_nats_server_ui}"
          {% if set_cpu_hard_limit %}
@@ -1170,7 +1181,10 @@ overrides:
 
 
       task "nats-prometheus-exporter" {
-      shutdown_delay ="10s"
+        shutdown_delay ="10s"
+        driver = "docker"
+        kill_timeout = "30s"
+        kill_signal  = "SIGTERM"
               lifecycle {
           hook = "poststart"
           sidecar = true
@@ -1201,7 +1215,6 @@ overrides:
                 }
             }
           }
-        driver = "docker"
         config {
            # for debugging
           #  image = "{{registry_dns}}/{{stack_name}}/prometheus-nats-exporter:${var.version_nats_prometheus_exporter}"
@@ -1234,12 +1247,14 @@ overrides:
       }
 
     task "nats" {
-        shutdown_delay ="10s"
+          shutdown_delay ="10s"
+          driver = "docker"
+          kill_timeout = "30s"
+          kill_signal  = "SIGTERM"
          volume_mount {
             volume      = "stack_observability_nats_volume"
             destination = "/data/jetstream"
           }
-             driver = "docker"
              config {
              image = "{{registry_dns}}/nats:${var.version_nats_server}-alpine"
  {% if set_cpu_hard_limit %}
@@ -1531,7 +1546,10 @@ mappings = {
       }
 
         task "grafana-alloy" {
-shutdown_delay ="10s"
+         shutdown_delay ="10s"
+         driver = "docker"
+         kill_timeout = "30s"
+         kill_signal  = "SIGTERM"
         resources {
             cpu    = 200
             memory = 128
@@ -1549,7 +1567,6 @@ shutdown_delay ="10s"
             volume      = "cert_consul"
             destination = "/certs/consul"
         }
-        driver = "docker"
         config {
             image = "{{registry_dns}}/grafana/alloy:v${var.version_grafana_alloy}"
 
@@ -1879,8 +1896,10 @@ discovery.relabel "relabel_consul_targets" {
            }
      }
      task "logunifier" {
-     shutdown_delay ="10s"
-     driver = "docker"
+      shutdown_delay ="10s"
+      driver = "docker"
+      kill_timeout = "30s"
+      kill_signal  = "SIGTERM"
             env {
                 GOMAXPROCS = "1"
             }
