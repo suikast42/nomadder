@@ -417,6 +417,22 @@ signal=2 means SIGINT was sent.
 signal=9 means SIGKILL was sent (this happens if your kill_timeout expires).
 ----
 
+.Find the right signals for the container
+
+1. When to use SIGINT (Signal 2)
+PostgreSQL: PostgreSQL interprets SIGTERM as a "Smart Shutdown" (wait forever for clients to disconnect), which causes it to time out and get forcefully killed (SIGKILL) by Nomad. SIGINT forces it into a "Fast Shutdown" where it drops connections, flushes the write-ahead logs cleanly to disk, and stops safely.
+
+Interactive CLI tools: Tools designed to be stopped manually by a human pressing Ctrl+C in a terminal.
+
+2. When to keep SIGTERM (Signal 15 - Default)
+Keep SIGTERM for virtually everything else in your Nomad file, including:
+
+Keycloak: Keycloak is a Java/Quarkus application. When it receives SIGTERM, it gracefully drains its active web requests, stops accepting new HTTP traffic, safely closes its database connection pool, and exits. If you send it SIGINT, it might terminate abruptly without finishing ongoing user authentications.
+
+Traefik / Ingress Proxies: Reverse proxies need SIGTERM so they can stop announcing themselves to the cluster, finish routing existing traffic (connection draining), and then close down.
+
+Node.js, Go, Python, and .NET Web APIs: Standard microservices are programmed out-of-the-box to listen for SIGTERM to close database connections and shut down HTTP servers smoothly.
+
 === Links
 [[_200_link_nomad_task_init,nomad task dependencies]]https://developer.hashicorp.com/nomad/tutorials/task-deps/task-dependencies-interjob[Express Inter-job Dependencies with Init Tasks]
 
