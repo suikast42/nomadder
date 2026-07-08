@@ -402,6 +402,15 @@ The job will receive CPU time equivalent to 1.6 full 2.5 GHz cores.
 
 Nomad handles the scheduling and CPU isolation via cgroups, which manage time shares based on the requested MHz value, ensuring the job gets its proportional slice of the total host compute.
 
+==== 4. Docker Driver Config
+
+.Find which kill signals are sent to the containers
+[source,shell]
+----
+docker events --filter 'event=kill'
+nomad job stop <jobname>
+----
+
 === Links
 [[_200_link_nomad_task_init,nomad task dependencies]]https://developer.hashicorp.com/nomad/tutorials/task-deps/task-dependencies-interjob[Express Inter-job Dependencies with Init Tasks]
 

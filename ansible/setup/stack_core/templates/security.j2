@@ -84,8 +84,8 @@ job "security" {
         destination = "/var/lib/postgresql/data/pgdata"
       }
       driver = "docker"
-      kill_timeout = "30s"
-      kill_signal  = "SIGTERM"
+      kill_timeout = "90s"
+      kill_signal  = "SIGINT"
       env {
         POSTGRES_USER        = "keycloak"
         # tell pg_isready to use this user
@@ -101,9 +101,12 @@ job "security" {
  {% if set_cpu_hard_limit %}
         cpu_hard_limit = "true"
  {% endif %}
-        volumes = [
-          "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
-        ]
+        # ❌ REMOVED: "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
+        # Keycloak automatically creates its own schema structures if they don't exist.
+        # Mapping init scripts on raw host mounts triggers initialization race conditions during crash loops.
+        #       volumes = [
+        #         "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
+        #       ]
         ports = ["db"]
         labels = {
            "com.github.logunifier.application.name" = "keycloak_postgres"
@@ -176,8 +179,8 @@ job "security" {
           destination = "/var/lib/postgresql/data/pgdata"
         }
         driver = "docker"
-        kill_timeout = "30s"
-        kill_signal  = "SIGTERM"
+        kill_timeout = "90s"
+        kill_signal  = "SIGINT"
         #  run the container as postgres user. This is required to restore a
         #  database that was created by a different user.
         user  = "postgres"
@@ -195,9 +198,12 @@ job "security" {
    {% if set_cpu_hard_limit %}
           cpu_hard_limit = "true"
    {% endif %}
-          volumes = [
-            "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
-          ]
+           # ❌ REMOVED: "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
+           # Keycloak automatically creates its own schema structures if they don't exist.
+           # Mapping init scripts on raw host mounts triggers initialization race conditions during crash loops.
+      #    volumes = [
+      #      "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
+      #    ]
           ports = ["db"]
           labels = {
              "com.github.logunifier.application.name" = "keycloak_postgres"

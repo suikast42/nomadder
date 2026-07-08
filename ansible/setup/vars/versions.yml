@@ -14,11 +14,8 @@ consul_template_checksum: "sha256:94d5044b822c5219bb116916b8d4d2545630e6ce0e1639
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "2.0.3"
-nomad_checksum: "sha256:8455d5691de4cb451e9443282f1c0171570b480737fc6386992638c52a4795e4"
-# Nomad 2.0.1 has a bug with the job ui view
-#nomad_version: "2.0.1"
-#nomad_checksum: "sha256:cf5d820b5dc3fcd1ceb8baf3afab46e3a52a56fc3016fcdaed0505f531a39540"
+nomad_version: "2.0.4"
+nomad_checksum: "sha256:f6b0d555f65de7d81ef3274d7d7dfcad6ff24d6e6214a806deb5c50b909e47b7"
 
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
