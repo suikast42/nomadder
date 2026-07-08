@@ -409,6 +409,12 @@ Nomad handles the scheduling and CPU isolation via cgroups, which manage time sh
 ----
 docker events --filter 'event=kill'
 nomad job stop <jobname>
+
+signal=15 means SIGTERM was sent.
+
+signal=2 means SIGINT was sent.
+
+signal=9 means SIGKILL was sent (this happens if your kill_timeout expires).
 ----
 
 === Links
