@@ -170,8 +170,8 @@ job "observability" {
     task "grafana" {
      shutdown_delay ="10s"
      driver = "docker"
-     kill_timeout = "30s"
-     kill_signal  = "SIGTERM"
+     kill_timeout = "60s"
+     kill_signal  = "SIGINT"
      volume_mount {
         volume      = "stack_observability_grafana_volume"
         destination = "/var/lib/grafana"
@@ -269,8 +269,8 @@ job "observability" {
       task "mimir"{
        shutdown_delay ="10s"
        driver = "docker"
-       kill_timeout = "30s"
-       kill_signal  = "SIGTERM"
+       kill_timeout = "60s"
+       kill_signal  = "SIGINT"
         volume_mount {
           volume      = "stack_observability_mimir_volume"
           destination = "/data"
@@ -524,8 +524,8 @@ limits:
      task "loki"{
        shutdown_delay ="10s"
        driver = "docker"
-       kill_timeout = "30s"
-       kill_signal  = "SIGTERM"
+       kill_timeout = "60s"
+       kill_signal  = "SIGINT"
        volume_mount {
          volume      = "stack_observability_loki_volume"
          destination = "/data"
@@ -904,8 +904,8 @@ pattern_ingester:
       task "tempo"{
         shutdown_delay ="10s"
         driver = "docker"
-        kill_timeout = "30s"
-        kill_signal  = "SIGTERM"
+        kill_timeout = "60s"
+        kill_signal  = "SIGINT"
         volume_mount {
           volume      = "stack_observability_tempo_volume"
           destination = "/data"
@@ -1249,8 +1249,8 @@ overrides:
     task "nats" {
           shutdown_delay ="10s"
           driver = "docker"
-          kill_timeout = "30s"
-          kill_signal  = "SIGTERM"
+          kill_timeout = "60s"
+          kill_signal  = "SIGINT"
          volume_mount {
             volume      = "stack_observability_nats_volume"
             destination = "/data/jetstream"
