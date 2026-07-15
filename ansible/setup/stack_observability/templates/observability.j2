@@ -182,6 +182,7 @@ job "observability" {
         GF_AUTH_OAUTH_AUTO_LOGIN= "true"
         GF_FEATURE_TOGGLES_ENABLE="dashboardScene accessControlOnCall lokiLogsDataplane exploreLogsShardSplitting"
         GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP= "true"
+
         GF_SERVER_DOMAIN = "grafana.{{tls_san}}"
         GF_PATHS_CONFIG  = "/etc/grafana/grafana2.ini"
         GF_PATHS_PLUGINS  = "/var/lib/grafana2/plugins"
