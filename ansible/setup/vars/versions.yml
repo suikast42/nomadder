@@ -4,8 +4,8 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "2.0.2"
-consul_checksum: "sha256:96e56c9d06b4a15bfa316afa39af926c1b67d189f66388dc1eecbb7c26faeed4"
+consul_version: "2.0.3"
+consul_checksum: "sha256:3020eea3fdfd939eb021ecaca105a1513af52b22e76f2ee97ea85acc6ff2f832"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
@@ -27,8 +27,8 @@ nomad_plugin_cni_checksum: "sha256:b98f74a0f8522f0a83867178729c1aa70f2158f90c45a
 uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
-nomad_plugin_consul_cni_version: "2.0.2"
-nomad_plugin_consul_cni_checksum: "sha256:73a700dfeff1867b590496d610f5d4d650ee10b7971579d7a43bf83f359a46b5"
+nomad_plugin_consul_cni_version: "2.0.3"
+nomad_plugin_consul_cni_checksum: "sha256:13391248335d35e2021924a399c2c81f3c38eea5d0a197619e1487d8543ce14a"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 
@@ -56,7 +56,7 @@ uninstall_docker: false
 
 update_certificates: false
 
-version_nexus: "3.94.0"
+version_nexus: "3.95.1"
 version_nexus_initlzr: "1.0.8"
 update_nexus: false
 
@@ -65,7 +65,7 @@ version_busy_box_init_container: "1.37.0"
 version_multi_stage_apline_container: "3.17.2"
 version_grafana_agent_container: "0.44.3"
 
-version_grafana_alloy: "1.18.0"
+version_grafana_alloy: "1.18.1"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version
