@@ -379,6 +379,7 @@ ingester_client:
     grpc_compression: snappy
 
 query_scheduler:
+  max_outstanding_requests_per_tenant: 10000
   grpc_client_config:
     grpc_compression: snappy
 
@@ -972,7 +973,7 @@ distributor:
       endpoint: 0.0.0.0:9411
 
 query_frontend:
-
+  max_outstanding_per_tenant: 10000
   # Metrics query configuration
   metrics:
     # The target number of bytes for each job to handle when querying the backend. 0 disabled 3h default
