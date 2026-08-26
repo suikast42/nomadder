@@ -45,7 +45,6 @@ grafana cli --pluginsDir=$GF_PATHS_PLUGINS  plugins install  grafana-pyroscope-a
 grafana cli --pluginsDir=$GF_PATHS_PLUGINS  plugins install  grafana-lokiexplore-app  &&
 grafana cli --pluginsDir=$GF_PATHS_PLUGINS  plugins install  grafana-metricsdrilldown-app  &&
 grafana cli --pluginsDir=$GF_PATHS_PLUGINS  plugins install  grafana-exploretraces-app  &&
-grafana cli --pluginsDir=$GF_PATHS_PLUGINS  plugins install  grafana-investigations-app  &&
 
 
 echo All plugins are installed

@@ -11,8 +11,8 @@ COPY installPlugins.sh /home/grafana/installPlugins.sh
 
 USER root
 RUN chmod +x /home/grafana/installPlugins.sh
-RUN  sh /home/grafana/installPlugins.sh
-COPY --from=tarampampam/curl:7.78.0 /bin/curl /bin/curl
+RUN  sh /home/grafana/installPlugins.sh 2>&1 | tee /home/grafana/installPlugins.log
+COPY --from=tarampampam/curl:8.2.0 /bin/curl /bin/curl
 
 FROM {{registry_dns}}/grafana/grafana:{{version_grafana}}
 LABEL org.opencontainers.image.authors="sueleyman.vurucu@amova.eu"
@@ -24,6 +24,7 @@ RUN mkdir  -p /var/lib/grafana2/plugins
 RUN chown -R grafana /var/lib/grafana2
 RUN chmod -R 777 /var/lib/grafana2
 COPY --from=builder /var/lib/grafana/plugins /var/lib/grafana2/plugins
+COPY --from=builder /home/grafana/installPlugins.log /var/lib/grafana2/plugins/installPlugins.log
 COPY --from=builder /bin/curl /bin/curl
 # Do not provision datasources anymore. The DS can't be updated after setup
 # Use grafana manager for provision dasources over api
