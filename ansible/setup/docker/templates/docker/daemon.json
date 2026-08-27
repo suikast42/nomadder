@@ -12,6 +12,8 @@
   "userland-proxy": false,
   "dns" : ["172.17.0.1"],
   "default-ulimit": "nofile=50:100",
+  "shutdown-timeout": 60,
+  "metrics-addr": "127.0.0.1:9323",
   {% if is_build_host %}
   "hosts": ["unix:///var/run/docker.sock", "tcp://{{host_ip}}:2375"],
   {% endif %}

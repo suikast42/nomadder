@@ -8,7 +8,7 @@
     service_facts:
 
   - name: "Apt Install dnsmasq"
-    when: "'dnsmasq.service' not in services"
+    when: "'dnsmasq.service' not in ansible_facts.services"
     apt:
       update_cache: true
       force_apt_get: true

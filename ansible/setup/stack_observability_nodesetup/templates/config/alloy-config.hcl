@@ -21,6 +21,19 @@ prometheus.scrape "nomad_exporter" {
 }
 
 
+prometheus.scrape "docker_exporter" {
+  job_name = "integrations/docker"
+  targets = [{
+    __address__ = "localhost:9323", agent_hostname = "{{host_name}}",
+  }]
+  forward_to = [prometheus.relabel.job_to_hostname.receiver]
+  params = {
+    format = ["prometheus"],
+  }
+  scrape_interval = "10s"
+  metrics_path = "/metrics"
+  scheme = "http"
+}
 
 prometheus.exporter.unix "node_exporter" {
 
