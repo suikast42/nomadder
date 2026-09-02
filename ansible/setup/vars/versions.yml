@@ -20,7 +20,7 @@ nomad_checksum: "sha256:f6b0d555f65de7d81ef3274d7d7dfcad6ff24d6e6214a806deb5c50b
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.39.0
+version_envoy: 1.39.1
 
 nomad_plugin_cni_version: "1.9.1"
 nomad_plugin_cni_checksum: "sha256:b98f74a0f8522f0a83867178729c1aa70f2158f90c45a2ca8fa791db1c76b303"
@@ -56,7 +56,7 @@ uninstall_docker: false
 
 update_certificates: false
 
-version_nexus: "3.95.1"
+version_nexus: "3.96.0"
 version_nexus_initlzr: "1.0.8"
 update_nexus: false
 

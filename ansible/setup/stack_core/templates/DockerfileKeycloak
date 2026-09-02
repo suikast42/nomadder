@@ -8,7 +8,7 @@
 
 
 #https://www.keycloak.org/server/containers
-FROM {{registry_dns}}/keycloak/keycloak:{{version_keycloak}} as stage2
+FROM {{registry_ip}}:{{registry_port}}/keycloak/keycloak:{{version_keycloak}} as stage2
 #COPY --from=stage1  /tmp/keycloak-metrics-spi-{{version_keycloak_metrics_spi}}.jar  /opt/keycloak/providers/keycloak-metrics-spi-{{version_keycloak_metrics_spi}}.jar
 ENV KC_HEALTH_ENABLED=true
 ENV KC_METRICS_ENABLED=true
@@ -23,7 +23,7 @@ USER keycloak
 RUN /opt/keycloak/bin/kc.sh build --features="token-exchange,persistent-user-sessions"
 #RUN opt/keycloak/bin/kc.sh import --dir /data/import --override true
 
-FROM {{registry_dns}}/keycloak/keycloak:{{version_keycloak}}
+FROM {{registry_ip}}:{{registry_port}}/keycloak/keycloak:{{version_keycloak}}
 COPY --from=stage2 /opt/keycloak/ /opt/keycloak/
 WORKDIR /opt/keycloak
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]

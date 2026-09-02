@@ -1,5 +1,5 @@
 # TODO http://docs.grafana.org/administration/provisioning/ import datasource and dashboard
-FROM {{registry_dns}}/grafana/grafana:{{version_grafana}} AS builder
+FROM {{registry_ip}}:{{registry_port}}/grafana/grafana:{{version_grafana}} AS builder
 
 #ENV GF_PATHS_PLUGINS=/data/grafana/plugins
 #
@@ -12,9 +12,9 @@ COPY installPlugins.sh /home/grafana/installPlugins.sh
 USER root
 RUN chmod +x /home/grafana/installPlugins.sh
 RUN  sh /home/grafana/installPlugins.sh 2>&1 | tee /home/grafana/installPlugins.log
-COPY --from=tarampampam/curl:8.2.0 /bin/curl /bin/curl
+COPY --from={{registry_ip}}:{{registry_port}}/tarampampam/curl:8.2.0 /bin/curl /bin/curl
 
-FROM {{registry_dns}}/grafana/grafana:{{version_grafana}}
+FROM {{registry_ip}}:{{registry_port}}/grafana/grafana:{{version_grafana}}
 LABEL org.opencontainers.image.authors="sueleyman.vurucu@amova.eu"
 # /var/lib/grafana is a mounted volume in deployment
 # For flexible plugin update map the plugins folder outise of volume config
