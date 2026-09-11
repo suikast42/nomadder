@@ -4,18 +4,21 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "2.0.3"
-consul_checksum: "sha256:3020eea3fdfd939eb021ecaca105a1513af52b22e76f2ee97ea85acc6ff2f832"
+consul_version: "2.0.4"
+consul_checksum: "sha256:7a28033850a24fd411722593931625d8b548a27646c3ab70c1379ea7fd2af423"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
-consul_template_version: "0.42.1"
-consul_template_checksum: "sha256:ab86817a4acf619c6612d99b8e11496a81027f2b84632887c941c3e7d43cbaa7"
+consul_template_version: "0.43.0"
+consul_template_checksum: "sha256:aa49f009a708f3e3beea990aa29cfaecfe6925c0b17ca9201747e1469922264e"
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
 nomad_version: "2.0.4"
 nomad_checksum: "sha256:f6b0d555f65de7d81ef3274d7d7dfcad6ff24d6e6214a806deb5c50b909e47b7"
+# 2.0.6 ois blocked until this issue https://github.com/hashicorp/nomad/issues/28537 resloved
+#nomad_version: "2.0.6"
+#nomad_checksum: "sha256:c6da734081a41d51cadf15ec880d5eab0313093a29d2ee0984ca5ae1cdf867ec"
 
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
@@ -27,8 +30,8 @@ nomad_plugin_cni_checksum: "sha256:b98f74a0f8522f0a83867178729c1aa70f2158f90c45a
 uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
-nomad_plugin_consul_cni_version: "2.0.3"
-nomad_plugin_consul_cni_checksum: "sha256:13391248335d35e2021924a399c2c81f3c38eea5d0a197619e1487d8543ce14a"
+nomad_plugin_consul_cni_version: "2.0.4"
+nomad_plugin_consul_cni_checksum: "sha256:4752049f9f03cb68bf027dab67dda620fa9612ee05ccbf2669dac7c24ecb7ed4"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 

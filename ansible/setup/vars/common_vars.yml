@@ -2,7 +2,7 @@
 tls_san: "{{ lookup('ansible.builtin.env', 'TLS_SAN') }}"
 tls_san_wc:
   -  "*.{{tls_san}}"
-host_name: "{{ ansible_hostname  }}"
+host_name: "{{ ansible_facts['hostname'] }}"
 
 
 
@@ -19,7 +19,7 @@ security_dns: "security.{{tls_san}}"
 masters: "{{ groups['masters'] }}"
 workers: "{{ groups['workers'] }}"
 builders: "{{ groups['build'] }}"
-worker_names: "{{groups['workers']|map('extract', hostvars, ['ansible_hostname']) |list}}"
+worker_names: "{{groups['workers']|map('extract', hostvars, ['ansible_facts', 'hostname']) |list}}"
 worker_index: "{{groups['workers'].index(inventory_hostname)}}"
 
 #hostvars is a dictionary which has an entry for each inventory host.
@@ -37,8 +37,8 @@ is_local_host: "{{ inventory_hostname in groups['localhost'] }}"
 is_build_host: "{{ inventory_hostname in groups['build'] }}"
 is_master_host: "{{ inventory_hostname in groups['masters'] }}"
 is_worker_host: "{{ inventory_hostname in groups['workers'] }}"
-is_master_0: "{{is_master_host and hostvars[groups['masters'][0]]['ansible_hostname'] == host_name}}"
-is_worker_0: "{{is_worker_host and hostvars[groups['workers'][0]]['ansible_hostname'] == host_name}}"
+is_master_0: "{{is_master_host and hostvars[groups['masters'][0]]['ansible_facts']['hostname'] == host_name}}"
+is_worker_0: "{{is_worker_host and hostvars[groups['workers'][0]]['ansible_facts']['hostname'] == host_name}}"
 is_devnode : "{{ groups['devnode'] is defined and inventory_hostname in groups['devnode'] }}"
 
 vault_dns: "vault.{{tls_san}}"
