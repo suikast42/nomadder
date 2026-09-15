@@ -50,7 +50,6 @@
       creates: ~/.vim/pack/jvirtanen/start
 
   - name: Template zshenv
-    when: is_devnode or is_master_0
     template:
       force: yes
       src: .zshenv
