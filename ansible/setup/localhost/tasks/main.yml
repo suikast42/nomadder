@@ -29,30 +29,6 @@
       name:
         - python3-pexpect
         - python3-docker
-  # Install secint on localhost
-  # Need for autoconfigure consul
-  # See https://github.com/hashicorp/learn-consul-docker/tree/main/datacenter-deploy-auto-config/secint
-  - name: Install secint
-    shell: |
-      rm -rf ./secint
-      git clone https://github.com/banks/secint
-      cd secint
-      go build 
-    failed_when: build.rc > 0
-    register: build
-
-  - name: Move secint to /usr/local/bin
-    become: true
-    shell: |
-      cd secint
-      mv secint /usr/local/bin
-      cd ..
-      rm -R secint
-#    failed_when: install.rc > 0
-#    args:
-#      creates: /usr/local/bin/secint
-#    register: build
-#
 
 
 
@@ -74,7 +50,7 @@
       creates: ~/.vim/pack/jvirtanen/start
 
   - name: Template zshenv
-    when: is_devnode
+    when: is_devnode or is_master_0
     template:
       force: yes
       src: .zshenv
@@ -96,6 +72,31 @@
       firstmatch: yes
       insertafter: EOF
       mode: '0644'
+
+    # Install secint on localhost
+    # Need for autoconfigure consul
+    # See https://github.com/hashicorp/learn-consul-docker/tree/main/datacenter-deploy-auto-config/secint
+  - name: Install secint
+    shell: |
+      rm -rf ./secint
+      git clone https://github.com/banks/secint
+      cd secint
+      go build
+    failed_when: build.rc > 0
+    register: build
+
+  - name: Move secint to /usr/local/bin
+    become: true
+    shell: |
+      cd secint
+      mv secint /usr/local/bin
+      cd ..
+      rm -R secint
+  #    failed_when: install.rc > 0
+  #    args:
+  #      creates: /usr/local/bin/secint
+  #    register: build
+  #
 
   vars:
     # Override the download_dir for localhost
