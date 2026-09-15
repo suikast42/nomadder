@@ -51,7 +51,9 @@ Login to the vm over ssh.
 
 [source,shell]
 ----
+# Show up thee deened partition with fdisk -l at first
 sudo fdisk /dev/sda
+(for SATA )sudo fdisk /dev/nvme0n1
 ----
 
 Press `d` and  then `3`
@@ -100,6 +102,7 @@ Login over ssh again
 [source,shell]
 ----
 sudo pvresize /dev/sda3
+(SATA) sudo pvresize /dev/nvme0n1p3
 sudo lvresize -l +100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv
 sudo resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
 ----
