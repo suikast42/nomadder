@@ -23,7 +23,7 @@
 #        - pexpect
 #        - docker
 #      extra_args: --user
-  - name: "Install pip modules"
+  - name: "Install pip modules {{ is_devnode or is_master_0 }}"
     become: true
     apt:
       name:
