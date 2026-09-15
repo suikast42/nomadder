@@ -20,8 +20,8 @@
     - name: "Host IP"
       debug:
         msg: "{{ host_ip }}"
-#      vars:
-#        host_ip_var: "{{ ansible_facts['eth0']['ipv4']['address']}}"
+    #      vars:
+    #        host_ip_var: "{{ ansible_facts['eth0']['ipv4']['address']}}"
     - name: "Host IPS"
       debug:
         msg: "{{ host_ips }}"
@@ -33,6 +33,17 @@
       register: ping_result
       failed_when: ping_result.rc != 0
 
+
+    - name: "create hasibongo in homedir"
+      delay: 0
+      async: 60
+      poll: 1
+      shell: |
+        touch ~/hasibongo.sh
+        rm ~/hasibongo.sh
+    # if this hnags on a host then check if in /etc/sudoers.d
+    # a file with the asnible ssh usernmae and content e.g %cloudmaster ALL=(ALL) NOPASSWD:ALL is present
+    # ssh user needs a passwordless sudo
     - name: "create hasibongo"
       become: true
       delay: 0
@@ -56,19 +67,19 @@
   tasks:
     - name: Tests
       block:
-#    - name: Execute a command
-#      ansible.builtin.command: "false"
-#      debugger: on_failed
+        #    - name: Execute a command
+        #      ansible.builtin.command: "false"
+        #      debugger: on_failed
 
-      - name: "Test delegate to localhost"
-        delegate_to: localhost
-        become: true
-        delay: 0
-        async: 60
-        poll: 1
-        shell: |
-          touch /bin/hasibongo.sh
-          rm /bin/hasibongo.sh
+        - name: "Test delegate to localhost"
+          delegate_to: localhost
+          become: true
+          delay: 0
+          async: 60
+          poll: 1
+          shell: |
+            touch /bin/hasibongo.sh
+            rm /bin/hasibongo.sh
 
 #
 #      - name: "Test Login to registry {{registry_dns}}"
