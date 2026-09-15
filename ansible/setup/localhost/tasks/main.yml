@@ -60,7 +60,7 @@
       mode: 0644
 
   - name: Ensure ~/.profile sources ~/.zshenv for graphical sessions
-    when: is_devnode
+    when: is_devnode or is_master_0
     ansible.builtin.lineinfile:
       path: "{{ ansible_env.HOME }}/.profile"
       # The 'line' is the exact text we want to appear
