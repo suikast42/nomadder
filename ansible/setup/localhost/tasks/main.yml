@@ -53,7 +53,7 @@
     template:
       force: yes
       src: .zshenv
-      dest: "{{ ansible_env.HOME }}/.zshenv"
+      dest: "{{ ansible_facts.env.HOME }}/.zshenv"
       group: "{{ansible_ssh_user}}"
       owner: "{{ansible_ssh_user}}"
       mode: 0644

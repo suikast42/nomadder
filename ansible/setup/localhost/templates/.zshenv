@@ -15,14 +15,7 @@ export CONSUL_CACERT=/usr/local/share/ca-certificates/cloudlocal/cluster-ca-bund
 export CONSUL_CLIENT_KEY=/etc/opt/certs/consul/consul-key.pem
 export CONSUL_CLIENT_CERT=/etc/opt/certs/consul/consul.pem
 
-{% if is_master_0  %}
-export GO111MODULE=on
-export ANSIBLE_NOCOWS=1
-export GOCACHE=/home/{{ansible_user}}/go/cache
-export GOTMPDIR=/home/{{ansible_user}}/go/tmp
-export GOBIN=/home/{{ansible_user}}/go/bin
-export PATH=$PATH:/usr/local/go/bin:$GOBIN
-{% endif %}
+
 {% if is_devnode  %}
 export GRAPHVIZ_DOT=/usr/bin/dot
 export WILDFLY_HOME=/opt/wildfly
