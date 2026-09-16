@@ -107,14 +107,15 @@ job "observability" {
   datacenters = ["{{data_center}}"]
   reschedule {
     delay          = "10s"
-    delay_function = "constant"
+    delay_function = "exponential"
+    max_delay      = "1m"
     unlimited      = true
   }
   update {
       health_check      = "checks"
       max_parallel      = 1
       # Alloc is marked as unhealthy after this time
-      healthy_deadline  = "5m"
+      healthy_deadline  = "2m"
       auto_revert  = true
       # Mark the task as healthy after 10s positive check
       min_healthy_time  = "10s"
@@ -123,10 +124,10 @@ job "observability" {
   }
   group "grafana" {
     restart {
-      attempts = 1
-      interval = "1h"
-      delay = "5s"
-      mode = "fail"
+      attempts = 5
+      interval = "10m"
+      delay    = "15s"
+      mode     = "delay"
     }
 
     volume "stack_observability_grafana_volume" {
@@ -222,10 +223,10 @@ job "observability" {
 
   group "mimir"{
     restart {
-      attempts = 1
-      interval = "1h"
-      delay = "5s"
-      mode = "fail"
+      attempts = 5
+      interval = "10m"
+      delay    = "15s"
+      mode     = "delay"
     }
     volume "stack_observability_mimir_volume" {
       type      = "host"
@@ -467,10 +468,10 @@ limits:
   }
  group "loki"{
     restart {
-      attempts = 1
-      interval = "1h"
-      delay = "5s"
-      mode = "fail"
+      attempts = 5
+      interval = "10m"
+      delay    = "15s"
+      mode     = "delay"
     }
     update {
        max_parallel      = 1
@@ -778,10 +779,10 @@ pattern_ingester:
   group "tempo"{
   # example https://github.com/grafana/tempo/blob/main/example/nomad/tempo-distributed/tempo.hcl
     restart {
-      attempts = 1
-      interval = "1h"
-      delay = "5s"
-      mode = "fail"
+      attempts = 5
+      interval = "10m"
+      delay    = "15s"
+      mode     = "delay"
     }
     volume "stack_observability_tempo_volume" {
       type      = "host"
@@ -1064,10 +1065,10 @@ overrides:
   }
     group "nats_ui"{
          restart {
-              attempts = 1
-              interval = "1h"
-              delay = "5s"
-              mode = "fail"
+              attempts = 5
+              interval = "10m"
+              delay    = "15s"
+              mode     = "delay"
             }
             update {
                max_parallel      = 1
@@ -1132,10 +1133,10 @@ overrides:
     }
     group "nats"{
         restart {
-          attempts = 1
-          interval = "1h"
-          delay = "5s"
-          mode = "fail"
+         attempts = 5
+         interval = "10m"
+         delay    = "15s"
+         mode     = "delay"
         }
      update {
         max_parallel      = 1
@@ -1395,10 +1396,10 @@ mappings = {
         # Grafana alloy is deployed on every node and scrapes the general nomad job metrics
         # This agent deployed for scraping metrics from consul services.
     restart {
-      attempts = 1
-      interval = "1h"
-      delay = "5s"
-      mode = "fail"
+      attempts = 5
+      interval = "10m"
+      delay    = "15s"
+      mode     = "delay"
     }
 
     volume "stack_observability_grafana_alloy_volume" {
@@ -1864,10 +1865,10 @@ discovery.relabel "relabel_consul_targets" {
 
     restart {
       # logunifier can fail more then once due to waiting for nats, loki and in future to elasticsearch
-      attempts = 3
-      interval = "1h"
-      delay = "5s"
-      mode = "fail"
+       attempts = 5
+       interval = "10m"
+       delay    = "15s"
+       mode     = "delay"
     }
      update {
        max_parallel      = 1

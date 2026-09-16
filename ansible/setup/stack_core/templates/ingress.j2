@@ -47,11 +47,12 @@ job "ingress" {
   }
   {% endif %}
 #   System jobs don't have a reschedule policy
-#  reschedule {
-#    delay          = "10s"
-#    delay_function = "constant"
-#    unlimited      = true
-#  }
+  reschedule {
+    delay          = "10s"
+    delay_function = "exponential"
+    max_delay      = "1m"
+    unlimited      = true
+  }
   # only one Traefik instance will be restarted at a time, with 1 minute delay between each such action
   # and automatic rollback to the previous version if the new one doesn't pass the health check
   update {
@@ -71,17 +72,11 @@ job "ingress" {
 
 
   group "traefik" {
-#    restart {
-#      attempts = 1
-#      interval = "1h"
-#      delay = "5s"
-#      mode = "fail"
-#    }
    restart {
-     attempts = 10
-      interval = "1h"
-      delay = "15s"
-      mode = "delay"
+     attempts = 5
+     interval = "10m"
+     delay = "15s"
+     mode = "delay"
     }
     volume "cert_ingress" {
       type      = "host"
