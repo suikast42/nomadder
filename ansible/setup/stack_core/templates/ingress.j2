@@ -47,12 +47,12 @@ job "ingress" {
   }
   {% endif %}
 #   System jobs don't have a reschedule policy
-  reschedule {
-    delay          = "10s"
-    delay_function = "exponential"
-    max_delay      = "1m"
-    unlimited      = true
-  }
+#  reschedule {
+#    delay          = "10s"
+#    delay_function = "exponential"
+#    max_delay      = "1m"
+#    unlimited      = true
+#  }
   # only one Traefik instance will be restarted at a time, with 1 minute delay between each such action
   # and automatic rollback to the previous version if the new one doesn't pass the health check
   update {
