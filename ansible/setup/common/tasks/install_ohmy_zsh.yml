@@ -1,18 +1,17 @@
 ---
-- name: "Uninstall zsh"
+- name: "Install colorls"
   become: true
   community.general.gem:
     name: colorls
     user_install: false
     state: present
 
-- name: "Dos2unix"
+- name: "Delete oh-my-zsh and oh-my-posh"
   become: true
   shell: |
     rm -fR /home/{{ansible_ssh_user}}/.oh-my-zsh
     rm -fR /usr/local/bin/oh-my-posh
     rm -fR /home/{{ansible_ssh_user}}/.zshrc
-    rm -fR /home/{{ansible_ssh_user}}/.oh-my-zsh/custom/themes/blueishv2.omp.json
   register: install
   failed_when: install.rc > 0
 
