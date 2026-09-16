@@ -101,12 +101,9 @@ job "security" {
  {% if set_cpu_hard_limit %}
         cpu_hard_limit = "true"
  {% endif %}
-        # ❌ REMOVED: "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
-        # Keycloak automatically creates its own schema structures if they don't exist.
-        # Mapping init scripts on raw host mounts triggers initialization race conditions during crash loops.
-        #       volumes = [
-        #         "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
-        #       ]
+         volumes = [
+             "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
+        ]
         ports = ["db"]
         labels = {
            "com.github.logunifier.application.name" = "keycloak_postgres"
@@ -198,12 +195,6 @@ job "security" {
    {% if set_cpu_hard_limit %}
           cpu_hard_limit = "true"
    {% endif %}
-           # ❌ REMOVED: "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
-           # Keycloak automatically creates its own schema structures if they don't exist.
-           # Mapping init scripts on raw host mounts triggers initialization race conditions during crash loops.
-      #    volumes = [
-      #      "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
-      #    ]
           ports = ["db"]
           labels = {
              "com.github.logunifier.application.name" = "keycloak_postgres"
@@ -218,12 +209,7 @@ job "security" {
           memory = 512
           memory_max = 32768
         }
-        template {
-          data = <<EOF
-             CREATE SCHEMA IF NOT EXISTS keycloak;
-           EOF
-          destination = "local/initddb.sql"
-        }
+
         template {
                 destination = "${NOMAD_SECRETS_DIR}/env.vars"
                 env         = true
