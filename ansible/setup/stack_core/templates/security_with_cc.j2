@@ -118,7 +118,7 @@ job "security" {
         cpu_hard_limit = "true"
  {% endif %}
         volumes = [
-          "local/initddb.sql:/docker-entrypoint-initdb.d/initddb.sql"
+          "local/initddb.sql:/docker-entrypoint-initdb.d/init.sql"
         ]
         ports = ["db"]
         labels = {
