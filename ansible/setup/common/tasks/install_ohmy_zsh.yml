@@ -70,15 +70,30 @@
     owner: "{{ansible_ssh_user}}"
     mode: 0644
 
-- name: Template zshenv
-  when: not is_devnode
-  template:
-    force: yes
-    src: .zshenv
-    dest: "{{ ansible_env.HOME }}/.zshenv"
-    group: "{{ansible_ssh_user}}"
-    owner: "{{ansible_ssh_user}}"
-    mode: 0644
+- name: Append custom configuration block to .zshenv
+  ansible.builtin.blockinfile:
+    path: "{{ ansible_facts.env.HOME }}/.zshenv"
+    block: |
+      export TLS_SAN={{tls_san}}
+      export ENVIRONMENT={{env}}
+      export NOMAD_ADDR=https://localhost:4646
+      export NOMAD_CACERT=/usr/local/share/ca-certificates/cloudlocal/cluster-ca-bundle.pem
+      export NOMAD_CLIENT_CERT=/etc/opt/certs/nomad/nomad-cli.pem
+      export NOMAD_CLIENT_KEY=/etc/opt/certs/nomad/nomad-cli-key.pem
+      
+      export CONSUL_HTTP_SSL=true
+      export CONSUL_HTTP_SSL_VERIFY=true
+      export CONSUL_HTTP_ADDR=127.0.0.1:8501
+      export CONSUL_HTTP_TOKEN=e95b599e-166e-7d80-08ad-aee76e7ddf19
+      export CONSUL_CACERT=/usr/local/share/ca-certificates/cloudlocal/cluster-ca-bundle.pem
+      export CONSUL_CLIENT_KEY=/etc/opt/certs/consul/consul-key.pem
+      export CONSUL_CLIENT_CERT=/etc/opt/certs/consul/consul.pem
+    marker: "# {mark} NOMADDER ANSIBLE NODE MANAGED BLOCK"
+    create: yes
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+    mode: '0644'
+
 
 - name: Ensure ~/.profile sources ~/.zshenv for graphical sessions
   when: not is_devnode

@@ -35,5 +35,15 @@ ping -s 1472 -M do 192.168.30.121
 ----
 
 
+===== ESXI installation
+Ubuntu desktop on esxi disablkes the gnome desktop after serval time
+for that install
 
+[source,shell]
+----
+sudo apt install -y dconf-editor
+sudo apt install -y gnome-shell-extension-manager
+----
 
+Then install the extension Unblank lock screen and disable everything in dconf-editor under org/gnome/settings-daemon/plugins/power
+image::ubuntu_powersetting_on_esxi.png[]

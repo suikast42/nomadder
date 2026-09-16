@@ -1,5 +1,6 @@
 - name: Set timezone to UTC
   become: true
+  when: not is_devnode
   community.general.timezone:
     name: UTC
   register: ts
