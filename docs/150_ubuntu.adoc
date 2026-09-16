@@ -60,3 +60,9 @@ sudo gnome-control-center
 ----
 System -> Remote Desktop -> Enable Remote Desktop
 
+===== VMware Tools
+[source,shell]
+----
+sudo apt install open-vm-tools open-vm-tools-desktop -y
+----
+
