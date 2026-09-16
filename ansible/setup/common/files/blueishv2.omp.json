@@ -17,11 +17,15 @@
           "type": "os"
         },
         {
-          "background": "#ADA9A8",
-          "foreground": "#546E7A",
+          "background_templates": [
+            "{{if  (ne \"cloud.private\" .Env.TLS_SAN)}}#A41903{{end}}"
+          ],
+          "foreground_templates": [
+            "{{if  (ne \"cloud.private\" .Env.TLS_SAN)}}#ADA9A8{{end}}"
+          ],
           "powerline_symbol": "\ue0b0",
           "properties": {
-            "template": " {{.UserName}}@{{.HostName}} "
+            "template": "{{.UserName}}@{{.HostName}}"
           },
           "style": "powerline",
           "type": "session"
@@ -30,15 +34,16 @@
           "background": "#ADA9A8",
           "foreground": "#546E7A",
           "background_templates": [
-            "{{if and (ne \"cloud.private\" .Env.TLS_SAN) (ne \"172.21.1.10:5001\" .Env.PUSH_REGISTRY)}}#A41903{{end}}"
+            "{{if  (ne \"cloud.private\" .Env.TLS_SAN)}}#A41903{{end}}"
           ],
           "foreground_templates": [
-            "{{if and (ne \"cloud.private\" .Env.TLS_SAN) (ne \"172.21.1.10:5001\" .Env.PUSH_REGISTRY)}}#ADA9A8{{end}}"
+            "{{if  (ne \"cloud.private\" .Env.TLS_SAN)}}#ADA9A8{{end}}"
           ],
           "type": "text",
           "style": "diamond",
-          "template": "{{if .Env.DOCKER_HOST}}{{ .Env.DOCKER_HOST }}@{{ .Env.TLS_SAN }}{{end}}"
+          "template": "{{if  (ne \"cloud.private\" .Env.TLS_SAN)}}@{{.Env.TLS_SAN }}{{end}}"
         },
+
         {
           "background": "#546E7A",
           "foreground": "#ADA9A8",
