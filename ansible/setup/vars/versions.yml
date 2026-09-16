@@ -4,8 +4,12 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "2.0.4"
-consul_checksum: "sha256:7a28033850a24fd411722593931625d8b548a27646c3ab70c1379ea7fd2af423"
+consul_version: "2.0.3"
+consul_checksum: "sha256:3020eea3fdfd939eb021ecaca105a1513af52b22e76f2ee97ea85acc6ff2f832"
+# is blocked untril https://github.com/hashicorp/consul/issues/23923 is resolved
+# First try update an then clean installation
+#consul_version: "2.0.4"
+#consul_checksum: "sha256:7a28033850a24fd411722593931625d8b548a27646c3ab70c1379ea7fd2af423"
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
@@ -50,7 +54,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.6.5
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "29.6.1"
+version_docker: "29.8.1"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead
@@ -59,7 +63,7 @@ uninstall_docker: false
 
 update_certificates: false
 
-version_nexus: "3.96.0"
+version_nexus: "3.96.1"
 version_nexus_initlzr: "1.0.8"
 update_nexus: false
 

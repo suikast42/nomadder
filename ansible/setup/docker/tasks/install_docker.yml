@@ -1,227 +1,227 @@
-- name: Uninstall docker
-  become: true
-  when: uninstall_docker|bool == true
-  block:
-
-    - name: Stop docker socket
-      failed_when: false
-      service:
-        name: docker.socket
-        state: stopped
-        enabled: false
-
-    - name: Stop docker daemon
-      failed_when: false
-      service:
-        name: docker
-        state: stopped
-        enabled: false
-
-    - name: Reload systemd
-      ansible.builtin.systemd:
-        daemon_reload: yes
-
-    - name: "Uninstall docker packages"
-      become: true
-      apt:
-        name:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-          - docker-compose-plugin
-          - docker-scan-plugin
-          - docker.io
-#          - docker-doc
-#          - docker-compose
-#          - docker-compose-v2
-          - podman-docker
-          - containerd
-          - runc
-          - docker-model-plugin
-          - docker-ce-rootless-extras
-          - docker-buildx-plugin
-
-        state: absent
-
-    - name: "Delete docker files"
-      file:
-        state: absent
-        path: "{{item}}"
-      with_items:
-        - "{{docker_download_dir}}"
-        - "/var/lib/docker"
-        - "/etc/apparmor.d/docker"
-        - "/var/run/docker.sock"
-        - "/var/lib/containerd"
-        - "/usr/bin/docker"
-        - "/usr/bin/dockerd"
-        - "{{base_cert_dir}}/docker"
-        - "/etc/docker"
-
-- name : Check docker installation present
-  stat:
-    path: /usr/bin/docker
-  register: dockerInstalled
-
-
-
-- name: "Install docker pre conditions"
-  become: true
-  when: not dockerInstalled.stat.exists
-  block:
-#  Grp add handled in generate_docker_certs.yml
-    - name: Docker group add if not present
-      become: true
-      group:
-        name: docker
-        state: present
-
-    - name: Docker group add if not present
-      become: true
-      group:
-        name: docker
-        state: present
-
-    - name: "{{ ansible_ssh_user }} userGrp conf"
-      become: true
-      ansible.builtin.user:
-        name: "{{ ansible_ssh_user }}"
-        groups: root, docker
-        state: present
-
-    - name: "{{ ansible_ssh_user }} userGrp conf"
-      become: true
-      ansible.builtin.user:
-        name: "{{ ansible_ssh_user }}"
-        groups: root, docker
-        state: present
-
-    - name: "Create docker download dir {{docker_download_dir}} if needed"
-      file:
-        state: directory
-        path: "{{docker_download_dir}}"
-
-    - name: "Docker conf dir if needed"
-      file:
-        state: directory
-        path: "/etc/docker"
-
-- name: Template docker daemon.json
-  become: true
-  template:
-    force: yes
-    src: templates/docker/daemon.json
-    dest: /etc/docker/daemon.json
-    group: docker
-    mode: '0644'
+- name: Docker installation
   vars:
-    docker_cert_path: "{{base_cert_dir}}/docker"
-    docker_server_cert: "{{docker_cert_path}}/docker-server.pem"
-    docker_server_cert_key: "{{docker_cert_path}}/docker-server-key.pem"
-
-
-- name: "Install docker certificates"
-  become: true
-  when: not dockerInstalled.stat.exists or update_certificates|bool == true
+    hold_docker_packages:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+      - docker-scan-plugin
+      - docker.io
+      #          - docker-doc
+      #          - docker-compose
+      #          - docker-compose-v2
+      - podman-docker
+      - containerd
+      - runc
+      - docker-model-plugin
+      - docker-ce-rootless-extras
+      - docker-buildx-plugin
   block:
-    - name: install_cert handler docker
-      include_tasks: handlers/generate_docker_certs.yml
-
-- name: "Docker Installed ?"
-  debug:
-    msg: "{{ dockerInstalled.stat.exists }}"
-
-- name: "Install docker V {{ version_docker }}"
-  become: true
-  when: not dockerInstalled.stat.exists
-  block:
-    - name: "Install docker V {{ version_docker }}"
-      failed_when: dockerInstall.rc != 0
-      delay: 0
-      async: 300
-      poll: 1
-      shell: |
-        export VERSION={{ version_docker }}
-        curl -fsSL https://get.docker.com -o install-docker.sh
-        chmod +x install-docker.sh
-        ./install-docker.sh
-        grep -qF '{{ ansible_ssh_user }} - nofile 65536' /etc/security/limits.conf || echo '{{ ansible_ssh_user }} - nofile 65536' >> /etc/security/limits.conf
-        systemctl enable docker
-      args:
-        creates: /usr/bin/docker # docker is already installed
-        chdir: "{{docker_download_dir}}"
-      register: dockerInstall
-
-    - name: "Check docker version"
-      failed_when: dockerVersion.rc != 0
-      shell: docker --version
-      register: dockerVersion
-#
-#    - name: "Docker install result"
-#      debug:
-#        msg: "{{ dockerInstall}}"
-
-    - name: "Docker Hosts Workaround"
-      when: is_build_host
+    # First, unhold the packages otherwise docker installer will fail
+    - name: Unhold Docker packages
       become: true
-      delay: 0
-      async: 300
-      poll: 1
-      shell: |
-        cp /lib/systemd/system/docker.service /etc/systemd/system/
-        sed -i 's# -H\ fd:\/\/# #g' /etc/systemd/system/docker.service
-        systemctl daemon-reload
-
-
-    - name: Start docker
       failed_when: false
-      service:
-        name: docker
-        state: restarted
-      register: dockerService
-      until: dockerService.status is defined and dockerService.status.ActiveState == "active"
-      retries: 5
-      delay: 5
+      ansible.builtin.command:
+        cmd: "apt-mark unhold {{ item }}"
+      loop: "{{ hold_docker_packages }}"
 
-#    #somehow on master the first restart attempt fails
-#    # So we do it again
-#    - name: Start docker
-#      service:
-#        name: docker
-#        state: restarted
-#      register: dockerService
-#      until: dockerService.status is defined and dockerService.status.ActiveState == "active"
-#      retries: 10
-#      delay: 5
+    - name: Uninstall docker
+      become: true
+      when: uninstall_docker|bool == true
+      block:
 
-#- name: "Restart build host"
-#  become: true
-#  when: not dockerInstalled.stat.exists and is_build_host
-#  ansible.builtin.reboot:
-#    msg: "Rebooting machine in 5 seconds"
+        - name: Stop docker socket
+          failed_when: false
+          service:
+            name: docker.socket
+            state: stopped
+            enabled: false
 
-#    - name: Debug docker install
-#      debug:
-#        msg: "{{dockerInstall}}"
+        - name: Stop docker daemon
+          failed_when: false
+          service:
+            name: docker
+            state: stopped
+            enabled: false
+
+        - name: Reload systemd
+          ansible.builtin.systemd:
+            daemon_reload: yes
+
+        - name: "Uninstall docker packages"
+          become: true
+          ansible.builtin.apt:
+            pkg: "{{ hold_docker_packages }}"
+            state: absent
+            purge: true # Optional: Removes configuration files alongside packages
 
 
-#- name: "Install docker compose"
-#  when: is_build_host
-#  block:
-#  - name: "Uninstall docker compose"
-##    when: uninstall_compose|bool == true
-#    become: true
-#    ansible.builtin.file:
-#      path: /usr/bin/docker-compose
-#      state: absent
+        - name: "Delete docker files"
+          file:
+            state: absent
+            path: "{{item}}"
+          with_items:
+            - "{{docker_download_dir}}"
+            - "/var/lib/docker"
+            - "/etc/apparmor.d/docker"
+            - "/var/run/docker.sock"
+            - "/var/lib/containerd"
+            - "/usr/bin/docker"
+            - "/usr/bin/dockerd"
+            - "{{base_cert_dir}}/docker"
+            - "/etc/docker"
 
-#  - name: "Install docker compose v {{version_docker_compose}}"
-#    become: true
-#    delay: 0
-#    async: 300
-#    poll: 1
-#    shell: |
-#      curl -L "https://github.com/docker/compose/releases/download/v{{version_docker_compose}}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose
-#      chmod +x /usr/bin/docker-compose
-#    args:
-#      creates: /usr/bin/docker-compose  # docker-compose is already installed
+
+
+
+
+
+    - name : Check docker installation present
+      stat:
+        path: /usr/bin/docker
+      register: dockerInstalled
+
+
+
+    - name: "Install docker pre conditions"
+      become: true
+      when: not dockerInstalled.stat.exists
+      block:
+
+          #  Grp add handled in generate_docker_certs.yml
+        - name: Docker group add if not present
+          become: true
+          group:
+            name: docker
+            state: present
+
+        - name: Docker group add if not present
+          become: true
+          group:
+            name: docker
+            state: present
+
+        - name: "{{ ansible_ssh_user }} userGrp conf"
+          become: true
+          ansible.builtin.user:
+            name: "{{ ansible_ssh_user }}"
+            groups: root, docker
+            state: present
+
+        - name: "{{ ansible_ssh_user }} userGrp conf"
+          become: true
+          ansible.builtin.user:
+            name: "{{ ansible_ssh_user }}"
+            groups: root, docker
+            state: present
+
+        - name: "Create docker download dir {{docker_download_dir}} if needed"
+          file:
+            state: directory
+            path: "{{docker_download_dir}}"
+
+        - name: "Docker conf dir if needed"
+          file:
+            state: directory
+            path: "/etc/docker"
+
+
+
+    - name: Template docker daemon.json
+      become: true
+      template:
+        force: yes
+        src: templates/docker/daemon.json
+        dest: /etc/docker/daemon.json
+        group: docker
+        mode: '0644'
+      vars:
+        docker_cert_path: "{{base_cert_dir}}/docker"
+        docker_server_cert: "{{docker_cert_path}}/docker-server.pem"
+        docker_server_cert_key: "{{docker_cert_path}}/docker-server-key.pem"
+
+
+    - name: "Install docker certificates"
+      become: true
+      when: not dockerInstalled.stat.exists or update_certificates|bool == true
+      block:
+        - name: install_cert handler docker
+          include_tasks: handlers/generate_docker_certs.yml
+
+    - name: "Docker Installed ?"
+      debug:
+        msg: "{{ dockerInstalled.stat.exists }}"
+
+    - name: "Install docker V {{ version_docker }}"
+      become: true
+      when: not dockerInstalled.stat.exists
+      block:
+
+        - name: "Install docker V {{ version_docker }}"
+          failed_when: dockerInstall.rc != 0
+          delay: 0
+          async: 300
+          poll: 1
+          shell: |
+            export VERSION={{ version_docker }}
+            curl -fsSL https://get.docker.com -o install-docker.sh
+            chmod +x install-docker.sh
+            ./install-docker.sh
+            grep -qF '{{ ansible_ssh_user }} - nofile 65536' /etc/security/limits.conf || echo '{{ ansible_ssh_user }} - nofile 65536' >> /etc/security/limits.conf
+            systemctl enable docker
+          args:
+            creates: /usr/bin/docker # docker is already installed
+            chdir: "{{docker_download_dir}}"
+          register: dockerInstall
+
+    #    - name: "Docker install result"
+    #      debug:
+    #         msg: "{{ dockerInstall}}"
+        - name: "Check docker version"
+          failed_when: dockerVersion.rc != 0
+          shell: docker --version
+          register: dockerVersion
+    #
+    #    - name: "Docker install result"
+    #      debug:
+    #        msg: "{{ dockerInstall}}"
+
+        - name: "Docker Hosts Workaround"
+          when: is_build_host
+          become: true
+          delay: 0
+          async: 300
+          poll: 1
+          shell: |
+            cp /lib/systemd/system/docker.service /etc/systemd/system/
+            sed -i 's# -H\ fd:\/\/# #g' /etc/systemd/system/docker.service
+            systemctl daemon-reload
+    
+
+        - name: Start docker
+          failed_when: false
+          service:
+            name: docker
+            state: restarted
+          register: dockerService
+          until: dockerService.status is defined and dockerService.status.ActiveState == "active"
+          retries: 5
+          delay: 5
+
+
+
+  always:
+    ## Prevent docker from being updated by apt upgrade
+    # sudo apt-mark hold docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    # current list can be looked at apt-mark showhold
+    # can be revert by sudo apt-mark unhold docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    # or maybe more dynamic
+    # dpkg-query -W -f='${binary:Package}\n' |
+    #      grep -E '^(docker|docker-|containerd|runc|podman-docker)' |
+    #      xargs -r apt-mark hold
+    - name: Hold Docker packages
+      become: true
+      failed_when: false
+      ansible.builtin.command:
+        cmd: "apt-mark hold {{ item }}"
+      loop: "{{ hold_docker_packages }}"

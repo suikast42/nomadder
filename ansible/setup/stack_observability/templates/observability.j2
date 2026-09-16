@@ -115,7 +115,7 @@ job "observability" {
       health_check      = "checks"
       max_parallel      = 1
       # Alloc is marked as unhealthy after this time
-      healthy_deadline  = "2m"
+      healthy_deadline  = "5m"
       auto_revert  = true
       # Mark the task as healthy after 10s positive check
       min_healthy_time  = "10s"
@@ -164,7 +164,7 @@ job "observability" {
           check_restart {
             limit = 3
             grace = "60s"
-            ignore_warnings = true
+            ignore_warnings = false
           }
         }
     }
@@ -263,7 +263,7 @@ job "observability" {
         check_restart {
           limit = 3
           grace = "60s"
-          ignore_warnings = true
+          ignore_warnings = false
         }
        }
     }
@@ -517,8 +517,8 @@ limits:
          timeout  = "2s"
          check_restart {
            limit = 3
-           grace = "60s"
-           ignore_warnings = true
+           grace = "90s"
+           ignore_warnings = false
          }
         }
      }
@@ -847,7 +847,7 @@ pattern_ingester:
         check_restart {
           limit = 3
           grace = "60s"
-          ignore_warnings = true
+          ignore_warnings = false
         }
        }
     }
@@ -1101,7 +1101,7 @@ overrides:
             check_restart {
               limit = 3
               grace = "60s"
-              ignore_warnings = true
+              ignore_warnings = false
               }
             }
         }
@@ -1176,7 +1176,7 @@ overrides:
           check_restart {
             limit = 3
             grace = "60s"
-            ignore_warnings = true
+            ignore_warnings = false
             }
           }
       }
@@ -1213,7 +1213,7 @@ overrides:
                 check_restart {
                     limit = 3
                     grace = "60s"
-                    ignore_warnings = true
+                    ignore_warnings = false
                 }
             }
           }
@@ -1476,42 +1476,15 @@ mappings = {
         path     = "/-/healthy"
         interval = "10s"
         timeout  = "2s"
-       }
-   }
-   service {
-      name = "grafana-alloy-health"
-      #name = "${NOMAD_ALLOC_NAME}-health"
-      port = "server"
-      check {
-        type     = "http"
-        port     = "server"
-        path     = "/-/healthy"
-        interval = "10s"
-        timeout  = "2s"
         check_restart {
           limit = 3
-          grace = "60s"
-          ignore_warnings = true
-      }
-     }
+          grace = "90s"
+          ignore_warnings = false
+        }
+       }
    }
-   service {
-      #name = "${NOMAD_ALLOC_NAME}-ready"
-      name = "grafana-alloy-ready"
-      port = "server"
-      check {
-        type     = "http"
-        port     = "server"
-        path     = "/-/ready"
-        interval = "10s"
-        timeout  = "2s"
-        check_restart {
-          limit = 5
-          grace = "60s"
-          ignore_warnings = true
-      }
-     }
-   }
+
+
 
 
   task "await-for-ltm" {
@@ -1893,7 +1866,7 @@ discovery.relabel "relabel_consul_targets" {
               check_restart {
                 limit = 3
                 grace = "60s"
-                ignore_warnings = true
+                ignore_warnings = false
               }
            }
      }
