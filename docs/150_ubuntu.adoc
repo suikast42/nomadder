@@ -36,6 +36,8 @@ ping -s 1472 -M do 192.168.30.121
 
 
 ===== ESXI installation
+
+===== Power settings
 Ubuntu desktop on esxi disablkes the gnome desktop after serval time
 for that install
 
@@ -46,4 +48,15 @@ sudo apt install -y gnome-shell-extension-manager
 ----
 
 Then install the extension Unblank lock screen and disable everything in dconf-editor under org/gnome/settings-daemon/plugins/power
-image::ubuntu_powersetting_on_esxi.png[]
+image::ubuntu_powersetting_on_esxi_1.png[]
+
+Disable power setting
+image::ubuntu_powersetting_on_esxi_2.png[]
+
+===== Remote Desktop
+[source,shell]
+----
+sudo gnome-control-center
+----
+System -> Remote Desktop -> Enable Remote Desktop
+
