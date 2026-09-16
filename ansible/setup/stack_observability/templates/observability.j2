@@ -164,7 +164,7 @@ job "observability" {
           check_restart {
             limit = 3
             grace = "60s"
-            ignore_warnings = false
+            ignore_warnings = true
           }
         }
     }
@@ -263,7 +263,7 @@ job "observability" {
         check_restart {
           limit = 3
           grace = "60s"
-          ignore_warnings = false
+          ignore_warnings = true
         }
        }
     }
@@ -518,7 +518,7 @@ limits:
          check_restart {
            limit = 3
            grace = "60s"
-           ignore_warnings = false
+           ignore_warnings = true
          }
         }
      }
@@ -847,7 +847,7 @@ pattern_ingester:
         check_restart {
           limit = 3
           grace = "60s"
-          ignore_warnings = false
+          ignore_warnings = true
         }
        }
     }
@@ -1101,7 +1101,7 @@ overrides:
             check_restart {
               limit = 3
               grace = "60s"
-              ignore_warnings = false
+              ignore_warnings = true
               }
             }
         }
@@ -1176,7 +1176,7 @@ overrides:
           check_restart {
             limit = 3
             grace = "60s"
-            ignore_warnings = false
+            ignore_warnings = true
             }
           }
       }
@@ -1213,7 +1213,7 @@ overrides:
                 check_restart {
                     limit = 3
                     grace = "60s"
-                    ignore_warnings = false
+                    ignore_warnings = true
                 }
             }
           }
@@ -1491,7 +1491,7 @@ mappings = {
         check_restart {
           limit = 3
           grace = "60s"
-          ignore_warnings = false
+          ignore_warnings = true
       }
      }
    }
@@ -1508,7 +1508,7 @@ mappings = {
         check_restart {
           limit = 5
           grace = "60s"
-          ignore_warnings = false
+          ignore_warnings = true
       }
      }
    }
@@ -1893,7 +1893,7 @@ discovery.relabel "relabel_consul_targets" {
               check_restart {
                 limit = 3
                 grace = "60s"
-                ignore_warnings = false
+                ignore_warnings = true
               }
            }
      }
