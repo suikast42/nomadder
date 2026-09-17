@@ -77,7 +77,7 @@ nc -z -v -w5 10.21.202.182 3100
 |List Ip tables rules
 a|[source,shell]
 ----
-sudo iptables -t nat  -n -v
+
 sudo iptables -t nat -L DOCKER -n -v
 ----
 
