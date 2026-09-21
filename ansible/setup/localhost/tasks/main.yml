@@ -50,6 +50,7 @@
       creates: ~/.vim/pack/jvirtanen/start
 
   - name: Append custom configuration block to .zshenv
+    become: true
     ansible.builtin.blockinfile:
       path: "{{ ansible_facts.env.HOME }}/.zshenv"
       block: |
@@ -74,6 +75,7 @@
       mode: '0644'
 
   - name: Append custom configuration block to .zshenv for devnode or master_0
+    become: true
     when: is_devnode
     ansible.builtin.blockinfile:
       path: "{{ ansible_facts.env.HOME }}/.zshenv"

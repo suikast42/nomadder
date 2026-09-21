@@ -71,6 +71,12 @@
             - "{{base_cert_dir}}/docker"
             - "/etc/docker"
 
+        # Remove modified docker.service file from former build host
+        - name: "Delete Docker Hosts Workaround {{not is_build_host}}"
+          when: not is_build_host
+          file:
+            path: "/etc/systemd/system/docker.service"
+            state: absent
 
 
 
@@ -186,7 +192,9 @@
     #      debug:
     #        msg: "{{ dockerInstall}}"
 
-        - name: "Docker Hosts Workaround"
+
+
+        - name: "Apply Docker Hosts Workaround {{is_build_host}}"
           when: is_build_host
           become: true
           delay: 0

@@ -18,8 +18,8 @@ consul_template_checksum: "sha256:aa49f009a708f3e3beea990aa29cfaecfe6925c0b17ca9
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "2.0.4"
-nomad_checksum: "sha256:f6b0d555f65de7d81ef3274d7d7dfcad6ff24d6e6214a806deb5c50b909e47b7"
+nomad_version: "2.0.7"
+nomad_checksum: "sha256:4c9b8a0850d6fd9caadbbab09b3e6fdf8b77aa777729543c70c61b85acca68c1"
 # 2.0.6 ois blocked until this issue https://github.com/hashicorp/nomad/issues/28537 resloved
 #nomad_version: "2.0.6"
 #nomad_checksum: "sha256:c6da734081a41d51cadf15ec880d5eab0313093a29d2ee0984ca5ae1cdf867ec"
@@ -63,12 +63,12 @@ uninstall_docker: false
 
 update_certificates: false
 
-version_nexus: "3.96.1"
+version_nexus: "3.96.2"
 version_nexus_initlzr: "1.0.8"
 update_nexus: false
 
 
-version_busy_box_init_container: "1.37.0"
+version_busy_box_init_container: "1.38.0"
 version_multi_stage_apline_container: "3.17.2"
 version_grafana_agent_container: "0.44.3"
 
