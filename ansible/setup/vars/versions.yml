@@ -63,7 +63,7 @@ uninstall_docker: false
 
 update_certificates: false
 
-version_nexus: "3.96.2"
+version_nexus: "3.96.3"
 version_nexus_initlzr: "1.0.8"
 update_nexus: false
 
