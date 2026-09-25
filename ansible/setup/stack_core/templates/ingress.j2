@@ -72,11 +72,13 @@ job "ingress" {
 
 
   group "traefik" {
+   # For x restart attempts triggered check_restart  in timewindows of interval x
+   # mark the task as failed. And trigger the rescheduler
    restart {
-     attempts = 5
-     interval = "10m"
-     delay = "15s"
-     mode = "delay"
+      attempts =  5
+      interval = "1h"
+      delay    = "1s"
+      mode     = "fail"
     }
     volume "cert_ingress" {
       type      = "host"

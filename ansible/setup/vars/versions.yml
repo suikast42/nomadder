@@ -18,11 +18,11 @@ consul_template_checksum: "sha256:aa49f009a708f3e3beea990aa29cfaecfe6925c0b17ca9
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
-nomad_version: "2.0.7"
-nomad_checksum: "sha256:4c9b8a0850d6fd9caadbbab09b3e6fdf8b77aa777729543c70c61b85acca68c1"
-# 2.0.6 ois blocked until this issue https://github.com/hashicorp/nomad/issues/28537 resloved
-#nomad_version: "2.0.6"
-#nomad_checksum: "sha256:c6da734081a41d51cadf15ec880d5eab0313093a29d2ee0984ca5ae1cdf867ec"
+# blocked until https://github.com/hashicorp/nomad/issues/28589 is resolved
+#nomad_version: "2.0.7"
+#nomad_checksum: "sha256:4c9b8a0850d6fd9caadbbab09b3e6fdf8b77aa777729543c70c61b85acca68c1"
+nomad_version: "2.0.4"
+nomad_checksum: "sha256:f6b0d555f65de7d81ef3274d7d7dfcad6ff24d6e6214a806deb5c50b909e47b7"
 
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
