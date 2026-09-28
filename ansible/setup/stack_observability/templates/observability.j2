@@ -120,7 +120,7 @@ job "observability" {
     healthy_deadline  = "3m"
     auto_revert = true
     # Mark the task as healthy after 1s positive check
-    min_healthy_time = "1s"
+    min_healthy_time = "10s"
     # Task is dead after failed checks in 1h
     progress_deadline = "1h"
   }
