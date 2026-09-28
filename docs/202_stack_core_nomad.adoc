@@ -160,6 +160,8 @@ Specifies strategy for Nomad to restart failed tasks on the same nomad client. F
 
 * `fail`- Instructs the client not to attempt to restart the task once the number of attempts have been used. This is the default behavior. This mode is useful for non-idempotent jobs which are unlikely to succeed after a few failures. The allocation will be marked as failed and the scheduler will attempt to reschedule the allocation according to the reschedule block.
 
+
+
 ==== check
 job -> group -> service -> check |
 job -> group -> task -> service -> check
@@ -281,6 +283,65 @@ job "docs" {
 ----
 
 For playing with update strategies you can use test_deployments/fail-service_healtlhy_to_unhealtly_.nomad
+
+==== restart mode `delay` vs `fail` on a single master and worker setup
+
+On a single server / single client topology the choice of `mode` has different trade-offs than on a multi node cluster, because there is no other client to reschedule work to.
+
+When a task exceeds `attempts` failures within `interval`, `mode` decides what happens next:
+
+[cols="1,2,2", options="header"]
+|===
+| Behaviour | `mode = "delay"` | `mode = "fail"`
+
+| After exhausting `attempts` in `interval`
+| Waits out the rest of the `interval`, then keeps restarting the task in place
+| Stops restarting and marks the allocation as `failed`
+
+| Interaction with `reschedule`
+| Does not trigger rescheduling, the task keeps retrying locally
+| Triggers the `reschedule` block, Nomad places a fresh allocation
+
+| End state
+| Task never gives up (infinite local retry)
+| Task can end up `dead/failed` if `reschedule` also exhausts
+|===
+
+.`mode = "delay"`
+[%collapsible]
+====
+*Advantages*
+
+* Self-healing without rescheduling. On a single node there is nowhere else to reschedule to, so `delay` keeps the task retrying in place until its dependency recovers.
+* Handles boot-order / dependency races. The observability stack has cross dependencies (Loki -> Mimir, Alloy waits for Tempo/Mimir, Tempo -> Mimir). `delay` keeps a task alive while a dependency is still starting instead of declaring it dead.
+* Combined with `reschedule { unlimited = true }` the job effectively never gives up.
+* Survives transient host issues (disk busy, port briefly held, image pull hiccup) gracefully.
+
+*Disadvantages*
+
+* Can mask real, permanent failures. A misconfigured task loops forever instead of surfacing as `failed`.
+* Crash-loop resource churn. Repeated container restarts consume CPU/IO and spam logs, which matters more on a small single node.
+* Health / alerting can look green-ish. The alloc stays in retry cycles rather than a clear `failed` state that is easy to alert on.
+====
+
+.`mode = "fail"`
+[%collapsible]
+====
+*Advantages*
+
+* Fast, visible failure. A genuinely broken task quickly reaches `failed`, which is easy to see in `nomad job status` and to alert on.
+* Triggers `reschedule`, which recreates the allocation cleanly (fresh alloc dir, re-rendered templates, re-pulled image) and can fix stuck state that in-place restarts do not.
+* Avoids tight crash-loops on the same node.
+
+*Disadvantages*
+
+* Nowhere to reschedule. With one client `reschedule` just re-places on the same node, so there is little benefit over `delay` while adding churn.
+* Risk of ending `dead`. If both `restart` and `reschedule` exhaust, the service stays down until manual intervention, which is bad for always-on infrastructure.
+* Worse for dependency races. A task that fails only because a dependency is not ready yet gets torn down and rescheduled repeatedly.
+====
+
+TIP: For a single master and worker setup running always-on infrastructure (Grafana, Mimir, Loki, Tempo, NATS, Alloy) prefer `mode = "delay"`. There is no scheduling benefit to `fail` on one node, and `delay` handles the inter-service startup dependencies better. Increase `delay` (for example `"15s"`) to reduce crash-loop churn, and rely on `check_restart` plus alerting to catch tasks that are running but unhealthy. Use `mode = "fail"` when you have a multi node cluster and want Nomad to move work to a healthy node.
+
 
 ==== Linux system signals
 . SIGHUP - Hangup signal. Sent to a process when its controlling terminal or session ends. Often used to reload configuration files.

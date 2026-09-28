@@ -25,12 +25,12 @@ job "fail-service" {
       count = 1
 
       # For x restart attempts triggered check_restart  in timewindows of interval x
-      # mark the task as failed. And trigger the rescheduler
+
       restart {
         attempts =  5
         interval = "1h"
-        delay    = "1s"
-        mode     = "fail"
+        delay    = "15s"
+        mode     ="fail"
       }
 
       network {

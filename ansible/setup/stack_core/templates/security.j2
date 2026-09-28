@@ -45,8 +45,8 @@ job "security" {
     restart {
       attempts =  5
       interval = "1h"
-      delay    = "1s"
-      mode     = "fail"
+      delay    = "15s"
+      mode     ="fail"
     }
     volume "keycloak_postgres_volume" {
       type      = "host"
@@ -235,8 +235,8 @@ job "security" {
     restart {
       attempts =  5
       interval = "1h"
-      delay    = "1s"
-      mode     = "fail"
+      delay    = "15s"
+      mode     ="fail"
     }
     volume "ca_cert" {
       type      = "host"
@@ -284,7 +284,22 @@ job "security" {
           cpu_hard_limit = "true"
  {% endif %}
           command      = "sh"
-          args         = ["-c", "echo -n 'Waiting for service keycloak'; until nslookup keycloak.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
+          args = [
+                "-c",
+                <<EOF
+                MAX_RETRIES=30
+                COUNT=0
+                until nslookup keycloak.service.consul >/dev/null 2>&1; do
+                  COUNT=$((COUNT+1))
+                  if [ $COUNT -ge $MAX_RETRIES ]; then
+                    echo "Timed out waiting for keycloak  DNS"
+                    exit 1
+                  fi
+                  echo "Waiting for keycloak... ($COUNT/$MAX_RETRIES)"
+                  sleep 2
+                done
+                EOF
+              ]
           #network_mode = "host"
         }
 
@@ -359,8 +374,8 @@ job "security" {
     restart {
       attempts =  5
       interval = "1h"
-      delay    = "1s"
-      mode     = "fail"
+      delay    = "15s"
+      mode     ="fail"
      }
      update {
        max_parallel      = 1
@@ -451,7 +466,22 @@ job "security" {
           cpu_hard_limit = "true"
  {% endif %}
           command      = "sh"
-          args         = ["-c", "echo -n 'Waiting for service keycloak-postgres'; until nslookup keycloak-postgres.service.consul 2>&1 >/dev/null; do echo '.'; sleep 2; done"]
+            args = [
+                  "-c",
+                  <<EOF
+                  MAX_RETRIES=30
+                  COUNT=0
+                  until nslookup keycloak-postgres.service.consul >/dev/null 2>&1; do
+                    COUNT=$((COUNT+1))
+                    if [ $COUNT -ge $MAX_RETRIES ]; then
+                      echo "Timed out waiting for keycloak-postgres  DNS"
+                      exit 1
+                    fi
+                    echo "Waiting for keycloak-postgres... ($COUNT/$MAX_RETRIES)"
+                    sleep 2
+                  done
+                  EOF
+                ]
           #network_mode = "host"
         }
 

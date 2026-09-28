@@ -130,8 +130,8 @@ job "observability" {
     restart {
       attempts =  5
       interval = "1h"
-      delay    = "1s"
-      mode     = "fail"
+      delay    = "15s"
+      mode     ="fail"
     }
 
     volume "stack_observability_grafana_volume" {
@@ -231,8 +231,8 @@ job "observability" {
     restart {
       attempts =  5
       interval = "1h"
-      delay    = "1s"
-      mode     = "fail"
+      delay    = "15s"
+      mode     ="fail"
     }
     volume "stack_observability_mimir_volume" {
       type      = "host"
@@ -478,8 +478,8 @@ limits:
    restart {
      attempts =  5
      interval = "1h"
-     delay    = "1s"
-     mode     = "fail"
+     delay    = "15s"
+     mode     ="fail"
    }
     update {
        max_parallel      = 1
@@ -791,8 +791,8 @@ pattern_ingester:
    restart {
      attempts =  5
      interval = "1h"
-     delay    = "1s"
-     mode     = "fail"
+     delay    = "15s"
+     mode     ="fail"
    }
     volume "stack_observability_tempo_volume" {
       type      = "host"
@@ -1079,8 +1079,8 @@ overrides:
       restart {
         attempts =  5
         interval = "1h"
-        delay    = "1s"
-        mode     = "fail"
+        delay    = "15s"
+        mode     ="fail"
       }
             update {
                max_parallel      = 1
@@ -1149,8 +1149,8 @@ overrides:
       restart {
         attempts =  5
         interval = "1h"
-        delay    = "1s"
-        mode     = "fail"
+        delay    = "15s"
+        mode     ="fail"
       }
      update {
         max_parallel      = 1
@@ -1414,8 +1414,8 @@ mappings = {
       restart {
         attempts =  5
         interval = "1h"
-        delay    = "1s"
-        mode     = "fail"
+        delay    = "15s"
+        mode     ="fail"
       }
 
     volume "stack_observability_grafana_alloy_volume" {
@@ -1517,10 +1517,22 @@ mappings = {
         cpu_hard_limit = "true"
        {% endif %}
         command      = "sh"
-        args         = [
-        "-c",
-        "echo -n 'Waiting for service tempo and mimir are up'; until nslookup tempo.service.consul && nslookup mimir.service.consul  2>&1 >/dev/null; do echo '.'; sleep 2; done"
-        ]
+        args = [
+              "-c",
+              <<EOF
+              MAX_RETRIES=30
+              COUNT=0
+              until nslookup tempo.service.consul >/dev/null 2>&1 && nslookup mimir.service.consul >/dev/null 2>&1; do
+                COUNT=$((COUNT+1))
+                if [ $COUNT -ge $MAX_RETRIES ]; then
+                  echo "Timed out waiting for Tempo/Mimir DNS"
+                  exit 1
+                fi
+                echo "Waiting for Tempo and Mimir... ($COUNT/$MAX_RETRIES)"
+                sleep 2
+              done
+              EOF
+            ]
                 #network_mode = "host"
        }
 
@@ -1857,8 +1869,8 @@ discovery.relabel "relabel_consul_targets" {
       restart {
         attempts =  5
         interval = "1h"
-        delay    = "1s"
-        mode     = "fail"
+        delay    = "15s"
+        mode     ="fail"
       }
      update {
        max_parallel      = 1

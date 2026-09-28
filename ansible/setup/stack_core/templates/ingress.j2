@@ -77,8 +77,8 @@ job "ingress" {
    restart {
       attempts =  5
       interval = "1h"
-      delay    = "1s"
-      mode     = "fail"
+      delay    = "15s"
+      mode     ="fail"
     }
     volume "cert_ingress" {
       type      = "host"

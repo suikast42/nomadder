@@ -72,7 +72,7 @@ job "cicd-job" {
       attempts = 1
       interval = "1h"
       delay    = "5s"
-      mode     = "fail"
+      mode     ="delay"
     }
     volume "nomad_volume_stack_cicd_gitlab_etc" {
       type      = "host"
@@ -231,7 +231,7 @@ EOF
       attempts = 1
       interval = "1h"
       delay    = "5s"
-      mode     = "fail"
+      mode     ="delay"
     }
     volume "nomad_volume_stack_cicd_jenkins" {
       type      = "host"
