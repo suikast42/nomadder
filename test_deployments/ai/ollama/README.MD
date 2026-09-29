@@ -10,8 +10,30 @@ PARAMETER num_ctx 32768
 
 ollama create qwen3-coder-next-32k -f Model
 ollama run qwen3-coder-next-32k
-
 claude --model qwen3-coder-next-32k
+
+FROM qwen3.8
+PARAMETER num_ctx 32768
+ollama create qwen3.8-32k -f Model
+ollama run qwen3.8-32k
+
+## CPU-only Ollama tuning
+
+If the server has no GPU, keep the runtime pinned to CPU-only and avoid model thrashing by applying these Ollama-side settings:
+
+```yaml
+environment:
+  - CUDA_VISIBLE_DEVICES=-1
+  - OLLAMA_NUM_PARALLEL=1
+  - OLLAMA_MAX_LOADED_MODELS=1
+  - OLLAMA_KEEP_ALIVE=-1
+```
+
+For a direct container launch without GPU support:
+
+```shell
+docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
+```
 
 
 # With docker and gpu support

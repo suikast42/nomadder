@@ -8,8 +8,16 @@ job "ai-stack" {
 
   type        = "service"
 
+
+
+
   group "ollama-group" {
     count = 1
+    volume "ollama" {
+      type      = "host"
+      source    = "ollama_test" # Must match a host volume definition
+      read_only = false
+    }
     restart {
       attempts = 1
       interval = "1h"
@@ -26,23 +34,42 @@ job "ai-stack" {
       }
     }
 
-    # Task 1: The Ollama Backend
+# Task 1: The Ollama Backend
     task "ollama" {
       driver = "docker"
-
-      config {
-        image = "ollama/ollama:latest"
-        ports = ["ollama_api"]
-        # Standard Ollama container automatically uses CPU if no GPU is detected
-        volumes = [
-          "local/ollama:/root/.ollama"
-        ]
+      env {
+        CUDA_VISIBLE_DEVICES   = "-1"
+        OLLAMA_NUM_PARALLEL    = "1"
+        OLLAMA_MAX_LOADED_MODELS = "1"
+        OLLAMA_KEEP_ALIVE      = "-1"
+        OMP_NUM_THREADS=32  # Adjust to your physical core count
+      }
+      volume_mount {
+        volume      = "ollama"
+        destination = "/root/.ollama"
+        read_only   = false
       }
 
+      config {
+        image = "ollama/ollama:0.34.4"
+        ports = ["ollama_api"]
+
+        volumes = [
+          # "local/ollama:/root/.ollama",
+          "local/Model:/root/Model"
+        ]
+      }
+      template {
+        data = <<EOF
+          FROM qwen3.8
+          PARAMETER num_ctx 32768
+        EOF
+        destination = "local/Model"
+      }
       resources {
         # Coding models are heavy; allocate at least 4 cores and 8GB RAM
-        cpu    = 4000
-        memory = 65536
+        cpu    = 90000
+        memory = 97000
       }
 
       service {

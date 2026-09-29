@@ -2,6 +2,11 @@ services:
   ollama:
     image: ollama/ollama:latest
     container_name: ollama
+    environment:
+      - CUDA_VISIBLE_DEVICES=-1
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_KEEP_ALIVE=-1
     volumes:
       - ./ai/ollama_data:/root/.ollama
     ports:
@@ -14,7 +19,7 @@ services:
               count: all
               capabilities: [gpu]
     restart: unless-stopped
-    # No deploy/resources/reservations needed for CPU-only
+    # Remove the deploy block above when you want a CPU-only compose stack.
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
@@ -23,8 +28,6 @@ services:
       - "3000:8080"
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
-      - OLLAMA_NUM_PARALLEL=1
-      - OLLAMA_KEEP_ALIVE=-1
       - OLLAMA_REQUEST_TIMEOUT=600s
       - ENABLE_IMAGE_GENERATION=false
       - WEBUI_AUTH=false
