@@ -5,6 +5,20 @@
     name: UTC
   register: ts
 
+- name: "Install timesyncd"
+  become: true
+  apt:
+    name:
+      - systemd-timesyncd
+    state: present
+
+- name: Set Ntp config
+  become: true
+  when: not is_devnode
+  shell: |
+    timedatectl set-ntp true
+    systemctl restart systemd-timesyncd
+# Add cosutom ntp server in  /etc/systemd/timesyncd.conf
 - name: Set Inode settings
   become: true
   changed_when: false
