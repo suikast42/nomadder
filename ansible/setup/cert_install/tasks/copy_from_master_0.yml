@@ -1,12 +1,12 @@
 # Copies
-- name: "Slurp item.src from master_0"
+- name: "Slurp item.src from master_0 {{item.src}}"
   become: true
   delegate_to: "{{masters[0]}}"
   ansible.builtin.slurp:
     src: "{{item.src}}"
   register: src
 
-- name: "Copy"
+- name: "Copy {{item.dest}} to host {{ item.host | default( host_ip) }}"
   become: true
   delegate_to: "{{ item.host | default( host_ip) }}"
   copy:
