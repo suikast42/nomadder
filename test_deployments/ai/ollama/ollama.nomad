@@ -61,7 +61,7 @@ job "ai-stack" {
       }
       template {
         data = <<EOF
-          FROM qwen3.8
+          FROM qwen3.8:27b
           PARAMETER num_ctx 32768
         EOF
         destination = "local/Model"
@@ -75,6 +75,11 @@ job "ai-stack" {
       service {
         name = "ollama"
         port = "ollama_api"
+        tags = [
+          "traefik.enable=true",
+          "traefik.http.routers.api-ai.tls=true",
+          "traefik.http.routers.api-ai.rule=Host(`api-ai.${var.org}`)",
+        ]
         check {
           type     = "http"
           path     = "/api/tags"

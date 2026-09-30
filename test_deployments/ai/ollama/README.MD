@@ -12,7 +12,7 @@ ollama create qwen3-coder-next-32k -f Model
 ollama run qwen3-coder-next-32k
 claude --model qwen3-coder-next-32k
 
-FROM qwen3.8
+FROM qwen3.8:27b
 PARAMETER num_ctx 32768
 ollama create qwen3.8-32k -f Model
 ollama run qwen3.8-32k
