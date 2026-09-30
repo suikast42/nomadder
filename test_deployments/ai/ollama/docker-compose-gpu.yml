@@ -1,12 +1,10 @@
 services:
   ollama:
-    image: ollama/ollama:latest
+    image: ollama/ollama:0.35.0
     container_name: ollama
     environment:
-      - CUDA_VISIBLE_DEVICES=-1
+      - OMP_NUM_THREADS=32
       - OLLAMA_NUM_PARALLEL=1
-      - OLLAMA_MAX_LOADED_MODELS=1
-      - OLLAMA_KEEP_ALIVE=-1
     volumes:
       - ./ai/ollama_data:/root/.ollama
     ports:
