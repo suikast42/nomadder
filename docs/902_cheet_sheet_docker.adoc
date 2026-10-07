@@ -15,6 +15,15 @@ a|[source,shell]
  docker ps | grep "amd64:3.2"  |  awk '{print $4,$5,$1,$10 }'
 ----
 
+|Cpu count of container
+a|[source,shell]
+----
+# Not croups aware and shows all cpus of host
+cat /proc/cpuinfo
+# Cgroup v2 aware. What the container really sees
+cat /sys/fs/cgroup/cpuset.cpus
+----
+
 |Networks speed test from inside docker daemon
 a|[source,shell]
 ----
