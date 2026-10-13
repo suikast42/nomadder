@@ -49,14 +49,6 @@ include_units = ["consul","nomad"]
 include_matches = { }
 
 
-{% if is_master_host  %}
-[sources.source_nomad_events]
-type = "http"
-address = "127.0.0.1:3333" # required
-decoding.codec = "json"
-{% endif %}
-
-
 ## Log sources END
 
 ## Logunifer add pattern key transform
@@ -122,17 +114,3 @@ acknowledgements.enabled=true
 
 
 
-{% if is_master_host  %}
-[sinks.sink_nats_nomad_events]
-type = "nats"
-inputs = [ "source_nomad_events" ]
-#url = "nats://nats-observability.service.consul:4222"
-#See issue https://github.com/suikast42/nomadder/issues/90
-url = "nats://{{worker_01_ip}}:4222"
-# Template syntax is useable here https://vector.dev/docs/reference/configuration/template-syntax/
-subject = "ingress.logs.nomadevents"
-connection_name ="{{host_name}}-ingress-nomadevents"
-#buffer.type = "disk"
-encoding.codec ="json"
-healthcheck = true
-{% endif %}
