@@ -27,7 +27,7 @@ nomad_checksum: "sha256:f6b0d555f65de7d81ef3274d7d7dfcad6ff24d6e6214a806deb5c50b
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.39.1
+version_envoy: 1.39.4
 
 nomad_plugin_cni_version: "1.9.1"
 nomad_plugin_cni_checksum: "sha256:b98f74a0f8522f0a83867178729c1aa70f2158f90c45a2ca8fa791db1c76b303"
@@ -51,10 +51,10 @@ uninstall_cli_wander: "{{uninstall_all or false }}"
 update_cli_wander: "{{update_all or false }}"
 
 
-version_cfssl: 1.7.0
+version_cfssl: 1.7.1
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "29.8.2"
+version_docker: "29.9.0"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead
