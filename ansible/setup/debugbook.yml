@@ -11,9 +11,20 @@
     - vars/common_vars.yml
     - vars/local_secret.yml
   tasks:
+
     - name: "Is devnode"
       debug:
         msg: "{{ is_devnode }} {{ansible_user}}"
+
+    - name: "data_center"
+      debug:
+        msg: "{{ data_center }}"
+#
+#    - name: Write hostvars[inventory_hostname] to local file
+#      ansible.builtin.copy:
+#        dest: "/tmp/data_center{{ inventory_hostname }}.json"
+#        content: "{{ hostvars[inventory_hostname]  }}\n"
+#      delegate_to: localhost
 
     - name: Ping test
       ping:

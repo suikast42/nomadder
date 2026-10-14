@@ -53,7 +53,8 @@ vault_hosts:
 
 core_realm: "nomadder"
 # consul and nomad datacenter name
-data_center: "nomadder1"
+# use first the data_center name defined per host if not found the default
+data_center: "{{ hostvars[inventory_hostname].data_center | default('nomadder1')}}"
 #cert path on nodes
 cert_path_master_0: /etc/ssl/private/cloudlocal
 #TODO rename to ca_os_trust_store
