@@ -142,12 +142,5 @@
     nomad_cli_cert: "{{nomad_cert_path}}/nomad-cli.pem"
     nomad_working_dir: "{{service_working_dir_base}}/core/nomad"
     nomad_data_dir: "{{nomad_working_dir}}/data"
-    nomad_dns: "nomad.{{tls_san}}"
     nomad_encrypt_key: "4PRfoE6Mj9dHTLpnzmYD1+THdlyAo2Ji4U6ewMumpAw="
     nomad_infra_image: "{{registry_dns}}/pause-amd64:3.3"
-    nomad_servers:
-      - "127.0.0.1"
-      - "server.global.nomad"
-      - "localhost"
-      - "{{nomad_dns}}"
-      - "{{host_name}}.node.{{data_center}}.consul"

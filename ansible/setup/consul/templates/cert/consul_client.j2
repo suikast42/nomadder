@@ -13,10 +13,5 @@
       "ST": "{{ca_cert_name_st}}"
     }
   ],
-    "hosts": [
-        "127.0.0.1",
-        "localhost",
-        "{{host_ip}}",
-        "client.{{host_name}}.{{data_center}}.consul"
-    ]
+  "hosts": {{(consul_servers_hosts ) | to_json }}
 }

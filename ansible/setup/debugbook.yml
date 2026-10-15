@@ -4,6 +4,8 @@
 - hosts: all
   # Do not gater facts at first
   gather_facts: true
+  vars:
+    consul_dns: "consul.{{tls_san}}"
   vars_files:
     - vars/versions.yml
     - vars/job_secrets.yml
@@ -19,6 +21,52 @@
     - name: "data_center"
       debug:
         msg: "{{ data_center }}"
+
+    - name: "data_centers"
+      debug:
+        msg: "{{ data_centers }}"
+
+    - name: Initialize consul_servers_hosts
+      ansible.builtin.set_fact:
+        consul_servers_hosts:
+          - "127.0.0.1"
+          - "localhost"
+          - "{{consul_dns}}"
+
+    - name: Build consul_servers_hosts
+      ansible.builtin.set_fact:
+        consul_servers_hosts: "{{ consul_servers_hosts | default([]) + ['server.' ~ item ~ '.consul','server.' ~ host_name ~ '.' ~ item ~ '.consul'] }}"
+      loop: "{{ data_centers }}"
+
+    - name: Debug consul_servers_hosts
+      ansible.builtin.debug:
+        var: consul_servers_hosts
+
+    - name: Initialize nomad host values for certs
+      ansible.builtin.set_fact:
+        nomad_servers_hosts:
+          - "127.0.0.1"
+          - "{{host_ip}}"
+          - "nomad.{{tls_san}}"
+          - "localhost"
+          - "server.global.nomad"
+
+    - name: Set nomad host values for certs
+      ansible.builtin.set_fact:
+        nomad_servers_hosts: "{{ nomad_servers_hosts | default([]) + [host_name ~ '.node.' ~ item, host_name ~ '.node.' ~ item ~ '.consul'] }}"
+      loop: "{{ data_centers }}"
+
+    - name: Debug nomad_servers_hosts
+      ansible.builtin.debug:
+        var: nomad_servers_hosts
+#        consul_servers_tmp:
+#           - "127.0.0.1"
+#           - "localhost"
+#           - "{{consul_dns}}"
+#
+#        consul_servers: "{{ (consul_servers_tmp + consul_servers_hosts) | unique | list }}"
+
+
 #
 #    - name: Write hostvars[inventory_hostname] to local file
 #      ansible.builtin.copy:

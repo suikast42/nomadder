@@ -1,6 +1,19 @@
 - name: "Generate nomad certs"
   become: true
   block:
+    - name: Initialize nomad host values for certs
+      ansible.builtin.set_fact:
+        nomad_servers_hosts:
+          - "127.0.0.1"
+          - "{{host_ip}}"
+          - "nomad.{{tls_san}}"
+          - "localhost"
+          - "server.global.nomad"
+
+    - name: Set nomad host values for certs
+      ansible.builtin.set_fact:
+        nomad_servers_hosts: "{{ nomad_servers_hosts | default([]) + [host_name ~ '.node.' ~ item, host_name ~ '.node.' ~ item ~ '.consul'] }}"
+      loop: "{{ data_centers }}"
 
     - name: Check if nomad service exists
       stat:
@@ -159,7 +172,6 @@
     nomad_cert_ingress_key: "{{nomad_cert_ingress_path}}/nomad-ingress-key.pem"#
     nomad_cert_ingress: "{{nomad_cert_ingress_path}}/nomad-ingress.pem"
     nomad_dns: "nomad.{{tls_san}}"
-    data_center: "nomadder1"
     nomad_servers:
       - "127.0.0.1"
       - "{{host_ip}}"

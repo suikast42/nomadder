@@ -45,8 +45,8 @@ nomad_cli_levant_checkusum: "sha256:1e06180f8d8327e721e2ad4c9637d1f391034a227094
 uninstall_cli_levant: "{{uninstall_all or false }}"
 update_cli_levant: "{{update_all or false }}"
 
-version_wander: "1.1.0"
-nomad_cli_wander_checkusum: "sha256:1d82191134ac213a36d1cee0aa9a91fb86de4344cce3649a2f45c5e25f58a1d1"
+version_wander: "1.1.2"
+nomad_cli_wander_checkusum: "sha256:e96e450d30272f4f6f47997046c6e418281976f4e96459fbb0cd5c6082390413"
 uninstall_cli_wander: "{{uninstall_all or false }}"
 update_cli_wander: "{{update_all or false }}"
 
@@ -54,7 +54,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.7.1
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "29.9.0"
+version_docker: "29.9.1"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead
@@ -63,7 +63,7 @@ uninstall_docker: false
 
 update_certificates: false
 
-version_nexus: "3.96.4"
+version_nexus: "3.97.0"
 version_nexus_initlzr: "1.0.8"
 update_nexus: false
 

@@ -55,6 +55,14 @@ core_realm: "nomadder"
 # consul and nomad datacenter name
 # use first the data_center name defined per host if not found the default
 data_center: "{{ hostvars[inventory_hostname].data_center | default('nomadder1')}}"
+# grep all defined datacenters here
+data_centers: >-
+  {{ (groups['masters'] | default([]) + groups['workers'] | default([]))
+     | unique
+     | map('extract', hostvars, 'data_center')
+     | map('default', 'nomadder1')
+     | unique
+     | list }}
 #cert path on nodes
 cert_path_master_0: /etc/ssl/private/cloudlocal
 #TODO rename to ca_os_trust_store

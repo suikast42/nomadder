@@ -1,6 +1,20 @@
 - name: "Generate consul certs"
   become: true
   block:
+    - name: Initialize consul host values for certs
+      ansible.builtin.set_fact:
+        consul_servers_hosts:
+          - "127.0.0.1"
+          - "{{host_ip}}"
+          - "localhost"
+          - "consul.{{tls_san}}"
+
+    - name: Set consul host values for certs
+      ansible.builtin.set_fact:
+        consul_servers_hosts: "{{ consul_servers_hosts | default([]) + ['server.' ~ item ~ '.consul','server.' ~ host_name ~ '.' ~ item ~ '.consul'] }}"
+      loop: "{{ data_centers }}"
+
+
     - name: Check if consul service exists
       stat:
         path: /etc/init.d/consul.service
@@ -120,10 +134,5 @@
     consul_cert_path: "{{base_cert_dir}}/consul"
     consul_cert: "{{consul_cert_path}}/consul.pem"
     consul_cert_key: "{{consul_cert_path}}/consul-key.pem"
-    consul_dns: "consul.{{tls_san}}"
-    consul_servers:
-      - "127.0.0.1"
-      - "localhost"
-      - "{{consul_dns}}"
-      - "server.{{data_center}}.consul"
-      - "server.{{host_name}}.{{data_center}}.consul"
+
+

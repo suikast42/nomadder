@@ -40,4 +40,3 @@
     nomad_data_dir: "{{nomad_working_dir}}/data"
     nomad_dns: "nomad.{{tls_san}}"
     nomad_conf_dir: "/etc/nomad.d"
-    data_center: "nomadder1"

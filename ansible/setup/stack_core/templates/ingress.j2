@@ -1,9 +1,5 @@
 #region var definitions
-variable "datacenter" {
-  type = string
-  description = "Deploy to this datacenter"
-  default = "{{data_center}}"
-}
+
 
 variable "ingress_http" {
   type = number
@@ -38,7 +34,6 @@ variable "env" {
 # endregion
 
 job "ingress" {
-  datacenters = [var.datacenter]
   priority    = 100
   type        = "system"
  {% if is_env_development %}
