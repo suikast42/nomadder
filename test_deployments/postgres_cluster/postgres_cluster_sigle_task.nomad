@@ -19,7 +19,7 @@ variable "host_3" {
 variable "image" {
   type        = string
   description = "image"
-  default     = "amovatdp/timescaledb-ha:pg18.6-ts2.30.2"
+  default     = "amovatdp/timescaledb-ha:pg18.6-ts2.30.2.3"
   # default     = "timescale/timescaledb-ha:pg18.6-ts2.30.2"
 }
 
@@ -29,6 +29,16 @@ job "timescaledb-ha" {
   group "pg1" {
     count = 1
 
+    volume "ca_cert" {
+      type      = "host"
+      source    = "ca_cert"
+      read_only = true
+    }
+    volume "cert_consul" {
+      type      = "host"
+      source    = "cert_consul"
+      read_only = true
+    }
     constraint {
       attribute = "${attr.unique.hostname}"
       value     = "worker-01"
@@ -53,8 +63,9 @@ job "timescaledb-ha" {
 
       config {
         image = "${var.image}"
-        command = "patroni"
+        # entrypoint = ["tail", "-f", "/dev/null"]
         ports = ["pg", "patroni", "raft"]
+        command = "patroni"
         args    = ["/home/postgres/postgres.yml"]
         volumes = [
           "local/patroni.yml:/home/postgres/postgres.yml",
@@ -70,27 +81,34 @@ job "timescaledb-ha" {
         POSTGRES_USER     = "postgres"
         POSTGRES_PASSWORD = "postgres"
         POSTGRES_DB       = "postgres"
-
+        PGDATA            = "/var/lib/postgresql/data/pgdata"
+        CONSUL_HOST_PORT ="${attr.unique.network.ip-address}:8501"
 
       }
-
+      volume_mount {
+        volume      = "ca_cert"
+        destination = "/etc/ssl/certs/"
+      }
+      volume_mount {
+        volume      = "cert_consul"
+        destination = "/etc/opt/certs/consul"
+      }
       template {
         data = <<-EOF
-        scope: scada-postgres-cluster
+        scope: pg-cluster
         namespace: /service
         name: patroni-1
 
-        raft:
-          data_dir: /var/lib/postgresql/raft
-          self_addr: {{ env "NOMAD_HOST_IP_patroni" }}:5010
-          partner_addrs:
-          {{- range datacenters -}}
-            {{- range nodes (printf "@%s" .) }}
-              {{- if and (ne .Address (env "NOMAD_HOST_IP_patroni")) (eq (index .Meta "node_type") "worker") }}
-            - {{ .Address }}:5010
-              {{- end }}
-            {{- end }}
-          {{- end }}
+        consul:
+          host: {{ env "CONSUL_HOST_PORT" }}
+          scheme: https
+          verify: true
+          cacert: /etc/ssl/certs/cluster-ca-bundle.pem
+          cert: /etc/opt/certs/consul/consul.pem
+          key: /etc/opt/certs/consul/consul-key.pem
+          register_service: true
+          service: primary-pg
+          service_check_interval: 10s
 
         restapi:
           listen: 0.0.0.0:{{ env "NOMAD_PORT_patroni" }}
@@ -135,7 +153,7 @@ job "timescaledb-ha" {
         postgresql:
           listen: 0.0.0.0:{{ env "NOMAD_PORT_pg" }}
           connect_address: {{ env "NOMAD_ADDR_pg" }}
-          data_dir: /var/lib/postgresql/data/patroni
+          data_dir: {{ env "PGDATA" }}/patroni
           bin_dir: /usr/lib/postgresql/18/bin
           authentication:
             replication:
@@ -162,6 +180,16 @@ job "timescaledb-ha" {
   group "pg2" {
     count = 1
 
+    volume "ca_cert" {
+      type      = "host"
+      source    = "ca_cert"
+      read_only = true
+    }
+    volume "cert_consul" {
+      type      = "host"
+      source    = "cert_consul"
+      read_only = true
+    }
     constraint {
       attribute = "${attr.unique.hostname}"
       value     = "worker-02"
@@ -202,26 +230,34 @@ job "timescaledb-ha" {
         POSTGRES_USER     = "postgres"
         POSTGRES_PASSWORD = "postgres"
         POSTGRES_DB       = "postgres"
+        PGDATA            = "/var/lib/postgresql/data/pgdata"
+        CONSUL_HOST_PORT ="${attr.unique.network.ip-address}:8501"
 
-
+      }
+      volume_mount {
+        volume      = "ca_cert"
+        destination = "/etc/ssl/certs/"
+      }
+      volume_mount {
+        volume      = "cert_consul"
+        destination = "/etc/opt/certs/consul"
       }
       template {
         data = <<-EOF
-        scope: scada-postgres-cluster
+        scope: pg-cluster
         namespace: /service
         name: patroni-2
 
-        raft:
-          data_dir: /var/lib/postgresql/raft
-          self_addr: {{ env "NOMAD_HOST_IP_patroni" }}:5010
-          partner_addrs:
-          {{- range datacenters -}}
-            {{- range nodes (printf "@%s" .) }}
-              {{- if and (ne .Address (env "NOMAD_HOST_IP_patroni")) (eq (index .Meta "node_type") "worker") }}
-            - {{ .Address }}:5010
-              {{- end }}
-            {{- end }}
-          {{- end }}
+        consul:
+          host: {{ env "CONSUL_HOST_PORT" }}
+          scheme: https
+          verify: true
+          cacert: /etc/ssl/certs/cluster-ca-bundle.pem
+          cert: /etc/opt/certs/consul/consul.pem
+          key: /etc/opt/certs/consul/consul-key.pem
+          register_service: true
+          service: primary-pg
+          service_check_interval: 10s
 
         restapi:
           listen: 0.0.0.0:{{ env "NOMAD_PORT_patroni" }}
@@ -266,7 +302,7 @@ job "timescaledb-ha" {
         postgresql:
           listen: 0.0.0.0:{{ env "NOMAD_PORT_pg" }}
           connect_address: {{ env "NOMAD_ADDR_pg" }}
-          data_dir: /var/lib/postgresql/data/patroni
+          data_dir: {{ env "PGDATA" }}/patroni
           bin_dir: /usr/lib/postgresql/18/bin
           authentication:
             replication:
@@ -292,6 +328,17 @@ job "timescaledb-ha" {
 
   group "pg3" {
     count = 1
+
+    volume "ca_cert" {
+      type      = "host"
+      source    = "ca_cert"
+      read_only = true
+    }
+    volume "cert_consul" {
+      type      = "host"
+      source    = "cert_consul"
+      read_only = true
+    }
 
     constraint {
       attribute = "${attr.unique.hostname}"
@@ -333,26 +380,33 @@ job "timescaledb-ha" {
         POSTGRES_USER     = "postgres"
         POSTGRES_PASSWORD = "postgres"
         POSTGRES_DB       = "postgres"
-
+        PGDATA            = "/var/lib/postgresql/data/pgdata"
+        CONSUL_HOST_PORT ="${attr.unique.network.ip-address}:8501"
       }
-
+      volume_mount {
+        volume      = "ca_cert"
+        destination = "/etc/ssl/certs/"
+      }
+      volume_mount {
+        volume      = "cert_consul"
+        destination = "/etc/opt/certs/consul"
+      }
       template {
         data = <<-EOF
-        scope: scada-postgres-cluster
+        scope: pg-cluster
         namespace: /service
         name: patroni-3
 
-        raft:
-          data_dir: /var/lib/postgresql/raft
-          self_addr: {{ env "NOMAD_HOST_IP_patroni" }}:5010
-          partner_addrs:
-          {{- range datacenters -}}
-            {{- range nodes (printf "@%s" .) }}
-              {{- if and (ne .Address (env "NOMAD_HOST_IP_patroni")) (eq (index .Meta "node_type") "worker") }}
-            - {{ .Address }}:5010
-              {{- end }}
-            {{- end }}
-          {{- end }}
+        consul:
+          host: {{ env "CONSUL_HOST_PORT" }}
+          scheme: https
+          verify: true
+          cacert: /etc/ssl/certs/cluster-ca-bundle.pem
+          cert: /etc/opt/certs/consul/consul.pem
+          key: /etc/opt/certs/consul/consul-key.pem
+          register_service: true
+          service: primary-pg
+          service_check_interval: 10s
 
         restapi:
           listen: 0.0.0.0:{{ env "NOMAD_PORT_patroni" }}
@@ -397,7 +451,7 @@ job "timescaledb-ha" {
         postgresql:
           listen: 0.0.0.0:{{ env "NOMAD_PORT_pg" }}
           connect_address: {{ env "NOMAD_ADDR_pg" }}
-          data_dir: /var/lib/postgresql/data/patroni
+          data_dir: {{ env "PGDATA" }}/patroni
           bin_dir: /usr/lib/postgresql/18/bin
           authentication:
             replication:
