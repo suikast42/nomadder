@@ -1,0 +1,70 @@
+---
+- name: Stop services on worker nodes first
+  hosts: workers
+  become: true
+  #serial: 1
+  tasks:
+    - name: Stop all Nomad-related services
+      ansible.builtin.service:
+        name: "{{ item }}"
+        state: stopped
+      loop:
+        - nomad
+      ignore_errors: true
+
+    - name: Stop Consul
+      ansible.builtin.service:
+        name: consul
+        state: stopped
+      ignore_errors: true
+
+    - name: Stop Docker
+      ansible.builtin.service:
+        name: docker
+        state: stopped
+      ignore_errors: true
+
+- name: Stop services on master nodes
+  hosts: masters
+  become: true
+  #serial: 1
+  tasks:
+    - name: Stop all Nomad-related services
+      ansible.builtin.service:
+        name: "{{ item }}"
+        state: stopped
+      loop:
+        - nomad
+      ignore_errors: true
+
+    - name: Stop Consul
+      ansible.builtin.service:
+        name: consul
+        state: stopped
+      ignore_errors: true
+
+    - name: Stop Docker
+      ansible.builtin.service:
+        name: docker
+        state: stopped
+      ignore_errors: true
+
+- name: Reboot master nodes first
+  hosts: masters
+  become: true
+ # serial: 1
+  tasks:
+    - name: Reboot master
+      ansible.builtin.reboot:
+        reboot_timeout: 900
+        test_command: whoami
+
+- name: Reboot worker nodes after masters
+  hosts: workers
+  become: true
+ # serial: 1
+  tasks:
+    - name: Reboot worker
+      ansible.builtin.reboot:
+        reboot_timeout: 900
+        test_command: whoami
