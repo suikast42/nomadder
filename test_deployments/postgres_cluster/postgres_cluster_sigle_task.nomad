@@ -19,7 +19,8 @@ variable "host_3" {
 variable "image" {
   type        = string
   description = "image"
-  default     = "timescale/timescaledb-ha:pg18.6-ts2.30.2"
+  default     = "amovatdp/timescaledb-ha:pg18.6-ts2.30.2"
+  # default     = "timescale/timescaledb-ha:pg18.6-ts2.30.2"
 }
 
 job "timescaledb-ha" {
