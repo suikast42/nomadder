@@ -116,8 +116,19 @@ job "timescaledb-ha" {
           key: /etc/opt/certs/consul/consul-key.pem
           register_service: true
           service_check_interval: 10s
-
-
+{{/* Raft example
+  #      raft:
+  #        data_dir: /var/lib/postgresql/raft
+  #        self_addr: {{ env "NOMAD_HOST_IP_patroni" }}:5010
+  #        partner_addrs:
+  #        {{- range datacenters -}}
+  #          {{- range nodes (printf "@%s" .) }}
+  #            {{- if and (ne .Address (env "NOMAD_HOST_IP_patroni")) (eq (index .Meta "node_type") "worker") }}
+  #          - {{ .Address }}:5010
+  #            {{- end }}
+  #          {{- end }}
+  #        {{- end }}
+*/}}
         restapi:
           listen: 0.0.0.0:{{ env "NOMAD_PORT_patroni" }}
           connect_address: {{ env "NOMAD_ADDR_patroni" }}
