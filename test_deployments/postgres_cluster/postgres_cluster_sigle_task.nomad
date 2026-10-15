@@ -1,8 +1,13 @@
+## Consul DNS with that config
+# pg-cluster.service.consul -> whole cluster
+# master.pg-cluster.service.consul and primary.pg-cluster.service.consul -> only the primary node
+# replica.pg-cluster.service.consul -> only the read only replica nodes
 variable "host_1" {
   type        = string
   description = "host1"
   default     = "192.168.30.124"
 }
+
 
 variable "host_2" {
   type        = string
@@ -15,6 +20,8 @@ variable "host_3" {
   description = "host3"
   default     = "192.168.30.126"
 }
+
+
 
 variable "image" {
   type        = string
@@ -82,6 +89,7 @@ job "timescaledb-ha" {
         POSTGRES_PASSWORD = "postgres"
         POSTGRES_DB       = "postgres"
         PGDATA            = "/var/lib/postgresql/data/pgdata"
+        PGBINDIR            = "/usr/lib/postgresql/18/bin"
         CONSUL_HOST_PORT ="${attr.unique.network.ip-address}:8501"
 
       }
@@ -107,8 +115,8 @@ job "timescaledb-ha" {
           cert: /etc/opt/certs/consul/consul.pem
           key: /etc/opt/certs/consul/consul-key.pem
           register_service: true
-          service: primary-pg
           service_check_interval: 10s
+
 
         restapi:
           listen: 0.0.0.0:{{ env "NOMAD_PORT_patroni" }}
@@ -153,8 +161,8 @@ job "timescaledb-ha" {
         postgresql:
           listen: 0.0.0.0:{{ env "NOMAD_PORT_pg" }}
           connect_address: {{ env "NOMAD_ADDR_pg" }}
-          data_dir: {{ env "PGDATA" }}/patroni
-          bin_dir: /usr/lib/postgresql/18/bin
+          data_dir: {{ env "PGDATA" }}
+          bin_dir: {{ env "PGBINDIR" }}
           authentication:
             replication:
               username: replicator
@@ -231,6 +239,7 @@ job "timescaledb-ha" {
         POSTGRES_PASSWORD = "postgres"
         POSTGRES_DB       = "postgres"
         PGDATA            = "/var/lib/postgresql/data/pgdata"
+        PGBINDIR            = "/usr/lib/postgresql/18/bin"
         CONSUL_HOST_PORT ="${attr.unique.network.ip-address}:8501"
 
       }
@@ -256,7 +265,6 @@ job "timescaledb-ha" {
           cert: /etc/opt/certs/consul/consul.pem
           key: /etc/opt/certs/consul/consul-key.pem
           register_service: true
-          service: primary-pg
           service_check_interval: 10s
 
         restapi:
@@ -302,8 +310,8 @@ job "timescaledb-ha" {
         postgresql:
           listen: 0.0.0.0:{{ env "NOMAD_PORT_pg" }}
           connect_address: {{ env "NOMAD_ADDR_pg" }}
-          data_dir: {{ env "PGDATA" }}/patroni
-          bin_dir: /usr/lib/postgresql/18/bin
+          data_dir: {{ env "PGDATA" }}
+          bin_dir: {{ env "PGBINDIR" }}
           authentication:
             replication:
               username: replicator
@@ -381,6 +389,7 @@ job "timescaledb-ha" {
         POSTGRES_PASSWORD = "postgres"
         POSTGRES_DB       = "postgres"
         PGDATA            = "/var/lib/postgresql/data/pgdata"
+        PGBINDIR            = "/usr/lib/postgresql/18/bin"
         CONSUL_HOST_PORT ="${attr.unique.network.ip-address}:8501"
       }
       volume_mount {
@@ -405,7 +414,6 @@ job "timescaledb-ha" {
           cert: /etc/opt/certs/consul/consul.pem
           key: /etc/opt/certs/consul/consul-key.pem
           register_service: true
-          service: primary-pg
           service_check_interval: 10s
 
         restapi:
@@ -451,8 +459,8 @@ job "timescaledb-ha" {
         postgresql:
           listen: 0.0.0.0:{{ env "NOMAD_PORT_pg" }}
           connect_address: {{ env "NOMAD_ADDR_pg" }}
-          data_dir: {{ env "PGDATA" }}/patroni
-          bin_dir: /usr/lib/postgresql/18/bin
+          data_dir: {{ env "PGDATA" }}
+          bin_dir: {{ env "PGBINDIR" }}
           authentication:
             replication:
               username: replicator
