@@ -10,14 +10,16 @@
   become: true
   shell: |
     rm -fR /home/{{ansible_ssh_user}}/.oh-my-zsh
+    rm -fR /root/.oh-my-zsh
     rm -fR /usr/local/bin/oh-my-posh
     rm -fR /home/{{ansible_ssh_user}}/.zshrc
+    rm -fR /root/.zshrc
   register: install
   failed_when: install.rc > 0
 
 
 
-- name: "Install oh-my-zsh"
+- name: "Install oh-my-zsh for {{ ansible_ssh_user }}"
   become: false
   delay: 0
   async: 60
@@ -30,6 +32,20 @@
   failed_when: install.rc > 0
   args:
     creates: ~/.oh-my-zsh # oh-my-zs is already installed
+
+- name: "Install oh-my-zsh for root"
+  become: true
+  delay: 0
+  async: 60
+  poll: 1
+  shell: |
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-/root/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-/root/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+  register: install
+  failed_when: install.rc > 0
+  args:
+    creates: /root/.oh-my-zsh # oh-my-zs is already installed
 
 - name: "Install oh-my-posh"
   become: true
@@ -50,7 +66,8 @@
     state: present
 
 
-- name: Template zshrc
+- name: "Template zshrc for {{ansible_ssh_user}}"
+  become: true
   template:
     force: yes
     src: .zshrc
@@ -60,13 +77,12 @@
     mode: 0644
 
 
-- name: Template zshrc
+- name: Template zshrc for root
+  become: true
   template:
     force: yes
     src: .zshrc
-    dest: "{{ansible_env.HOME}}/.zshrc"
-    group: "{{ansible_ssh_user}}"
-    owner: "{{ansible_ssh_user}}"
+    dest: "/root/.zshrc"
     mode: 0644
 
 - name: Append custom configuration block to .zshenv
@@ -108,13 +124,21 @@
     insertafter: EOF
     mode: '0644'
 
-- name: Copy theme
+- name: "Copy theme for {{ansible_ssh_user}}"
   ansible.builtin.copy:
     force: yes
     src: blueishv2.omp.json
     dest: "{{ansible_env.HOME}}/.oh-my-zsh/custom/themes/blueishv2.omp.json"
     group: "{{ansible_ssh_user}}"
     owner: "{{ansible_ssh_user}}"
+    mode: 0644
+
+- name: Copy theme for root
+  become: true
+  ansible.builtin.copy:
+    force: yes
+    src: blueishv2.omp.json
+    dest: "/root/.oh-my-zsh/custom/themes/blueishv2.omp.json"
     mode: 0644
 
 - name: "Dos2unix"
