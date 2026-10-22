@@ -1,4 +1,7 @@
-ansible_ssh_user: "cloudmaster"
+# ansible_ssh_user_local is defined inf vars/local_secret.yml
+# This is the case if the master node is the local dev machine.
+# The local machine need a ssh key access for the user defined in /home/{{ansible_ssh_user_local}}/.ssh/authorized_keys
+ansible_ssh_user: "{{ ansible_ssh_user_local | default('cloudmaster', true) }}"
 ansible_ssh_private_key_file: "{{ inventory_dir }}/ssh/master01/master01_rsa"
 
 host_default_if : "ens37"

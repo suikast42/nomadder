@@ -67,7 +67,6 @@
 
 
 - name: "Template zshrc for {{ansible_ssh_user}}"
-  become: true
   template:
     force: yes
     src: .zshrc
