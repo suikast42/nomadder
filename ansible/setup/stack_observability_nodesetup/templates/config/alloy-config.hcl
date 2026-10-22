@@ -101,4 +101,22 @@ prometheus.relabel "job_to_hostname" {
     target_label = "instance"
     replacement = "{{host_name}}"
   }
+{% if is_devnode  %}
+  rule {
+    action       = "replace"
+    target_label = "env"
+    replacement  = "dev"
+  }
+{% endif  %}
 }
+
+{% if is_devnode  %}
+// on dev machine add wildfly monitoring
+prometheus.scrape "wildfly" {
+    job_name = "integrations/wildfly"
+    metrics_path = "/metrics"
+    targets = [{__address__ = "127.0.0.1:9990"}]
+    forward_to = [prometheus.relabel.job_to_hostname.receiver]
+    scrape_interval = "10s"
+}
+{% endif  %}

@@ -13,8 +13,8 @@ consul_checksum: "sha256:3020eea3fdfd939eb021ecaca105a1513af52b22e76f2ee97ea85ac
 uninstall_consul: "{{uninstall_all or false }}"
 update_consul: "{{update_all or false }}"
 
-consul_template_version: "0.43.0"
-consul_template_checksum: "sha256:aa49f009a708f3e3beea990aa29cfaecfe6925c0b17ca9201747e1469922264e"
+consul_template_version: "0.43.1"
+consul_template_checksum: "sha256:4f3afadcc6612abf55ae7c9c3328955bfeb43becffe15d2972acf0e0a194c339"
 update_consul_template: "{{update_all or false }}"
 uninstall_consul_template: "{{uninstall_all or false }}"
 
@@ -54,7 +54,7 @@ update_cli_wander: "{{update_all or false }}"
 version_cfssl: 1.7.1
 update_cfssl: "{{update_all or false }}"
 
-version_docker: "29.9.1"
+version_docker: "29.9.2"
 uninstall_docker: false
 
 # docker-compose is not used anymore use docker compose plugin instead
@@ -63,7 +63,7 @@ uninstall_docker: false
 
 update_certificates: false
 
-version_nexus: "3.97.0"
+version_nexus: "3.97.1"
 version_nexus_initlzr: "1.0.8"
 update_nexus: false
 
@@ -72,7 +72,7 @@ version_busy_box_init_container: "1.38.0"
 version_multi_stage_apline_container: "3.17.2"
 version_grafana_agent_container: "0.44.3"
 
-version_grafana_alloy: "1.21.0"
+version_grafana_alloy: "1.21.1"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version
