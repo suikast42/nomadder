@@ -19,17 +19,41 @@
 #        src: "{{core_deployment_dir}}/ingress.nomad"
 #      register: job
 
-- name: Create job
+- name: "Create job ingress"
+  async: 360
+  poll: 5
+  shell: nomad job run ingress.nomad
+  environment:
+    - NOMAD_ADDR: "https://localhost:4646"
+    - NOMAD_CACERT: "{{cluster_intermediate_ca_bundle}}"
+    - NOMAD_CLIENT_CERT: "{{nomad_cli_cert}}"
+    - NOMAD_CLIENT_KEY: "{{nomad_cli_cert_key}}"
+  args:
+    chdir: "{{core_deployment_dir}}"
+
+- name: Force job to start ingress
   community.general.nomad_job:
-    # host: "{{masters[0]}}"
     client_cert: "{{nomad_cli_cert}}"
     client_key: "{{nomad_cli_cert_key}}"
     host: localhost
     state: present
+    name: ingress
+    validate_certs: false
+    timeout: 360
     force_start: true
-    #        content: "{{ job.content | b64decode }}"
-#    content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/ingress.nomad') }}"
-    content: "{{ lookup('ansible.builtin.file', role_path ~ '/files/ingress.nomad') }}"
+
+#- name: Create job
+#  community.general.nomad_job:
+#    # host: "{{masters[0]}}"
+#    client_cert: "{{nomad_cli_cert}}"
+#    client_key: "{{nomad_cli_cert_key}}"
+#    host: localhost
+#    state: present
+#    force_start: true
+#    validate_certs: false
+#    #        content: "{{ job.content | b64decode }}"
+##    content: "{{ lookup('ansible.builtin.file', '{{role_path}}/files/ingress.nomad') }}"
+#    content: "{{ lookup('ansible.builtin.file', role_path ~ '/files/ingress.nomad') }}"
 
 
 

@@ -73,6 +73,7 @@
       host: localhost
       state: present
       name: observability
+      validate_certs: false
       timeout: 360
       force_start: true
 
