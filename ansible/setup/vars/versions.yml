@@ -27,7 +27,7 @@ nomad_checksum: "sha256:f6b0d555f65de7d81ef3274d7d7dfcad6ff24d6e6214a806deb5c50b
 uninstall_nomad: "{{uninstall_all or false }}"
 update_nomad: "{{update_all or false }}"
 
-version_envoy: 1.40.0
+version_envoy: 1.40.1
 
 nomad_plugin_cni_version: "1.9.1"
 nomad_plugin_cni_checksum: "sha256:b98f74a0f8522f0a83867178729c1aa70f2158f90c45a2ca8fa791db1c76b303"
@@ -63,7 +63,7 @@ uninstall_docker: false
 
 update_certificates: false
 
-version_nexus: "3.97.1"
+version_nexus: "3.97.2"
 version_nexus_initlzr: "1.0.8"
 update_nexus: false
 
@@ -72,7 +72,7 @@ version_busy_box_init_container: "1.38.0"
 version_multi_stage_apline_container: "3.17.2"
 version_grafana_agent_container: "0.44.3"
 
-version_grafana_alloy: "1.21.1"
+version_grafana_alloy: "1.21.2"
 
 uninstall_grafana_alloy : "{{uninstall_all or false }}"
 # Update is handled by grafana role specify only the new version
