@@ -4,8 +4,8 @@ uninstall_vault: "{{uninstall_all or false }}"
 update_vault: "{{update_all or false }}"
 
 
-consul_version: "2.0.3"
-consul_checksum: "sha256:3020eea3fdfd939eb021ecaca105a1513af52b22e76f2ee97ea85acc6ff2f832"
+consul_version: "2.1.0"
+consul_checksum: "sha256:a9c9cdf1ed93bd29a9671b02e5433131f3f777bab16c076fcef712a2820bfe33"
 # is blocked untril https://github.com/hashicorp/consul/issues/23923 is resolved
 # First try update an then clean installation
 #consul_version: "2.0.4"
@@ -34,8 +34,8 @@ nomad_plugin_cni_checksum: "sha256:b98f74a0f8522f0a83867178729c1aa70f2158f90c45a
 uninstall_nomad_plugin_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_cni: "{{update_all or false }}"
 
-nomad_plugin_consul_cni_version: "2.0.4"
-nomad_plugin_consul_cni_checksum: "sha256:4752049f9f03cb68bf027dab67dda620fa9612ee05ccbf2669dac7c24ecb7ed4"
+nomad_plugin_consul_cni_version: "2.1.0"
+nomad_plugin_consul_cni_checksum: "sha256:6de56571e420992958808c3a100392773d7daa3003efcd86dc35faed5261213e"
 uninstall_nomad_plugin_consul_cni: "{{uninstall_all or false }}"
 update_nomad_plugin_consul_cni: "{{update_all or false }}"
 
