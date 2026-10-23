@@ -1,11 +1,12 @@
 collections:
   - name: community.docker
-    version: "5.2.0"
+    version: "5.4.0"
     # Needs for rsync
   - name: ansible.posix
-    version: "2.2.0"
+    version: "2.2.2"
     # nomad_job
   - name: community.general
-    version: "13.0.1"
+    version: "13.5.0"
   - name: grafana.grafana
     version: "6.1.0"
+
