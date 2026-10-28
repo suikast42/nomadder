@@ -125,6 +125,9 @@ alias lc="colorls"
 source $(dirname $(gem which colorls))/tab_complete.sh
 eval "$(oh-my-posh init zsh --config ~/.oh-my-zsh/custom/themes/blueishv2.omp.json)"
 source $ZSH/oh-my-zsh.sh
+{% if is_devnode  %}
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+{% endif  %}
 enable_poshtransientprompt
 
 alias ls='colorls'
