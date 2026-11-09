@@ -107,7 +107,7 @@
           "powerline_symbol": "\uE0B0",
           "foreground": "#ffffff",
           "background": "#7FD5EA",
-          "template": " \uFCD1 {{ .Full }} "
+          "template": " \uE627 {{ .Full }} "
         },
         {
           "background": "#0077c2",
